@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package grpc;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_registration) = true;
+
+import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+
+import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
+import "github.com/elojah/trax/pkg/pbtypes/string.proto";
+
+service Admin {
+	// ### TECHNICAL ADMIN ###
+
+    // DB migrations
+    rpc MigrateUp(pbtypes.String) returns (pbtypes.Empty);
+
+	// Cookie secure management
+	rpc RotateCookieKeys(pbtypes.Empty) returns (pbtypes.Empty);
+
+	// Ping
+	rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
+
+	// ### WEB ADMIN ###
+}

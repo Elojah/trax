@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package cookie;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_registration) = true;
+
+import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+
+message Keys {
+    bytes Hash         = 1;
+    bytes Block        = 2;
+}

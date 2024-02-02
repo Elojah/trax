@@ -1,0 +1,14 @@
+steps:
+  # check  
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - '$PROJECT_ID/$REPO_NAME:${COMMIT_SHA}-check'
+      - '.'
+      - '-f'
+      - docker/check/Dockerfile
+      - --build-arg
+      - GITHUB_TOKEN=${_GITHUB_TOKEN}
+    id: check

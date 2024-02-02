@@ -1,2 +1,2 @@
 # trax
-Trading platform network (JS stack training)
+Trading platform network
