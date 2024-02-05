@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"github.com/elojah/redis"
 	"github.com/elojah/trax/pkg/cookie"
+	"github.com/elojah/trax/pkg/redis"
 )
 
 var _ cookie.CacheKeys = (*Cache)(nil)

@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/elojah/redis"
 	"github.com/elojah/trax/pkg/grpc"
 	"github.com/elojah/trax/pkg/postgres"
+	"github.com/elojah/trax/pkg/redis"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 

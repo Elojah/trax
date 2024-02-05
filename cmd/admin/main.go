@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	admingrpc "github.com/elojah/trax/internal/admin/grpc"
+	admingrpc "github.com/elojah/trax/cmd/admin/grpc"
 	"github.com/elojah/trax/pkg/cookie"
 	cookieapp "github.com/elojah/trax/pkg/cookie/app"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
