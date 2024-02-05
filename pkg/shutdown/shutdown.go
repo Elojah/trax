@@ -14,9 +14,9 @@ type Closer interface {
 	Close(context.Context) error
 }
 
-type closers []Closer
+type Closers []Closer
 
-func (cs closers) Close(ctx context.Context) error {
+func (cs Closers) Close(ctx context.Context) error {
 	var err error
 
 	for _, c := range cs {
@@ -28,7 +28,7 @@ func (cs closers) Close(ctx context.Context) error {
 	return err
 }
 
-func (cs closers) WaitSignal(ctx context.Context, to time.Duration) {
+func (cs Closers) WaitSignal(ctx context.Context, to time.Duration) {
 	// listen for signals
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
@@ -45,7 +45,7 @@ func (cs closers) WaitSignal(ctx context.Context, to time.Duration) {
 
 			defer cancel()
 
-			if err := closers(cs).Close(ctx); err != nil {
+			if err := cs.Close(ctx); err != nil {
 				fmt.Printf("error closing service: %s\n", err.Error())
 
 				return

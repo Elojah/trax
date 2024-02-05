@@ -7,15 +7,13 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	authgrpc "github.com/elojah/trax/cmd/auth/grpc"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	ghttp "github.com/elojah/trax/pkg/http"
 	glog "github.com/elojah/trax/pkg/log"
-	"github.com/hashicorp/go-multierror"
+	"github.com/elojah/trax/pkg/shutdown"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	_ "google.golang.org/grpc/encoding/gzip"
@@ -28,24 +26,6 @@ const (
 
 var version string
 
-type closer interface {
-	Close(context.Context) error
-}
-
-type closers []closer
-
-func (cs closers) Close(ctx context.Context) error {
-	var result *multierror.Error
-
-	for _, c := range cs {
-		if c != nil {
-			result = multierror.Append(result, c.Close(ctx))
-		}
-	}
-
-	return result.ErrorOrNil()
-}
-
 // run services.
 func run(prog string, filename string) {
 	ctx := context.Background()
@@ -53,7 +33,7 @@ func run(prog string, filename string) {
 	// no need for defer cancel
 	_ = cancel
 
-	var cs []closer
+	var cs shutdown.Closers
 
 	logs := glog.Service{}
 	if err := logs.Dial(ctx, glog.Config{}); err != nil {
@@ -118,30 +98,7 @@ func run(prog string, filename string) {
 	}()
 	log.Info().Msg("web_client up")
 
-	// listen for signals
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
-
-	for sig := range c {
-		switch sig {
-		case syscall.SIGHUP:
-			fallthrough
-		case syscall.SIGINT:
-			fallthrough
-		case syscall.SIGTERM:
-			if err := closers(cs).Close(ctx); err != nil {
-				fmt.Printf("error closing service: %s\n", err.Error())
-
-				return
-			}
-
-			cancel()
-
-			fmt.Println("successfully closed service")
-
-			return
-		}
-	}
+	cs.WaitSignal(ctx, initTO)
 }
 
 func main() {

@@ -1,3 +1,4 @@
+// source: github.com/elojah/trax/cmd/auth/grpc/auth.proto
 /**
  * @fileoverview
  * @enhanceable
@@ -12,7 +13,10 @@ var goog = jspb;
 var global = Function('return this')();
 
 var github_com_elojah_trax_pkg_gogoproto_gogo_pb = require('../../../../../../github.com/elojah/trax/pkg/gogoproto/gogo_pb.js');
+goog.object.extend(proto, github_com_elojah_trax_pkg_gogoproto_gogo_pb);
 var github_com_elojah_trax_pkg_pbtypes_empty_pb = require('../../../../../../github.com/elojah/trax/pkg/pbtypes/empty_pb.js');
+goog.object.extend(proto, github_com_elojah_trax_pkg_pbtypes_empty_pb);
 var github_com_elojah_trax_pkg_pbtypes_string_pb = require('../../../../../../github.com/elojah/trax/pkg/pbtypes/string_pb.js');
+goog.object.extend(proto, github_com_elojah_trax_pkg_pbtypes_string_pb);
 var github_com_elojah_trax_pkg_user_dto_user_pb = require('../../../../../../github.com/elojah/trax/pkg/user/dto/user_pb.js');
-goog.object.extend(exports, proto.grpc);
+goog.object.extend(proto, github_com_elojah_trax_pkg_user_dto_user_pb);

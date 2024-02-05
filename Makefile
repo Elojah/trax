@@ -97,10 +97,10 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/empty.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/string.proto
 	$(info $(M) generate domain…) @
-	# $Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/user/user.proto
 	$(info $(M) generate clients…) @
 	$(info $(M) generate dto…) @
-	# $Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/user.proto
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/user/dto/user.proto
 	$(info $(M) generate services…) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto
@@ -150,6 +150,16 @@ clean:
 	$Q rm -rf bin/$(PACKAGE)_$(WEB_CLIENT)*
 	$Q rm -rf bin/$(PACKAGE)_$(CLIENT)*
 	$Q rm -rf bin/$(CLIENT)/$(STATIC)
+
+# Clean protobuf generated files
+.PHONY: clean-proto
+clean-proto:
+	$(info $(M) cleaning protobuf generated files…) @
+	$Q find . -name "*_pb.d.ts" -type f -delete
+	$Q find . -name "*_pb.js" -type f -delete
+	$Q find . -name "*.pb.go" -type f -delete
+	$Q find . -name "*pb_test.go" -type f -delete
+	$Q find . -name "*ServiceClientPb.ts" -type f -delete
 
 ## Helpers
 

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package grpc;
+package user;
 
 option (gogoproto.testgen_all)  = true;
 option (gogoproto.benchgen_all) = true;
@@ -13,18 +13,15 @@ option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 
-import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
-import "github.com/elojah/trax/pkg/pbtypes/string.proto";
+message U {
+	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
-import "github.com/elojah/trax/pkg/user/dto/user.proto";
+	string Email           = 2;
+	string Password        = 3;
 
-service Auth {
-	// Signin Google
-	rpc SigninGoogle(pbtypes.String) returns (dto.SigninResp);
+	string TwitchID        = 4;
+	string GoogleID        = 5;
 
-	// Refresh token
-	rpc RefreshToken(pbtypes.String) returns (dto.SigninResp);
-
-    // Ping
-    rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
+	int64 CreatedAt        = 6;
+	int64 UpdatedAt        = 7;
 }

@@ -40,7 +40,7 @@ func run(prog string, filename string) {
 	// no need for defer cancel
 	_ = cancel
 
-	var cs []shutdown.Closer
+	var cs shutdown.Closers
 
 	logs := glog.Service{}
 	if err := logs.Dial(ctx, glog.Config{}); err != nil {

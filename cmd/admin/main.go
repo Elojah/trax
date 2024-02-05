@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	admingrpc "github.com/elojah/trax/internal/admin/grpc"
@@ -36,7 +34,7 @@ func run(prog string, filename string) {
 	// no need for defer cancel
 	_ = cancel
 
-	var cs []shutdown.Closer
+	var cs shutdown.Closers
 
 	logs := glog.Service{}
 	if err := logs.Dial(ctx, glog.Config{}); err != nil {
@@ -123,29 +121,7 @@ func run(prog string, filename string) {
 	log.Info().Msg("admin up")
 
 	// listen for signals
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
-
-	for sig := range c {
-		switch sig {
-		case syscall.SIGHUP:
-			fallthrough
-		case syscall.SIGINT:
-			fallthrough
-		case syscall.SIGTERM:
-			if err := closers(cs).Close(ctx); err != nil {
-				fmt.Printf("error closing service: %s\n", err.Error())
-
-				return
-			}
-
-			cancel()
-
-			fmt.Println("successfully closed service")
-
-			return
-		}
-	}
+	cs.WaitSignal(ctx, initTO)
 }
 
 func main() {
