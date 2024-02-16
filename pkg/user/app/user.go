@@ -72,7 +72,7 @@ func (a App) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
 	t, err := jwt.ParseWithClaims(ck, &user.Claims{}, func(t *jwt.Token) (any, error) {
 		claims, ok := t.Claims.(*user.Claims)
 		if !ok {
-			return user.Claims{}, errors.ErrInvalidClaims{}
+			return user.Claims{}, user.ErrInvalidClaims{}
 		}
 
 		secret, err := a.Cookie.Decode(ctx, "jwt_secret", claims.RegisteredClaims.ID)
@@ -89,11 +89,11 @@ func (a App) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
 	// check token validity
 	claims, ok := t.Claims.(*user.Claims)
 	if !ok {
-		return user.Claims{}, errors.ErrInvalidClaims{}
+		return user.Claims{}, user.ErrInvalidClaims{}
 	}
 
 	if err := claims.Valid(); err != nil {
-		return user.Claims{}, errors.ErrInvalidClaims{Err: err}
+		return user.Claims{}, user.ErrInvalidClaims{Err: err}
 	}
 
 	return *claims, nil
@@ -129,7 +129,7 @@ func (a App) Auth(ctx context.Context, audience string) (user.U, error) {
 
 	id, err := ulid.Parse(claims.Subject)
 	if err != nil {
-		return user.U{}, errors.ErrInvalidClaims{Err: err}
+		return user.U{}, user.ErrInvalidClaims{Err: err}
 	}
 
 	return user.U{

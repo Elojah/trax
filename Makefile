@@ -32,9 +32,9 @@ STATIC            = static
 GEN_PARENT_PATH    = $(GOPATH)/src
 PROTOC_GEN_TS      = $(DIR)/cmd/$(CLIENT)/node_modules/.bin/protoc-gen-ts
 GEN_PB_GO          = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=$(GEN_PARENT_PATH)
-GEN_PB_TS          = protoc -I=$(GEN_PARENT_PATH) -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
-GEN_PB_SERVICE_GO  = protoc -I=$(GEN_PARENT_PATH) -I=$(GEN_PARENT_PATH) --gogoslick_out=plugins=grpc:$(GEN_PARENT_PATH)
-GEN_PB_SERVICE_TS  = protoc -I=$(GEN_PARENT_PATH) -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
+GEN_PB_TS          = protoc -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
+GEN_PB_SERVICE_GO  = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=plugins=grpc:$(GEN_PARENT_PATH)
+GEN_PB_SERVICE_TS  = protoc -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
 
 .PHONY: all
 all: admin api auth client web_client
@@ -47,7 +47,7 @@ admin:  ## Build admin binary
 		-tags release \
 		-ldflags '-X main.version=$(VERSION)' \
 		-o ../../bin/$(PACKAGE)_$(ADMIN)_$(VERSION)
-	$Q cp bin/$(PACKAGE)_$(ADMIN)_$(VERSION) bin/$(PACKAGE)_$(API)
+	$Q cp bin/$(PACKAGE)_$(ADMIN)_$(VERSION) bin/$(PACKAGE)_$(ADMIN)
 
 .PHONY: api
 api:  ## Build api binary
@@ -98,6 +98,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/string.proto
 	$(info $(M) generate domain…) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/user/user.proto
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/cookie/keys.proto
 	$(info $(M) generate clients…) @
 	$(info $(M) generate dto…) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/user/dto/user.proto
@@ -105,6 +106,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(AUTH)/grpc/$(AUTH).proto
+	$Q $(GEN_PB_SERVICE_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
 	$Q $(GEN_PB_SERVICE_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto
 	$Q $(GEN_PB_SERVICE_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(AUTH)/grpc/$(AUTH).proto
 

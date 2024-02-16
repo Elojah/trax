@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/elojah/trax/pkg/cookie"
-	"github.com/elojah/trax/pkg/errors"
 	"github.com/gorilla/securecookie"
 )
 
@@ -43,7 +42,7 @@ func (a A) Encode(ctx context.Context, key string, value string) (string, error)
 	}
 
 	if len(ks) == 0 {
-		return "", errors.ErrMissingSecureKeys{}
+		return "", cookie.ErrMissingSecureKeys{}
 	}
 
 	ck, err := securecookie.New(

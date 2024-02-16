@@ -4,11 +4,15 @@
 package grpc
 
 import (
+	context "context"
 	fmt "fmt"
 	_ "github.com/elojah/trax/pkg/gogoproto"
-	_ "github.com/elojah/trax/pkg/pbtypes"
+	pbtypes "github.com/elojah/trax/pkg/pbtypes"
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -51,4 +55,162 @@ var fileDescriptor_7a310f739c32c4bd = []byte{
 	0x84, 0xd7, 0x88, 0x64, 0x15, 0x11, 0x1e, 0x5a, 0x24, 0xf3, 0x16, 0xa1, 0x69, 0x91, 0x2c, 0x5b,
 	0x24, 0xd9, 0xff, 0xfe, 0xc8, 0xfd, 0xf7, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7a, 0xd4, 0xd7, 0x93,
 	0xb1, 0x01, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// AdminClient is the client API for Admin service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type AdminClient interface {
+	// DB migrations
+	MigrateUp(ctx context.Context, in *pbtypes.String, opts ...grpc.CallOption) (*pbtypes.Empty, error)
+	// Cookie secure management
+	RotateCookieKeys(ctx context.Context, in *pbtypes.Empty, opts ...grpc.CallOption) (*pbtypes.Empty, error)
+	// Ping
+	Ping(ctx context.Context, in *pbtypes.Empty, opts ...grpc.CallOption) (*pbtypes.Empty, error)
+}
+
+type adminClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewAdminClient(cc *grpc.ClientConn) AdminClient {
+	return &adminClient{cc}
+}
+
+func (c *adminClient) MigrateUp(ctx context.Context, in *pbtypes.String, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+	out := new(pbtypes.Empty)
+	err := c.cc.Invoke(ctx, "/grpc.Admin/MigrateUp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminClient) RotateCookieKeys(ctx context.Context, in *pbtypes.Empty, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+	out := new(pbtypes.Empty)
+	err := c.cc.Invoke(ctx, "/grpc.Admin/RotateCookieKeys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminClient) Ping(ctx context.Context, in *pbtypes.Empty, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+	out := new(pbtypes.Empty)
+	err := c.cc.Invoke(ctx, "/grpc.Admin/Ping", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AdminServer is the server API for Admin service.
+type AdminServer interface {
+	// DB migrations
+	MigrateUp(context.Context, *pbtypes.String) (*pbtypes.Empty, error)
+	// Cookie secure management
+	RotateCookieKeys(context.Context, *pbtypes.Empty) (*pbtypes.Empty, error)
+	// Ping
+	Ping(context.Context, *pbtypes.Empty) (*pbtypes.Empty, error)
+}
+
+// UnimplementedAdminServer can be embedded to have forward compatible implementations.
+type UnimplementedAdminServer struct {
+}
+
+func (*UnimplementedAdminServer) MigrateUp(ctx context.Context, req *pbtypes.String) (*pbtypes.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MigrateUp not implemented")
+}
+func (*UnimplementedAdminServer) RotateCookieKeys(ctx context.Context, req *pbtypes.Empty) (*pbtypes.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RotateCookieKeys not implemented")
+}
+func (*UnimplementedAdminServer) Ping(ctx context.Context, req *pbtypes.Empty) (*pbtypes.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+
+func RegisterAdminServer(s *grpc.Server, srv AdminServer) {
+	s.RegisterService(&_Admin_serviceDesc, srv)
+}
+
+func _Admin_MigrateUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(pbtypes.String)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).MigrateUp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.Admin/MigrateUp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).MigrateUp(ctx, req.(*pbtypes.String))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Admin_RotateCookieKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(pbtypes.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).RotateCookieKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.Admin/RotateCookieKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).RotateCookieKeys(ctx, req.(*pbtypes.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Admin_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(pbtypes.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).Ping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.Admin/Ping",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).Ping(ctx, req.(*pbtypes.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Admin_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "grpc.Admin",
+	HandlerType: (*AdminServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "MigrateUp",
+			Handler:    _Admin_MigrateUp_Handler,
+		},
+		{
+			MethodName: "RotateCookieKeys",
+			Handler:    _Admin_RotateCookieKeys_Handler,
+		},
+		{
+			MethodName: "Ping",
+			Handler:    _Admin_Ping_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "github.com/elojah/trax/cmd/admin/grpc/admin.proto",
 }

@@ -89,7 +89,7 @@ func run(prog string, filename string) {
 	}
 
 	migrateApp := &migrateapp.App{
-		Service: &postgress,
+		// Service: &postgress,
 	}
 
 	h := handler{
