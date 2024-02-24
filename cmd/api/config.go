@@ -6,8 +6,8 @@ import (
 	"github.com/elojah/trax/pkg/grpc"
 	"github.com/elojah/trax/pkg/grpcweb"
 	"github.com/elojah/trax/pkg/http"
+	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/redis"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 

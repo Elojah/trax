@@ -8,6 +8,12 @@ import (
 	"os"
 	"time"
 
+	userapp "github.com/elojah/trax/internal/user/app"
+	userpostgres "github.com/elojah/trax/internal/user/postgres"
+
+	// userredis "github.com/elojah/trax/internal/user/redis"
+
+	apigrpc "github.com/elojah/trax/cmd/api/grpc"
 	cookieapp "github.com/elojah/trax/pkg/cookie/app"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
@@ -17,8 +23,6 @@ import (
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
-	userapp "github.com/elojah/trax/pkg/user/app"
-	userpostgres "github.com/elojah/trax/pkg/user/postgres"
 	"github.com/rs/zerolog/log"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/reflection"
@@ -95,16 +99,15 @@ func run(prog string, filename string) {
 
 	cs = append(cs, &https)
 
-	userStore := &userpostgres.Store{Service: postgress}
-	userCache := &userredis.Cache{Service: rediss}
+	userStore := &userpostgres.Store{Service: &postgress}
+	// userCache := &userredis.Cache{Service: rediss}
 	userApp := userapp.App{
-		Store:        userStore,
-		StoreSession: userStore,
-		CacheSession: userCache,
-		Cookie:       cookieApp,
+		Store: userStore,
+		// Cache: userCache,
+		Cookie: cookieApp,
 	}
 
-	if err := userApp.Dial(ctx, cfg.Session); err != nil {
+	if err := userApp.Dial(ctx); err != nil {
 		log.Error().Err(err).Msg("failed to dial user application")
 
 		return

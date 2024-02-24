@@ -18,5 +18,5 @@ var github_com_elojah_trax_pkg_pbtypes_empty_pb = require('../../../../../../git
 goog.object.extend(proto, github_com_elojah_trax_pkg_pbtypes_empty_pb);
 var github_com_elojah_trax_pkg_pbtypes_string_pb = require('../../../../../../github.com/elojah/trax/pkg/pbtypes/string_pb.js');
 goog.object.extend(proto, github_com_elojah_trax_pkg_pbtypes_string_pb);
-var github_com_elojah_trax_pkg_user_dto_user_pb = require('../../../../../../github.com/elojah/trax/pkg/user/dto/user_pb.js');
-goog.object.extend(proto, github_com_elojah_trax_pkg_user_dto_user_pb);
+var github_com_elojah_trax_internal_user_dto_user_pb = require('../../../../../../github.com/elojah/trax/internal/user/dto/user_pb.js');
+goog.object.extend(proto, github_com_elojah_trax_internal_user_dto_user_pb);

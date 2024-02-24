@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package user;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_registration) = true;
+
+import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+
+message U {
+	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+
+	string Email           = 2;
+	string Password        = 3;
+
+	string TwitchID        = 4;
+	string GoogleID        = 5;
+
+	int64 CreatedAt        = 6;
+	int64 UpdatedAt        = 7;
+}

@@ -16,7 +16,7 @@ import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
 import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 
-import "github.com/elojah/trax/pkg/user/dto/user.proto";
+import "github.com/elojah/trax/internal/user/dto/user.proto";
 
 service Auth {
 	// Signin Google

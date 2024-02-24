@@ -96,12 +96,15 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/gogoproto/gogo.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/empty.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/string.proto
-	$(info $(M) generate domain…) @
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/user/user.proto
+	$(info $(M) generate pkg…) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/cookie/keys.proto
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/twitch/follow.proto
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/twitch/user.proto
+	$(info $(M) generate internal…) @
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto
 	$(info $(M) generate clients…) @
 	$(info $(M) generate dto…) @
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/user/dto/user.proto
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/user.proto
 	$(info $(M) generate services…) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto

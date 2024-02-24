@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/twitch"
 )
 
@@ -56,7 +55,7 @@ func (c Client) GetUsers(
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= http.StatusBadRequest {
-		return errors.ErrInvalidStatus{Status: resp.Status}
+		return twitch.ErrInvalidStatus{Status: resp.Status}
 	}
 
 	var result struct {

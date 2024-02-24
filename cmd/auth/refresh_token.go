@@ -6,7 +6,7 @@ import (
 
 	gerrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/pbtypes"
-	"github.com/elojah/trax/pkg/user/dto"
+	"github.com/elojah/trax/internal/user/dto"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

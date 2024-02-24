@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/elojah/trax/pkg/google"
 	"github.com/elojah/trax/pkg/twitch"
-	"github.com/elojah/trax/pkg/user"
+	"github.com/elojah/trax/internal/user"
 )
 
 type handler struct {

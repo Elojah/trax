@@ -17,7 +17,7 @@
 
 import * as grpcWeb from 'grpc-web';
 
-import * as github_com_elojah_trax_pkg_user_dto_user_pb from '../../../../../../github.com/elojah/trax/pkg/user/dto/user_pb';
+import * as github_com_elojah_trax_internal_user_dto_user_pb from '../../../../../../github.com/elojah/trax/internal/user/dto/user_pb';
 import * as github_com_elojah_trax_pkg_pbtypes_empty_pb from '../../../../../../github.com/elojah/trax/pkg/pbtypes/empty_pb';
 import * as github_com_elojah_trax_pkg_pbtypes_string_pb from '../../../../../../github.com/elojah/trax/pkg/pbtypes/string_pb';
 
@@ -45,28 +45,28 @@ export class AuthClient {
     '/grpc.Auth/SigninGoogle',
     grpcWeb.MethodType.UNARY,
     github_com_elojah_trax_pkg_pbtypes_string_pb.String,
-    github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp,
+    github_com_elojah_trax_internal_user_dto_user_pb.SigninResp,
     (request: github_com_elojah_trax_pkg_pbtypes_string_pb.String) => {
       return request.serializeBinary();
     },
-    github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp.deserializeBinary
+    github_com_elojah_trax_internal_user_dto_user_pb.SigninResp.deserializeBinary
   );
 
   signinGoogle(
     request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
-    metadata: grpcWeb.Metadata | null): Promise<github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp>;
+    metadata: grpcWeb.Metadata | null): Promise<github_com_elojah_trax_internal_user_dto_user_pb.SigninResp>;
 
   signinGoogle(
     request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
-               response: github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp) => void): grpcWeb.ClientReadableStream<github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp>;
+               response: github_com_elojah_trax_internal_user_dto_user_pb.SigninResp) => void): grpcWeb.ClientReadableStream<github_com_elojah_trax_internal_user_dto_user_pb.SigninResp>;
 
   signinGoogle(
     request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
-               response: github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp) => void) {
+               response: github_com_elojah_trax_internal_user_dto_user_pb.SigninResp) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -88,28 +88,28 @@ export class AuthClient {
     '/grpc.Auth/RefreshToken',
     grpcWeb.MethodType.UNARY,
     github_com_elojah_trax_pkg_pbtypes_string_pb.String,
-    github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp,
+    github_com_elojah_trax_internal_user_dto_user_pb.SigninResp,
     (request: github_com_elojah_trax_pkg_pbtypes_string_pb.String) => {
       return request.serializeBinary();
     },
-    github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp.deserializeBinary
+    github_com_elojah_trax_internal_user_dto_user_pb.SigninResp.deserializeBinary
   );
 
   refreshToken(
     request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
-    metadata: grpcWeb.Metadata | null): Promise<github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp>;
+    metadata: grpcWeb.Metadata | null): Promise<github_com_elojah_trax_internal_user_dto_user_pb.SigninResp>;
 
   refreshToken(
     request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
-               response: github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp) => void): grpcWeb.ClientReadableStream<github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp>;
+               response: github_com_elojah_trax_internal_user_dto_user_pb.SigninResp) => void): grpcWeb.ClientReadableStream<github_com_elojah_trax_internal_user_dto_user_pb.SigninResp>;
 
   refreshToken(
     request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
-               response: github_com_elojah_trax_pkg_user_dto_user_pb.SigninResp) => void) {
+               response: github_com_elojah_trax_internal_user_dto_user_pb.SigninResp) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +

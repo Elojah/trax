@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/twitch"
 )
 
@@ -67,7 +66,7 @@ func (c Client) GetFollows(
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= http.StatusBadRequest {
-		return twitch.Cursor{}, errors.ErrInvalidStatus{Status: resp.Status}
+		return twitch.Cursor{}, twitch.ErrInvalidStatus{Status: resp.Status}
 	}
 
 	var result struct {

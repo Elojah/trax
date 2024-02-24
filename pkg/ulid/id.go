@@ -17,6 +17,28 @@ const (
 // ID is an alias of ulid.ULID.
 type ID []byte
 
+type IDs []ID
+
+func (ids IDs) String() []string {
+	result := make([]string, len(ids))
+
+	for i, id := range ids {
+		result[i] = id.String()
+	}
+
+	return result
+}
+
+func (ids IDs) Any() []any {
+	result := make([]any, len(ids))
+
+	for i, id := range ids {
+		result[i] = id
+	}
+
+	return result
+}
+
 var zero = make(ID, length)
 
 // NewID returns a new random ID.

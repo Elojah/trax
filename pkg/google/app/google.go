@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 
-	"github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/google"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/idtoken"
@@ -41,13 +40,13 @@ func (a App) Signin(ctx context.Context, token string) (string, error) {
 	// #Retrieve Google ID
 	subI, ok := p.Claims["sub"]
 	if !ok {
-		err := errors.ErrInvalidClaim{Claim: "not found"}
+		err := google.ErrInvalidClaim{Claim: "claim not found"}
 		return "", err
 	}
 
 	sub, ok := subI.(string)
 	if !ok {
-		err := errors.ErrInvalidClaim{Claim: "invalid format"}
+		err := google.ErrInvalidClaim{Claim: "invalid claim format"}
 		return "", err
 	}
 
