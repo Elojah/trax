@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/gob"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,12 +9,15 @@ import (
 	"time"
 
 	authgrpc "github.com/elojah/trax/cmd/auth/grpc"
+	cookieapp "github.com/elojah/trax/pkg/cookie/app"
+	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	ghttp "github.com/elojah/trax/pkg/http"
 	glog "github.com/elojah/trax/pkg/log"
+	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
+	"github.com/hashicorp/go-multierror"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/oauth2"
 	_ "google.golang.org/grpc/encoding/gzip"
 )
 
@@ -25,6 +27,24 @@ const (
 )
 
 var version string
+
+type closer interface {
+	Close(context.Context) error
+}
+
+type closers []closer
+
+func (cs closers) Close(ctx context.Context) error {
+	var result *multierror.Error
+
+	for _, c := range cs {
+		if c != nil {
+			result = multierror.Append(result, c.Close(ctx))
+		}
+	}
+
+	return result.ErrorOrNil()
+}
 
 // run services.
 func run(prog string, filename string) {
@@ -65,6 +85,21 @@ func run(prog string, filename string) {
 
 	cs = append(cs, &https)
 
+	// init redis storage
+	rediss := redis.Service{}
+	if err := rediss.Dial(ctx, cfg.Redis); err != nil {
+		log.Error().Err(err).Msg("failed to dial redis")
+
+		return
+	}
+
+	cs = append(cs, &rediss)
+
+	cookieCache := &cookieredis.Cache{Service: rediss}
+	cookieApp := &cookieapp.A{
+		CacheKeys: cookieCache,
+	}
+
 	authclient := ggrpc.Client{}
 	if err := authclient.Dial(ctx, cfg.AuthClient); err != nil {
 		log.Error().Err(err).Msg("failed to dial auth")
@@ -75,16 +110,16 @@ func run(prog string, filename string) {
 	cs = append(cs, &authclient)
 
 	h := handler{
+		cookie:     cookieApp,
 		AuthClient: authgrpc.NewAuthClient(authclient.ClientConn),
 	}
 
-	_ = h
-
-	// Serve static dir
+	// auth
+	https.Router.Path("/signin_google").HandlerFunc(h.signinGoogle)
+	https.Router.Path("/signin_twitch").HandlerFunc(h.signinTwitch)
+	https.Router.Path("/refresh_token").HandlerFunc(h.refreshToken)
+	// serve static dir
 	https.Router.PathPrefix("/").Handler(http.FileServer(http.Dir(cfg.Web.Static)))
-
-	// Register for cookie session
-	gob.Register(oauth2.Token{})
 
 	// serve http web
 	go func() {
@@ -96,7 +131,7 @@ func run(prog string, filename string) {
 			}
 		}
 	}()
-	log.Info().Msg("web_client up")
+	log.Info().Msg("web client up")
 
 	cs.WaitSignal(ctx, initTO)
 }

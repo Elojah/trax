@@ -5,6 +5,7 @@ import (
 
 	"github.com/elojah/trax/pkg/grpc"
 	"github.com/elojah/trax/pkg/http"
+	"github.com/elojah/trax/pkg/redis"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -15,6 +16,7 @@ type web struct {
 type config struct {
 	HTTP       http.Config       `json:"http"`
 	Web        web               `json:"web"`
+	Redis      redis.Config      `json:"redis"`
 	AuthClient grpc.ConfigClient `json:"auth_client"`
 }
 

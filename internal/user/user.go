@@ -22,14 +22,11 @@ type Filter struct {
 
 	GoogleID *string
 	TwitchID *string
-
-	State []byte
-	Size  int
 }
 
 type Store interface {
 	Insert(context.Context, U) error
 	Fetch(context.Context, Filter) (U, error)
-	FetchMany(context.Context, Filter) ([]U, []byte, error)
+	FetchMany(context.Context, Filter) ([]U, error)
 	Delete(context.Context, Filter) error
 }

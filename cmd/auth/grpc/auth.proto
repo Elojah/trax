@@ -22,6 +22,9 @@ service Auth {
 	// Signin Google
 	rpc SigninGoogle(pbtypes.String) returns (dto.SigninResp);
 
+	// Signin Twitch
+    rpc SigninTwitch(pbtypes.String) returns (dto.SigninResp);
+
 	// Refresh token
 	rpc RefreshToken(pbtypes.String) returns (dto.SigninResp);
 

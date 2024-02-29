@@ -81,12 +81,14 @@ func (f filter) index() string {
 }
 
 func (s Store) Insert(ctx context.Context, u user.U) error {
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO main.user (id, email, password, google_id, twitch_id, created_at, updated_at) VALUES (`)
+	b.WriteString(postgres.Array(1, 7))
+	b.WriteString(`)`)
+
 	_, err := s.Service.DB.ExecContext(
 		ctx,
-		fmt.Sprintf(
-			`INSERT INTO main.user (id, email, password, google_id, twitch_id, created_at, updated_at) VALUES (%s)`,
-			postgres.Array(1, 7),
-		),
+		b.String(),
 		u.ID, u.Email, u.Password, u.GoogleID, u.TwitchID, u.CreatedAt, u.UpdatedAt,
 	)
 
@@ -114,44 +116,30 @@ func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 	return u, nil
 }
 
-func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, []byte, error) {
-	if f.Size <= 0 {
-		return nil, nil, nil
-	}
-
+func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
 	b := strings.Builder{}
 	b.WriteString(`SELECT id, email, password, google_id, twitch_id, created_at, updated_at FROM main.user `)
 
 	clause, args := filter(f).where()
 	b.WriteString(clause)
 
-	iter := s.Service.DB.QueryContext(ctx, b.String(), args...)
+	rows, err := s.Service.DB.QueryContext(ctx, b.String(), args...)
+	if err != nil {
+		return nil, err
+	}
 
-	defer iter.Close()
+	var users []user.U
 
-	state := iter.PageState()
-
-	scanner := iter.Scanner()
-
-	users := make([]user.U, f.Size)
-
-	var i int
-
-	for ; scanner.Next(); i++ {
-		if err := scanner.Scan(
-			&users[i].ID,
-			&users[i].GoogleID,
-			&users[i].TwitchID,
-		); err != nil {
-			return nil, nil, err
+	for rows.Next() {
+		var u user.U
+		if err := rows.Scan(&u.ID, &u.Email, &u.Password, &u.GoogleID, &u.TwitchID, &u.CreatedAt, &u.UpdatedAt); err != nil {
+			return nil, err
 		}
+
+		users = append(users, u)
 	}
 
-	if err := scanner.Err(); err != nil {
-		return nil, nil, err
-	}
-
-	return users[:i], state, nil
+	return users, nil
 }
 
 func (s Store) Delete(ctx context.Context, f user.Filter) error {
@@ -161,13 +149,10 @@ func (s Store) Delete(ctx context.Context, f user.Filter) error {
 	clause, args := filter(f).where()
 	b.WriteString(clause)
 
-	q := s.Session.Query(b.String(), args...).WithContext(ctx)
-
-	defer q.Release()
-
-	if err := q.Exec(); err != nil {
+	_, err := s.Service.DB.ExecContext(ctx, b.String(), args...)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	return err
 }

@@ -15,3 +15,14 @@ services:
       - 5432
     ports:
       - 5432:5432
+
+  # Redis
+  redis:
+    build: docker/redis
+    container_name: trax_redis
+    volumes:
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    expose:
+      - 6379
+    ports:
+      - 6379:6379

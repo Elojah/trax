@@ -84,6 +84,49 @@ export class AuthClient {
     this.methodDescriptorSigninGoogle);
   }
 
+  methodDescriptorSigninTwitch = new grpcWeb.MethodDescriptor(
+    '/grpc.Auth/SigninTwitch',
+    grpcWeb.MethodType.UNARY,
+    github_com_elojah_trax_pkg_pbtypes_string_pb.String,
+    github_com_elojah_trax_internal_user_dto_user_pb.SigninResp,
+    (request: github_com_elojah_trax_pkg_pbtypes_string_pb.String) => {
+      return request.serializeBinary();
+    },
+    github_com_elojah_trax_internal_user_dto_user_pb.SigninResp.deserializeBinary
+  );
+
+  signinTwitch(
+    request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
+    metadata: grpcWeb.Metadata | null): Promise<github_com_elojah_trax_internal_user_dto_user_pb.SigninResp>;
+
+  signinTwitch(
+    request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: github_com_elojah_trax_internal_user_dto_user_pb.SigninResp) => void): grpcWeb.ClientReadableStream<github_com_elojah_trax_internal_user_dto_user_pb.SigninResp>;
+
+  signinTwitch(
+    request: github_com_elojah_trax_pkg_pbtypes_string_pb.String,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: github_com_elojah_trax_internal_user_dto_user_pb.SigninResp) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/grpc.Auth/SigninTwitch',
+        request,
+        metadata || {},
+        this.methodDescriptorSigninTwitch,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/grpc.Auth/SigninTwitch',
+    request,
+    metadata || {},
+    this.methodDescriptorSigninTwitch);
+  }
+
   methodDescriptorRefreshToken = new grpcWeb.MethodDescriptor(
     '/grpc.Auth/RefreshToken',
     grpcWeb.MethodType.UNARY,
