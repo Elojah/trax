@@ -32,9 +32,9 @@ STATIC            = static
 GEN_PARENT_PATH    = $(GOPATH)/src
 PROTOC_GEN_TS      = $(DIR)/cmd/$(CLIENT)/node_modules/.bin/protoc-gen-ts
 GEN_PB_GO          = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=$(GEN_PARENT_PATH)
-GEN_PB_TS          = protoc -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
+GEN_PB_TS          = protoc -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs+dts,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
 GEN_PB_SERVICE_GO  = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=plugins=grpc:$(GEN_PARENT_PATH)
-GEN_PB_SERVICE_TS  = protoc -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
+GEN_PB_SERVICE_TS  = protoc -I=$(GEN_PARENT_PATH) --js_out=import_style=commonjs+dts,binary:$(GEN_PARENT_PATH) --grpc-web_out=import_style=typescript,mode=grpcweb:$(GEN_PARENT_PATH)
 
 .PHONY: all
 all: admin api auth client web_client

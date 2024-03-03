@@ -18,6 +18,7 @@
 import * as grpcWeb from 'grpc-web';
 
 import * as github_com_elojah_trax_pkg_pbtypes_empty_pb from '../../../../../../github.com/elojah/trax/pkg/pbtypes/empty_pb';
+import * as github_com_elojah_trax_internal_user_user_pb from '../../../../../../github.com/elojah/trax/internal/user/user_pb';
 
 
 export class APIClient {
@@ -80,6 +81,49 @@ export class APIClient {
     request,
     metadata || {},
     this.methodDescriptorPing);
+  }
+
+  methodDescriptorFetchProfile = new grpcWeb.MethodDescriptor(
+    '/grpc.API/FetchProfile',
+    grpcWeb.MethodType.UNARY,
+    github_com_elojah_trax_pkg_pbtypes_empty_pb.Empty,
+    github_com_elojah_trax_internal_user_user_pb.Profile,
+    (request: github_com_elojah_trax_pkg_pbtypes_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    github_com_elojah_trax_internal_user_user_pb.Profile.deserializeBinary
+  );
+
+  fetchProfile(
+    request: github_com_elojah_trax_pkg_pbtypes_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<github_com_elojah_trax_internal_user_user_pb.Profile>;
+
+  fetchProfile(
+    request: github_com_elojah_trax_pkg_pbtypes_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: github_com_elojah_trax_internal_user_user_pb.Profile) => void): grpcWeb.ClientReadableStream<github_com_elojah_trax_internal_user_user_pb.Profile>;
+
+  fetchProfile(
+    request: github_com_elojah_trax_pkg_pbtypes_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: github_com_elojah_trax_internal_user_user_pb.Profile) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/grpc.API/FetchProfile',
+        request,
+        metadata || {},
+        this.methodDescriptorFetchProfile,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/grpc.API/FetchProfile',
+    request,
+    metadata || {},
+    this.methodDescriptorFetchProfile);
   }
 
 }

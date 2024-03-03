@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/pkg/cookie"
 	"github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/ulid"
-	"github.com/elojah/trax/internal/user"
 	"github.com/golang-jwt/jwt/v4"
 	"google.golang.org/grpc/metadata"
 )
@@ -17,6 +17,7 @@ var _ user.App = (*App)(nil)
 
 type App struct {
 	user.Store
+	user.StoreProfile
 
 	Cookie cookie.App
 }

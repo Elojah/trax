@@ -11,9 +11,9 @@ import (
 	authgrpc "github.com/elojah/trax/cmd/auth/grpc"
 	cookieapp "github.com/elojah/trax/pkg/cookie/app"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
-	ggrpc "github.com/elojah/trax/pkg/grpc"
-	ghttp "github.com/elojah/trax/pkg/http"
-	glog "github.com/elojah/trax/pkg/log"
+	tgrpc "github.com/elojah/trax/pkg/grpc"
+	thttp "github.com/elojah/trax/pkg/http"
+	tlog "github.com/elojah/trax/pkg/log"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
 	"github.com/hashicorp/go-multierror"
@@ -55,8 +55,8 @@ func run(prog string, filename string) {
 
 	var cs shutdown.Closers
 
-	logs := glog.Service{}
-	if err := logs.Dial(ctx, glog.Config{}); err != nil {
+	logs := tlog.Service{}
+	if err := logs.Dial(ctx, tlog.Config{}); err != nil {
 		fmt.Println("failed to dial logger")
 
 		return
@@ -75,7 +75,7 @@ func run(prog string, filename string) {
 	}
 
 	// init http web server
-	https := ghttp.Service{}
+	https := thttp.Service{}
 
 	if err := https.Dial(ctx, cfg.HTTP); err != nil {
 		log.Error().Err(err).Msg("failed to dial http")
@@ -100,7 +100,7 @@ func run(prog string, filename string) {
 		CacheKeys: cookieCache,
 	}
 
-	authclient := ggrpc.Client{}
+	authclient := tgrpc.Client{}
 	if err := authclient.Dial(ctx, cfg.AuthClient); err != nil {
 		log.Error().Err(err).Msg("failed to dial auth")
 

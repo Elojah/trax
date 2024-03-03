@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS "user"."user" (
 	"created_at" TIMESTAMP NOT NULL,
 	"updated_at" TIMESTAMP NOT NULL,
 	PRIMARY KEY ("id"),
-	UNIQUE ("email")
+	UNIQUE ("email"),
+	UNIQUE ("google_id"),
+	UNIQUE ("twitch_id")
 );
 CREATE TABLE IF NOT EXISTS "user"."user_profile" (
 	"user_id" UUID NOT NULL,

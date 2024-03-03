@@ -12,7 +12,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@internal': fileURLToPath(new URL('./../../internal', import.meta.url)),
+      '@pkg': fileURLToPath(new URL('./../../pkg', import.meta.url)),
+      '@api': fileURLToPath(new URL('./../../cmd/api/grpc', import.meta.url)),
     }
-  }
+  },
 })

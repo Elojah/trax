@@ -1,5 +1,8 @@
 <script lang="ts">
+import { useAuthStore } from '@/stores/auth';
 import { defineComponent } from 'vue';
+
+const authStore = useAuthStore();
 
 export default defineComponent({
   data() {
@@ -11,6 +14,7 @@ export default defineComponent({
   methods: {
     signIn() {
       // Add your sign in logic here
+      authStore.signinGoogle(this.email!);
       console.log('Signing in...');
     }
   }

@@ -9,6 +9,7 @@ import (
 
 type App interface {
 	Store
+	StoreProfile
 
 	CreateJWT(context.Context, U, string, time.Duration) (string, error)
 	ReadJWT(context.Context, string) (Claims, error)
@@ -29,4 +30,16 @@ type Store interface {
 	Fetch(context.Context, Filter) (U, error)
 	FetchMany(context.Context, Filter) ([]U, error)
 	Delete(context.Context, Filter) error
+}
+
+type FilterProfile struct {
+	UserID  ulid.ID
+	UserIDs []ulid.ID
+}
+
+type StoreProfile interface {
+	InsertProfile(context.Context, Profile) error
+	FetchProfile(context.Context, FilterProfile) (Profile, error)
+	FetchManyProfile(context.Context, FilterProfile) ([]Profile, error)
+	DeleteProfile(context.Context, FilterProfile) error
 }

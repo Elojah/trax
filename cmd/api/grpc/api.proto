@@ -12,10 +12,14 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
-
 import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
+
+import "github.com/elojah/trax/internal/user/user.proto";
 
 service API {
     // Ping
     rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
+
+    // User
+    rpc FetchProfile(pbtypes.Empty) returns (user.Profile);
 }
