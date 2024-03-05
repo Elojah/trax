@@ -1,6 +1,6 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "../../cmd/api/grpc/*"],
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "../../pkg/**/*.ts", "../../internal/**/*.ts", "../../cmd/api/grpc/**/*.ts"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "composite": true,

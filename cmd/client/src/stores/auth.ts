@@ -1,9 +1,9 @@
 import router from '@/router';
 import { defineStore } from 'pinia';
-import {Profile} from '@internal/user/user_pb';
+import {Profile} from '@internal/user/user';
 import {config, logger} from "@/config"
 import {SignInError} from "@/errors"
-import {APIClient} from '@api/ApiServiceClientPb';
+import {APIClient} from '@api/api.client';
 import * as grpc from 'grpc-web';
 
 export const useAuthStore = defineStore({
