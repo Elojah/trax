@@ -14,6 +14,7 @@ if (!configData) {
 
 type Config = {
   web_client_url:string;
+  api_url:string;
 }
 
 export const config:Config = JSON.parse(configData);

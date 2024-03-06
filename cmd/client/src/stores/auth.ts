@@ -4,12 +4,13 @@ import {Profile} from '@internal/user/user';
 import {config, logger} from "@/config"
 import {SignInError} from "@/errors"
 import {APIClient} from '@api/api.client';
-import * as grpc from 'grpc-web';
+import { Empty } from '@pkg/pbtypes/empty';
 
 export const useAuthStore = defineStore({
     id: 'auth',
     state: () => ({
-        profile: null as Profile | null,
+      token: null as string | null,
+      profile: null as Profile | null,
     }),
     actions: {
       async signin(email:string, password:string) {
@@ -43,21 +44,8 @@ export const useAuthStore = defineStore({
         this.profile = await this.fetchProfile();
       },
       async fetchProfile(): Promise<Profile|null> {
-        const client = new APIClient('https://api.legacyfactory.com:8082', null)
-        const metadata: grpc.Metadata = {}//{ 'token': getCookie('access')! }
-
-        // const refreshRooms = () => {
-        //   const req = new ListRoomReq()
-        //   req.setSize(100)
-        //   setRooms({ rooms: [], loaded: false })
-        //   client.listRoomPublic(req, metadata).then((result) => {
-        //     console.log('found ', result.getRoomsList().length, ' rooms')
-
-        //     setRooms({ rooms: result.getRoomsList(), loaded: true })
-        //   }).catch((err) => {
-        //     console.log(err)
-        //   })
-        // }
+        const client = new APIClient(config.api_url)
+        const profile = await client.fetchProfile(Empty, {meta: {token: this.token}})
 
 
         return null

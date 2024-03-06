@@ -16,6 +16,8 @@ export default defineConfig({
       '@internal': fileURLToPath(new URL('./../../internal', import.meta.url)),
       '@pkg': fileURLToPath(new URL('./../../pkg', import.meta.url)),
       '@api': fileURLToPath(new URL('./../../cmd/api/grpc', import.meta.url)),
+      // imports from external files
+      '@protobuf-ts': fileURLToPath(new URL('./node_modules/@protobuf-ts', import.meta.url)),
     }
-  },
+  }
 })

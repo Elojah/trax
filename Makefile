@@ -30,10 +30,8 @@ CLIENT            = client
 STATIC            = static
 
 GEN_PARENT_PATH    = $(GOPATH)/src
-GEN_PB_GO          = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=$(GEN_PARENT_PATH)
-GEN_PB_TS          = npx protoc -I=$(GEN_PARENT_PATH) --ts_opt optimize_code_size --ts_out $(GEN_PARENT_PATH)
-GEN_PB_SERVICE_GO  = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=plugins=grpc:$(GEN_PARENT_PATH)
-GEN_PB_SERVICE_TS  = npx protoc -I=$(GEN_PARENT_PATH) --ts_opt optimize_code_size --ts_out $(GEN_PARENT_PATH)
+GEN_PB_GO          = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=plugins=grpc:$(GEN_PARENT_PATH)
+GEN_PB_TS          = npx protoc -I=$(GEN_PARENT_PATH) --ts_opt optimize_speed --ts_out $(GEN_PARENT_PATH)
 
 .PHONY: all
 all: admin api auth client web_client
@@ -108,9 +106,6 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(AUTH)/grpc/$(AUTH).proto
-	$Q $(GEN_PB_SERVICE_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
-	$Q $(GEN_PB_SERVICE_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto
-	$Q $(GEN_PB_SERVICE_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(AUTH)/grpc/$(AUTH).proto
 
 # Proto
 .PHONY: proto
