@@ -2,9 +2,15 @@
 import { useAuthStore } from '@/stores/auth';
 import { defineComponent } from 'vue';
 
-const authStore = useAuthStore();
 
 export default defineComponent({
+  setup() {
+    const authStore = useAuthStore();
+
+    return {
+      authStore
+    };
+  },
   data() {
     return {
       email: null as string | null,
@@ -14,7 +20,7 @@ export default defineComponent({
   methods: {
     signIn() {
       // Add your sign in logic here
-      authStore.signinGoogle(this.email!);
+      this.authStore.signinGoogle(this.email!);
       console.log('Signing in...');
     }
   }
