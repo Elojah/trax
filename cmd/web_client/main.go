@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	authgrpc "github.com/elojah/trax/cmd/auth/grpc"
@@ -118,8 +119,17 @@ func run(prog string, filename string) {
 	https.Router.Path("/signin_google").HandlerFunc(h.signinGoogle)
 	https.Router.Path("/signin_twitch").HandlerFunc(h.signinTwitch)
 	https.Router.Path("/refresh_token").HandlerFunc(h.refreshToken)
+
 	// serve static dir
-	https.Router.PathPrefix("/").Handler(http.FileServer(http.Dir(cfg.Web.Static)))
+	https.Router.PathPrefix("/assets").Handler(http.StripPrefix("/assets", http.FileServer(http.Dir(path.Join(cfg.Web.Static, "assets")))))
+	favicon := path.Join(cfg.Web.Static, "favicon.ico")
+	https.Router.Path("/favicon.ico").Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, favicon)
+	}))
+	index := path.Join(cfg.Web.Static, "index.html")
+	https.Router.Path("/").Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, index)
+	}))
 
 	// serve http web
 	go func() {
