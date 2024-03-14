@@ -131,6 +131,10 @@ func run(prog string, filename string) {
 		http.ServeFile(w, r, index)
 	}))
 
+	https.Router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/", http.StatusFound)
+	})
+
 	// serve http web
 	go func() {
 		if err := https.Server.ListenAndServeTLS("", ""); err != nil {

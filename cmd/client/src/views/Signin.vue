@@ -2,7 +2,6 @@
 import { useAuthStore } from '@/stores/auth';
 import { defineComponent } from 'vue';
 
-
 export default defineComponent({
   setup() {
     const authStore = useAuthStore();
@@ -14,7 +13,19 @@ export default defineComponent({
   data() {
     return {
       email: null as string | null,
-      password: null as string | null
+      password: null as string | null,
+
+      valid: null as boolean | null,
+      showPassword: false,
+
+      emailRules: [
+        (v: string) => !!v || "Required",
+        (v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
+      ],
+      passwordRules: [
+        (v: string) => !!v || "Required.",
+        (v: string) => (v && v.length >= 8) || "Min 8 characters"
+      ],
     };
   },
   methods: {
@@ -29,22 +40,27 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
-    <h1>Sign In</h1>
-    <form>
-      <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" />
-      </div>
-      <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" />
-      </div>
-      <button @click="signIn">Sign In</button>
-    </form>
-  </div>
+  <v-card class="mx-auto px-6 py-8">
+    <v-container>
+      <v-form ref="signin-form" v-model="valid" lazy-validation>
+        <v-row>
+          <v-col cols="12">
+            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" variant="underlined"
+              required clearable></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field v-model="password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="passwordRules" :type="showPassword ? 'text' : 'password'" label="Password"
+              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" variant="underlined"
+              required clearable>
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" align="center">
+            <v-btn size="large" :disabled="!valid" append-icon="mdi-account-circle" @click="signIn">Signin</v-btn>
+          </v-col>
+        </v-row>
+      </v-form>
+    </v-container>
+  </v-card>
 </template>
-
-<style scoped>
-/* Add your component styles here */
-</style>
+<style scoped></style>
