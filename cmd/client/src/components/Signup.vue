@@ -1,57 +1,41 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { defineComponent } from 'vue';
+import { ref } from 'vue';
 
 
-export default defineComponent({
-  setup() {
-    const authStore = useAuthStore();
+const authStore = useAuthStore();
 
-    return {
-      authStore
-    };
-  },
-  data() {
-    return {
-      email: null as string | null,
-      password: null as string | null,
-      firstname: null as string | null,
-      lastname: null as string | null,
+const email = ref(null as string | null)
+const password = ref(null as string | null)
+const firstname = ref(null as string | null)
+const lastname = ref(null as string | null)
+const valid = ref(null as boolean | null)
+const passwordCheck = ref(null as string | null)
+const showPassword = ref(false)
+const showPasswordCheck = ref(false)
+const emailRules = [
+  (v: string) => !!v || "Required",
+  (v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
+]
+const passwordRules = [
+  (v: string) => !!v || "Required.",
+  (v: string) => (v && v.length >= 8) || "Min 8 characters"
+]
+const firstnameRules = [
+  (v: string) => !!v || "Required.",
+]
+const lastnameRules = [
+  (v: string) => !!v || "Required.",
+]
+const passwordMatch = function () {
+  return () => password.value === passwordCheck.value || "Password must match";
+}
 
-      valid: null as boolean | null,
-      passwordCheck: null as string | null,
-      showPassword: false,
-      showPasswordCheck: false,
-
-      emailRules: [
-        (v: string) => !!v || "Required",
-        (v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
-      ],
-      passwordRules: [
-        (v: string) => !!v || "Required.",
-        (v: string) => (v && v.length >= 8) || "Min 8 characters"
-      ],
-      firstnameRules: [
-        (v: string) => !!v || "Required.",
-      ],
-      lastnameRules: [
-        (v: string) => !!v || "Required.",
-      ],
-    };
-  },
-  computed: {
-    passwordMatch() {
-      return () => this.password === this.passwordCheck || "Password must match";
-    }
-  },
-  methods: {
-    signUp() {
-      //   // Add your sign in logic here
-      //   this.authStore.signinGoogle(this.email!);
-      console.log('Signing up...');
-    }
-  }
-});
+const signUp = function () {
+  // Add your sign in logic here
+  console.log('Signing up with ', email.value, password.value);
+  authStore.signinGoogle(email.value!);
+}
 
 </script>
 

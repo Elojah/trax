@@ -1,41 +1,31 @@
-<script lang="ts">
+<script setup lang="ts">
+import { ref } from "vue";
 import { useAuthStore } from '@/stores/auth';
-import { defineComponent } from 'vue';
+import { GoogleLogin } from 'vue3-google-login';
+import { config } from '@/config';
 
-export default defineComponent({
-  setup() {
-    const authStore = useAuthStore();
+const authStore = useAuthStore()
 
-    return {
-      authStore
-    };
-  },
-  data() {
-    return {
-      email: null as string | null,
-      password: null as string | null,
+const email = ref(null as string | null)
+const password = ref(null as string | null)
+const valid = ref(null as boolean | null)
+const showPassword = ref(false as boolean)
+const emailRules = [
+  (v: string) => !!v || "Required",
+  (v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
+]
 
-      valid: null as boolean | null,
-      showPassword: false,
+const passwordRules = [
+  (v: string) => !!v || "Required.",
+  (v: string) => (v && v.length >= 8) || "Min 8 characters"
+]
 
-      emailRules: [
-        (v: string) => !!v || "Required",
-        (v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
-      ],
-      passwordRules: [
-        (v: string) => !!v || "Required.",
-        (v: string) => (v && v.length >= 8) || "Min 8 characters"
-      ],
-    };
-  },
-  methods: {
-    signIn() {
-      // Add your sign in logic here
-      this.authStore.signinGoogle(this.email!);
-      console.log('Signing in...');
-    }
-  }
-});
+const googleClientID = config.google_client_id
+const signIn = function () {
+  // Add your sign in logic here
+  authStore.signinGoogle(email.value!);
+  console.log('Signing in with ', email.value, password.value);
+}
 
 </script>
 
@@ -68,6 +58,9 @@ export default defineComponent({
                 <v-icon color="success"></v-icon>
               </template>
             </v-btn>
+          </v-col>
+          <v-col cols="12" align="center">
+            <GoogleLogin :client-id="googleClientID" :callback="signIn" />
           </v-col>
         </v-row>
       </v-form>

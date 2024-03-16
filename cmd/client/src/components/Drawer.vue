@@ -1,20 +1,18 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
 
-export default defineComponent({
-	methods: {
-		redirectHome() {
-			this.$router.push({ name: 'home' });
-		}
-	}
-});
+const router = useRouter()
+
+const redirectHome = function () {
+	router.push({ name: 'home' });
+}
 
 </script>
 
 <template>
 	<v-navigation-drawer rail>
 		<v-list density="compact" nav>
-			<v-list-item prepend-icon="mdi-radar" title="Home" value="home" @click="redirectHome"></v-list-item>
+			<v-list-item prepend-icon="mdi-radar" title="Home" value="home" @click="redirectHome()"></v-list-item>
 		</v-list>
 		<v-divider></v-divider>
 	</v-navigation-drawer>
