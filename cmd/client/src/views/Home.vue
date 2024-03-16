@@ -4,16 +4,20 @@ import Signin from '@/views/Signin.vue';
 </script>
 
 <template>
-  <v-layout class="rounded rounded-md">
-    <v-main class="d-flex" justify="center" align="center" style="min-height: 300px;">
+  <v-main>
+    <v-container>
       <v-row>
-        <v-col cols="4">
-          <Signin></Signin>
+        <v-col class="mx-auto px-12 py-12" cols="12" md="6">
+          <v-sheet>
+            <Signin />
+          </v-sheet>
         </v-col>
-        <v-col cols="4">
-          <Signup></Signup>
+        <v-divider vertical></v-divider>
+        <v-col class="mx-auto px-12 py-12" cols="12" md="6">
+          <v-sheet>
+            <Signup />
+          </v-sheet>
         </v-col>
       </v-row>
-    </v-main>
-  </v-layout>
-</template>
+    </v-container>
+  </v-main></template>

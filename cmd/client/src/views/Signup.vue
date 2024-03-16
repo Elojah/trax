@@ -56,27 +56,32 @@ export default defineComponent({
 </script>
 
 <template>
-  <v-card class="mx-auto px-6 py-8">
-    <v-container>
+  <v-card class="px-6 py-8 rounded-xl">
+    <v-card-item class="justify-center mb-12" prepend-icon="mdi-account-plus">
+      <v-card-title>
+        SIGNUP
+      </v-card-title>
+    </v-card-item>
+    <v-card-text>
       <v-form ref="signup-form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="6">
-            <v-text-field v-model="firstname" :rules="firstnameRules" label="First Name" maxlength="20" variant="solo"
+            <v-text-field v-model="firstname" :rules="firstnameRules" label="First Name" maxlength="20" underlined
               append-icon="mdi-card-account-details" required clearable></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field v-model="lastname" :rules="lastnameRules" label="Last Name" maxlength="20" variant="solo"
+            <v-text-field v-model="lastname" :rules="lastnameRules" label="Last Name" maxlength="20" underlined
               append-icon="mdi-card-account-details" required clearable></v-text-field>
           </v-col>
 
           <v-col cols="12">
-            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" variant="solo"
-              required clearable></v-text-field>
+            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" underlined required
+              clearable></v-text-field>
           </v-col>
           <v-col cols="12">
             <v-text-field v-model="password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="passwordRules" :type="showPassword ? 'text' : 'password'" label="Password"
-              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" variant="solo" required
+              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" underlined required
               clearable>
             </v-text-field>
           </v-col>
@@ -84,7 +89,7 @@ export default defineComponent({
             <v-text-field v-model="passwordCheck" :append-icon="showPasswordCheck ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="[...passwordRules, passwordMatch]" :type="showPasswordCheck ? 'text' : 'password'"
               label="Confirm Password" hint="At least 8 characters" counter
-              @click:append="showPasswordCheck = !showPasswordCheck" variant="solo" required clearable>
+              @click:append="showPasswordCheck = !showPasswordCheck" underlined required clearable>
             </v-text-field>
           </v-col>
           <v-col cols="12" align="center">
@@ -97,7 +102,7 @@ export default defineComponent({
           </v-col>
         </v-row>
       </v-form>
-    </v-container>
+    </v-card-text>
   </v-card>
 </template>
 <style scoped></style>

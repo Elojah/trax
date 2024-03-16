@@ -2,7 +2,9 @@
 </script>
 
 <template>
-  <v-app>
+  <v-app id="trax">
+    <v-navigation-drawer class="pt-4" model-value rail>
+    </v-navigation-drawer>
     <RouterView />
   </v-app>
 </template>

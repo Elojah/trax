@@ -40,18 +40,23 @@ export default defineComponent({
 </script>
 
 <template>
-  <v-card class="mx-auto px-6 py-8">
-    <v-container>
+  <v-card class="px-6 py-8 rounded-xl">
+    <v-card-item class="justify-center mb-12" prepend-icon="mdi-login">
+      <v-card-title>
+        SIGNIN
+      </v-card-title>
+    </v-card-item>
+    <v-card-text>
       <v-form ref="signin-form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="12">
-            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" variant="solo"
-              required clearable></v-text-field>
+            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" underlined required
+              clearable></v-text-field>
           </v-col>
           <v-col cols="12">
             <v-text-field v-model="password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="passwordRules" :type="showPassword ? 'text' : 'password'" label="Password"
-              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" variant="solo" required
+              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" underlined required
               clearable>
             </v-text-field>
           </v-col>
@@ -65,7 +70,7 @@ export default defineComponent({
           </v-col>
         </v-row>
       </v-form>
-    </v-container>
+    </v-card-text>
   </v-card>
 </template>
 <style scoped></style>
