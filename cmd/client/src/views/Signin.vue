@@ -45,18 +45,23 @@ export default defineComponent({
       <v-form ref="signin-form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="12">
-            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" variant="underlined"
+            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" variant="solo"
               required clearable></v-text-field>
           </v-col>
           <v-col cols="12">
             <v-text-field v-model="password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="passwordRules" :type="showPassword ? 'text' : 'password'" label="Password"
-              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" variant="underlined"
-              required clearable>
+              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" variant="solo" required
+              clearable>
             </v-text-field>
           </v-col>
           <v-col cols="12" align="center">
-            <v-btn size="large" :disabled="!valid" append-icon="mdi-account-circle" @click="signIn">Signin</v-btn>
+            <v-btn size="large" :disabled="!valid" variant="tonal" append-icon="mdi-account-circle"
+              @click="signIn">Signin
+              <template v-slot:append>
+                <v-icon color="success"></v-icon>
+              </template>
+            </v-btn>
           </v-col>
         </v-row>
       </v-form>
