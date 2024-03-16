@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import Drawer from '@/components/Drawer.vue';
 </script>
 
 <template>
   <v-app id="trax">
-    <v-navigation-drawer class="pt-4" model-value rail>
-    </v-navigation-drawer>
+    <Drawer />
     <RouterView />
   </v-app>
 </template>

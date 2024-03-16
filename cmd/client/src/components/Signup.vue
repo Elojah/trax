@@ -56,13 +56,14 @@ export default defineComponent({
 </script>
 
 <template>
-  <v-card class="px-6 py-8 rounded-xl">
-    <v-card-item class="justify-center mb-12" prepend-icon="mdi-account-plus">
+  <v-card class="px-6 py-6" rounded>
+    <v-card-item class="justify-center mb-2" prepend-icon="mdi-account-plus">
       <v-card-title>
         SIGNUP
       </v-card-title>
     </v-card-item>
-    <v-card-text>
+    <v-divider></v-divider>
+    <v-card-text class="mt-6">
       <v-form ref="signup-form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="6">

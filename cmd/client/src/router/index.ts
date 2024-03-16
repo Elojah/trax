@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
 import About from '@/views/About.vue'
-import Signin from '@/views/Signin.vue'
 import NotFound from '@/views/NotFound.vue'
-import { config } from '@/config'
+// import { config } from '@/config'
 
 const router = createRouter({
   history: createWebHistory(""),
@@ -18,11 +17,6 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component:About,
-    },
-    {
-      path: '/signin',
-      name: 'signin',
-      component:Signin,
     },
     {
       path: '/:catchAll(.*)',
