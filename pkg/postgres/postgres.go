@@ -93,21 +93,13 @@ func (s Service) Tx(ctx context.Context, access transaction.AccessMode, f func(c
 
 		return err
 	case transaction.Commit:
-		if err := tx.Commit(ctx); err != nil {
-			if err := tx.Rollback(ctx); err != nil {
-				return err
+		if terr := tx.Commit(ctx); terr != nil {
+			if terr := tx.Rollback(ctx); terr != nil {
+				return terr
 			}
 
 			return err
 		}
-	}
-
-	if err := f(ctx); err != nil {
-		if err := tx.Rollback(ctx); err != nil {
-			return err
-		}
-
-		return err
 	}
 
 	return nil
