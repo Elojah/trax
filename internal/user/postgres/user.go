@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/elojah/trax/internal/user"
 	terrors "github.com/elojah/trax/pkg/errors"
@@ -14,6 +15,28 @@ import (
 	"github.com/jackc/pgconn"
 	_ "github.com/lib/pq"
 )
+
+type sqlUser struct {
+	ID        []byte
+	Email     string
+	Password  string
+	GoogleID  sql.NullString
+	TwitchID  sql.NullString
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func new(u user.U) sqlUser {
+	return sqlUser{
+		ID:        u.ID,
+		Email:     u.Email,
+		Password:  u.Password,
+		GoogleID:  sql.NullString{String: u.GoogleID, Valid: u.GoogleID != ""},
+		TwitchID:  sql.NullString{String: u.TwitchID, Valid: u.TwitchID != ""},
+		CreatedAt: time.Unix(u.CreatedAt, 0),
+		UpdatedAt: time.Unix(u.UpdatedAt, 0),
+	}
+}
 
 type filter user.Filter
 
@@ -102,19 +125,23 @@ func (s Store) Insert(ctx context.Context, u user.U) error {
 	b.WriteString(postgres.Array(1, 7))
 	b.WriteString(`)`)
 
+	sqlu := new(u)
+
 	if _, err := tx.Exec(
 		ctx,
 		b.String(),
-		u.ID, u.Email, u.Password, u.GoogleID, u.TwitchID, u.CreatedAt, u.UpdatedAt,
+		sqlu.ID, sqlu.Email, sqlu.Password, sqlu.GoogleID, sqlu.TwitchID, sqlu.CreatedAt, sqlu.UpdatedAt,
 	); err != nil {
 		var pgErr *pgconn.PgError
 
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
 			return terrors.ErrConflict{Resource: "user", Index: u.ID.String()}
 		}
+
+		return err
 	}
 
-	return err
+	return nil
 }
 
 func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {

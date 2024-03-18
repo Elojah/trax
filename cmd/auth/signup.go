@@ -37,28 +37,21 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 		UpdatedAt: now,
 	}
 
-	var result error
-
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) error {
+	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		if err := h.user.Insert(ctx, u); err != nil {
 			if errors.As(err, &gerrors.ErrConflict{}) {
 				logger.Error().Err(err).Msg("failed to insert user")
-				result = status.New(codes.AlreadyExists, err.Error()).Err()
 
-				return nil
-			} else {
-				logger.Error().Err(err).Msg("failed to insert user")
-				result = status.New(codes.Internal, err.Error()).Err()
-
-				return nil
+				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
 			}
+			logger.Error().Err(err).Msg("failed to insert user")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		return nil
+		return transaction.Commit, nil
 	}); err != nil {
-		return &pbtypes.Empty{}, status.New(codes.Internal, err.Error()).Err()
-	} else if result != nil {
-		return &pbtypes.Empty{}, result
+		return &pbtypes.Empty{}, err
 	}
 
 	logger.Info().Msg("success")

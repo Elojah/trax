@@ -84,8 +84,6 @@ func (s Service) Tx(ctx context.Context, access transaction.AccessMode, f func(c
 	op, err := f(ctx)
 
 	switch op {
-	case transaction.NilOperation:
-		return err
 	case transaction.Rollback:
 		if terr := tx.Rollback(ctx); terr != nil {
 			return terr
@@ -93,16 +91,17 @@ func (s Service) Tx(ctx context.Context, access transaction.AccessMode, f func(c
 
 		return err
 	case transaction.Commit:
-		if terr := tx.Commit(ctx); terr != nil {
-			if terr := tx.Rollback(ctx); terr != nil {
-				return terr
+		if cerr := tx.Commit(ctx); cerr != nil {
+			fmt.Println("commit error", cerr)
+			if rerr := tx.Rollback(ctx); rerr != nil {
+				return rerr
 			}
 
-			return err
+			return cerr
 		}
 	}
 
-	return nil
+	return err
 }
 
 func Tx(ctx context.Context) (pgx.Tx, error) {

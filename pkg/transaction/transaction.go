@@ -7,16 +7,14 @@ type Key struct{}
 type AccessMode int
 
 const (
-	NilAccessMode AccessMode = iota
-	Read
+	Read AccessMode = iota
 	Write
 )
 
 type Operation int
 
 const (
-	NilOperation Operation = iota
-	Rollback
+	Rollback Operation = iota
 	Commit
 )
 

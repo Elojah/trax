@@ -75,7 +75,7 @@ func (s Store) InsertProfile(ctx context.Context, profile user.Profile) error {
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Profile, error) {
