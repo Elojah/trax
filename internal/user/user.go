@@ -4,10 +4,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/elojah/trax/pkg/transaction"
 	"github.com/elojah/trax/pkg/ulid"
 )
 
 type App interface {
+	transaction.Transactioner
+
 	Store
 	StoreProfile
 
@@ -21,6 +24,7 @@ type Filter struct {
 	ID  ulid.ID
 	IDs []ulid.ID
 
+	Email    *string
 	GoogleID *string
 	TwitchID *string
 }

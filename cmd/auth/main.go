@@ -107,10 +107,12 @@ func run(prog string, filename string) {
 		CacheKeys: cookieCache,
 	}
 
-	userStore := &userpostgres.Store{Service: &postgress}
+	userStore := &userpostgres.Store{}
+	// userStore := &userpostgres.StoreProfile{}
 	userApp := userapp.App{
-		Store:  userStore,
-		Cookie: cookieApp,
+		Transactioner: postgress,
+		Store:         userStore,
+		Cookie:        cookieApp,
 	}
 	if err := userApp.Dial(ctx); err != nil {
 		log.Error().Err(err).Msg("failed to dial user application")

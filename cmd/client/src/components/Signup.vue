@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import { useAuthStore } from '@/stores/auth';
+import { SignupReq } from '@internal/user/dto/user';
 import { ref } from 'vue';
 
 
-const authStore = useAuthStore();
+// const authStore = useAuthStore();
 
 const email = ref(null as string | null)
 const password = ref(null as string | null)
@@ -27,14 +29,21 @@ const firstnameRules = [
 const lastnameRules = [
   (v: string) => !!v || "Required.",
 ]
-const passwordMatch = function () {
-  return () => password.value === passwordCheck.value || "Password must match";
-}
+const passwordMatch = () => password.value === passwordCheck.value || "Password must match";
 
 const signUp = function () {
-  // Add your sign in logic here
-  console.log('Signing up with ', email.value, password.value);
-  authStore.signinGoogle(email.value!);
+  const url = new URL('/signup', config.web_client_url);
+  const req = SignupReq.create({
+    email: email.value,
+    password: password.value,
+    firstname: firstname.value,
+    lastname: lastname.value,
+  });
+
+  fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(req),
+  })
 }
 
 </script>
@@ -45,6 +54,9 @@ const signUp = function () {
       <v-card-title>
         SIGNUP
       </v-card-title>
+      <template v-slot:prepend>
+        <v-icon color="success"></v-icon>
+      </template>
     </v-card-item>
     <v-divider></v-divider>
     <v-card-text class="mt-6">
@@ -58,7 +70,6 @@ const signUp = function () {
             <v-text-field v-model="lastname" :rules="lastnameRules" label="Last Name" maxlength="20" underlined
               append-icon="mdi-card-account-details" required clearable></v-text-field>
           </v-col>
-
           <v-col cols="12">
             <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" underlined required
               clearable></v-text-field>

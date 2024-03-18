@@ -61,28 +61,36 @@ func (f filterProfile) index() string {
 }
 
 func (s Store) InsertProfile(ctx context.Context, profile user.Profile) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`INSERT INTO main.profile (user_id, first_name, last_name, created_at, updated_at) VALUES (`)
+	b.WriteString(`INSERT INTO "user"."user_profile" (user_id, first_name, last_name, created_at, updated_at) VALUES (`)
 	b.WriteString(postgres.Array(1, 7))
 	b.WriteString(`)`)
 
-	_, err := s.Service.DB.ExecContext(
-		ctx,
-		b.String(),
-		profile.UserID, profile.Firstname, profile.LastName, profile.CreatedAt, profile.UpdatedAt,
-	)
+	if _, err := tx.Exec(ctx, b.String(), profile.UserID, profile.Firstname, profile.LastName, profile.CreatedAt, profile.UpdatedAt); err != nil {
+		return err
+	}
 
 	return err
 }
 
 func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Profile, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return user.Profile{}, err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`SELECT user_id, first_name, last_name, created_at, updated_at FROM main.profile `)
+	b.WriteString(`SELECT user_id, first_name, last_name, created_at, updated_at FROM "user"."user_profile" `)
 
 	clause, args := filterProfile(f).where()
 	b.WriteString(clause)
 
-	q := s.Service.DB.QueryRowContext(ctx, b.String(), args...)
+	q := tx.QueryRow(ctx, b.String(), args...)
 
 	var profile user.Profile
 	if err := q.Scan(&profile.UserID, &profile.Firstname, &profile.LastName, &profile.CreatedAt, &profile.UpdatedAt); err != nil {
@@ -97,13 +105,18 @@ func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Pro
 }
 
 func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]user.Profile, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`SELECT user_id, first_name, last_name, created_at, updated_at FROM main.profile `)
+	b.WriteString(`SELECT user_id, first_name, last_name, created_at, updated_at FROM "user"."user_profile" `)
 
 	clause, args := filterProfile(f).where()
 	b.WriteString(clause)
 
-	rows, err := s.Service.DB.QueryContext(ctx, b.String(), args...)
+	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -123,14 +136,18 @@ func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]us
 }
 
 func (s Store) DeleteProfile(ctx context.Context, f user.FilterProfile) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`DELETE FROM main.profile `)
+	b.WriteString(`DELETE FROM "user"."user_profile" `)
 
 	clause, args := filterProfile(f).where()
 	b.WriteString(clause)
 
-	_, err := s.Service.DB.ExecContext(ctx, b.String(), args...)
-	if err != nil {
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
 		return err
 	}
 

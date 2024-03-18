@@ -2,6 +2,12 @@ package errors
 
 import "fmt"
 
+type ErrMissingTransaction struct{}
+
+func (e ErrMissingTransaction) Error() string {
+	return fmt.Sprintf("transaction not initialized")
+}
+
 type ErrNotFound struct {
 	Resource string
 	Index    string

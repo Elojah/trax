@@ -17,3 +17,15 @@ message SigninResp {
     string AccessToken    = 1;
     string RefreshToken   = 2;
 }
+
+message SignupReq {
+    string Firstname    = 1;
+    string Lastname     = 2;
+    string Email        = 3;
+    string Password     = 4;
+}
+
+message SigninReq {
+    string Email        = 1;
+    string Password     = 2;
+}

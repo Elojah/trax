@@ -8,13 +8,13 @@ import Signin from '@/components/Signin.vue';
     <v-container fluid>
       <v-row>
         <v-col class="mx-auto px-12 py-12" cols="12" md="6">
-          <v-sheet class="px-1" outlined color="primary" rounded>
+          <v-sheet class="px-1" outlined color="success" rounded>
             <Signin />
           </v-sheet>
         </v-col>
         <v-divider vertical :thickness="1"></v-divider>
         <v-col class="mx-auto px-12 py-12" cols="12" md="6">
-          <v-sheet class="px-1" outlined color="primary" rounded>
+          <v-sheet class="px-1" outlined color="success" rounded>
             <Signup />
           </v-sheet>
         </v-col>

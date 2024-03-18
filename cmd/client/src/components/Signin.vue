@@ -26,6 +26,11 @@ const signIn = function () {
   authStore.signinGoogle(email.value!);
   console.log('Signing in with ', email.value, password.value);
 }
+const signInGoogle = function () {
+  // Add your sign in logic here
+  authStore.signinGoogle(email.value!);
+  console.log('Signing in with ', email.value, password.value);
+}
 
 </script>
 
@@ -35,6 +40,9 @@ const signIn = function () {
       <v-card-title>
         SIGNIN
       </v-card-title>
+      <template v-slot:prepend>
+        <v-icon color="success"></v-icon>
+      </template>
     </v-card-item>
     <v-divider></v-divider>
     <v-card-text class="mt-6">
@@ -51,7 +59,7 @@ const signIn = function () {
               clearable>
             </v-text-field>
           </v-col>
-          <v-col cols="12" align="center">
+          <v-col class="mb-6" cols="12" align="center">
             <v-btn size="large" :disabled="!valid" variant="tonal" append-icon="mdi-account-circle"
               @click="signIn">Signin
               <template v-slot:append>
@@ -59,8 +67,16 @@ const signIn = function () {
               </template>
             </v-btn>
           </v-col>
-          <v-col cols="12" align="center">
-            <GoogleLogin :client-id="googleClientID" :callback="signIn" />
+          <v-divider></v-divider>
+          <v-col class="mt-6" cols="12" align="center">
+            <GoogleLogin :client-id="googleClientID" :callback="signInGoogle">
+              <v-btn size="large" variant="tonal" append-icon="mdi-google">
+                Signin with Google
+                <template v-slot:append>
+                  <v-icon color="success"></v-icon>
+                </template>
+              </v-btn>
+            </GoogleLogin>
           </v-col>
         </v-row>
       </v-form>

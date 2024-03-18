@@ -12,7 +12,11 @@ const redirectHome = function () {
 <template>
 	<v-navigation-drawer rail>
 		<v-list density="compact" nav>
-			<v-list-item prepend-icon="mdi-radar" title="Home" value="home" @click="redirectHome()"></v-list-item>
+			<v-list-item prepend-icon="mdi-home" title="Home" value="home" @click="redirectHome">
+				<template v-slot:prepend>
+					<v-icon color="success"></v-icon>
+				</template>
+			</v-list-item>
 		</v-list>
 		<v-divider></v-divider>
 	</v-navigation-drawer>

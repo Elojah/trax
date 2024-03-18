@@ -11,6 +11,7 @@ import (
 	terrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
+	"github.com/jackc/pgconn"
 	_ "github.com/lib/pq"
 )
 
@@ -31,6 +32,12 @@ func (f filter) where() (string, []any) {
 		clause = append(clause, fmt.Sprintf(`id IN (%s)`, postgres.Array(n, len(f.IDs))))
 		args = append(args, ulid.IDs(f.IDs).Any()...)
 		n += len(f.IDs)
+	}
+
+	if f.Email != nil {
+		clause = append(clause, fmt.Sprintf(`email = $%d`, n))
+		args = append(args, *f.Email)
+		n++
 	}
 
 	if f.GoogleID != nil {
@@ -69,6 +76,10 @@ func (f filter) index() string {
 		cols = append(cols, strings.Join(ss, "|"))
 	}
 
+	if f.Email != nil {
+		cols = append(cols, *f.Email)
+	}
+
 	if f.GoogleID != nil {
 		cols = append(cols, *f.GoogleID)
 	}
@@ -81,28 +92,44 @@ func (f filter) index() string {
 }
 
 func (s Store) Insert(ctx context.Context, u user.U) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`INSERT INTO main.user (id, email, password, google_id, twitch_id, created_at, updated_at) VALUES (`)
+	b.WriteString(`INSERT INTO "user"."user" (id, email, password, google_id, twitch_id, created_at, updated_at) VALUES (`)
 	b.WriteString(postgres.Array(1, 7))
 	b.WriteString(`)`)
 
-	_, err := s.Service.DB.ExecContext(
+	if _, err := tx.Exec(
 		ctx,
 		b.String(),
 		u.ID, u.Email, u.Password, u.GoogleID, u.TwitchID, u.CreatedAt, u.UpdatedAt,
-	)
+	); err != nil {
+		var pgErr *pgconn.PgError
+
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return terrors.ErrConflict{Resource: "user", Index: u.ID.String()}
+		}
+	}
 
 	return err
 }
 
 func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return user.U{}, err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, email, password, google_id, twitch_id, created_at, updated_at FROM main.user `)
+	b.WriteString(`SELECT id, email, password, google_id, twitch_id, created_at, updated_at FROM "user"."user" `)
 
 	clause, args := filter(f).where()
 	b.WriteString(clause)
 
-	q := s.Service.DB.QueryRowContext(ctx, b.String(), args...)
+	q := tx.QueryRow(ctx, b.String(), args...)
 
 	var u user.U
 	if err := q.Scan(&u.ID, &u.Email, &u.Password, &u.GoogleID, &u.TwitchID, &u.CreatedAt, &u.UpdatedAt); err != nil {
@@ -117,13 +144,18 @@ func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 }
 
 func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, email, password, google_id, twitch_id, created_at, updated_at FROM main.user `)
+	b.WriteString(`SELECT id, email, password, google_id, twitch_id, created_at, updated_at FROM "user"."user" `)
 
 	clause, args := filter(f).where()
 	b.WriteString(clause)
 
-	rows, err := s.Service.DB.QueryContext(ctx, b.String(), args...)
+	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -143,14 +175,18 @@ func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
 }
 
 func (s Store) Delete(ctx context.Context, f user.Filter) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
 	b := strings.Builder{}
-	b.WriteString(`DELETE FROM main.user `)
+	b.WriteString(`DELETE FROM "user"."user" `)
 
 	clause, args := filter(f).where()
 	b.WriteString(clause)
 
-	_, err := s.Service.DB.ExecContext(ctx, b.String(), args...)
-	if err != nil {
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
 		return err
 	}
 

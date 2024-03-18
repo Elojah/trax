@@ -19,6 +19,9 @@ import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 import "github.com/elojah/trax/internal/user/dto/user.proto";
 
 service Auth {
+	// Signup
+	rpc Signup(dto.SignupReq) returns (pbtypes.Empty);
+
 	// Signin Google
 	rpc SigninGoogle(pbtypes.String) returns (dto.SigninResp);
 

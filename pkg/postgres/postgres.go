@@ -2,19 +2,25 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
+	"github.com/elojah/trax/pkg/errors"
+	"github.com/elojah/trax/pkg/transaction"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 )
 
+var _ transaction.Transactioner = (*Service)(nil)
+
 // Service wraps a postgres client.
 type Service struct {
-	DB *sql.DB
+	*pgxpool.Pool
 }
 
 // Dial connects postgres server.
 func (s *Service) Dial(ctx context.Context, cfg Config) error {
+
 	info := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host,
@@ -26,32 +32,48 @@ func (s *Service) Dial(ctx context.Context, cfg Config) error {
 
 	var err error
 
-	s.DB, err = sql.Open("postgres", info)
+	s.Pool, err = pgxpool.New(ctx, info)
+
 	if err != nil {
 		return err
 	}
 
-	return s.DB.Ping()
+	return s.Pool.Ping(ctx)
 }
 
 func (s *Service) Close(ctx context.Context) error {
-	if s.DB != nil {
-		return s.DB.Close()
+	if s.Pool != nil {
+		s.Pool.Close()
 	}
 
 	return nil
 }
 
-func (s Service) Tx(ctx context.Context, f func(*sql.Tx) error) (rerr error) {
-	tx, err := s.DB.BeginTx(ctx, nil)
+func (s Service) Tx(ctx context.Context, access transaction.AccessMode, f func(context.Context) (transaction.Operation, error)) (rerr error) {
+	tx, err := s.Pool.BeginTx(ctx, pgx.TxOptions{
+		IsoLevel: pgx.Serializable, // safest
+		AccessMode: func(access transaction.AccessMode) pgx.TxAccessMode {
+			switch access {
+			case transaction.Read:
+				return pgx.ReadOnly
+			case transaction.Write:
+				return pgx.ReadWrite
+			default:
+				return pgx.ReadOnly
+			}
+		}(access),
+		DeferrableMode: pgx.NotDeferrable,
+	})
 	if err != nil {
 		return err
 	}
 
+	ctx = context.WithValue(ctx, transaction.Key{}, tx)
+
 	// panic safeguard for commit operation
 	defer func() {
 		if p := recover(); p != nil {
-			if err := tx.Rollback(); err != nil {
+			if err := tx.Rollback(ctx); err != nil {
 				rerr = err
 			}
 
@@ -59,21 +81,42 @@ func (s Service) Tx(ctx context.Context, f func(*sql.Tx) error) (rerr error) {
 		}
 	}()
 
-	if err := f(tx); err != nil {
-		if err := tx.Rollback(); err != nil {
+	op, err := f(ctx)
+
+	switch op {
+	case transaction.NilOperation:
+		return err
+	case transaction.Rollback:
+		if terr := tx.Rollback(ctx); terr != nil {
+			return terr
+		}
+
+		return err
+	case transaction.Commit:
+		if err := tx.Commit(ctx); err != nil {
+			if err := tx.Rollback(ctx); err != nil {
+				return err
+			}
+
+			return err
+		}
+	}
+
+	if err := f(ctx); err != nil {
+		if err := tx.Rollback(ctx); err != nil {
 			return err
 		}
 
 		return err
 	}
 
-	if err := tx.Commit(); err != nil {
-		if err := tx.Rollback(); err != nil {
-			return rerr
-		}
-
-		return err
-	}
-
 	return nil
+}
+
+func Tx(ctx context.Context) (pgx.Tx, error) {
+	tx, ok := ctx.Value(transaction.Key{}).(*pgxpool.Tx)
+	if !ok {
+		return nil, errors.ErrMissingTransaction{}
+	}
+	return tx, nil
 }

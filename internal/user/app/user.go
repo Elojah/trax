@@ -8,6 +8,7 @@ import (
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/pkg/cookie"
 	"github.com/elojah/trax/pkg/errors"
+	"github.com/elojah/trax/pkg/transaction"
 	"github.com/elojah/trax/pkg/ulid"
 	"github.com/golang-jwt/jwt/v4"
 	"google.golang.org/grpc/metadata"
@@ -16,6 +17,8 @@ import (
 var _ user.App = (*App)(nil)
 
 type App struct {
+	transaction.Transactioner
+
 	user.Store
 	user.StoreProfile
 
