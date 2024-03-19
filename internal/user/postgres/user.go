@@ -12,7 +12,6 @@ import (
 	terrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
-	"github.com/jackc/pgconn"
 	_ "github.com/lib/pq"
 )
 
@@ -31,10 +30,22 @@ func new(u user.U) sqlUser {
 		ID:        u.ID,
 		Email:     u.Email,
 		Password:  u.Password,
-		GoogleID:  sql.NullString{String: u.GoogleID, Valid: u.GoogleID != ""},
-		TwitchID:  sql.NullString{String: u.TwitchID, Valid: u.TwitchID != ""},
+		GoogleID:  sql.NullString{String: u.GoogleID, Valid: len(u.GoogleID) > 0},
+		TwitchID:  sql.NullString{String: u.TwitchID, Valid: len(u.TwitchID) > 0},
 		CreatedAt: time.Unix(u.CreatedAt, 0),
 		UpdatedAt: time.Unix(u.UpdatedAt, 0),
+	}
+}
+
+func (sqlu sqlUser) user() user.U {
+	return user.U{
+		ID:        sqlu.ID,
+		Email:     sqlu.Email,
+		Password:  sqlu.Password,
+		GoogleID:  sqlu.GoogleID.String,
+		TwitchID:  sqlu.TwitchID.String,
+		CreatedAt: sqlu.CreatedAt.Unix(),
+		UpdatedAt: sqlu.UpdatedAt.Unix(),
 	}
 }
 
@@ -132,13 +143,7 @@ func (s Store) Insert(ctx context.Context, u user.U) error {
 		b.String(),
 		sqlu.ID, sqlu.Email, sqlu.Password, sqlu.GoogleID, sqlu.TwitchID, sqlu.CreatedAt, sqlu.UpdatedAt,
 	); err != nil {
-		var pgErr *pgconn.PgError
-
-		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return terrors.ErrConflict{Resource: "user", Index: u.ID.String()}
-		}
-
-		return err
+		return postgres.Error(err, "user", u.ID.String())
 	}
 
 	return nil

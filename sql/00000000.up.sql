@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS "user"."user" (
 	"updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	PRIMARY KEY ("id"),
 	UNIQUE ("email"),
-	UNIQUE NULLS NOT DISTINCT ("google_id"),
-	UNIQUE NULLS NOT DISTINCT ("twitch_id")
+	UNIQUE ("google_id"),
+	UNIQUE ("twitch_id")
 );
 CREATE TABLE IF NOT EXISTS "user"."user_profile" (
 	"user_id" UUID NOT NULL,
