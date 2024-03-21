@@ -17,13 +17,15 @@ message U {
 	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
 	string Email           = 2;
-	string Password        = 3;
 
-	string TwitchID        = 4;
+	bytes PasswordHash     = 3;
+	bytes PasswordSalt     = 4;
+
 	string GoogleID        = 5;
+	string TwitchID        = 6;
 
-	int64 CreatedAt        = 6;
-	int64 UpdatedAt        = 7;
+	int64 CreatedAt        = 7;
+	int64 UpdatedAt        = 8;
 }
 
 message Profile {

@@ -2,10 +2,12 @@ package user
 
 import (
 	"context"
+	"crypto/subtle"
 	"time"
 
 	"github.com/elojah/trax/pkg/transaction"
 	"github.com/elojah/trax/pkg/ulid"
+	"golang.org/x/crypto/argon2"
 )
 
 type App interface {
@@ -46,4 +48,28 @@ type StoreProfile interface {
 	FetchProfile(context.Context, FilterProfile) (Profile, error)
 	FetchManyProfile(context.Context, FilterProfile) ([]Profile, error)
 	DeleteProfile(context.Context, FilterProfile) error
+}
+
+const (
+	ntime   uint32 = 1
+	memory  uint32 = 64 * 1024
+	threads uint8  = 4
+	keylen  uint32 = 16 // salt ulid length in bytes
+)
+
+func Encrypt(password string) ([]byte, []byte) {
+	salt := ulid.NewID()
+	hash := argon2.IDKey([]byte(password), salt, ntime, memory, threads, keylen)
+
+	return hash, salt
+}
+
+func (u U) Check(password string) error {
+	hash := argon2.IDKey([]byte(password), u.PasswordSalt, ntime, memory, threads, keylen)
+
+	if subtle.ConstantTimeCompare(u.PasswordHash, hash) != 1 {
+		return ErrInvalidPassword{}
+	}
+
+	return nil
 }

@@ -12,7 +12,7 @@ import Signin from '@/components/Signin.vue';
             <Signin />
           </v-sheet>
         </v-col>
-        <v-divider vertical :thickness="1"></v-divider>
+        <v-divider vertical :thickness="1" color="success"></v-divider>
         <v-col class="mx-auto px-12 py-12" cols="12" md="6">
           <v-sheet class="px-1" outlined color="success" rounded>
             <Signup />

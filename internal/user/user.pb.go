@@ -4,6 +4,7 @@
 package user
 
 import (
+	bytes "bytes"
 	fmt "fmt"
 	_ "github.com/elojah/trax/pkg/gogoproto"
 	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
@@ -29,13 +30,14 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type U struct {
-	ID        github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,1,opt,name=ID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"ID"`
-	Email     string                             `protobuf:"bytes,2,opt,name=Email,proto3" json:"Email,omitempty"`
-	Password  string                             `protobuf:"bytes,3,opt,name=Password,proto3" json:"Password,omitempty"`
-	TwitchID  string                             `protobuf:"bytes,4,opt,name=TwitchID,proto3" json:"TwitchID,omitempty"`
-	GoogleID  string                             `protobuf:"bytes,5,opt,name=GoogleID,proto3" json:"GoogleID,omitempty"`
-	CreatedAt int64                              `protobuf:"varint,6,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
-	UpdatedAt int64                              `protobuf:"varint,7,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
+	ID           github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,1,opt,name=ID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"ID"`
+	Email        string                             `protobuf:"bytes,2,opt,name=Email,proto3" json:"Email,omitempty"`
+	PasswordHash []byte                             `protobuf:"bytes,3,opt,name=PasswordHash,proto3" json:"PasswordHash,omitempty"`
+	PasswordSalt []byte                             `protobuf:"bytes,4,opt,name=PasswordSalt,proto3" json:"PasswordSalt,omitempty"`
+	GoogleID     string                             `protobuf:"bytes,5,opt,name=GoogleID,proto3" json:"GoogleID,omitempty"`
+	TwitchID     string                             `protobuf:"bytes,6,opt,name=TwitchID,proto3" json:"TwitchID,omitempty"`
+	CreatedAt    int64                              `protobuf:"varint,7,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
+	UpdatedAt    int64                              `protobuf:"varint,8,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
 }
 
 func (m *U) Reset()      { *m = U{} }
@@ -125,31 +127,32 @@ func init() {
 }
 
 var fileDescriptor_c833e8dbf581e4f7 = []byte{
-	// 373 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x91, 0x3d, 0x6f, 0xda, 0x40,
-	0x18, 0xc7, 0xef, 0xe1, 0xb5, 0x9c, 0x3a, 0x59, 0x1d, 0x2c, 0x54, 0x3d, 0x20, 0x26, 0xd4, 0x01,
-	0x0f, 0xdd, 0xba, 0x95, 0xba, 0x2f, 0x96, 0xaa, 0x0a, 0xa1, 0xf2, 0x01, 0x0e, 0x7c, 0x35, 0x6e,
-	0x0c, 0x87, 0xce, 0x87, 0xc8, 0x98, 0x8f, 0x90, 0x8f, 0x91, 0x8f, 0x90, 0x11, 0x29, 0x0b, 0x23,
-	0x23, 0xca, 0x80, 0xe2, 0xb3, 0x22, 0x65, 0x64, 0xcc, 0x18, 0xf9, 0x05, 0x50, 0x22, 0x85, 0x21,
-	0x8b, 0xf5, 0xfc, 0x9f, 0x9f, 0xff, 0x77, 0xfa, 0xe9, 0xa8, 0xe5, 0xf9, 0x6a, 0x3c, 0x1f, 0x76,
-	0x46, 0x62, 0x62, 0xf1, 0x40, 0xfc, 0x67, 0x63, 0x4b, 0x49, 0x76, 0x6e, 0xf9, 0x53, 0xc5, 0xe5,
-	0x94, 0x05, 0xd6, 0x3c, 0xe4, 0x32, 0xfd, 0x74, 0x66, 0x52, 0x28, 0x61, 0x94, 0x92, 0xb9, 0xfe,
-	0x5a, 0x6d, 0x76, 0xe6, 0x59, 0x9e, 0xf0, 0x44, 0xfa, 0x6f, 0x3a, 0x65, 0xb5, 0xd6, 0x3d, 0x50,
-	0x18, 0x18, 0x5f, 0x68, 0xc1, 0xb1, 0x4d, 0x68, 0x42, 0xfb, 0x7d, 0xf7, 0xd3, 0x6a, 0xdb, 0x20,
-	0xb7, 0xdb, 0x46, 0xeb, 0xc4, 0x51, 0xf3, 0xc0, 0x77, 0x3b, 0x8e, 0xdd, 0x2f, 0x38, 0xb6, 0xf1,
-	0x81, 0x96, 0xbf, 0x4f, 0x98, 0x1f, 0x98, 0x85, 0x26, 0xb4, 0x6b, 0xfd, 0x2c, 0x18, 0x75, 0xfa,
-	0xae, 0xc7, 0xc2, 0x70, 0x21, 0xa4, 0x6b, 0x16, 0x53, 0x70, 0xc8, 0x09, 0xfb, 0xbb, 0xf0, 0xd5,
-	0x68, 0xec, 0xd8, 0x66, 0x29, 0x63, 0xfb, 0x9c, 0xb0, 0x9f, 0x42, 0x78, 0x01, 0x77, 0x6c, 0xb3,
-	0x9c, 0xb1, 0x7d, 0x36, 0x3e, 0xd2, 0xda, 0x37, 0xc9, 0x99, 0xe2, 0xee, 0x57, 0x65, 0x56, 0x9a,
-	0xd0, 0x2e, 0xf6, 0x8f, 0x8b, 0x84, 0x0e, 0x66, 0x6e, 0x4e, 0xab, 0x19, 0x3d, 0x2c, 0x5a, 0x37,
-	0x40, 0xab, 0x3d, 0x29, 0xfe, 0xf9, 0x01, 0x37, 0xba, 0xb4, 0x32, 0x08, 0xb9, 0x7c, 0x93, 0x71,
-	0xde, 0x4c, 0x6e, 0xfb, 0xe1, 0xcb, 0x50, 0x4d, 0xd9, 0x84, 0xe7, 0xe6, 0xc7, 0x45, 0x62, 0xf1,
-	0x9b, 0x85, 0xea, 0x4f, 0x02, 0x73, 0xfb, 0x7d, 0x7e, 0x6e, 0x51, 0x3a, 0x69, 0x51, 0x7e, 0x61,
-	0xd1, 0xfd, 0xb5, 0x8a, 0x90, 0xac, 0x23, 0x24, 0x9b, 0x08, 0xc9, 0x2e, 0x42, 0x78, 0x8c, 0x10,
-	0x2e, 0x34, 0xc2, 0x95, 0x46, 0xb8, 0xd6, 0x08, 0x4b, 0x8d, 0xb0, 0xd2, 0x08, 0x6b, 0x8d, 0x70,
-	0xa7, 0x11, 0x1e, 0x34, 0x92, 0x9d, 0x46, 0xb8, 0x8c, 0x91, 0x2c, 0x63, 0x84, 0x75, 0x8c, 0x64,
-	0x13, 0x23, 0x19, 0x56, 0xd2, 0xe7, 0xff, 0xfc, 0x14, 0x00, 0x00, 0xff, 0xff, 0xe4, 0x30, 0x42,
-	0x8e, 0x68, 0x02, 0x00, 0x00,
+	// 394 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x52, 0x3d, 0x8f, 0xd3, 0x40,
+	0x10, 0xdd, 0x71, 0x3e, 0xee, 0x6e, 0x75, 0x95, 0x45, 0x61, 0x9d, 0xd0, 0x5c, 0xe4, 0x2a, 0xa2,
+	0x88, 0x0b, 0x3a, 0x3a, 0x82, 0x81, 0xb3, 0x84, 0xd0, 0xc9, 0x90, 0x1f, 0xb0, 0x17, 0x2f, 0xb6,
+	0xc1, 0xc9, 0x46, 0xeb, 0x8d, 0x42, 0xc9, 0x4f, 0x80, 0x7f, 0xc1, 0x4f, 0xa0, 0x8c, 0x44, 0x93,
+	0x32, 0x65, 0x44, 0x11, 0xe1, 0x75, 0x43, 0x99, 0x92, 0x12, 0xad, 0x9d, 0x0f, 0x82, 0x44, 0x8a,
+	0x6b, 0x56, 0xf3, 0xde, 0x9b, 0x37, 0xa3, 0x37, 0x5a, 0xea, 0xc5, 0xa9, 0x4a, 0xa6, 0x77, 0xbd,
+	0xa1, 0x18, 0x79, 0x3c, 0x13, 0xef, 0x59, 0xe2, 0x29, 0xc9, 0x3e, 0x7a, 0xe9, 0x58, 0x71, 0x39,
+	0x66, 0x99, 0x37, 0xcd, 0xb9, 0xac, 0x9e, 0xde, 0x44, 0x0a, 0x25, 0xec, 0xa6, 0xa9, 0xaf, 0xfe,
+	0x67, 0x9b, 0x7c, 0x88, 0xbd, 0x58, 0xc4, 0xa2, 0xea, 0xad, 0xaa, 0xda, 0xe6, 0x7e, 0xb1, 0x28,
+	0x0c, 0xec, 0x27, 0xd4, 0x0a, 0x7c, 0x07, 0x3a, 0xd0, 0xbd, 0xec, 0x3f, 0x5a, 0xac, 0xaf, 0xc9,
+	0x8f, 0xf5, 0xb5, 0x7b, 0x62, 0xd4, 0x34, 0x4b, 0xa3, 0x5e, 0xe0, 0x87, 0x56, 0xe0, 0xdb, 0x0f,
+	0x68, 0xeb, 0xf9, 0x88, 0xa5, 0x99, 0x63, 0x75, 0xa0, 0x7b, 0x11, 0xd6, 0xc0, 0x76, 0xe9, 0xe5,
+	0x2d, 0xcb, 0xf3, 0x99, 0x90, 0xd1, 0x0d, 0xcb, 0x13, 0xa7, 0x61, 0x66, 0x87, 0x47, 0xdc, 0xdf,
+	0x3d, 0x6f, 0x58, 0xa6, 0x9c, 0xe6, 0x71, 0x8f, 0xe1, 0xec, 0x2b, 0x7a, 0xfe, 0x52, 0x88, 0x38,
+	0xe3, 0x81, 0xef, 0xb4, 0xaa, 0x05, 0x7b, 0x6c, 0xb4, 0xb7, 0xb3, 0x54, 0x0d, 0x93, 0xc0, 0x77,
+	0xda, 0xb5, 0xb6, 0xc3, 0xf6, 0x43, 0x7a, 0xf1, 0x4c, 0x72, 0xa6, 0x78, 0xf4, 0x54, 0x39, 0x67,
+	0x1d, 0xe8, 0x36, 0xc2, 0x03, 0x61, 0xd4, 0xc1, 0x24, 0xda, 0xaa, 0xe7, 0xb5, 0xba, 0x27, 0xdc,
+	0xef, 0x40, 0xcf, 0x6e, 0xa5, 0x78, 0x97, 0x66, 0xdc, 0xee, 0xd3, 0xf6, 0x20, 0xe7, 0xf2, 0x5e,
+	0xd7, 0xd9, 0x3a, 0xcd, 0xb6, 0x17, 0xa9, 0xcc, 0xd5, 0x98, 0x8d, 0xf8, 0xf6, 0x4a, 0x07, 0xc2,
+	0xa4, 0x78, 0xc5, 0x72, 0xf5, 0xda, 0x88, 0x8d, 0x3a, 0xc5, 0x0e, 0x1f, 0xa7, 0x68, 0x9e, 0x4c,
+	0xd1, 0xfa, 0x27, 0x45, 0xff, 0x66, 0x51, 0x20, 0x59, 0x16, 0x48, 0x56, 0x05, 0x92, 0x4d, 0x81,
+	0xf0, 0xbb, 0x40, 0xf8, 0xa4, 0x11, 0xbe, 0x6a, 0x84, 0x6f, 0x1a, 0x61, 0xae, 0x11, 0x16, 0x1a,
+	0x61, 0xa9, 0x11, 0x7e, 0x6a, 0x84, 0x5f, 0x1a, 0xc9, 0x46, 0x23, 0x7c, 0x2e, 0x91, 0xcc, 0x4b,
+	0x84, 0x65, 0x89, 0x64, 0x55, 0x22, 0xb9, 0x6b, 0x57, 0x5f, 0xe5, 0xf1, 0x9f, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x71, 0x54, 0x18, 0x85, 0x94, 0x02, 0x00, 0x00,
 }
 
 func (this *U) Equal(that interface{}) bool {
@@ -177,13 +180,16 @@ func (this *U) Equal(that interface{}) bool {
 	if this.Email != that1.Email {
 		return false
 	}
-	if this.Password != that1.Password {
+	if !bytes.Equal(this.PasswordHash, that1.PasswordHash) {
 		return false
 	}
-	if this.TwitchID != that1.TwitchID {
+	if !bytes.Equal(this.PasswordSalt, that1.PasswordSalt) {
 		return false
 	}
 	if this.GoogleID != that1.GoogleID {
+		return false
+	}
+	if this.TwitchID != that1.TwitchID {
 		return false
 	}
 	if this.CreatedAt != that1.CreatedAt {
@@ -234,13 +240,14 @@ func (this *U) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 11)
+	s := make([]string, 0, 12)
 	s = append(s, "&user.U{")
 	s = append(s, "ID: "+fmt.Sprintf("%#v", this.ID)+",\n")
 	s = append(s, "Email: "+fmt.Sprintf("%#v", this.Email)+",\n")
-	s = append(s, "Password: "+fmt.Sprintf("%#v", this.Password)+",\n")
-	s = append(s, "TwitchID: "+fmt.Sprintf("%#v", this.TwitchID)+",\n")
+	s = append(s, "PasswordHash: "+fmt.Sprintf("%#v", this.PasswordHash)+",\n")
+	s = append(s, "PasswordSalt: "+fmt.Sprintf("%#v", this.PasswordSalt)+",\n")
 	s = append(s, "GoogleID: "+fmt.Sprintf("%#v", this.GoogleID)+",\n")
+	s = append(s, "TwitchID: "+fmt.Sprintf("%#v", this.TwitchID)+",\n")
 	s = append(s, "CreatedAt: "+fmt.Sprintf("%#v", this.CreatedAt)+",\n")
 	s = append(s, "UpdatedAt: "+fmt.Sprintf("%#v", this.UpdatedAt)+",\n")
 	s = append(s, "}")
@@ -291,12 +298,19 @@ func (m *U) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.UpdatedAt != 0 {
 		i = encodeVarintUser(dAtA, i, uint64(m.UpdatedAt))
 		i--
-		dAtA[i] = 0x38
+		dAtA[i] = 0x40
 	}
 	if m.CreatedAt != 0 {
 		i = encodeVarintUser(dAtA, i, uint64(m.CreatedAt))
 		i--
-		dAtA[i] = 0x30
+		dAtA[i] = 0x38
+	}
+	if len(m.TwitchID) > 0 {
+		i -= len(m.TwitchID)
+		copy(dAtA[i:], m.TwitchID)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.TwitchID)))
+		i--
+		dAtA[i] = 0x32
 	}
 	if len(m.GoogleID) > 0 {
 		i -= len(m.GoogleID)
@@ -305,17 +319,17 @@ func (m *U) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x2a
 	}
-	if len(m.TwitchID) > 0 {
-		i -= len(m.TwitchID)
-		copy(dAtA[i:], m.TwitchID)
-		i = encodeVarintUser(dAtA, i, uint64(len(m.TwitchID)))
+	if len(m.PasswordSalt) > 0 {
+		i -= len(m.PasswordSalt)
+		copy(dAtA[i:], m.PasswordSalt)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.PasswordSalt)))
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Password) > 0 {
-		i -= len(m.Password)
-		copy(dAtA[i:], m.Password)
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Password)))
+	if len(m.PasswordHash) > 0 {
+		i -= len(m.PasswordHash)
+		copy(dAtA[i:], m.PasswordHash)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.PasswordHash)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -412,9 +426,18 @@ func NewPopulatedU(r randyUser, easy bool) *U {
 	v1 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
 	this.ID = *v1
 	this.Email = string(randStringUser(r))
-	this.Password = string(randStringUser(r))
-	this.TwitchID = string(randStringUser(r))
+	v2 := r.Intn(100)
+	this.PasswordHash = make([]byte, v2)
+	for i := 0; i < v2; i++ {
+		this.PasswordHash[i] = byte(r.Intn(256))
+	}
+	v3 := r.Intn(100)
+	this.PasswordSalt = make([]byte, v3)
+	for i := 0; i < v3; i++ {
+		this.PasswordSalt[i] = byte(r.Intn(256))
+	}
 	this.GoogleID = string(randStringUser(r))
+	this.TwitchID = string(randStringUser(r))
 	this.CreatedAt = int64(r.Int63())
 	if r.Intn(2) == 0 {
 		this.CreatedAt *= -1
@@ -430,8 +453,8 @@ func NewPopulatedU(r randyUser, easy bool) *U {
 
 func NewPopulatedProfile(r randyUser, easy bool) *Profile {
 	this := &Profile{}
-	v2 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.UserID = *v2
+	v4 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.UserID = *v4
 	this.Firstname = string(randStringUser(r))
 	this.LastName = string(randStringUser(r))
 	this.CreatedAt = int64(r.Int63())
@@ -466,9 +489,9 @@ func randUTF8RuneUser(r randyUser) rune {
 	return rune(ru + 61)
 }
 func randStringUser(r randyUser) string {
-	v3 := r.Intn(100)
-	tmps := make([]rune, v3)
-	for i := 0; i < v3; i++ {
+	v5 := r.Intn(100)
+	tmps := make([]rune, v5)
+	for i := 0; i < v5; i++ {
 		tmps[i] = randUTF8RuneUser(r)
 	}
 	return string(tmps)
@@ -490,11 +513,11 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
-		v4 := r.Int63()
+		v6 := r.Int63()
 		if r.Intn(2) == 0 {
-			v4 *= -1
+			v6 *= -1
 		}
-		dAtA = encodeVarintPopulateUser(dAtA, uint64(v4))
+		dAtA = encodeVarintPopulateUser(dAtA, uint64(v6))
 	case 1:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -531,15 +554,19 @@ func (m *U) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
-	l = len(m.Password)
+	l = len(m.PasswordHash)
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
-	l = len(m.TwitchID)
+	l = len(m.PasswordSalt)
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
 	l = len(m.GoogleID)
+	if l > 0 {
+		n += 1 + l + sovUser(uint64(l))
+	}
+	l = len(m.TwitchID)
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
@@ -590,9 +617,10 @@ func (this *U) String() string {
 	s := strings.Join([]string{`&U{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
-		`Password:` + fmt.Sprintf("%v", this.Password) + `,`,
-		`TwitchID:` + fmt.Sprintf("%v", this.TwitchID) + `,`,
+		`PasswordHash:` + fmt.Sprintf("%v", this.PasswordHash) + `,`,
+		`PasswordSalt:` + fmt.Sprintf("%v", this.PasswordSalt) + `,`,
 		`GoogleID:` + fmt.Sprintf("%v", this.GoogleID) + `,`,
+		`TwitchID:` + fmt.Sprintf("%v", this.TwitchID) + `,`,
 		`CreatedAt:` + fmt.Sprintf("%v", this.CreatedAt) + `,`,
 		`UpdatedAt:` + fmt.Sprintf("%v", this.UpdatedAt) + `,`,
 		`}`,
@@ -717,9 +745,9 @@ func (m *U) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Password", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PasswordHash", wireType)
 			}
-			var stringLen uint64
+			var byteLen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowUser
@@ -729,29 +757,31 @@ func (m *U) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				byteLen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if byteLen < 0 {
 				return ErrInvalidLengthUser
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + byteLen
 			if postIndex < 0 {
 				return ErrInvalidLengthUser
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Password = string(dAtA[iNdEx:postIndex])
+			m.PasswordHash = append(m.PasswordHash[:0], dAtA[iNdEx:postIndex]...)
+			if m.PasswordHash == nil {
+				m.PasswordHash = []byte{}
+			}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TwitchID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PasswordSalt", wireType)
 			}
-			var stringLen uint64
+			var byteLen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowUser
@@ -761,23 +791,25 @@ func (m *U) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				byteLen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if byteLen < 0 {
 				return ErrInvalidLengthUser
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + byteLen
 			if postIndex < 0 {
 				return ErrInvalidLengthUser
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TwitchID = string(dAtA[iNdEx:postIndex])
+			m.PasswordSalt = append(m.PasswordSalt[:0], dAtA[iNdEx:postIndex]...)
+			if m.PasswordSalt == nil {
+				m.PasswordSalt = []byte{}
+			}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -812,6 +844,38 @@ func (m *U) Unmarshal(dAtA []byte) error {
 			m.GoogleID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TwitchID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthUser
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TwitchID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
 			}
@@ -830,7 +894,7 @@ func (m *U) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 7:
+		case 8:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
 			}

@@ -26,6 +26,10 @@ AUTH              = auth
 WEB_CLIENT        = web_client
 CLIENT            = client
 
+#  Migration directory for goose postgres
+MIGRATION_DIR     = db/postgres
+GOOSE_DRIVER      = postgres
+
 # Static directory name for client
 STATIC            = static
 
@@ -38,7 +42,7 @@ all: admin api auth client web_client
 
 .PHONY: admin
 admin:  ## Build admin binary
-	$(info $(M) building executable admin…) @
+	$(info $(M) building executable admin) @
 	$Q cd cmd/$(ADMIN) && $(GO) build \
 		-mod=readonly \
 		-tags release \
@@ -48,7 +52,7 @@ admin:  ## Build admin binary
 
 .PHONY: api
 api:  ## Build api binary
-	$(info $(M) building executable api…) @
+	$(info $(M) building executable api) @
 	$Q cd cmd/$(API) && $(GO) build \
 		-mod=readonly \
 		-tags release \
@@ -58,7 +62,7 @@ api:  ## Build api binary
 
 .PHONY: auth
 auth:  ## Build auth binary
-	$(info $(M) building executable auth…) @
+	$(info $(M) building executable auth) @
 	$Q cd cmd/$(AUTH) && $(GO) build \
 		-mod=readonly \
 		-tags release \
@@ -68,14 +72,14 @@ auth:  ## Build auth binary
 
 .PHONY: client
 client:  ## Build client content
-	$(info $(M) building bundle client…) @
+	$(info $(M) building bundle client) @
 	$Q cd cmd/$(CLIENT) && npx vite build
 	$Q mkdir -p bin && rm -rf bin/$(STATIC) && mkdir -p bin/$(CLIENT)/$(STATIC)/
 	$Q yes | cp -rf cmd/$(CLIENT)/dist/. bin/$(CLIENT)/$(STATIC)/
 
 .PHONY: web_client
 web_client: ## Build web_client binary
-	$(info $(M) building executable web_client…) @
+	$(info $(M) building executable web_client) @
 	$Q cd cmd/$(WEB_CLIENT) && $(GO) build \
 		-mod=readonly \
 		-tags release \
@@ -88,21 +92,21 @@ web_client: ## Build web_client binary
 proto-go:    PB_LANG = GO
 proto-ts:    PB_LANG = TS
 proto-go proto-ts: ## Regenerate protobuf files
-	$(info $(M) running protobuf $(PB_LANG)…) @
-	$(info $(M) generate utils…) @
+	$(info $(M) running protobuf $(PB_LANG)) @
+	$(info $(M) generate utils) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/gogoproto/gogo.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/empty.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/string.proto
-	$(info $(M) generate pkg…) @
+	$(info $(M) generate pkg) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/cookie/keys.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/twitch/follow.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/twitch/user.proto
-	$(info $(M) generate internal…) @
+	$(info $(M) generate internal) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto
-	$(info $(M) generate clients…) @
-	$(info $(M) generate dto…) @
+	$(info $(M) generate clients) @
+	$(info $(M) generate dto) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/user.proto
-	$(info $(M) generate services…) @
+	$(info $(M) generate services) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(AUTH)/grpc/$(AUTH).proto
@@ -114,13 +118,13 @@ proto: proto-go proto-ts
 # Vendor
 .PHONY: vendor
 vendor:
-	$(info $(M) running go mod vendor…) @
+	$(info $(M) running go mod vendor) @
 	$Q $(GO) mod vendor
 
 # Tidy
 .PHONY: tidy
 tidy:
-	$(info $(M) running go mod tidy…) @
+	$(info $(M) running go mod tidy) @
 	$Q $(GO) mod tidy
 
 # Check
@@ -130,19 +134,19 @@ check: vendor lint test
 # Lint
 .PHONY: lint
 lint:
-	$(info $(M) running $(GOLINT)…)
+	$(info $(M) running $(GOLINT))
 	$Q $(GOLINT) run
 
 # Test
 .PHONY: test
 test:
-	$(info $(M) running go test…) @
+	$(info $(M) running go test) @
 	$Q $(GO) test -cover -race -v ./...
 
 # Clean
 .PHONY: clean
 clean:
-	$(info $(M) cleaning binaries…) @
+	$(info $(M) cleaning binaries) @
 	$Q rm -rf bin/$(PACKAGE)_$(ADMIN)*
 	$Q rm -rf bin/$(PACKAGE)_$(API)*
 	$Q rm -rf bin/$(PACKAGE)_$(AUTH)*
@@ -153,7 +157,7 @@ clean:
 # Clean protobuf generated files
 .PHONY: clean-proto
 clean-proto:
-	$(info $(M) cleaning protobuf generated files…) @
+	$(info $(M) cleaning protobuf generated files) @
 	$Q find . -name "*_pb.d.ts" -type f -delete
 	$Q find . -name "*_pb.js" -type f -delete
 	$Q find . -name "*.pb.go" -type f -delete
@@ -162,18 +166,35 @@ clean-proto:
 
 ## Helpers
 
+# Goose helpers
+.PHONY: goose-create
+goose-create: ## Create a new migration
+	$(info $(M) create new migration file using NAME=$(NAME)) @
+	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) goose create $(NAME) sql
+
+.PHONY: goose-up
+goose-up: ## Create a new migration
+	$(info $(M) migration up) @
+	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) goose up
+
+# Goose helpers
+.PHONY: goose-down
+goose-down: ## Create a new migration
+	$(info $(M) migration down) @
+	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) goose down
+
 .PHONY: go-version
 go-version: ## Print go version used in this makefile
 	$Q echo $(GO)
 
 .PHONY: fmt
 fmt: ## Format code
-	$(info $(M) running $(GOFMT)…) @
+	$(info $(M) running $(GOFMT)) @
 	$Q $(GOFMT) ./...
 
 .PHONY: doc
 doc: ## Generate project documentation
-	$(info $(M) running $(GODOC)…) @
+	$(info $(M) running $(GODOC)) @
 	$Q $(GODOC) ./...
 
 .PHONY: version

@@ -2,10 +2,12 @@ package errors
 
 import "fmt"
 
-type ErrUnknown struct{}
+type ErrUnknown struct {
+	Err error
+}
 
 func (err ErrUnknown) Error() string {
-	return fmt.Sprintf("unknown error, investigation required")
+	return fmt.Sprintf("unknown error: %s", err.Err)
 }
 
 type ErrNotImplemented struct {

@@ -117,7 +117,7 @@ func run(prog string, filename string) {
 
 	// auth
 	https.Router.Path("/signup").Methods(http.MethodPost).HandlerFunc(h.signup)
-	// https.Router.Path("/signin").Methods(http.MethodPost).HandlerFunc(h.signin)
+	https.Router.Path("/signin").Methods(http.MethodPost).HandlerFunc(h.signin)
 	https.Router.Path("/signin_google").Methods(http.MethodPost).HandlerFunc(h.signinGoogle)
 	https.Router.Path("/signin_twitch").Methods(http.MethodPost).HandlerFunc(h.signinTwitch)
 	https.Router.Path("/refresh_token").Methods(http.MethodPost).HandlerFunc(h.refreshToken)

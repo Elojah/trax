@@ -22,6 +22,9 @@ service Auth {
 	// Signup
 	rpc Signup(dto.SignupReq) returns (pbtypes.Empty);
 
+	// Signin
+	rpc Signin(dto.SigninReq) returns (dto.SigninResp);
+
 	// Signin Google
 	rpc SigninGoogle(pbtypes.String) returns (dto.SigninResp);
 

@@ -42,7 +42,7 @@ func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 	now := time.Now()
 	claims := &user.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "spc",
+			Issuer:    "trax",
 			Subject:   u.ID.String(),
 			Audience:  jwt.ClaimStrings{audience},
 			ExpiresAt: jwt.NewNumericDate(now.Add(validity)),

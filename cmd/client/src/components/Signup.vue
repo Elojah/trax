@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { config } from '@/config';
+import { useAuthStore } from '@/stores/auth';
 import { SignupReq } from '@internal/user/dto/user';
 import { ref } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 
 const form = ref<VForm | null>(null);
+
+const authStore = useAuthStore()
 
 const email = ref(null as string | null)
 const password = ref(null as string | null)
@@ -35,7 +37,6 @@ const snackbarConflict = ref(false)
 const snackbarInternal = ref(false)
 
 const signup = async function () {
-  const url = new URL('/signup', config.web_client_url);
   const req = SignupReq.create({
     email: email.value,
     password: password.value,
@@ -43,10 +44,7 @@ const signup = async function () {
     lastname: lastname.value,
   });
 
-  const resp = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(req),
-  })
+  const resp = await authStore.signup(req);
 
   switch (resp.status) {
     case 200: // success
@@ -74,7 +72,7 @@ const signup = async function () {
         <v-icon color="success"></v-icon>
       </template>
     </v-card-item>
-    <v-divider></v-divider>
+    <v-divider color="success"></v-divider>
     <v-card-text class="mt-6">
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-row>
