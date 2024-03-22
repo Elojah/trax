@@ -36,7 +36,7 @@ export const useAuthStore = defineStore({
         })
 
         if (resp.status === 200) {
-          this.token = getCookie('token') ?? "";
+          this.token = getCookie('access') ?? "";
         }
 
         return resp
@@ -59,7 +59,17 @@ export const useAuthStore = defineStore({
         }
       },
       async refreshProfile() {
-        await this.api.fetchProfile(Empty, {meta: {token: this.token}})
+        try {
+          const resp = await this.api.fetchProfile(Empty, {meta: {token: this.token}})
+
+          const profile = resp.response;
+          this.profile = profile;
+        } catch (err) {
+          switch (err.code) {
+            default:
+              logger.error(err);
+          }
+        }
       },
       async signinTwitch(token:string) {},
       async refresh() {

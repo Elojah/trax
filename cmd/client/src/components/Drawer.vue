@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+const authStore = useAuthStore()
 
 const redirect = function (name: string) {
 	router.push({ name: name });
@@ -19,7 +22,7 @@ const redirect = function (name: string) {
 			</v-list-item>
 		</v-list>
 		<v-divider></v-divider>
-		<template v-slot:append>
+		<template v-slot:append v-if="authStore.profile">
 			<v-divider></v-divider>
 			<v-list-item prepend-icon="mdi-account" title="Profile" value="profile" @click="redirect('profile')">
 				<template v-slot:prepend>

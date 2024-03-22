@@ -16,7 +16,7 @@ import (
 )
 
 type sqlUser struct {
-	ID           []byte
+	ID           ulid.ID
 	Email        string
 	PasswordHash []byte
 	PasswordSalt []byte

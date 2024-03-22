@@ -16,7 +16,7 @@ import (
 )
 
 type sqlProfile struct {
-	UserID    []byte
+	UserID    ulid.ID
 	FirstName string
 	LastName  string
 	CreatedAt time.Time

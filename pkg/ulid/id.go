@@ -2,6 +2,7 @@ package ulid
 
 import (
 	"crypto/rand"
+	"database/sql/driver"
 	"encoding/base64"
 	"encoding/json"
 	"time"
@@ -49,6 +50,20 @@ func NewID() ID {
 // NewZeroID returns a new zero ID.
 func NewZeroID() ID {
 	return make(ID, length)
+}
+
+// Value override marshalling for database/sql
+func (id ID) Value() (driver.Value, error) {
+	return id.Bytes(), nil
+}
+
+// Value override unmarshalling for database/sql
+func (id *ID) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return id.Unmarshal(bytes)
 }
 
 // MarshalCQL override marshalling to fit CQL UUID.
