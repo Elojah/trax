@@ -39,6 +39,14 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 		UpdatedAt:    now,
 	}
 
+	p := user.Profile{
+		UserID:    u.ID,
+		FirstName: req.Firstname,
+		LastName:  req.Lastname,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		if err := h.user.Insert(ctx, u); err != nil {
 			if errors.As(err, &gerrors.ErrConflict{}) {
@@ -47,6 +55,17 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
 			}
 			logger.Error().Err(err).Msg("failed to insert user")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		if err := h.user.InsertProfile(ctx, p); err != nil {
+			if errors.As(err, &gerrors.ErrConflict{}) {
+				logger.Error().Err(err).Msg("failed to insert profile")
+
+				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
+			}
+			logger.Error().Err(err).Msg("failed to insert profile")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}

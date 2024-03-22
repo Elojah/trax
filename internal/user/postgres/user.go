@@ -26,7 +26,7 @@ type sqlUser struct {
 	UpdatedAt    time.Time
 }
 
-func new(u user.U) sqlUser {
+func newUser(u user.U) sqlUser {
 	return sqlUser{
 		ID:           u.ID,
 		Email:        u.Email,
@@ -139,7 +139,7 @@ func (s Store) Insert(ctx context.Context, u user.U) error {
 	b.WriteString(postgres.Array(1, 8))
 	b.WriteString(`)`)
 
-	sqlu := new(u)
+	sqlu := newUser(u)
 
 	if _, err := tx.Exec(
 		ctx,

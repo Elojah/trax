@@ -31,7 +31,7 @@ message U {
 message Profile {
 	bytes UserID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
-	string Firstname           = 2;
+	string FirstName           = 2;
 	string LastName            = 3;
 
 	int64 CreatedAt            = 4;

@@ -6,14 +6,21 @@ import {SignInError} from "@/errors"
 import {APIClient} from '@api/api.client';
 import { Empty } from '@pkg/pbtypes/empty';
 import type { SigninReq, SignupReq } from '@internal/user/dto/user';
+import {GrpcWebFetchTransport} from "@protobuf-ts/grpcweb-transport";
+import { getCookie } from 'typescript-cookie'
 
 export const useAuthStore = defineStore({
     id: 'auth',
     state: () => ({
-      token: null as string | null,
+      token: "" as string,
       profile: null as Profile | null,
+
       signupURL: new URL('signup', config.web_client_url).href,
       signinURL: new URL('signin', config.web_client_url).href,
+
+      api: new APIClient(new GrpcWebFetchTransport({
+          baseUrl: config.api_url,
+      })),
     }),
     actions: {
       async signup (req: SignupReq): Promise<Response> {
@@ -23,10 +30,16 @@ export const useAuthStore = defineStore({
         })
       },
       async signin(req:SigninReq) {
-        return await fetch(this.signinURL, {
+        const resp = await fetch(this.signinURL, {
           method: 'POST',
           body: JSON.stringify(req),
         })
+
+        if (resp.status === 200) {
+          this.token = getCookie('token') ?? "";
+        }
+
+        return resp
       },
       async signinGoogle(token: string) {
         logger.info('signin google attempt');
@@ -44,15 +57,9 @@ export const useAuthStore = defineStore({
 
           throw new SignInError(err);
         }
-
-        this.profile = await this.fetchProfile();
       },
-      async fetchProfile(): Promise<Profile|null> {
-        const client = new APIClient(config.api_url)
-        const profile = await client.fetchProfile(Empty, {meta: {token: this.token}})
-
-
-        return null
+      async refreshProfile() {
+        await this.api.fetchProfile(Empty, {meta: {token: this.token}})
       },
       async signinTwitch(token:string) {},
       async refresh() {

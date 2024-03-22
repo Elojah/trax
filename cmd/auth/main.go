@@ -108,10 +108,10 @@ func run(prog string, filename string) {
 	}
 
 	userStore := &userpostgres.Store{}
-	// userStore := &userpostgres.StoreProfile{}
 	userApp := userapp.App{
 		Transactioner: postgress,
 		Store:         userStore,
+		StoreProfile:  userStore,
 		Cookie:        cookieApp,
 	}
 	if err := userApp.Dial(ctx); err != nil {

@@ -99,13 +99,14 @@ func run(prog string, filename string) {
 
 	cs = append(cs, &https)
 
-	userStore := &userpostgres.Store{Service: &postgress}
+	userStore := &userpostgres.Store{}
 	// userCache := &userredis.Cache{Service: rediss}
 	userApp := userapp.App{
-		Store:        userStore,
-		StoreProfile: userStore,
+		Transactioner: postgress,
+		Store:         userStore,
+		StoreProfile:  userStore,
+		Cookie:        cookieApp,
 		// Cache: userCache,
-		Cookie: cookieApp,
 	}
 
 	if err := userApp.Dial(ctx); err != nil {

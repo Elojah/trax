@@ -39,14 +39,16 @@ const signin = async function () {
 
   switch (resp.status) {
     case 200: // success
+      authStore.refreshProfile()
       // snackbarSuccess.value = true
-      // form?.value?.reset()
       break;
     case 401: // unauthorized
       snackbarUnauthorized.value = true
+      form?.value?.reset()
       break;
     case 500: // internal
       snackbarInternal.value = true
+      form?.value?.reset()
       break;
   }
 }
@@ -58,7 +60,7 @@ const signInGoogle = function () {
 </script>
 
 <template>
-  <v-card class="px-6 py-6" rounded>
+  <v-card class="px-6 py-6 rounded-xl" variant="elevated">
     <v-card-item class="justify-center mb-2" prepend-icon="mdi-login">
       <v-card-title>
         SIGNIN
@@ -92,7 +94,7 @@ const signInGoogle = function () {
           </v-col>
           <v-divider color="success"></v-divider>
           <v-col class="mt-6" cols="12" align="center">
-            <GoogleLogin :client-id="googleClientID" :callback="signin">
+            <GoogleLogin :client-id="googleClientID" :callback="signInGoogle">
               <v-btn size="large" variant="tonal" append-icon="mdi-google">
                 Signin with Google
                 <template v-slot:append>

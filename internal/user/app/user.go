@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -117,6 +118,8 @@ func (a App) Auth(ctx context.Context, audience string) (user.U, error) {
 
 		return strings.Trim(md["token"][0], " ")
 	}()
+
+	fmt.Println("FOUND token", token)
 
 	if token == "" {
 		return user.U{}, errors.ErrMissingAuth{}

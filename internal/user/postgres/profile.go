@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/elojah/trax/internal/user"
 	terrors "github.com/elojah/trax/pkg/errors"
@@ -13,6 +14,34 @@ import (
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
 )
+
+type sqlProfile struct {
+	UserID    []byte
+	FirstName string
+	LastName  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func newProfile(p user.Profile) sqlProfile {
+	return sqlProfile{
+		UserID:    p.UserID,
+		FirstName: p.FirstName,
+		LastName:  p.LastName,
+		CreatedAt: time.Unix(p.CreatedAt, 0),
+		UpdatedAt: time.Unix(p.UpdatedAt, 0),
+	}
+}
+
+func (sqlp sqlProfile) profile() user.Profile {
+	return user.Profile{
+		UserID:    sqlp.UserID,
+		FirstName: sqlp.FirstName,
+		LastName:  sqlp.LastName,
+		CreatedAt: sqlp.CreatedAt.Unix(),
+		UpdatedAt: sqlp.UpdatedAt.Unix(),
+	}
+}
 
 type filterProfile user.FilterProfile
 
@@ -66,12 +95,14 @@ func (s Store) InsertProfile(ctx context.Context, profile user.Profile) error {
 		return err
 	}
 
+	p := newProfile(profile)
+
 	b := strings.Builder{}
 	b.WriteString(`INSERT INTO "user"."user_profile" (user_id, first_name, last_name, created_at, updated_at) VALUES (`)
-	b.WriteString(postgres.Array(1, 7))
+	b.WriteString(postgres.Array(1, 5))
 	b.WriteString(`)`)
 
-	if _, err := tx.Exec(ctx, b.String(), profile.UserID, profile.Firstname, profile.LastName, profile.CreatedAt, profile.UpdatedAt); err != nil {
+	if _, err := tx.Exec(ctx, b.String(), p.UserID, p.FirstName, p.LastName, p.CreatedAt, p.UpdatedAt); err != nil {
 		return err
 	}
 
@@ -92,8 +123,8 @@ func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Pro
 
 	q := tx.QueryRow(ctx, b.String(), args...)
 
-	var profile user.Profile
-	if err := q.Scan(&profile.UserID, &profile.Firstname, &profile.LastName, &profile.CreatedAt, &profile.UpdatedAt); err != nil {
+	var p sqlProfile
+	if err := q.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.CreatedAt, &p.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return user.Profile{}, terrors.ErrNotFound{Resource: "profile", Index: filterProfile(f).index()}
 		}
@@ -101,7 +132,7 @@ func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Pro
 		return user.Profile{}, err
 	}
 
-	return profile, nil
+	return p.profile(), nil
 }
 
 func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]user.Profile, error) {
@@ -124,12 +155,12 @@ func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]us
 	var profiles []user.Profile
 
 	for rows.Next() {
-		var profile user.Profile
-		if err := rows.Scan(&profile.UserID, &profile.Firstname, &profile.LastName, &profile.CreatedAt, &profile.UpdatedAt); err != nil {
+		var p sqlProfile
+		if err := rows.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.CreatedAt, &p.UpdatedAt); err != nil {
 			return nil, err
 		}
 
-		profiles = append(profiles, profile)
+		profiles = append(profiles, p.profile())
 	}
 
 	return profiles, nil

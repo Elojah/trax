@@ -56,9 +56,9 @@ export interface Profile {
      */
     userID: Uint8Array;
     /**
-     * @generated from protobuf field: string Firstname = 2 [json_name = "Firstname"];
+     * @generated from protobuf field: string FirstName = 2 [json_name = "FirstName"];
      */
-    firstname: string;
+    firstName: string;
     /**
      * @generated from protobuf field: string LastName = 3 [json_name = "LastName"];
      */
@@ -180,7 +180,7 @@ class Profile$Type extends MessageType<Profile> {
     constructor() {
         super("user.Profile", [
             { no: 1, name: "UserID", kind: "scalar", jsonName: "UserID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 2, name: "Firstname", kind: "scalar", jsonName: "Firstname", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "FirstName", kind: "scalar", jsonName: "FirstName", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "LastName", kind: "scalar", jsonName: "LastName", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
             { no: 5, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
@@ -189,7 +189,7 @@ class Profile$Type extends MessageType<Profile> {
     create(value?: PartialMessage<Profile>): Profile {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.userID = new Uint8Array(0);
-        message.firstname = "";
+        message.firstName = "";
         message.lastName = "";
         message.createdAt = 0n;
         message.updatedAt = 0n;
@@ -205,8 +205,8 @@ class Profile$Type extends MessageType<Profile> {
                 case /* bytes UserID = 1 [json_name = "UserID"];*/ 1:
                     message.userID = reader.bytes();
                     break;
-                case /* string Firstname = 2 [json_name = "Firstname"];*/ 2:
-                    message.firstname = reader.string();
+                case /* string FirstName = 2 [json_name = "FirstName"];*/ 2:
+                    message.firstName = reader.string();
                     break;
                 case /* string LastName = 3 [json_name = "LastName"];*/ 3:
                     message.lastName = reader.string();
@@ -232,9 +232,9 @@ class Profile$Type extends MessageType<Profile> {
         /* bytes UserID = 1 [json_name = "UserID"]; */
         if (message.userID.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.userID);
-        /* string Firstname = 2 [json_name = "Firstname"]; */
-        if (message.firstname !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.firstname);
+        /* string FirstName = 2 [json_name = "FirstName"]; */
+        if (message.firstName !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.firstName);
         /* string LastName = 3 [json_name = "LastName"]; */
         if (message.lastName !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.lastName);

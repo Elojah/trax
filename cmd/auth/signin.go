@@ -78,6 +78,8 @@ func (h *handler) Signin(ctx context.Context, req *dto.SigninReq) (*dto.SigninRe
 		return &dto.SigninResp{}, status.New(codes.Internal, err.Error()).Err()
 	}
 
+	logger.Info().Msg("success")
+
 	return &dto.SigninResp{
 		AccessToken:  jwt,
 		RefreshToken: rt,

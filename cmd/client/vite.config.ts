@@ -25,18 +25,24 @@ export default async() =>{
 
       config = JSON.parse(configData);
     },
-    transform(code:any) {
-      return code.replace('__CONFIG__', JSON.stringify(config));
-    }
+    transform(code:any) : any {
+      return {
+        code: code.replace('__CONFIG__', JSON.stringify(config)),
+        map: null,
+      };
+    },
   }
 
   return defineConfig({
     plugins: [
+      loadConfigPlugin,
       vue(),
       vueJsx(),
       vuetify(),
-      loadConfigPlugin,
     ],
+    build :{
+      sourcemap: true,
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
