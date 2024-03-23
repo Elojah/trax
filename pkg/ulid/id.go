@@ -2,12 +2,12 @@ package ulid
 
 import (
 	"crypto/rand"
-	"database/sql/driver"
 	"encoding/base64"
 	"encoding/json"
 	"time"
 
 	"github.com/gocql/gocql"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/oklog/ulid/v2"
 )
 
@@ -52,18 +52,18 @@ func NewZeroID() ID {
 	return make(ID, length)
 }
 
-// Value override marshalling for database/sql
-func (id ID) Value() (driver.Value, error) {
-	return id.Bytes(), nil
+// ScanUUID implements pgtype.UUIDScanner interface
+func (id *ID) ScanUUID(v pgtype.UUID) error {
+	if !v.Valid {
+		return ErrInvalidULID{Value: v.Bytes}
+	}
+
+	return id.Unmarshal(v.Bytes[:])
 }
 
-// Value override unmarshalling for database/sql
-func (id *ID) Scan(value interface{}) error {
-	bytes, ok := value.([]byte)
-	if !ok {
-		return nil
-	}
-	return id.Unmarshal(bytes)
+// UUIDValue implements pgtype.UUIDValuer interface
+func (id ID) UUIDValue() (pgtype.UUID, error) {
+	return pgtype.UUID{Bytes: [16]byte(id.Bytes()), Valid: true}, nil
 }
 
 // MarshalCQL override marshalling to fit CQL UUID.

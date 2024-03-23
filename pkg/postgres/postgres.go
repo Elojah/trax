@@ -92,7 +92,6 @@ func (s Service) Tx(ctx context.Context, access transaction.AccessMode, f func(c
 		return err
 	case transaction.Commit:
 		if cerr := tx.Commit(ctx); cerr != nil {
-			fmt.Println("commit error", cerr)
 			if rerr := tx.Rollback(ctx); rerr != nil {
 				return rerr
 			}

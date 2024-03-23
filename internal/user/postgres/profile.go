@@ -2,14 +2,11 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/elojah/trax/internal/user"
-	terrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
@@ -125,11 +122,7 @@ func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Pro
 
 	var p sqlProfile
 	if err := q.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.CreatedAt, &p.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return user.Profile{}, terrors.ErrNotFound{Resource: "profile", Index: filterProfile(f).index()}
-		}
-
-		return user.Profile{}, err
+		return user.Profile{}, postgres.Error(err, "profile", filterProfile(f).index())
 	}
 
 	return p.profile(), nil

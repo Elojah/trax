@@ -26,5 +26,8 @@ config/
 # Executables
 bin/
 
+# Temporary vite config
+cmd/client/vite.config.ts.timestamp-*
+
 # IDE
 .vscode

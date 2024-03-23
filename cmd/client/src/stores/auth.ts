@@ -17,6 +17,7 @@ export const useAuthStore = defineStore({
 
       signupURL: new URL('signup', config.web_client_url).href,
       signinURL: new URL('signin', config.web_client_url).href,
+      signinGoogleURL: new URL('signin', config.web_client_url).href,
 
       api: new APIClient(new GrpcWebFetchTransport({
           baseUrl: config.api_url,
@@ -36,35 +37,31 @@ export const useAuthStore = defineStore({
         })
 
         if (resp.status === 200) {
-          this.token = getCookie('access') ?? "";
+          this.refreshProfile();
         }
 
         return resp
       },
       async signinGoogle(token: string) {
-        logger.info('signin google attempt');
-
-        const signin = await fetch(
-          new URL('signin_google', config.web_client_url).href, {
+        const resp = await fetch(this.signinGoogleURL, {
           method: 'POST',
-          headers: {},
           body: token
         });
 
-        if (signin.status !== 200) {
-          const err = `signin google failed with status ${signin.status}`
-          logger.error(err);
-
-          throw new SignInError(err);
+        if (resp.status === 200) {
+          this.refreshProfile();
         }
+
+        return resp
       },
       async refreshProfile() {
+        this.token = getCookie('access') ?? "";
+
         try {
           const resp = await this.api.fetchProfile(Empty, {meta: {token: this.token}})
-
           const profile = resp.response;
           this.profile = profile;
-        } catch (err) {
+        } catch (err: any) {
           switch (err.code) {
             default:
               logger.error(err);

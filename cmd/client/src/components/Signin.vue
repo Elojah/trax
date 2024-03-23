@@ -39,6 +39,23 @@ const signin = async function () {
 
   switch (resp.status) {
     case 200: // success
+      // TODO: redirect
+      break;
+    case 401: // unauthorized
+      snackbarUnauthorized.value = true
+      form?.value?.reset()
+      break;
+    case 500: // internal
+      snackbarInternal.value = true
+      form?.value?.reset()
+      break;
+  }
+}
+const signInGoogle = async function (token: string) {
+  const resp = await authStore.signinGoogle(token);
+
+  switch (resp.status) {
+    case 200: // success
       authStore.refreshProfile()
       // snackbarSuccess.value = true
       break;
@@ -52,11 +69,8 @@ const signin = async function () {
       break;
   }
 }
-const signInGoogle = function () {
-  // Add your sign in logic here
-  authStore.signinGoogle(email.value!);
-  console.log('Signing in with ', email.value, password.value);
-}
+
+authStore.refreshProfile()
 </script>
 
 <template>

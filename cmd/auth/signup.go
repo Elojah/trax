@@ -26,28 +26,28 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 	}
 
 	// #Create user
-	now := time.Now().Unix()
-	hash, salt := user.Encrypt(req.Password)
-	u := user.U{
-		ID:           ulid.NewID(),
-		Email:        req.Email,
-		PasswordHash: hash,
-		PasswordSalt: salt,
-		TwitchID:     "",
-		GoogleID:     "",
-		CreatedAt:    now,
-		UpdatedAt:    now,
-	}
-
-	p := user.Profile{
-		UserID:    u.ID,
-		FirstName: req.Firstname,
-		LastName:  req.Lastname,
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
-
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		now := time.Now().Unix()
+		hash, salt := user.Encrypt(req.Password)
+		u := user.U{
+			ID:           ulid.NewID(),
+			Email:        req.Email,
+			PasswordHash: hash,
+			PasswordSalt: salt,
+			TwitchID:     "",
+			GoogleID:     "",
+			CreatedAt:    now,
+			UpdatedAt:    now,
+		}
+
+		p := user.Profile{
+			UserID:    u.ID,
+			FirstName: req.Firstname,
+			LastName:  req.Lastname,
+			CreatedAt: now,
+			UpdatedAt: now,
+		}
+
 		if err := h.user.Insert(ctx, u); err != nil {
 			if errors.As(err, &gerrors.ErrConflict{}) {
 				logger.Error().Err(err).Msg("failed to insert user")

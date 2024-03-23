@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 
 	"github.com/elojah/trax/internal/user"
 	gerrors "github.com/elojah/trax/pkg/errors"
@@ -34,7 +35,12 @@ func (h *handler) FetchProfile(ctx context.Context, req *pbtypes.Empty) (*user.P
 			UserID: u.ID,
 		})
 		if err != nil {
-			logger.Error().Err(err).Msg("failed to fetch profile")
+			if errors.As(err, &gerrors.ErrNotFound{}) {
+				logger.Error().Err(err).Msg("failed to fetch user profile")
+
+				return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
+			}
+			logger.Error().Err(err).Msg("failed to fetch user profile")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
