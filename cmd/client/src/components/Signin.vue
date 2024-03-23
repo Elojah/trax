@@ -57,7 +57,7 @@ const signInGoogle = async function (token: string) {
   switch (resp.status) {
     case 200: // success
       authStore.refreshProfile()
-      // snackbarSuccess.value = true
+      // TODO: redirect
       break;
     case 401: // unauthorized
       snackbarUnauthorized.value = true
@@ -108,7 +108,7 @@ authStore.refreshProfile()
           </v-col>
           <v-divider color="success"></v-divider>
           <v-col class="mt-6" cols="12" align="center">
-            <GoogleLogin :client-id="googleClientID" :callback="signInGoogle">
+            <GoogleLogin :client-id="googleClientID" :callback="signInGoogle" prompt auto-login>
               <v-btn size="large" variant="tonal" append-icon="mdi-google">
                 Signin with Google
                 <template v-slot:append>

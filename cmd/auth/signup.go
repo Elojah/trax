@@ -48,6 +48,8 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 			UpdatedAt: now,
 		}
 
+		logger = logger.With().Str("user_id", u.ID.String()).Str("user_email", u.Email).Logger()
+
 		if err := h.user.Insert(ctx, u); err != nil {
 			if errors.As(err, &gerrors.ErrConflict{}) {
 				logger.Error().Err(err).Msg("failed to insert user")
@@ -69,6 +71,8 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
+
+		logger.Info().Msg("created")
 
 		return transaction.Commit, nil
 	}); err != nil {

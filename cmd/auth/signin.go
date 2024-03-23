@@ -43,6 +43,10 @@ func (h *handler) Signin(ctx context.Context, req *dto.SigninReq) (*dto.SigninRe
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
+		logger = logger.With().Str("user_id", u.ID.String()).Str("user_email", u.Email).Logger()
+
+		logger.Info().Msg("found")
+
 		return transaction.Commit, nil
 	}); err != nil {
 		return &dto.SigninResp{}, err

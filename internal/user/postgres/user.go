@@ -3,13 +3,11 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/elojah/trax/internal/user"
-	terrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
@@ -168,11 +166,7 @@ func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 
 	var u sqlUser
 	if err := q.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PasswordSalt, &u.GoogleID, &u.TwitchID, &u.CreatedAt, &u.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return user.U{}, terrors.ErrNotFound{Resource: "user", Index: filter(f).index()}
-		}
-
-		return user.U{}, err
+		return user.U{}, postgres.Error(err, "user", filter(f).index())
 	}
 
 	return u.user(), nil

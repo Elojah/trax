@@ -2,7 +2,6 @@ import router from '@/router';
 import { defineStore } from 'pinia';
 import {Profile} from '@internal/user/user';
 import {config, logger} from "@/config"
-import {SignInError} from "@/errors"
 import {APIClient} from '@api/api.client';
 import { Empty } from '@pkg/pbtypes/empty';
 import type { SigninReq, SignupReq } from '@internal/user/dto/user';
@@ -17,7 +16,7 @@ export const useAuthStore = defineStore({
 
       signupURL: new URL('signup', config.web_client_url).href,
       signinURL: new URL('signin', config.web_client_url).href,
-      signinGoogleURL: new URL('signin', config.web_client_url).href,
+      signinGoogleURL: new URL('signin_google', config.web_client_url).href,
 
       api: new APIClient(new GrpcWebFetchTransport({
           baseUrl: config.api_url,
@@ -42,10 +41,10 @@ export const useAuthStore = defineStore({
 
         return resp
       },
-      async signinGoogle(token: string) {
+      async signinGoogle(identifier: {client_id:string, credential:string}) {
         const resp = await fetch(this.signinGoogleURL, {
           method: 'POST',
-          body: token
+          body: identifier.credential,
         });
 
         if (resp.status === 200) {
@@ -56,6 +55,10 @@ export const useAuthStore = defineStore({
       },
       async refreshProfile() {
         this.token = getCookie('access') ?? "";
+
+        if (!this.token) {
+          return;
+        }
 
         try {
           const resp = await this.api.fetchProfile(Empty, {meta: {token: this.token}})

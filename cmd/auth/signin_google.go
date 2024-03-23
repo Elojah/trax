@@ -35,6 +35,8 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 
 	var u user.U
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		logger = logger.With().Str("google_id", gid).Logger()
+
 		// #Check if user exist
 		u, err = h.user.Fetch(ctx, user.Filter{GoogleID: &gid})
 		if err != nil {
@@ -45,16 +47,26 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 			}
 			// user not found, create
 		} else {
+			logger.Info().Msg("found")
+
 			return transaction.Commit, nil
 		}
 
+		now := time.Now().Unix()
+
 		// #Create user
+		// generate a random password
+		hash, salt := user.Encrypt(ulid.NewID().String())
+
 		u = user.U{
-			ID:       ulid.NewID(),
-			GoogleID: gid,
+			ID:           ulid.NewID(),
+			PasswordHash: hash,
+			PasswordSalt: salt,
+			GoogleID:     gid,
+			CreatedAt:    now,
+			UpdatedAt:    now,
 		}
 
-		now := time.Now().Unix()
 		p := user.Profile{
 			UserID: u.ID,
 			// FirstName: req.Firstname,
@@ -62,6 +74,8 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 			CreatedAt: now,
 			UpdatedAt: now,
 		}
+
+		logger = logger.With().Str("user_id", u.ID.String()).Logger()
 
 		if err := h.user.Insert(ctx, u); err != nil {
 			logger.Error().Err(err).Msg("failed to create user")
@@ -79,6 +93,8 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
+
+		logger.Info().Msg("created")
 
 		return transaction.Commit, nil
 	}); err != nil {
