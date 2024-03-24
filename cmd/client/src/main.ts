@@ -5,11 +5,17 @@ import 'vuetify/styles'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createVuetify } from 'vuetify'
+import GoogleSignInPlugin from "vue3-google-signin"
 
 import App from './App.vue'
 import router from './router'
+import { config } from './config'
 
 const app = createApp(App)
+
+app.use(GoogleSignInPlugin, {
+  clientId: config.google_client_id,
+});
 
 app.use(createVuetify({
   theme: {

@@ -14,7 +14,6 @@ export const Auth = new ServiceType("grpc.Auth", [
     { name: "Signup", options: {}, I: SignupReq, O: Empty },
     { name: "Signin", options: {}, I: SigninReq, O: SigninResp },
     { name: "SigninGoogle", options: {}, I: String$, O: SigninResp },
-    { name: "SigninTwitch", options: {}, I: String$, O: SigninResp },
     { name: "RefreshToken", options: {}, I: String$, O: SigninResp },
     { name: "Ping", options: {}, I: Empty, O: Empty }
 ]);

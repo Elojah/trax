@@ -35,12 +35,6 @@ export interface IAuthClient {
      */
     signinGoogle(input: String$, options?: RpcOptions): UnaryCall<String$, SigninResp>;
     /**
-     * Signin Twitch
-     *
-     * @generated from protobuf rpc: SigninTwitch(pbtypes.String) returns (dto.SigninResp);
-     */
-    signinTwitch(input: String$, options?: RpcOptions): UnaryCall<String$, SigninResp>;
-    /**
      * Refresh token
      *
      * @generated from protobuf rpc: RefreshToken(pbtypes.String) returns (dto.SigninResp);
@@ -90,21 +84,12 @@ export class AuthClient implements IAuthClient, ServiceInfo {
         return stackIntercept<String$, SigninResp>("unary", this._transport, method, opt, input);
     }
     /**
-     * Signin Twitch
-     *
-     * @generated from protobuf rpc: SigninTwitch(pbtypes.String) returns (dto.SigninResp);
-     */
-    signinTwitch(input: String$, options?: RpcOptions): UnaryCall<String$, SigninResp> {
-        const method = this.methods[3], opt = this._transport.mergeOptions(options);
-        return stackIntercept<String$, SigninResp>("unary", this._transport, method, opt, input);
-    }
-    /**
      * Refresh token
      *
      * @generated from protobuf rpc: RefreshToken(pbtypes.String) returns (dto.SigninResp);
      */
     refreshToken(input: String$, options?: RpcOptions): UnaryCall<String$, SigninResp> {
-        const method = this.methods[4], opt = this._transport.mergeOptions(options);
+        const method = this.methods[3], opt = this._transport.mergeOptions(options);
         return stackIntercept<String$, SigninResp>("unary", this._transport, method, opt, input);
     }
     /**
@@ -113,7 +98,7 @@ export class AuthClient implements IAuthClient, ServiceInfo {
      * @generated from protobuf rpc: Ping(pbtypes.Empty) returns (pbtypes.Empty);
      */
     ping(input: Empty, options?: RpcOptions): UnaryCall<Empty, Empty> {
-        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept<Empty, Empty>("unary", this._transport, method, opt, input);
     }
 }

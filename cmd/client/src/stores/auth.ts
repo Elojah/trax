@@ -41,10 +41,10 @@ export const useAuthStore = defineStore({
 
         return resp
       },
-      async signinGoogle(identifier: {client_id:string, credential:string}) {
+      async signinGoogle(token: string) {
         const resp = await fetch(this.signinGoogleURL, {
           method: 'POST',
-          body: identifier.credential,
+          body: token,
         });
 
         if (resp.status === 200) {
@@ -62,8 +62,8 @@ export const useAuthStore = defineStore({
 
         try {
           const resp = await this.api.fetchProfile(Empty, {meta: {token: this.token}})
-          const profile = resp.response;
-          this.profile = profile;
+
+          this.profile = resp.response;
         } catch (err: any) {
           switch (err.code) {
             default:

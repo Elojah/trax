@@ -2,9 +2,8 @@
 import { ref } from "vue";
 import { SigninReq } from '@internal/user/dto/user';
 import { useAuthStore } from '@/stores/auth';
-import { GoogleLogin } from 'vue3-google-login';
-import { config } from '@/config';
 import type { VForm } from "vuetify/components/VForm";
+import { useTokenClient, type AuthCodeFlowSuccessResponse, type AuthCodeFlowErrorResponse, type CredentialResponse } from "vue3-google-signin";
 
 const form = ref<VForm | null>(null);
 
@@ -23,8 +22,6 @@ const passwordRules = [
   (v: string) => !!v || "Required.",
   (v: string) => (v && v.length >= 8) || "Min 8 characters"
 ]
-
-const googleClientID = config.google_client_id
 
 const snackbarUnauthorized = ref(false)
 const snackbarInternal = ref(false)
@@ -51,8 +48,9 @@ const signin = async function () {
       break;
   }
 }
-const signInGoogle = async function (token: string) {
-  const resp = await authStore.signinGoogle(token);
+
+const signInGoogle = async function (credentials: CredentialResponse) {
+  const resp = await authStore.signinGoogle(credentials.credential!);
 
   switch (resp.status) {
     case 200: // success
@@ -68,6 +66,12 @@ const signInGoogle = async function (token: string) {
       form?.value?.reset()
       break;
   }
+}
+
+const signInGoogleError = async function (error: any) {
+  console.log(error)
+  snackbarInternal.value = true
+  form?.value?.reset()
 }
 
 authStore.refreshProfile()
@@ -107,15 +111,10 @@ authStore.refreshProfile()
             </v-btn>
           </v-col>
           <v-divider color="success"></v-divider>
-          <v-col class="mt-6" cols="12" align="center">
-            <GoogleLogin :client-id="googleClientID" :callback="signInGoogle" prompt auto-login>
-              <v-btn size="large" variant="tonal" append-icon="mdi-google">
-                Signin with Google
-                <template v-slot:append>
-                  <v-icon color="success"></v-icon>
-                </template>
-              </v-btn>
-            </GoogleLogin>
+          <v-col class="mt-6 color-auto" cols="12" align="center">
+            <GoogleSignInButton @success="signInGoogle" @error="signInGoogleError" theme="filled_black" size="large"
+              shape="pill">
+            </GoogleSignInButton>
           </v-col>
         </v-row>
       </v-form>
@@ -134,4 +133,8 @@ authStore.refreshProfile()
     </v-card-text>
   </v-card>
 </template>
-<style scoped></style>
+<style scoped>
+.color-auto{
+  color-scheme: auto;
+}
+</style>

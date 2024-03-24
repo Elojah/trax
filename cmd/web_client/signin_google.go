@@ -10,8 +10,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const maxTokenLength = 32768
-
 func (h handler) signinGoogle(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -26,14 +24,7 @@ func (h handler) signinGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(raw) > maxTokenLength {
-		logger.Error().Msg("invalid token format")
-		http.Error(w, "invalid token format", http.StatusBadRequest)
-
-		return
-	}
-
-	// Signin with auth.
+	// Signin with auth
 	jwt, err := h.SigninGoogle(ctx, &pbtypes.String{Value: string(raw)})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to signin")

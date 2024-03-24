@@ -7,6 +7,7 @@ import (
 	"github.com/elojah/trax/pkg/http"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/ilyakaznacheev/cleanenv"
+	"golang.org/x/oauth2"
 )
 
 type web struct {
@@ -18,6 +19,8 @@ type config struct {
 	Web        web               `json:"web"`
 	Redis      redis.Config      `json:"redis"`
 	AuthClient grpc.ConfigClient `json:"auth_client"`
+
+	Google oauth2.Config `json:"google"`
 }
 
 // Populate populates config object reading file and env.

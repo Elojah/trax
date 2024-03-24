@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
@@ -18,8 +17,6 @@ import (
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
-	twitchapp "github.com/elojah/trax/pkg/twitch/app"
-	twitchhttp "github.com/elojah/trax/pkg/twitch/http"
 	"github.com/rs/zerolog/log"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/reflection"
@@ -81,18 +78,6 @@ func run(prog string, filename string) {
 
 	cs = append(cs, &rediss)
 
-	// init domain
-	twitchApp := twitchapp.App{
-		Client: &twitchhttp.Client{
-			Client: http.DefaultClient,
-		},
-	}
-	if err := twitchApp.Dial(ctx, cfg.Twitch); err != nil {
-		log.Error().Err(err).Msg("failed to dial twitch app")
-
-		return
-	}
-
 	googleApp := googleapp.App{}
 	if err := googleApp.Dial(ctx, cfg.Google); err != nil {
 		log.Error().Err(err).Msg("failed to dial google app")
@@ -122,7 +107,6 @@ func run(prog string, filename string) {
 
 	// init handler
 	h := handler{
-		twitch: twitchApp,
 		google: googleApp,
 
 		user: userApp,

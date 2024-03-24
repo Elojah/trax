@@ -15,7 +15,6 @@ type config struct {
 	GRPC     grpc.Config     `json:"grpc"`
 	Redis    redis.Config    `json:"redis"`
 
-	Twitch oauth2.Config `json:"twitch"`
 	Google oauth2.Config `json:"google"`
 }
 

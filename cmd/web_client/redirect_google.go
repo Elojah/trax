@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (h handler) redirectTwitch(w http.ResponseWriter, r *http.Request) {
+func (h handler) redirectGoogle(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := log.With().Str("route", r.URL.EscapedPath()).Str("method", r.Method).Str("address", r.RemoteAddr).Logger()
 
@@ -35,7 +35,7 @@ func (h handler) redirectTwitch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// #Fetch token
-	oa := h.twitch.OAuth()
+	oa := h.google.OAuth()
 
 	token, err := oa.Exchange(ctx, r.FormValue("code"))
 	if err != nil {
@@ -46,7 +46,7 @@ func (h handler) redirectTwitch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// #Fetch JWT
-	jwt, err := h.AuthClient.SigninTwitch(ctx, &pbtypes.String{Value: token.AccessToken})
+	jwt, err := h.AuthClient.SigninGoogle(ctx, &pbtypes.String{Value: token.AccessToken})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to signin")
 		http.Error(w, "failed to signin", http.StatusInternalServerError)

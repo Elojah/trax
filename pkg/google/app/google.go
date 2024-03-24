@@ -5,6 +5,7 @@ import (
 
 	"github.com/elojah/trax/pkg/google"
 	"golang.org/x/oauth2"
+	o2google "golang.org/x/oauth2/google"
 	"google.golang.org/api/idtoken"
 )
 
@@ -17,6 +18,8 @@ type App struct {
 func (a *App) Dial(ctx context.Context, cfg oauth2.Config) error {
 	a.config = cfg
 
+	a.config.Endpoint = o2google.Endpoint
+
 	return nil
 }
 
@@ -26,8 +29,8 @@ func (a *App) Close(ctx context.Context) error {
 	return nil
 }
 
-func (a App) OAuth() oauth2.Config {
-	return a.config
+func (a App) OAuth() *oauth2.Config {
+	return &a.config
 }
 
 func (a App) Signin(ctx context.Context, token string) (string, error) {

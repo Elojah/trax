@@ -12,6 +12,7 @@ import (
 	authgrpc "github.com/elojah/trax/cmd/auth/grpc"
 	cookieapp "github.com/elojah/trax/pkg/cookie/app"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
+	googleapp "github.com/elojah/trax/pkg/google/app"
 	tgrpc "github.com/elojah/trax/pkg/grpc"
 	thttp "github.com/elojah/trax/pkg/http"
 	tlog "github.com/elojah/trax/pkg/log"
@@ -110,8 +111,16 @@ func run(prog string, filename string) {
 
 	cs = append(cs, &authclient)
 
+	googleApp := googleapp.App{}
+	if err := googleApp.Dial(ctx, cfg.Google); err != nil {
+		log.Error().Err(err).Msg("failed to dial google app")
+
+		return
+	}
+
 	h := handler{
 		cookie:     cookieApp,
+		google:     googleApp,
 		AuthClient: authgrpc.NewAuthClient(authclient.ClientConn),
 	}
 
@@ -119,7 +128,7 @@ func run(prog string, filename string) {
 	https.Router.Path("/signup").Methods(http.MethodPost).HandlerFunc(h.signup)
 	https.Router.Path("/signin").Methods(http.MethodPost).HandlerFunc(h.signin)
 	https.Router.Path("/signin_google").Methods(http.MethodPost).HandlerFunc(h.signinGoogle)
-	https.Router.Path("/signin_twitch").Methods(http.MethodPost).HandlerFunc(h.signinTwitch)
+	https.Router.Path("/redirect_google").Methods(http.MethodPost).HandlerFunc(h.redirectGoogle)
 	https.Router.Path("/refresh_token").Methods(http.MethodPost).HandlerFunc(h.refreshToken)
 
 	// serve static dir
@@ -129,7 +138,7 @@ func run(prog string, filename string) {
 		http.ServeFile(w, r, favicon)
 	}))
 	index := path.Join(cfg.Web.Static, "index.html")
-	https.Router.Path("/").Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	https.Router.PathPrefix("/").Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, index)
 	}))
 
