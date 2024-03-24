@@ -25,6 +25,6 @@ import Signin from '@/components/Signin.vue';
 
 <style scoped>
 .bg {
-	background: url('@/assets/img/home-background.svg') !important;
+	background: url('@/assets/img/main-background.svg') !important;
 }
 </style>

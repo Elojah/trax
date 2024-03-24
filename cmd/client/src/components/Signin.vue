@@ -37,7 +37,7 @@ const signin = async function () {
 
   switch (resp.status) {
     case 200: // success
-      router.push({ name: 'home' })
+      router.push({ name: 'dashboard' })
       break;
     case 401: // unauthorized
       snackbarUnauthorized.value = true
@@ -56,7 +56,7 @@ const signInGoogle = async function (credentials: CredentialResponse) {
   switch (resp.status) {
     case 200: // success
       authStore.refreshProfile()
-      router.push({ name: 'home' })
+      router.push({ name: 'dashboard' })
       break;
     case 401: // unauthorized
       snackbarUnauthorized.value = true

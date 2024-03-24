@@ -18,6 +18,6 @@ import Profile from '@/components/Profile.vue';
 
 <style scoped>
 .bg {
-	background: url('@/assets/img/profile-background.svg') !important;
+	background: url('@/assets/img/main-background.svg') !important;
 }
 </style>
