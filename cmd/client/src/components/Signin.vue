@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { SigninReq } from '@internal/user/dto/user';
 import { useAuthStore } from '@/stores/auth';
 import type { VForm } from "vuetify/components/VForm";
-import { useTokenClient, type AuthCodeFlowSuccessResponse, type AuthCodeFlowErrorResponse, type CredentialResponse } from "vue3-google-signin";
+import { type CredentialResponse } from "vue3-google-signin";
 
 const form = ref<VForm | null>(null);
 
@@ -73,8 +73,6 @@ const signInGoogleError = async function (error: any) {
   snackbarInternal.value = true
   form?.value?.reset()
 }
-
-authStore.refreshProfile()
 </script>
 
 <template>

@@ -67,7 +67,7 @@ func (h *handler) Signin(ctx context.Context, req *dto.SigninReq) (*dto.SigninRe
 	}
 
 	// #Create JWT
-	jwt, err := h.user.CreateJWT(ctx, u, "access", time.Minute) // TODO: up to 1 hour (configurable)
+	jwt, err := h.user.CreateJWT(ctx, u, "access", 15*time.Minute) // TODO: configurable
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")
 
@@ -75,7 +75,7 @@ func (h *handler) Signin(ctx context.Context, req *dto.SigninReq) (*dto.SigninRe
 	}
 
 	// #Create refresh token
-	rt, err := h.user.CreateJWT(ctx, u, "refresh", 24*time.Hour)
+	rt, err := h.user.CreateJWT(ctx, u, "refresh", 24*time.Hour) // TODO: configurable
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")
 

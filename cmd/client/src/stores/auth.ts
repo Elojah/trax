@@ -1,4 +1,3 @@
-import router from '@/router';
 import { defineStore } from 'pinia';
 import {Profile} from '@internal/user/user';
 import {config, logger} from "@/config"
@@ -17,6 +16,7 @@ export const useAuthStore = defineStore({
       signupURL: new URL('signup', config.web_client_url).href,
       signinURL: new URL('signin', config.web_client_url).href,
       signinGoogleURL: new URL('signin_google', config.web_client_url).href,
+      refreshTokenURL: new URL('refresh_token', config.web_client_url).href,
 
       api: new APIClient(new GrpcWebFetchTransport({
           baseUrl: config.api_url,
@@ -62,7 +62,6 @@ export const useAuthStore = defineStore({
 
         try {
           const resp = await this.api.fetchProfile(Empty, {meta: {token: this.token}})
-
           this.profile = resp.response;
         } catch (err: any) {
           switch (err.code) {
@@ -71,11 +70,20 @@ export const useAuthStore = defineStore({
           }
         }
       },
-      async refresh() {
+      async refreshToken() {
+        if (!this.token) {
+          return;
+        }
+
+        await fetch(this.refreshTokenURL, {
+          method: 'POST',
+        })
       },
-        async signout() {
-            this.profile = null;
-            router.push('/signin');
+      async signout() {
+          this.token = "";
+          this.profile = null;
+          document.cookie = 'access' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          document.cookie = 'refresh' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       }
     }
 });

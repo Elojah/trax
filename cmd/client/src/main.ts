@@ -13,6 +13,8 @@ import { config } from './config'
 
 const app = createApp(App)
 
+app.use(createPinia())
+
 app.use(GoogleSignInPlugin, {
   clientId: config.google_client_id,
 });
@@ -25,8 +27,6 @@ app.use(createVuetify({
     defaultSet: 'mdi',
   },
 }))
-
-app.use(createPinia())
 
 app.use(router)
 

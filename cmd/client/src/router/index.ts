@@ -4,6 +4,7 @@ import Sign from '@/views/Sign.vue'
 import Profile from '@/views/Profile.vue'
 import NotFound from '@/views/NotFound.vue'
 import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 // import { config } from '@/config'
 
 const router = createRouter({
@@ -35,13 +36,16 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    const profile = useAuthStore().profile
-    if (!profile) {
-      next({ name: 'sign' })
-    } else {
-      next()
-    }
+  const authStore = useAuthStore()
+
+  if (to.matched.some(record => record.meta.requiresAuth) && !authStore.profile) {
+      authStore.refreshProfile().then(() => {
+        if (!authStore.profile) {
+          next({ name: 'sign' })
+        } else {
+          next()
+        }
+      })
   } else {
     next()
   }
