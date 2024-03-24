@@ -25,12 +25,6 @@ $ make client && ./bin/game_03_web_client config/web_client/local.json
 
 TODO:
 
-- Logout in profile
-
-- Automatic refresh token
-
 - Redirect in profile when already logged in
-
-- Check refresh and redirect when already logged in
 
 - Leaflet ?

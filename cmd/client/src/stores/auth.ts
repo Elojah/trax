@@ -5,7 +5,7 @@ import {APIClient} from '@api/api.client';
 import { Empty } from '@pkg/pbtypes/empty';
 import type { SigninReq, SignupReq } from '@internal/user/dto/user';
 import {GrpcWebFetchTransport} from "@protobuf-ts/grpcweb-transport";
-import { getCookie } from 'typescript-cookie'
+import { getCookie, removeCookie } from 'typescript-cookie'
 
 export const useAuthStore = defineStore({
     id: 'auth',
@@ -82,8 +82,9 @@ export const useAuthStore = defineStore({
       async signout() {
           this.token = "";
           this.profile = null;
-          document.cookie = 'access' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-          document.cookie = 'refresh' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          removeCookie('g_state');
+          removeCookie('refresh', { path: '', domain: '.legacyfactory.com' })
+          removeCookie('access', { path: '', domain: '.legacyfactory.com' })
       }
     }
 });

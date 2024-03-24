@@ -13,7 +13,7 @@ const redirect = function (name: string) {
 </script>
 
 <template>
-	<v-navigation-drawer rail>
+	<v-navigation-drawer floating>
 		<v-list nav>
 			<v-list-item prepend-icon="mdi-home" title="Home" value="home" @click="redirect('home')">
 				<template v-slot:prepend>

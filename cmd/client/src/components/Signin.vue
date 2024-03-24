@@ -4,6 +4,7 @@ import { SigninReq } from '@internal/user/dto/user';
 import { useAuthStore } from '@/stores/auth';
 import type { VForm } from "vuetify/components/VForm";
 import { type CredentialResponse } from "vue3-google-signin";
+import router from "@/router";
 
 const form = ref<VForm | null>(null);
 
@@ -36,7 +37,7 @@ const signin = async function () {
 
   switch (resp.status) {
     case 200: // success
-      // TODO: redirect
+      router.push({ name: 'home' })
       break;
     case 401: // unauthorized
       snackbarUnauthorized.value = true
@@ -55,7 +56,7 @@ const signInGoogle = async function (credentials: CredentialResponse) {
   switch (resp.status) {
     case 200: // success
       authStore.refreshProfile()
-      // TODO: redirect
+      router.push({ name: 'home' })
       break;
     case 401: // unauthorized
       snackbarUnauthorized.value = true
