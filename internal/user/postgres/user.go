@@ -19,7 +19,6 @@ type sqlUser struct {
 	PasswordHash []byte
 	PasswordSalt []byte
 	GoogleID     sql.NullString
-	TwitchID     sql.NullString
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -31,7 +30,6 @@ func newUser(u user.U) sqlUser {
 		PasswordHash: u.PasswordHash,
 		PasswordSalt: u.PasswordSalt,
 		GoogleID:     sql.NullString{String: u.GoogleID, Valid: len(u.GoogleID) > 0},
-		TwitchID:     sql.NullString{String: u.TwitchID, Valid: len(u.TwitchID) > 0},
 		CreatedAt:    time.Unix(u.CreatedAt, 0),
 		UpdatedAt:    time.Unix(u.UpdatedAt, 0),
 	}
@@ -44,7 +42,6 @@ func (sqlu sqlUser) user() user.U {
 		PasswordHash: sqlu.PasswordHash,
 		PasswordSalt: sqlu.PasswordSalt,
 		GoogleID:     sqlu.GoogleID.String,
-		TwitchID:     sqlu.TwitchID.String,
 		CreatedAt:    sqlu.CreatedAt.Unix(),
 		UpdatedAt:    sqlu.UpdatedAt.Unix(),
 	}
@@ -81,12 +78,6 @@ func (f filter) where() (string, []any) {
 		n++
 	}
 
-	if f.TwitchID != nil {
-		clause = append(clause, fmt.Sprintf(`twitch_id = $%d`, n))
-		args = append(args, *f.TwitchID)
-		n++
-	}
-
 	b := strings.Builder{}
 	b.WriteString(" WHERE ")
 
@@ -119,10 +110,6 @@ func (f filter) index() string {
 		cols = append(cols, *f.GoogleID)
 	}
 
-	if f.TwitchID != nil {
-		cols = append(cols, *f.TwitchID)
-	}
-
 	return strings.Join(cols, " - ")
 }
 
@@ -133,8 +120,8 @@ func (s Store) Insert(ctx context.Context, u user.U) error {
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`INSERT INTO "user"."user" (id, email, password_hash, password_salt, google_id, twitch_id, created_at, updated_at) VALUES (`)
-	b.WriteString(postgres.Array(1, 8))
+	b.WriteString(`INSERT INTO "user"."user" (id, email, password_hash, password_salt, google_id, created_at, updated_at) VALUES (`)
+	b.WriteString(postgres.Array(1, 7))
 	b.WriteString(`)`)
 
 	sqlu := newUser(u)
@@ -142,7 +129,7 @@ func (s Store) Insert(ctx context.Context, u user.U) error {
 	if _, err := tx.Exec(
 		ctx,
 		b.String(),
-		sqlu.ID, sqlu.Email, sqlu.PasswordHash, sqlu.PasswordSalt, sqlu.GoogleID, sqlu.TwitchID, sqlu.CreatedAt, sqlu.UpdatedAt,
+		sqlu.ID, sqlu.Email, sqlu.PasswordHash, sqlu.PasswordSalt, sqlu.GoogleID, sqlu.CreatedAt, sqlu.UpdatedAt,
 	); err != nil {
 		return postgres.Error(err, "user", u.ID.String())
 	}
@@ -157,7 +144,7 @@ func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, email, password_hash, password_salt, google_id, twitch_id, created_at, updated_at FROM "user"."user" `)
+	b.WriteString(`SELECT id, email, password_hash, password_salt, google_id, created_at, updated_at FROM "user"."user" `)
 
 	clause, args := filter(f).where()
 	b.WriteString(clause)
@@ -165,7 +152,7 @@ func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 	q := tx.QueryRow(ctx, b.String(), args...)
 
 	var u sqlUser
-	if err := q.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PasswordSalt, &u.GoogleID, &u.TwitchID, &u.CreatedAt, &u.UpdatedAt); err != nil {
+	if err := q.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PasswordSalt, &u.GoogleID, &u.CreatedAt, &u.UpdatedAt); err != nil {
 		return user.U{}, postgres.Error(err, "user", filter(f).index())
 	}
 
@@ -179,7 +166,7 @@ func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, email, password_hash, password_salt, google_id, twitch_id, created_at, updated_at FROM "user"."user" `)
+	b.WriteString(`SELECT id, email, password_hash, password_salt, google_id, created_at, updated_at FROM "user"."user" `)
 
 	clause, args := filter(f).where()
 	b.WriteString(clause)
@@ -193,7 +180,7 @@ func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
 
 	for rows.Next() {
 		var u user.U
-		if err := rows.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PasswordSalt, &u.GoogleID, &u.TwitchID, &u.CreatedAt, &u.UpdatedAt); err != nil {
+		if err := rows.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PasswordSalt, &u.GoogleID, &u.CreatedAt, &u.UpdatedAt); err != nil {
 			return nil, err
 		}
 

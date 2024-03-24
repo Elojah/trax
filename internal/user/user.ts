@@ -35,15 +35,11 @@ export interface U {
      */
     googleID: string;
     /**
-     * @generated from protobuf field: string TwitchID = 6 [json_name = "TwitchID"];
-     */
-    twitchID: string;
-    /**
-     * @generated from protobuf field: int64 CreatedAt = 7 [json_name = "CreatedAt"];
+     * @generated from protobuf field: int64 CreatedAt = 6 [json_name = "CreatedAt"];
      */
     createdAt: bigint;
     /**
-     * @generated from protobuf field: int64 UpdatedAt = 8 [json_name = "UpdatedAt"];
+     * @generated from protobuf field: int64 UpdatedAt = 7 [json_name = "UpdatedAt"];
      */
     updatedAt: bigint;
 }
@@ -64,11 +60,15 @@ export interface Profile {
      */
     lastName: string;
     /**
-     * @generated from protobuf field: int64 CreatedAt = 4 [json_name = "CreatedAt"];
+     * @generated from protobuf field: string AvatarURL = 4 [json_name = "AvatarURL"];
+     */
+    avatarURL: string;
+    /**
+     * @generated from protobuf field: int64 CreatedAt = 5 [json_name = "CreatedAt"];
      */
     createdAt: bigint;
     /**
-     * @generated from protobuf field: int64 UpdatedAt = 5 [json_name = "UpdatedAt"];
+     * @generated from protobuf field: int64 UpdatedAt = 6 [json_name = "UpdatedAt"];
      */
     updatedAt: bigint;
 }
@@ -81,9 +81,8 @@ class U$Type extends MessageType<U> {
             { no: 3, name: "PasswordHash", kind: "scalar", jsonName: "PasswordHash", T: 12 /*ScalarType.BYTES*/ },
             { no: 4, name: "PasswordSalt", kind: "scalar", jsonName: "PasswordSalt", T: 12 /*ScalarType.BYTES*/ },
             { no: 5, name: "GoogleID", kind: "scalar", jsonName: "GoogleID", T: 9 /*ScalarType.STRING*/ },
-            { no: 6, name: "TwitchID", kind: "scalar", jsonName: "TwitchID", T: 9 /*ScalarType.STRING*/ },
-            { no: 7, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 8, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 6, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 7, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
     create(value?: PartialMessage<U>): U {
@@ -93,7 +92,6 @@ class U$Type extends MessageType<U> {
         message.passwordHash = new Uint8Array(0);
         message.passwordSalt = new Uint8Array(0);
         message.googleID = "";
-        message.twitchID = "";
         message.createdAt = 0n;
         message.updatedAt = 0n;
         if (value !== undefined)
@@ -120,13 +118,10 @@ class U$Type extends MessageType<U> {
                 case /* string GoogleID = 5 [json_name = "GoogleID"];*/ 5:
                     message.googleID = reader.string();
                     break;
-                case /* string TwitchID = 6 [json_name = "TwitchID"];*/ 6:
-                    message.twitchID = reader.string();
-                    break;
-                case /* int64 CreatedAt = 7 [json_name = "CreatedAt"];*/ 7:
+                case /* int64 CreatedAt = 6 [json_name = "CreatedAt"];*/ 6:
                     message.createdAt = reader.int64().toBigInt();
                     break;
-                case /* int64 UpdatedAt = 8 [json_name = "UpdatedAt"];*/ 8:
+                case /* int64 UpdatedAt = 7 [json_name = "UpdatedAt"];*/ 7:
                     message.updatedAt = reader.int64().toBigInt();
                     break;
                 default:
@@ -156,15 +151,12 @@ class U$Type extends MessageType<U> {
         /* string GoogleID = 5 [json_name = "GoogleID"]; */
         if (message.googleID !== "")
             writer.tag(5, WireType.LengthDelimited).string(message.googleID);
-        /* string TwitchID = 6 [json_name = "TwitchID"]; */
-        if (message.twitchID !== "")
-            writer.tag(6, WireType.LengthDelimited).string(message.twitchID);
-        /* int64 CreatedAt = 7 [json_name = "CreatedAt"]; */
+        /* int64 CreatedAt = 6 [json_name = "CreatedAt"]; */
         if (message.createdAt !== 0n)
-            writer.tag(7, WireType.Varint).int64(message.createdAt);
-        /* int64 UpdatedAt = 8 [json_name = "UpdatedAt"]; */
+            writer.tag(6, WireType.Varint).int64(message.createdAt);
+        /* int64 UpdatedAt = 7 [json_name = "UpdatedAt"]; */
         if (message.updatedAt !== 0n)
-            writer.tag(8, WireType.Varint).int64(message.updatedAt);
+            writer.tag(7, WireType.Varint).int64(message.updatedAt);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -182,8 +174,9 @@ class Profile$Type extends MessageType<Profile> {
             { no: 1, name: "UserID", kind: "scalar", jsonName: "UserID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 2, name: "FirstName", kind: "scalar", jsonName: "FirstName", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "LastName", kind: "scalar", jsonName: "LastName", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 5, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 4, name: "AvatarURL", kind: "scalar", jsonName: "AvatarURL", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 6, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
     create(value?: PartialMessage<Profile>): Profile {
@@ -191,6 +184,7 @@ class Profile$Type extends MessageType<Profile> {
         message.userID = new Uint8Array(0);
         message.firstName = "";
         message.lastName = "";
+        message.avatarURL = "";
         message.createdAt = 0n;
         message.updatedAt = 0n;
         if (value !== undefined)
@@ -211,10 +205,13 @@ class Profile$Type extends MessageType<Profile> {
                 case /* string LastName = 3 [json_name = "LastName"];*/ 3:
                     message.lastName = reader.string();
                     break;
-                case /* int64 CreatedAt = 4 [json_name = "CreatedAt"];*/ 4:
+                case /* string AvatarURL = 4 [json_name = "AvatarURL"];*/ 4:
+                    message.avatarURL = reader.string();
+                    break;
+                case /* int64 CreatedAt = 5 [json_name = "CreatedAt"];*/ 5:
                     message.createdAt = reader.int64().toBigInt();
                     break;
-                case /* int64 UpdatedAt = 5 [json_name = "UpdatedAt"];*/ 5:
+                case /* int64 UpdatedAt = 6 [json_name = "UpdatedAt"];*/ 6:
                     message.updatedAt = reader.int64().toBigInt();
                     break;
                 default:
@@ -238,12 +235,15 @@ class Profile$Type extends MessageType<Profile> {
         /* string LastName = 3 [json_name = "LastName"]; */
         if (message.lastName !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.lastName);
-        /* int64 CreatedAt = 4 [json_name = "CreatedAt"]; */
+        /* string AvatarURL = 4 [json_name = "AvatarURL"]; */
+        if (message.avatarURL !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.avatarURL);
+        /* int64 CreatedAt = 5 [json_name = "CreatedAt"]; */
         if (message.createdAt !== 0n)
-            writer.tag(4, WireType.Varint).int64(message.createdAt);
-        /* int64 UpdatedAt = 5 [json_name = "UpdatedAt"]; */
+            writer.tag(5, WireType.Varint).int64(message.createdAt);
+        /* int64 UpdatedAt = 6 [json_name = "UpdatedAt"]; */
         if (message.updatedAt !== 0n)
-            writer.tag(5, WireType.Varint).int64(message.updatedAt);
+            writer.tag(6, WireType.Varint).int64(message.updatedAt);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

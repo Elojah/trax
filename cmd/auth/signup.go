@@ -34,7 +34,6 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 			Email:        req.Email,
 			PasswordHash: hash,
 			PasswordSalt: salt,
-			TwitchID:     "",
 			GoogleID:     "",
 			CreatedAt:    now,
 			UpdatedAt:    now,

@@ -29,6 +29,7 @@ CLIENT            = client
 #  Migration directory for goose postgres
 MIGRATION_DIR     = db/postgres
 GOOSE_DRIVER      = postgres
+GOOSE_DBSTRING    = postgres://username:password@localhost:5432/postgres
 
 # Static directory name for client
 STATIC            = static
@@ -99,8 +100,6 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/string.proto
 	$(info $(M) generate pkg) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/cookie/keys.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/twitch/follow.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/twitch/user.proto
 	$(info $(M) generate internal) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto
 	$(info $(M) generate clients) @
@@ -170,18 +169,18 @@ clean-proto:
 .PHONY: goose-create
 goose-create: ## Create a new migration
 	$(info $(M) create new migration file using NAME=$(NAME)) @
-	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) goose create $(NAME) sql
+	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) goose create $(NAME) sql
 
 .PHONY: goose-up
 goose-up: ## Create a new migration
 	$(info $(M) migration up) @
-	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) goose up
+	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) goose up
 
 # Goose helpers
 .PHONY: goose-down
 goose-down: ## Create a new migration
 	$(info $(M) migration down) @
-	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) goose down
+	$Q cd $(MIGRATION_DIR) && GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) goose down
 
 .PHONY: go-version
 go-version: ## Print go version used in this makefile

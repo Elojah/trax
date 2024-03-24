@@ -71,7 +71,6 @@ export const useAuthStore = defineStore({
           }
         }
       },
-      async signinTwitch(token:string) {},
       async refresh() {
       },
         async signout() {

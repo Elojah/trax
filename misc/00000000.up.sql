@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS "user"."user_profile" (
 	"user_id" UUID NOT NULL,
 	"first_name" VARCHAR(255) NOT NULL,
 	"last_name" VARCHAR(255) NOT NULL,
+	"last_name" VARCHAR(255) NOT NULL,
+	"avatar_url" VARCHAR(255),
 	"created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	"updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	PRIMARY KEY ("user_id"),

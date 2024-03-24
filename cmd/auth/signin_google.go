@@ -10,7 +10,6 @@ import (
 	gerrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/pbtypes"
 	"github.com/elojah/trax/pkg/transaction"
-	"github.com/elojah/trax/pkg/ulid"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,7 +25,7 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 	}
 
 	// #Validate token
-	gid, err := h.google.Signin(ctx, req.Value)
+	gid, claims, err := h.google.Signin(ctx, req.Value)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to validate token")
 
@@ -52,27 +51,12 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 			return transaction.Commit, nil
 		}
 
-		now := time.Now().Unix()
+		var p user.Profile
+		u, p, err = claims.CreateUser(ctx)
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to create user")
 
-		// #Create user
-		// generate a random password
-		hash, salt := user.Encrypt(ulid.NewID().String())
-
-		u = user.U{
-			ID:           ulid.NewID(),
-			PasswordHash: hash,
-			PasswordSalt: salt,
-			GoogleID:     gid,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		}
-
-		p := user.Profile{
-			UserID: u.ID,
-			// FirstName: req.Firstname,
-			// LastName:  req.Lastname,
-			CreatedAt: now,
-			UpdatedAt: now,
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
 		logger = logger.With().Str("user_id", u.ID.String()).Logger()

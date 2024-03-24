@@ -22,10 +22,9 @@ message U {
 	bytes PasswordSalt     = 4;
 
 	string GoogleID        = 5;
-	string TwitchID        = 6;
 
-	int64 CreatedAt        = 7;
-	int64 UpdatedAt        = 8;
+	int64 CreatedAt        = 6;
+	int64 UpdatedAt        = 7;
 }
 
 message Profile {
@@ -33,7 +32,8 @@ message Profile {
 
 	string FirstName           = 2;
 	string LastName            = 3;
+	string AvatarURL           = 4;
 
-	int64 CreatedAt            = 4;
-	int64 UpdatedAt            = 5;
+	int64 CreatedAt            = 5;
+	int64 UpdatedAt            = 6;
 }

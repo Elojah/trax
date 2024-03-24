@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -16,6 +17,7 @@ type sqlProfile struct {
 	UserID    ulid.ID
 	FirstName string
 	LastName  string
+	AvatarURL sql.NullString
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -25,6 +27,7 @@ func newProfile(p user.Profile) sqlProfile {
 		UserID:    p.UserID,
 		FirstName: p.FirstName,
 		LastName:  p.LastName,
+		AvatarURL: sql.NullString{String: p.AvatarURL, Valid: p.AvatarURL != ""},
 		CreatedAt: time.Unix(p.CreatedAt, 0),
 		UpdatedAt: time.Unix(p.UpdatedAt, 0),
 	}
@@ -35,6 +38,7 @@ func (sqlp sqlProfile) profile() user.Profile {
 		UserID:    sqlp.UserID,
 		FirstName: sqlp.FirstName,
 		LastName:  sqlp.LastName,
+		AvatarURL: sqlp.AvatarURL.String,
 		CreatedAt: sqlp.CreatedAt.Unix(),
 		UpdatedAt: sqlp.UpdatedAt.Unix(),
 	}
@@ -95,11 +99,11 @@ func (s Store) InsertProfile(ctx context.Context, profile user.Profile) error {
 	p := newProfile(profile)
 
 	b := strings.Builder{}
-	b.WriteString(`INSERT INTO "user"."user_profile" (user_id, first_name, last_name, created_at, updated_at) VALUES (`)
-	b.WriteString(postgres.Array(1, 5))
+	b.WriteString(`INSERT INTO "user"."user_profile" (user_id, first_name, last_name, avatar_url, created_at, updated_at) VALUES (`)
+	b.WriteString(postgres.Array(1, 6))
 	b.WriteString(`)`)
 
-	if _, err := tx.Exec(ctx, b.String(), p.UserID, p.FirstName, p.LastName, p.CreatedAt, p.UpdatedAt); err != nil {
+	if _, err := tx.Exec(ctx, b.String(), p.UserID, p.FirstName, p.LastName, p.AvatarURL, p.CreatedAt, p.UpdatedAt); err != nil {
 		return err
 	}
 
@@ -113,7 +117,7 @@ func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Pro
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT user_id, first_name, last_name, created_at, updated_at FROM "user"."user_profile" `)
+	b.WriteString(`SELECT user_id, first_name, last_name, avatar_url, created_at, updated_at FROM "user"."user_profile" `)
 
 	clause, args := filterProfile(f).where()
 	b.WriteString(clause)
@@ -121,7 +125,7 @@ func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Pro
 	q := tx.QueryRow(ctx, b.String(), args...)
 
 	var p sqlProfile
-	if err := q.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.CreatedAt, &p.UpdatedAt); err != nil {
+	if err := q.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
 		return user.Profile{}, postgres.Error(err, "profile", filterProfile(f).index())
 	}
 
@@ -135,7 +139,7 @@ func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]us
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT user_id, first_name, last_name, created_at, updated_at FROM "user"."user_profile" `)
+	b.WriteString(`SELECT user_id, first_name, last_name, avatar_url, created_at, updated_at FROM "user"."user_profile" `)
 
 	clause, args := filterProfile(f).where()
 	b.WriteString(clause)
@@ -149,7 +153,7 @@ func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]us
 
 	for rows.Next() {
 		var p sqlProfile
-		if err := rows.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		if err := rows.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
 			return nil, err
 		}
 

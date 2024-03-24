@@ -134,7 +134,7 @@ authStore.refreshProfile()
   </v-card>
 </template>
 <style scoped>
-.color-auto{
+.color-auto {
   color-scheme: auto;
 }
 </style>

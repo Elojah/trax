@@ -28,7 +28,6 @@ type Filter struct {
 
 	Email    *string
 	GoogleID *string
-	TwitchID *string
 }
 
 type Store interface {

@@ -22,3 +22,15 @@ $ make api && ./bin/game_03_api config/api/local.json
 $ make auth && ./bin/game_03_auth config/auth/local.json
 $ make client && ./bin/game_03_web_client config/web_client/local.json
 ```
+
+TODO:
+
+- Fetch firstname lastname from google token
+
+- Create profile page
+
+- Redirect in profile when already logged in
+
+- Check refresh and redirect when already logged in
+
+- Leaflet ?

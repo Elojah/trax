@@ -9,18 +9,17 @@ CREATE TABLE IF NOT EXISTS "user"."user" (
 	"password_hash" BYTEA NOT NULL,
 	"password_salt" BYTEA NOT NULL,
 	"google_id" VARCHAR(255),
-	"twitch_id" VARCHAR(255),
 	"created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	"updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	PRIMARY KEY ("id"),
 	UNIQUE ("email"),
-	UNIQUE ("google_id"),
-	UNIQUE ("twitch_id")
+	UNIQUE ("google_id")
 );
 CREATE TABLE IF NOT EXISTS "user"."user_profile" (
 	"user_id" UUID NOT NULL,
 	"first_name" VARCHAR(255) NOT NULL,
 	"last_name" VARCHAR(255) NOT NULL,
+	"avatar_url" VARCHAR(255),
 	"created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	"updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	PRIMARY KEY ("user_id"),
