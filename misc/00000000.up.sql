@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "user"."user" (
 	UNIQUE ("google_id"),
 	UNIQUE ("twitch_id")
 );
-CREATE TABLE IF NOT EXISTS "user"."user_profile" (
+CREATE TABLE IF NOT EXISTS "user"."profile" (
 	"user_id" UUID NOT NULL,
 	"first_name" VARCHAR(255) NOT NULL,
 	"last_name" VARCHAR(255) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS "user"."user_profile" (
 	"created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	"updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	PRIMARY KEY ("user_id"),
-	CONSTRAINT "fk_user_profile_user_id" FOREIGN KEY ("user_id") REFERENCES "user"."user" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT "fk_profile_user_id" FOREIGN KEY ("user_id") REFERENCES "user"."user" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Entity
 CREATE TABLE IF NOT EXISTS "user"."entity" (

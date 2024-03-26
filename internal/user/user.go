@@ -16,6 +16,8 @@ type App interface {
 	Store
 	StoreProfile
 
+	StoreEntity
+
 	CreateJWT(context.Context, U, string, time.Duration) (string, error)
 	ReadJWT(context.Context, string) (Claims, error)
 

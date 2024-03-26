@@ -22,6 +22,8 @@ type App struct {
 	user.Store
 	user.StoreProfile
 
+	user.StoreEntity
+
 	Cookie cookie.App
 }
 

@@ -105,6 +105,7 @@ func run(prog string, filename string) {
 		Transactioner: postgress,
 		Store:         userStore,
 		StoreProfile:  userStore,
+		StoreEntity:   userStore,
 		Cookie:        cookieApp,
 		// Cache: userCache,
 	}
