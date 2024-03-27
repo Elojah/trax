@@ -48,10 +48,16 @@ type FilterProfile struct {
 	UserIDs []ulid.ID
 }
 
+type PatchProfile struct {
+	FirstName *string
+	LastName  *string
+}
+
 type StoreProfile interface {
 	InsertProfile(context.Context, Profile) error
 	FetchProfile(context.Context, FilterProfile) (Profile, error)
 	FetchManyProfile(context.Context, FilterProfile) ([]Profile, error)
+	UpdateProfile(context.Context, FilterProfile, PatchProfile) error
 	DeleteProfile(context.Context, FilterProfile) error
 }
 

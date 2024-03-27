@@ -4,6 +4,7 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
+import type { UpdateProfileReq } from "../../../internal/user/dto/profile";
 import type { Profile } from "../../../internal/user/user";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
 import type { Empty } from "../../../pkg/pbtypes/empty";
@@ -25,6 +26,10 @@ export interface IAPIClient {
      * @generated from protobuf rpc: FetchProfile(pbtypes.Empty) returns (user.Profile);
      */
     fetchProfile(input: Empty, options?: RpcOptions): UnaryCall<Empty, Profile>;
+    /**
+     * @generated from protobuf rpc: UpdateProfile(dto.UpdateProfileReq) returns (pbtypes.Empty);
+     */
+    updateProfile(input: UpdateProfileReq, options?: RpcOptions): UnaryCall<UpdateProfileReq, Empty>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -52,5 +57,12 @@ export class APIClient implements IAPIClient, ServiceInfo {
     fetchProfile(input: Empty, options?: RpcOptions): UnaryCall<Empty, Profile> {
         const method = this.methods[1], opt = this._transport.mergeOptions(options);
         return stackIntercept<Empty, Profile>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: UpdateProfile(dto.UpdateProfileReq) returns (pbtypes.Empty);
+     */
+    updateProfile(input: UpdateProfileReq, options?: RpcOptions): UnaryCall<UpdateProfileReq, Empty> {
+        const method = this.methods[2], opt = this._transport.mergeOptions(options);
+        return stackIntercept<UpdateProfileReq, Empty>("unary", this._transport, method, opt, input);
     }
 }

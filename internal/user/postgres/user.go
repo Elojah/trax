@@ -173,7 +173,7 @@ func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, err
+		return nil, postgres.Error(err, "user", filter(f).index())
 	}
 
 	var users []user.U
@@ -181,7 +181,7 @@ func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
 	for rows.Next() {
 		var u user.U
 		if err := rows.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PasswordSalt, &u.GoogleID, &u.CreatedAt, &u.UpdatedAt); err != nil {
-			return nil, err
+			return nil, postgres.Error(err, "user", filter(f).index())
 		}
 
 		users = append(users, u)
@@ -203,7 +203,7 @@ func (s Store) Delete(ctx context.Context, f user.Filter) error {
 	b.WriteString(clause)
 
 	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
-		return err
+		return postgres.Error(err, "user", filter(f).index())
 	}
 
 	return err

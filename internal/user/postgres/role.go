@@ -42,10 +42,9 @@ func (sqlp sqlRole) role() user.Role {
 
 type filterRole user.FilterRole
 
-func (f filterRole) where() (string, []any) {
+func (f filterRole) where(n int) (string, []any) {
 	var clause []string
 	var args []any
-	n := 1
 
 	if f.ID != nil {
 		clause = append(clause, fmt.Sprintf(`id = $%d`, n))
@@ -106,7 +105,7 @@ func (s Store) InsertRole(ctx context.Context, role user.Role) error {
 	b.WriteString(`)`)
 
 	if _, err := tx.Exec(ctx, b.String(), p.ID, p.EntityID, p.Name, p.CreatedAt, p.UpdatedAt); err != nil {
-		return err
+		return postgres.Error(err, "role", p.ID.String())
 	}
 
 	return nil
@@ -121,7 +120,7 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 	b := strings.Builder{}
 	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" `)
 
-	clause, args := filterRole(f).where()
+	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
 
 	q := tx.QueryRow(ctx, b.String(), args...)
@@ -143,12 +142,12 @@ func (s Store) FetchManyRole(ctx context.Context, f user.FilterRole) ([]user.Rol
 	b := strings.Builder{}
 	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" `)
 
-	clause, args := filterRole(f).where()
+	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, err
+		return nil, postgres.Error(err, "role", filterRole(f).index())
 	}
 
 	var roles []user.Role
@@ -156,7 +155,7 @@ func (s Store) FetchManyRole(ctx context.Context, f user.FilterRole) ([]user.Rol
 	for rows.Next() {
 		var p sqlRole
 		if err := rows.Scan(&p.ID, &p.EntityID, &p.Name, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
+			return nil, postgres.Error(err, "role", filterRole(f).index())
 		}
 
 		roles = append(roles, p.role())
@@ -174,11 +173,11 @@ func (s Store) DeleteRole(ctx context.Context, f user.FilterRole) error {
 	b := strings.Builder{}
 	b.WriteString(`DELETE FROM "user"."role" `)
 
-	clause, args := filterRole(f).where()
+	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
 
 	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
-		return err
+		return postgres.Error(err, "role", filterRole(f).index())
 	}
 
 	return err

@@ -15,6 +15,8 @@ import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
 
 import "github.com/elojah/trax/internal/user/user.proto";
+import "github.com/elojah/trax/internal/user/entity.proto";
+import "github.com/elojah/trax/internal/user/dto/profile.proto";
 
 service API {
     // Ping
@@ -22,9 +24,9 @@ service API {
 
     // User
     rpc FetchProfile(pbtypes.Empty) returns (user.Profile);
-    rpc UpdateProfile(pbtypes.Empty) returns (user.Profile); // TODO: IMPLEMENT
+    rpc UpdateProfile(dto.UpdateProfileReq) returns (pbtypes.Empty);
 
     // Entity
-    rpc CreateEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
-    rpc FetchEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
+    // rpc CreateEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
+    // rpc FetchEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
 }

@@ -39,10 +39,9 @@ func (sqlp sqlRoleUser) roleUser() user.RoleUser {
 
 type filterRoleUser user.FilterRoleUser
 
-func (f filterRoleUser) where() (string, []any) {
+func (f filterRoleUser) where(n int) (string, []any) {
 	var clause []string
 	var args []any
-	n := 1
 
 	if f.RoleID != nil {
 		clause = append(clause, fmt.Sprintf(`role_id = $%d`, n))
@@ -118,7 +117,7 @@ func (s Store) InsertRoleUser(ctx context.Context, roleUser user.RoleUser) error
 	b.WriteString(`)`)
 
 	if _, err := tx.Exec(ctx, b.String(), p.RoleID, p.UserID, p.CreatedAt, p.UpdatedAt); err != nil {
-		return err
+		return postgres.Error(err, "role_user", p.RoleID.String())
 	}
 
 	return nil
@@ -133,14 +132,14 @@ func (s Store) FetchRoleUser(ctx context.Context, f user.FilterRoleUser) (user.R
 	b := strings.Builder{}
 	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" `)
 
-	clause, args := filterRoleUser(f).where()
+	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)
 
 	q := tx.QueryRow(ctx, b.String(), args...)
 
 	var p sqlRoleUser
 	if err := q.Scan(&p.RoleID, &p.UserID, &p.CreatedAt, &p.UpdatedAt); err != nil {
-		return user.RoleUser{}, postgres.Error(err, "roleUser", filterRoleUser(f).index())
+		return user.RoleUser{}, postgres.Error(err, "role_user", filterRoleUser(f).index())
 	}
 
 	return p.roleUser(), nil
@@ -155,12 +154,12 @@ func (s Store) FetchManyRoleUser(ctx context.Context, f user.FilterRoleUser) ([]
 	b := strings.Builder{}
 	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" `)
 
-	clause, args := filterRoleUser(f).where()
+	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, err
+		return nil, postgres.Error(err, "role_user", filterRoleUser(f).index())
 	}
 
 	var roleUsers []user.RoleUser
@@ -168,7 +167,7 @@ func (s Store) FetchManyRoleUser(ctx context.Context, f user.FilterRoleUser) ([]
 	for rows.Next() {
 		var p sqlRoleUser
 		if err := rows.Scan(&p.RoleID, &p.UserID, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
+			return nil, postgres.Error(err, "role_user", filterRoleUser(f).index())
 		}
 
 		roleUsers = append(roleUsers, p.roleUser())
@@ -186,11 +185,11 @@ func (s Store) DeleteRoleUser(ctx context.Context, f user.FilterRoleUser) error 
 	b := strings.Builder{}
 	b.WriteString(`DELETE FROM "user"."role_user" `)
 
-	clause, args := filterRoleUser(f).where()
+	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)
 
 	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
-		return err
+		return postgres.Error(err, "role_user", filterRoleUser(f).index())
 	}
 
 	return err

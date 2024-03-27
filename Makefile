@@ -106,6 +106,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto
 	$(info $(M) generate clients) @
 	$(info $(M) generate dto) @
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/profile.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/user.proto
 	$(info $(M) generate services) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto

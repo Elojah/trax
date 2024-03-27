@@ -43,10 +43,9 @@ func (sqlp sqlEntity) entity() user.Entity {
 
 type filterEntity user.FilterEntity
 
-func (f filterEntity) where() (string, []any) {
+func (f filterEntity) where(n int) (string, []any) {
 	var clause []string
 	var args []any
-	n := 1
 
 	if f.ID != nil {
 		clause = append(clause, fmt.Sprintf(`id = $%d`, n))
@@ -101,7 +100,7 @@ func (s Store) InsertEntity(ctx context.Context, entity user.Entity) error {
 	b.WriteString(`)`)
 
 	if _, err := tx.Exec(ctx, b.String(), p.ID, p.Name, p.AvatarURL, p.CreatedAt, p.UpdatedAt); err != nil {
-		return err
+		return postgres.Error(err, "entity", p.ID.String())
 	}
 
 	return nil
@@ -116,7 +115,7 @@ func (s Store) FetchEntity(ctx context.Context, f user.FilterEntity) (user.Entit
 	b := strings.Builder{}
 	b.WriteString(`SELECT id, name, avatar_url, created_at, updated_at FROM "user"."entity" `)
 
-	clause, args := filterEntity(f).where()
+	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
 
 	q := tx.QueryRow(ctx, b.String(), args...)
@@ -138,12 +137,12 @@ func (s Store) FetchManyEntity(ctx context.Context, f user.FilterEntity) ([]user
 	b := strings.Builder{}
 	b.WriteString(`SELECT id, name, avatar_url, created_at, updated_at FROM "user"."entity" `)
 
-	clause, args := filterEntity(f).where()
+	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, err
+		return nil, postgres.Error(err, "entity", filterEntity(f).index())
 	}
 
 	var entities []user.Entity
@@ -151,7 +150,7 @@ func (s Store) FetchManyEntity(ctx context.Context, f user.FilterEntity) ([]user
 	for rows.Next() {
 		var p sqlEntity
 		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
+			return nil, postgres.Error(err, "entity", filterEntity(f).index())
 		}
 
 		entities = append(entities, p.entity())
@@ -169,11 +168,11 @@ func (s Store) DeleteEntity(ctx context.Context, f user.FilterEntity) error {
 	b := strings.Builder{}
 	b.WriteString(`DELETE FROM "user"."entity" `)
 
-	clause, args := filterEntity(f).where()
+	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
 
 	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
-		return err
+		return postgres.Error(err, "entity", filterEntity(f).index())
 	}
 
 	return err

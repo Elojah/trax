@@ -14,10 +14,11 @@ const signout = () => {
 <template>
 	<v-card v-if="profile" class="px-6 py-6 rounded-xl" variant="elevated">
 		<v-card-title class="justify-center mb-2 text-center">
-			<v-avatar size="96">
+			<v-avatar class="mb-6" size="96">
 				<img :src="profile?.avatarURL" alt="Avatar">
 			</v-avatar>
-			<v-list-item :title="profile.firstName + ' ' + profile.lastName"></v-list-item>
+			<v-list-item :title="profile.lastName"></v-list-item>
+			<v-list-item :title="profile.firstName"></v-list-item>
 		</v-card-title>
 		<v-card-actions class="justify-center">
 			<v-btn size="large" variant="tonal" append-icon="mdi-account-circle" @click="signout">Signout
