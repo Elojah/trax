@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package dto;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_registration) = true;
+
+import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+
+message UpdateProfileReq {
+    string Firstname    = 1;
+    string Lastname     = 2;
+}
