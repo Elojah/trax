@@ -27,6 +27,6 @@ CREATE TABLE IF NOT EXISTS "user"."profile" (
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE IF EXISTS "user"."profile";
-DROP TABLE IF EXISTS "user"."user";
+DROP TABLE IF EXISTS "user"."user" CASCADE;
 DROP SCHEMA IF EXISTS "user";
 -- +goose StatementEnd

@@ -24,6 +24,10 @@ type App struct {
 
 	user.StoreEntity
 
+	user.StoreRole
+	user.StorePermission
+	user.StoreRoleUser
+
 	Cookie cookie.App
 }
 

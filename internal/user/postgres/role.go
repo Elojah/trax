@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -13,37 +12,37 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type sqlEntity struct {
+type sqlRole struct {
 	ID        ulid.ID
+	EntityID  ulid.ID
 	Name      string
-	AvatarURL sql.NullString
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func newEntity(p user.Entity) sqlEntity {
-	return sqlEntity{
+func newRole(p user.Role) sqlRole {
+	return sqlRole{
 		ID:        p.ID,
+		EntityID:  p.EntityID,
 		Name:      p.Name,
-		AvatarURL: sql.NullString{String: p.AvatarURL, Valid: p.AvatarURL != ""},
 		CreatedAt: time.Unix(p.CreatedAt, 0),
 		UpdatedAt: time.Unix(p.UpdatedAt, 0),
 	}
 }
 
-func (sqlp sqlEntity) entity() user.Entity {
-	return user.Entity{
+func (sqlp sqlRole) role() user.Role {
+	return user.Role{
 		ID:        sqlp.ID,
+		EntityID:  sqlp.EntityID,
 		Name:      sqlp.Name,
-		AvatarURL: sqlp.AvatarURL.String,
 		CreatedAt: sqlp.CreatedAt.Unix(),
 		UpdatedAt: sqlp.UpdatedAt.Unix(),
 	}
 }
 
-type filterEntity user.FilterEntity
+type filterRole user.FilterRole
 
-func (f filterEntity) where() (string, []any) {
+func (f filterRole) where() (string, []any) {
 	var clause []string
 	var args []any
 	n := 1
@@ -60,6 +59,12 @@ func (f filterEntity) where() (string, []any) {
 		n += len(f.IDs)
 	}
 
+	if f.EntityID != nil {
+		clause = append(clause, fmt.Sprintf(`entity_id = $%d`, n))
+		args = append(args, f.EntityID)
+		n++
+	}
+
 	b := strings.Builder{}
 	b.WriteString(" WHERE ")
 
@@ -72,7 +77,7 @@ func (f filterEntity) where() (string, []any) {
 	return b.String(), args
 }
 
-func (f filterEntity) index() string {
+func (f filterRole) index() string {
 	var cols []string
 
 	if f.ID != nil {
@@ -87,58 +92,58 @@ func (f filterEntity) index() string {
 	return strings.Join(cols, " - ")
 }
 
-func (s Store) InsertEntity(ctx context.Context, entity user.Entity) error {
+func (s Store) InsertRole(ctx context.Context, role user.Role) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return err
 	}
 
-	p := newEntity(entity)
+	p := newRole(role)
 
 	b := strings.Builder{}
-	b.WriteString(`INSERT INTO "user"."entity" (id, name, avatar_url, created_at, updated_at) VALUES (`)
-	b.WriteString(postgres.Array(1, 6))
+	b.WriteString(`INSERT INTO "user"."role" (id, entity_id, name, created_at, updated_at) VALUES (`)
+	b.WriteString(postgres.Array(1, 5))
 	b.WriteString(`)`)
 
-	if _, err := tx.Exec(ctx, b.String(), p.ID, p.Name, p.AvatarURL, p.CreatedAt, p.UpdatedAt); err != nil {
+	if _, err := tx.Exec(ctx, b.String(), p.ID, p.EntityID, p.Name, p.CreatedAt, p.UpdatedAt); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s Store) FetchEntity(ctx context.Context, f user.FilterEntity) (user.Entity, error) {
+func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
-		return user.Entity{}, err
+		return user.Role{}, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, name, avatar_url, created_at, updated_at FROM "user"."entity" `)
+	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" `)
 
-	clause, args := filterEntity(f).where()
+	clause, args := filterRole(f).where()
 	b.WriteString(clause)
 
 	q := tx.QueryRow(ctx, b.String(), args...)
 
-	var p sqlEntity
-	if err := q.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
-		return user.Entity{}, postgres.Error(err, "entity", filterEntity(f).index())
+	var p sqlRole
+	if err := q.Scan(&p.ID, &p.EntityID, &p.Name, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		return user.Role{}, postgres.Error(err, "role", filterRole(f).index())
 	}
 
-	return p.entity(), nil
+	return p.role(), nil
 }
 
-func (s Store) FetchManyEntity(ctx context.Context, f user.FilterEntity) ([]user.Entity, error) {
+func (s Store) FetchManyRole(ctx context.Context, f user.FilterRole) ([]user.Role, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, name, avatar_url, created_at, updated_at FROM "user"."entity" `)
+	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" `)
 
-	clause, args := filterEntity(f).where()
+	clause, args := filterRole(f).where()
 	b.WriteString(clause)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
@@ -146,30 +151,30 @@ func (s Store) FetchManyEntity(ctx context.Context, f user.FilterEntity) ([]user
 		return nil, err
 	}
 
-	var entities []user.Entity
+	var roles []user.Role
 
 	for rows.Next() {
-		var p sqlEntity
-		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		var p sqlRole
+		if err := rows.Scan(&p.ID, &p.EntityID, &p.Name, &p.CreatedAt, &p.UpdatedAt); err != nil {
 			return nil, err
 		}
 
-		entities = append(entities, p.entity())
+		roles = append(roles, p.role())
 	}
 
-	return entities, nil
+	return roles, nil
 }
 
-func (s Store) DeleteEntity(ctx context.Context, f user.FilterEntity) error {
+func (s Store) DeleteRole(ctx context.Context, f user.FilterRole) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`DELETE FROM "user"."entity" `)
+	b.WriteString(`DELETE FROM "user"."role" `)
 
-	clause, args := filterEntity(f).where()
+	clause, args := filterRole(f).where()
 	b.WriteString(clause)
 
 	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {

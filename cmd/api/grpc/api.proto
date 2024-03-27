@@ -22,4 +22,9 @@ service API {
 
     // User
     rpc FetchProfile(pbtypes.Empty) returns (user.Profile);
+    rpc UpdateProfile(pbtypes.Empty) returns (user.Profile); // TODO: IMPLEMENT
+
+    // Entity
+    rpc CreateEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
+    rpc FetchEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
 }

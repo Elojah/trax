@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package user;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_registration) = true;
+
+import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+
+enum Resource {
+	R_user       = 0;
+	R_asset      = 1;
+	R_operation  = 2;
+}
+
+enum Command {
+	C_read       = 0;
+	C_create     = 1;
+	C_update     = 2;
+	C_delete     = 3;
+}
+
+message Role {
+	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+
+	bytes EntityID         = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	string Name            = 3;
+
+	int64 CreatedAt        = 4;
+	int64 UpdatedAt        = 5;
+}
+
+message Permission {
+	bytes RoleID           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+
+	Resource Resource      = 2;
+	Command Command        = 3;
+
+	int64 CreatedAt        = 4;
+	int64 UpdatedAt        = 5;
+}
+
+message RoleUser {
+	bytes RoleID           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes UserID           = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+
+	int64 CreatedAt        = 3;
+	int64 UpdatedAt        = 4;
+}

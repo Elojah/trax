@@ -7,4 +7,10 @@ import (
 var _ user.Store = (*Store)(nil)
 var _ user.StoreProfile = (*Store)(nil)
 
+var _ user.StoreEntity = (*Store)(nil)
+
+var _ user.StoreRole = (*Store)(nil)
+var _ user.StorePermission = (*Store)(nil)
+var _ user.StoreRoleUser = (*Store)(nil)
+
 type Store struct{}

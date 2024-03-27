@@ -18,6 +18,10 @@ type App interface {
 
 	StoreEntity
 
+	StoreRole
+	StorePermission
+	StoreRoleUser
+
 	CreateJWT(context.Context, U, string, time.Duration) (string, error)
 	ReadJWT(context.Context, string) (Claims, error)
 

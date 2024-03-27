@@ -1,0 +1,197 @@
+package postgres
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/elojah/trax/internal/user"
+	"github.com/elojah/trax/pkg/postgres"
+	"github.com/elojah/trax/pkg/ulid"
+	_ "github.com/lib/pq"
+)
+
+type sqlRoleUser struct {
+	RoleID    ulid.ID
+	UserID    ulid.ID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func newRoleUser(p user.RoleUser) sqlRoleUser {
+	return sqlRoleUser{
+		RoleID:    p.RoleID,
+		UserID:    p.UserID,
+		CreatedAt: time.Unix(p.CreatedAt, 0),
+		UpdatedAt: time.Unix(p.UpdatedAt, 0),
+	}
+}
+
+func (sqlp sqlRoleUser) roleUser() user.RoleUser {
+	return user.RoleUser{
+		RoleID:    sqlp.RoleID,
+		UserID:    sqlp.UserID,
+		CreatedAt: sqlp.CreatedAt.Unix(),
+		UpdatedAt: sqlp.UpdatedAt.Unix(),
+	}
+}
+
+type filterRoleUser user.FilterRoleUser
+
+func (f filterRoleUser) where() (string, []any) {
+	var clause []string
+	var args []any
+	n := 1
+
+	if f.RoleID != nil {
+		clause = append(clause, fmt.Sprintf(`role_id = $%d`, n))
+		args = append(args, f.RoleID)
+		n++
+	}
+
+	if len(f.RoleIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`role_id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
+		args = append(args, ulid.IDs(f.RoleIDs).Any()...)
+		n += len(f.RoleIDs)
+	}
+
+	if f.UserID != nil {
+		clause = append(clause, fmt.Sprintf(`user_id = $%d`, n))
+		args = append(args, f.UserID)
+		n++
+	}
+
+	if len(f.UserIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`user_id IN (%s)`, postgres.Array(n, len(f.UserIDs))))
+		args = append(args, ulid.IDs(f.UserIDs).Any()...)
+		n += len(f.UserIDs)
+	}
+
+	b := strings.Builder{}
+	b.WriteString(" WHERE ")
+
+	if len(clause) == 0 {
+		b.WriteString("false")
+	} else {
+		b.WriteString(strings.Join(clause, " AND "))
+	}
+
+	return b.String(), args
+}
+
+func (f filterRoleUser) index() string {
+	var cols []string
+
+	if f.RoleID != nil {
+		cols = append(cols, f.RoleID.String())
+	}
+
+	if f.RoleIDs != nil {
+		ss := ulid.IDs(f.RoleIDs).String()
+		cols = append(cols, strings.Join(ss, "|"))
+	}
+
+	if f.UserID != nil {
+		cols = append(cols, f.UserID.String())
+	}
+
+	if f.UserIDs != nil {
+		ss := ulid.IDs(f.UserIDs).String()
+		cols = append(cols, strings.Join(ss, "|"))
+	}
+
+	return strings.Join(cols, " - ")
+}
+
+func (s Store) InsertRoleUser(ctx context.Context, roleUser user.RoleUser) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	p := newRoleUser(roleUser)
+
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO "user"."role_user" (role_id, user_id, created_at, updated_at) VALUES (`)
+	b.WriteString(postgres.Array(1, 4))
+	b.WriteString(`)`)
+
+	if _, err := tx.Exec(ctx, b.String(), p.RoleID, p.UserID, p.CreatedAt, p.UpdatedAt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s Store) FetchRoleUser(ctx context.Context, f user.FilterRoleUser) (user.RoleUser, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return user.RoleUser{}, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" `)
+
+	clause, args := filterRoleUser(f).where()
+	b.WriteString(clause)
+
+	q := tx.QueryRow(ctx, b.String(), args...)
+
+	var p sqlRoleUser
+	if err := q.Scan(&p.RoleID, &p.UserID, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		return user.RoleUser{}, postgres.Error(err, "roleUser", filterRoleUser(f).index())
+	}
+
+	return p.roleUser(), nil
+}
+
+func (s Store) FetchManyRoleUser(ctx context.Context, f user.FilterRoleUser) ([]user.RoleUser, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" `)
+
+	clause, args := filterRoleUser(f).where()
+	b.WriteString(clause)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	var roleUsers []user.RoleUser
+
+	for rows.Next() {
+		var p sqlRoleUser
+		if err := rows.Scan(&p.RoleID, &p.UserID, &p.CreatedAt, &p.UpdatedAt); err != nil {
+			return nil, err
+		}
+
+		roleUsers = append(roleUsers, p.roleUser())
+	}
+
+	return roleUsers, nil
+}
+
+func (s Store) DeleteRoleUser(ctx context.Context, f user.FilterRoleUser) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`DELETE FROM "user"."role_user" `)
+
+	clause, args := filterRoleUser(f).where()
+	b.WriteString(clause)
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
+		return err
+	}
+
+	return err
+}
