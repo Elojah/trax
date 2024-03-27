@@ -205,6 +205,10 @@ func (s Store) UpdateProfile(ctx context.Context, f user.FilterProfile, p user.P
 	cols, args, n := patchProfile(p).set()
 	b.WriteString(cols)
 
+	if len(cols) == 0 {
+		return nil
+	}
+
 	clause, args := filterProfile(f).where(n)
 	b.WriteString(clause)
 
