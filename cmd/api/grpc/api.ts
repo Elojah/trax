@@ -11,5 +11,5 @@ import { ServiceType } from "@protobuf-ts/runtime-rpc";
 export const API = new ServiceType("grpc.API", [
     { name: "Ping", options: {}, I: Empty, O: Empty },
     { name: "FetchProfile", options: {}, I: Empty, O: Profile },
-    { name: "UpdateProfile", options: {}, I: UpdateProfileReq, O: Empty }
+    { name: "UpdateProfile", options: {}, I: UpdateProfileReq, O: Profile }
 ]);

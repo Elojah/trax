@@ -6,6 +6,7 @@ import { Empty } from '@pkg/pbtypes/empty';
 import type { SigninReq, SignupReq } from '@internal/user/dto/user';
 import {GrpcWebFetchTransport} from "@protobuf-ts/grpcweb-transport";
 import { getCookie, removeCookie } from 'typescript-cookie'
+import { UpdateProfileReq } from '@internal/user/dto/profile';
 
 export const useAuthStore = defineStore({
     id: 'auth',
@@ -62,6 +63,22 @@ export const useAuthStore = defineStore({
 
         try {
           const resp = await this.api.fetchProfile(Empty, {meta: {token: this.token}})
+          this.profile = resp.response;
+        } catch (err: any) {
+          switch (err.code) {
+            default:
+              logger.error(err);
+          }
+        }
+      },
+      async updateProfile(firstName: string|null, lastName: string|null) {
+        try {
+          const req = UpdateProfileReq.create({
+            firstname: firstName,
+            lastname: lastName,
+          });
+
+          const resp = await this.api.updateProfile(req, {meta: {token: this.token}})
           this.profile = resp.response;
         } catch (err: any) {
           switch (err.code) {

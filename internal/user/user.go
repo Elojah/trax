@@ -57,7 +57,7 @@ type StoreProfile interface {
 	InsertProfile(context.Context, Profile) error
 	FetchProfile(context.Context, FilterProfile) (Profile, error)
 	FetchManyProfile(context.Context, FilterProfile) ([]Profile, error)
-	UpdateProfile(context.Context, FilterProfile, PatchProfile) error
+	UpdateProfile(context.Context, FilterProfile, PatchProfile) ([]Profile, error)
 	DeleteProfile(context.Context, FilterProfile) error
 }
 

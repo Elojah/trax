@@ -112,7 +112,7 @@ func (p patchProfile) set() (string, []any, int) {
 	b.WriteString(" SET ")
 
 	if len(cols) == 0 {
-		b.WriteString("false")
+		b.WriteString("user_id = user_id")
 	} else {
 		b.WriteString(strings.Join(cols, " , "))
 	}
@@ -193,10 +193,10 @@ func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]us
 	return profiles, nil
 }
 
-func (s Store) UpdateProfile(ctx context.Context, f user.FilterProfile, p user.PatchProfile) error {
+func (s Store) UpdateProfile(ctx context.Context, f user.FilterProfile, p user.PatchProfile) ([]user.Profile, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	b := strings.Builder{}
@@ -205,19 +205,30 @@ func (s Store) UpdateProfile(ctx context.Context, f user.FilterProfile, p user.P
 	cols, args, n := patchProfile(p).set()
 	b.WriteString(cols)
 
-	if len(cols) == 0 {
-		return nil
-	}
-
-	clause, args := filterProfile(f).where(n)
+	clause, wargs := filterProfile(f).where(n)
 	b.WriteString(clause)
 
-	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
-		return postgres.Error(err, "profile", filterProfile(f).index())
+	args = append(args, wargs...)
+
+	b.WriteString(` RETURNING user_id, first_name, last_name, avatar_url, created_at, updated_at`)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, postgres.Error(err, "profile", filterProfile(f).index())
 	}
 
-	return nil
+	var profiles []user.Profile
 
+	for rows.Next() {
+		var p sqlProfile
+		if err := rows.Scan(&p.UserID, &p.FirstName, &p.LastName, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
+			return nil, postgres.Error(err, "profile", filterProfile(f).index())
+		}
+
+		profiles = append(profiles, p.profile())
+	}
+
+	return profiles, nil
 }
 
 func (s Store) DeleteProfile(ctx context.Context, f user.FilterProfile) error {

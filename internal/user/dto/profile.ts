@@ -10,31 +10,30 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { String$ } from "../../../pkg/pbtypes/string";
 /**
  * @generated from protobuf message dto.UpdateProfileReq
  */
 export interface UpdateProfileReq {
     /**
-     * @generated from protobuf field: string Firstname = 1 [json_name = "Firstname"];
+     * @generated from protobuf field: pbtypes.String Firstname = 1 [json_name = "Firstname"];
      */
-    firstname: string;
+    firstname?: String$;
     /**
-     * @generated from protobuf field: string Lastname = 2 [json_name = "Lastname"];
+     * @generated from protobuf field: pbtypes.String Lastname = 2 [json_name = "Lastname"];
      */
-    lastname: string;
+    lastname?: String$;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class UpdateProfileReq$Type extends MessageType<UpdateProfileReq> {
     constructor() {
         super("dto.UpdateProfileReq", [
-            { no: 1, name: "Firstname", kind: "scalar", jsonName: "Firstname", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "Lastname", kind: "scalar", jsonName: "Lastname", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "Firstname", kind: "message", jsonName: "Firstname", T: () => String$ },
+            { no: 2, name: "Lastname", kind: "message", jsonName: "Lastname", T: () => String$ }
         ]);
     }
     create(value?: PartialMessage<UpdateProfileReq>): UpdateProfileReq {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.firstname = "";
-        message.lastname = "";
         if (value !== undefined)
             reflectionMergePartial<UpdateProfileReq>(this, message, value);
         return message;
@@ -44,11 +43,11 @@ class UpdateProfileReq$Type extends MessageType<UpdateProfileReq> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string Firstname = 1 [json_name = "Firstname"];*/ 1:
-                    message.firstname = reader.string();
+                case /* pbtypes.String Firstname = 1 [json_name = "Firstname"];*/ 1:
+                    message.firstname = String$.internalBinaryRead(reader, reader.uint32(), options, message.firstname);
                     break;
-                case /* string Lastname = 2 [json_name = "Lastname"];*/ 2:
-                    message.lastname = reader.string();
+                case /* pbtypes.String Lastname = 2 [json_name = "Lastname"];*/ 2:
+                    message.lastname = String$.internalBinaryRead(reader, reader.uint32(), options, message.lastname);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -62,12 +61,12 @@ class UpdateProfileReq$Type extends MessageType<UpdateProfileReq> {
         return message;
     }
     internalBinaryWrite(message: UpdateProfileReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string Firstname = 1 [json_name = "Firstname"]; */
-        if (message.firstname !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.firstname);
-        /* string Lastname = 2 [json_name = "Lastname"]; */
-        if (message.lastname !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.lastname);
+        /* pbtypes.String Firstname = 1 [json_name = "Firstname"]; */
+        if (message.firstname)
+            String$.internalBinaryWrite(message.firstname, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String Lastname = 2 [json_name = "Lastname"]; */
+        if (message.lastname)
+            String$.internalBinaryWrite(message.lastname, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

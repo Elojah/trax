@@ -13,49 +13,49 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) (*pbtypes.Empty, error) {
+func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) (*user.Profile, error) {
 	logger := log.With().Str("method", "update_profile").Logger()
 
 	if req == nil {
-		return &pbtypes.Empty{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &user.Profile{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #Authenticate
 	u, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &pbtypes.Empty{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &user.Profile{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	p := user.PatchProfile{
-		FirstName: func(s string) *string {
-			if len(s) == 0 {
-				return nil
-			}
-			return &s
-		}(req.Firstname),
-		LastName: func(s string) *string {
-			if len(s) == 0 {
-				return nil
-			}
-			return &s
-		}(req.Lastname),
-	}
+	var profile user.Profile
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		if err = h.user.UpdateProfile(ctx, user.FilterProfile{
+		profiles, err := h.user.UpdateProfile(ctx, user.FilterProfile{
 			UserID: u.ID,
-		}, p); err != nil {
+		}, user.PatchProfile{
+			FirstName: pbtypes.GetString(req.Firstname),
+			LastName:  pbtypes.GetString(req.Lastname),
+		})
+		if err != nil {
 			logger.Error().Err(err).Msg("failed to update user profile")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
+		if len(profiles) == 0 {
+			err := gerrors.ErrNotFound{Resource: "profile", Index: u.ID.String()}
+			logger.Error().Err(err).Msg("failed to update user profile")
+
+			return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
+		}
+
+		profile = profiles[0]
+
 		return transaction.Commit, nil
 	}); err != nil {
-		return &pbtypes.Empty{}, err
+		return &user.Profile{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &pbtypes.Empty{}, nil
+	return &profile, nil
 }
