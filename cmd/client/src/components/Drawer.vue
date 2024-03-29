@@ -15,6 +15,12 @@ const redirect = function (name: string) {
 <template>
 	<v-navigation-drawer rail v-if="authStore.profile">
 		<v-list nav>
+			<v-list-item prepend-icon="mdi-domain" title="Entity" value="entity" @click="redirect('entity')">
+				<template v-slot:prepend>
+					<v-icon color="success"></v-icon>
+				</template>
+			</v-list-item>
+			<v-divider></v-divider>
 			<v-list-item prepend-icon="mdi-chart-box-multiple" title="Dashboard" value="dashboard"
 				@click="redirect('dashboard')">
 				<template v-slot:prepend>

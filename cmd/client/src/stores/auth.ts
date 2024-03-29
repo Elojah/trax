@@ -71,11 +71,11 @@ export const useAuthStore = defineStore({
           }
         }
       },
-      async updateProfile(firstName: string|null, lastName: string|null) {
+      async updateProfile() {
         try {
           const req = UpdateProfileReq.create({
-            firstname: firstName,
-            lastname: lastName,
+            firstname:{value: this.profile?.firstName},
+            lastname: {value:this.profile?.lastName},
           });
 
           const resp = await this.api.updateProfile(req, {meta: {token: this.token}})
