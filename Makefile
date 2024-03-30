@@ -74,7 +74,7 @@ auth:  ## Build auth binary
 .PHONY: client
 client:  ## Build client content
 	$(info $(M) building bundle client) @
-	$Q cd cmd/$(CLIENT) && npx vite build --mode development
+	$Q cd cmd/$(CLIENT) && npx vite build
 	$Q mkdir -p bin && rm -rf bin/$(STATIC) && mkdir -p bin/$(CLIENT)/$(STATIC)/
 	$Q yes | cp -rf cmd/$(CLIENT)/dist/. bin/$(CLIENT)/$(STATIC)/
 

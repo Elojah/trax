@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"time"
 
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
@@ -29,11 +30,13 @@ func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) 
 	var profile user.Profile
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		now := time.Now().Unix()
 		profiles, err := h.user.UpdateProfile(ctx, user.FilterProfile{
 			UserID: u.ID,
 		}, user.PatchProfile{
 			FirstName: pbtypes.GetString(req.Firstname),
 			LastName:  pbtypes.GetString(req.Lastname),
+			UpdatedAt: &now,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to update user profile")

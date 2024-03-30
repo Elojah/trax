@@ -51,6 +51,7 @@ type FilterProfile struct {
 type PatchProfile struct {
 	FirstName *string
 	LastName  *string
+	UpdatedAt *int64
 }
 
 type StoreProfile interface {

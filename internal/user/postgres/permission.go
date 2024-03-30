@@ -115,13 +115,13 @@ func (f filterPermission) index() string {
 	return strings.Join(cols, " - ")
 }
 
-func (s Store) InsertPermission(ctx context.Context, entity user.Permission) error {
+func (s Store) InsertPermission(ctx context.Context, permission user.Permission) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return err
 	}
 
-	p := newPermission(entity)
+	p := newPermission(permission)
 
 	b := strings.Builder{}
 	b.WriteString(`INSERT INTO "user"."permission" (role_id, resource, command, created_at, updated_at) VALUES (`)
@@ -129,6 +129,42 @@ func (s Store) InsertPermission(ctx context.Context, entity user.Permission) err
 	b.WriteString(`)`)
 
 	if _, err := tx.Exec(ctx, b.String(), p.RoleID, p.Resource, p.Command, p.CreatedAt, p.UpdatedAt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s Store) InsertManyPermission(ctx context.Context, permissions []user.Permission) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	n := 0
+	values := make([]string, 0, len(permissions))
+	args := make([]any, 0, len(permissions)*5)
+
+	for _, permission := range permissions {
+		b := strings.Builder{}
+		b.WriteString(`(`)
+
+		n += 1
+		b.WriteString(postgres.Array(n, n+4))
+		n += 4
+
+		p := newPermission(permission)
+		args = append(args, p.RoleID, p.Resource, p.Command, p.CreatedAt, p.UpdatedAt)
+		b.WriteString(`)`)
+
+		values = append(values, b.String())
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO "user"."permission" (role_id, resource, command, created_at, updated_at) VALUES `)
+	b.WriteString(strings.Join(values, ", "))
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
 		return err
 	}
 
@@ -151,7 +187,7 @@ func (s Store) FetchPermission(ctx context.Context, f user.FilterPermission) (us
 
 	var p sqlPermission
 	if err := q.Scan(&p.RoleID, &p.Resource, &p.Command, &p.CreatedAt, &p.UpdatedAt); err != nil {
-		return user.Permission{}, postgres.Error(err, "entity", filterPermission(f).index())
+		return user.Permission{}, postgres.Error(err, "permission", filterPermission(f).index())
 	}
 
 	return p.permission()

@@ -108,6 +108,12 @@ func (p patchProfile) set() (string, []any, int) {
 		n++
 	}
 
+	if p.UpdatedAt != nil {
+		cols = append(cols, fmt.Sprintf(`updated_at = $%d`, n))
+		args = append(args, time.Unix(*p.UpdatedAt, 0))
+		n++
+	}
+
 	b := strings.Builder{}
 	b.WriteString(" SET ")
 

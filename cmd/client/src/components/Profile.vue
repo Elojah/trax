@@ -48,31 +48,31 @@ const updateFirstName = async function () {
 	<v-card v-if="profile" class="px-6 py-6 rounded-xl" variant="elevated">
 		<v-card-title class="justify-center mb-2 text-center">
 			<v-form v-if="profile" ref="form" v-model="valid" lazy-validation>
-				<v-avatar class="mb-4" size="96">
-					<img :src="profile.avatarURL" alt="Avatar">
+				<v-avatar class="mb-4" size="96" :color="!profile.avatarURL ? 'primary' : ''">
+					<img v-if="profile.avatarURL" :src="profile.avatarURL" alt="Avatar">
+					<span v-if="!profile.avatarURL" class=" mx-auto text-center text-h5">
+						{{ (profile.firstName.at(0)?.toUpperCase() ?? '')
+		.concat(profile.lastName.at(0)?.toUpperCase() ?? '') }}
+					</span>
 				</v-avatar>
-				<v-col cols="12" class="pa-0">
-					<v-text-field v-model="profile.lastName" :rules="nameRules"
-						:variant="!lastNameEdit ? 'solo' : 'solo-filled'" :readonly="!lastNameEdit">
-						<template v-slot:append-inner>
-							<v-icon color="success" large @click="updateLastName"
-								:icon="!lastNameEdit ? 'mdi-pencil-circle-outline' : 'mdi-check-circle-outline'"></v-icon>
-						</template>
-					</v-text-field>
-				</v-col>
-				<v-col cols="12" class="pa-0">
-					<v-text-field v-model="profile.firstName" :rules="nameRules"
-						:variant="!firstNameEdit ? 'solo' : 'solo-filled'" :readonly="!firstNameEdit">
-						<template v-slot:append-inner>
-							<v-icon color="success" large @click="updateFirstName"
-								:icon="!firstNameEdit ? 'mdi-pencil-circle-outline' : 'mdi-check-circle-outline'"></v-icon>
-						</template>
-					</v-text-field>
-				</v-col>
+				<v-text-field class="justify-center text-h6" density="compact" v-model="profile.lastName"
+					:rules="nameRules" :variant="!lastNameEdit ? 'plain' : 'underlined'" :readonly="!lastNameEdit">
+					<template v-slot:append-inner>
+						<v-icon color="primary" size="large" @click="updateLastName"
+							:icon="!lastNameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
+					</template>
+				</v-text-field>
+				<v-text-field class="justify-center text-h6" density="compact" v-model="profile.firstName"
+					:rules="nameRules" :variant="!firstNameEdit ? 'plain' : 'underlined'" :readonly="!firstNameEdit">
+					<template v-slot:append-inner>
+						<v-icon color="primary" size="large" @click="updateFirstName"
+							:icon="!firstNameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
+					</template>
+				</v-text-field>
 			</v-form>
 		</v-card-title>
 		<v-card-actions class="justify-center mt-6">
-			<v-btn size="large" variant="tonal" append-icon="mdi-account-circle" @click="signout">Signout
+			<v-btn class="px-4" size="large" variant="tonal" append-icon="mdi-account-circle" @click="signout">Signout
 				<template v-slot:append>
 					<v-icon color="error"></v-icon>
 				</template>

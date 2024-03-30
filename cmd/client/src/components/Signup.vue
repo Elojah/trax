@@ -69,35 +69,37 @@ const signup = async function () {
         SIGNUP
       </v-card-title>
       <template v-slot:prepend>
-        <v-icon color="success"></v-icon>
+        <v-icon color="primary"></v-icon>
       </template>
     </v-card-item>
-    <v-divider color="success"></v-divider>
+    <v-divider color="primary"></v-divider>
     <v-card-text class="mt-6">
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="6">
             <v-text-field v-model="firstname" :rules="firstnameRules" label="First Name" maxlength="20" underlined
-              append-icon="mdi-card-account-details" required clearable></v-text-field>
+              prepend-inner-icon="mdi-card-account-details" required clearable></v-text-field>
           </v-col>
           <v-col cols="6">
             <v-text-field v-model="lastname" :rules="lastnameRules" label="Last Name" maxlength="20" underlined
-              append-icon="mdi-card-account-details" required clearable></v-text-field>
+              prepend-inner-icon="mdi-card-account-details" required clearable></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" underlined required
-              clearable></v-text-field>
+            <v-text-field v-model="email" label="Email" :rules="emailRules" preprnd-inner-icon="mdi-email" underlined
+              required clearable></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="passwordRules" :type="showPassword ? 'text' : 'password'" label="Password" counter
-              @click:append="showPassword = !showPassword" underlined required clearable>
+            <v-text-field v-model="password" prepend-inner-icon="mdi-lock"
+              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"
+              :type="showPassword ? 'text' : 'password'" label="Password" counter
+              @click:append-inner="showPassword = !showPassword" underlined required clearable>
             </v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="passwordCheck" :append-icon="showPasswordCheck ? 'mdi-eye' : 'mdi-eye-off'"
+            <v-text-field v-model="passwordCheck" prepend-inner-icon="mdi-lock"
+              :append-inner-icon="showPasswordCheck ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="[...passwordRules, passwordMatch]" :type="showPasswordCheck ? 'text' : 'password'"
-              label="Confirm Password" counter @click:append="showPasswordCheck = !showPasswordCheck" underlined
+              label="Confirm Password" counter @click:append-inner="showPasswordCheck = !showPasswordCheck" underlined
               required clearable>
             </v-text-field>
           </v-col>
@@ -105,13 +107,13 @@ const signup = async function () {
             <v-btn size="large" :disabled="!valid" variant="tonal" append-icon="mdi-account-circle"
               @click="signup">Signup
               <template v-slot:append>
-                <v-icon color="success"></v-icon>
+                <v-icon color="primary"></v-icon>
               </template>
             </v-btn>
           </v-col>
         </v-row>
       </v-form>
-      <v-snackbar :timeout="2000" v-model="snackbarSuccess" class="mt-6" color="success">
+      <v-snackbar :timeout="2000" v-model="snackbarSuccess" class="mt-6" color="primary">
         Successfully Signup ! You can now signin.
         <template v-slot:actions>
           <v-btn variant="text" @click="snackbarSuccess = false">Close</v-btn>

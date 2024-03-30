@@ -4,6 +4,7 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
+import type { Entity } from "../../../internal/user/entity";
 import type { UpdateProfileReq } from "../../../internal/user/dto/profile";
 import type { Profile } from "../../../internal/user/user";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
@@ -30,6 +31,15 @@ export interface IAPIClient {
      * @generated from protobuf rpc: UpdateProfile(dto.UpdateProfileReq) returns (user.Profile);
      */
     updateProfile(input: UpdateProfileReq, options?: RpcOptions): UnaryCall<UpdateProfileReq, Profile>;
+    /**
+     * Entity
+     *
+     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
+     * rpc FetchEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: CreateEntity(user.Entity) returns (user.Entity);
+     */
+    createEntity(input: Entity, options?: RpcOptions): UnaryCall<Entity, Entity>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -64,5 +74,17 @@ export class APIClient implements IAPIClient, ServiceInfo {
     updateProfile(input: UpdateProfileReq, options?: RpcOptions): UnaryCall<UpdateProfileReq, Profile> {
         const method = this.methods[2], opt = this._transport.mergeOptions(options);
         return stackIntercept<UpdateProfileReq, Profile>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * Entity
+     *
+     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
+     * rpc FetchEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: CreateEntity(user.Entity) returns (user.Entity);
+     */
+    createEntity(input: Entity, options?: RpcOptions): UnaryCall<Entity, Entity> {
+        const method = this.methods[3], opt = this._transport.mergeOptions(options);
+        return stackIntercept<Entity, Entity>("unary", this._transport, method, opt, input);
     }
 }

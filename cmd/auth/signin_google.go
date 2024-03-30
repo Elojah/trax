@@ -62,7 +62,7 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 		logger = logger.With().Str("user_id", u.ID.String()).Logger()
 
 		if err := h.user.Insert(ctx, u); err != nil {
-			logger.Error().Err(err).Msg("failed to create user")
+			logger.Error().Err(err).Msg("failed to insert user")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}

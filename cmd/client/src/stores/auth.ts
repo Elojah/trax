@@ -1,107 +1,118 @@
 import { defineStore } from 'pinia';
-import {Profile} from '@internal/user/user';
-import {config, logger} from "@/config"
-import {APIClient} from '@api/api.client';
+import { Profile } from '@internal/user/user';
+import { config, logger } from "@/config"
+import { APIClient } from '@api/api.client';
 import { Empty } from '@pkg/pbtypes/empty';
 import type { SigninReq, SignupReq } from '@internal/user/dto/user';
-import {GrpcWebFetchTransport} from "@protobuf-ts/grpcweb-transport";
+import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import { getCookie, removeCookie } from 'typescript-cookie'
 import { UpdateProfileReq } from '@internal/user/dto/profile';
+import { ref } from 'vue';
 
-export const useAuthStore = defineStore({
-    id: 'auth',
-    state: () => ({
-      token: "" as string,
-      profile: null as Profile | null,
+export const useAuthStore = defineStore('auth', () => {
+  const token = ref("" as string)
+  const profile = ref(null as Profile | null)
 
-      signupURL: new URL('signup', config.web_client_url).href,
-      signinURL: new URL('signin', config.web_client_url).href,
-      signinGoogleURL: new URL('signin_google', config.web_client_url).href,
-      refreshTokenURL: new URL('refresh_token', config.web_client_url).href,
+  const signupURL = new URL('signup', config.web_client_url).href
+  const signinURL = new URL('signin', config.web_client_url).href
+  const signinGoogleURL = new URL('signin_google', config.web_client_url).href
+  const refreshTokenURL = new URL('refresh_token', config.web_client_url).href
 
-      api: new APIClient(new GrpcWebFetchTransport({
-          baseUrl: config.api_url,
-      })),
-    }),
-    actions: {
-      async signup (req: SignupReq): Promise<Response> {
-        return await fetch(this.signupURL, {
-          method: 'POST',
-          body: JSON.stringify(req),
-        })
-      },
-      async signin(req:SigninReq) {
-        const resp = await fetch(this.signinURL, {
-          method: 'POST',
-          body: JSON.stringify(req),
-        })
+  const api = new APIClient(new GrpcWebFetchTransport({
+    baseUrl: config.api_url,
+  }))
 
-        if (resp.status === 200) {
-          this.refreshProfile();
-        }
+  const signup = async (req: SignupReq): Promise<Response> => {
+    return await fetch(signupURL, {
+      method: 'POST',
+      body: JSON.stringify(req),
+    })
+  }
 
-        return resp
-      },
-      async signinGoogle(token: string) {
-        const resp = await fetch(this.signinGoogleURL, {
-          method: 'POST',
-          body: token,
-        });
+  const signin = async (req: SigninReq) => {
+    const resp = await fetch(signinURL, {
+      method: 'POST',
+      body: JSON.stringify(req),
+    })
 
-        if (resp.status === 200) {
-          this.refreshProfile();
-        }
+    if (resp.status === 200) {
+      refreshProfile();
+    }
 
-        return resp
-      },
-      async refreshProfile() {
-        this.token = getCookie('access') ?? "";
+    return resp
+  }
 
-        if (!this.token) {
-          return;
-        }
+  const signinGoogle = async (token: string) => {
+    const resp = await fetch(signinGoogleURL, {
+      method: 'POST',
+      body: token,
+    });
 
-        try {
-          const resp = await this.api.fetchProfile(Empty, {meta: {token: this.token}})
-          this.profile = resp.response;
-        } catch (err: any) {
-          switch (err.code) {
-            default:
-              logger.error(err);
-          }
-        }
-      },
-      async updateProfile() {
-        try {
-          const req = UpdateProfileReq.create({
-            firstname:{value: this.profile?.firstName},
-            lastname: {value:this.profile?.lastName},
-          });
+    if (resp.status === 200) {
+      refreshProfile();
+    }
 
-          const resp = await this.api.updateProfile(req, {meta: {token: this.token}})
-          this.profile = resp.response;
-        } catch (err: any) {
-          switch (err.code) {
-            default:
-              logger.error(err);
-          }
-        }
-      },
-      async refreshToken() {
-        if (!this.token) {
-          return;
-        }
+    return resp
+  }
 
-        await fetch(this.refreshTokenURL, {
-          method: 'POST',
-        })
-      },
-      async signout() {
-          this.token = "";
-          this.profile = null;
-          removeCookie('g_state');
-          removeCookie('refresh', { path: '', domain: '.legacyfactory.com' })
-          removeCookie('access', { path: '', domain: '.legacyfactory.com' })
+  const refreshProfile = async () => {
+    token.value = getCookie('access') ?? "";
+
+    if (!token.value) {
+      return;
+    }
+
+    try {
+      const resp = await api.fetchProfile(Empty, { meta: { token: token.value } })
+      profile.value = resp.response;
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err);
       }
     }
+  }
+
+  const updateProfile = async () => {
+    try {
+      const req = UpdateProfileReq.create({
+        firstname: { value: profile?.value?.firstName },
+        lastname: { value: profile?.value?.lastName },
+      });
+
+      const resp = await api.updateProfile(req, { meta: { token: token.value } })
+      profile.value = resp.response;
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err);
+      }
+    }
+  }
+
+  const refreshToken = async () => {
+    if (!token.value) {
+      return;
+    }
+
+    await fetch(refreshTokenURL, {
+      method: 'POST',
+    })
+  }
+
+  const signout = async () => {
+    token.value = "";
+    profile.value = null;
+    removeCookie('g_state');
+    removeCookie('refresh', { path: '', domain: '.legacyfactory.com' })
+    removeCookie('access', { path: '', domain: '.legacyfactory.com' })
+  }
+
+  return {
+    token, profile,
+    signup, signin, signout,
+    signinGoogle,
+    refreshProfile, updateProfile,
+    refreshToken,
+  }
 });

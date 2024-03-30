@@ -83,33 +83,33 @@ const signInGoogleError = async function (error: any) {
         SIGNIN
       </v-card-title>
       <template v-slot:prepend>
-        <v-icon color="success"></v-icon>
+        <v-icon color="primary"></v-icon>
       </template>
     </v-card-item>
-    <v-divider color="success"></v-divider>
+    <v-divider color="primary"></v-divider>
     <v-card-text class="mt-6">
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="12">
-            <v-text-field v-model="email" label="Email" :rules="emailRules" append-icon="mdi-email" underlined required
-              clearable></v-text-field>
+            <v-text-field v-model="email" label="Email" :rules="emailRules" prepend-inner-icon="mdi-email" underlined
+              required clearable></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="passwordRules" :type="showPassword ? 'text' : 'password'" label="Password"
-              hint="At least 8 characters" counter @click:append="showPassword = !showPassword" underlined required
-              clearable>
+            <v-text-field v-model="password" prepend-inner-icon="mdi-lock"
+              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"
+              :type="showPassword ? 'text' : 'password'" label="Password" hint="At least 8 characters" counter
+              @click:append-inner="showPassword = !showPassword" underlined required clearable>
             </v-text-field>
           </v-col>
           <v-col class="mb-6" cols="12" align="center">
             <v-btn size="large" :disabled="!valid" variant="tonal" append-icon="mdi-account-circle"
               @click="signin">Signin
               <template v-slot:append>
-                <v-icon color="success"></v-icon>
+                <v-icon color="primary"></v-icon>
               </template>
             </v-btn>
           </v-col>
-          <v-divider color="success"></v-divider>
+          <v-divider color="primary"></v-divider>
           <v-col class="mt-6 color-auto" cols="12" align="center">
             <GoogleSignInButton @success="signInGoogle" @error="signInGoogleError" theme="filled_black" size="large"
               shape="pill">

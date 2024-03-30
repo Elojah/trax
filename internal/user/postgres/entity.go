@@ -86,6 +86,43 @@ func (f filterEntity) index() string {
 	return strings.Join(cols, " - ")
 }
 
+type patchEntity user.PatchEntity
+
+func (p patchEntity) set() (string, []any, int) {
+	var cols []string
+	var args []any
+	n := 1
+
+	if p.Name != nil {
+		cols = append(cols, fmt.Sprintf(`name = $%d`, n))
+		args = append(args, *p.Name)
+		n++
+	}
+
+	if p.AvatarURL != nil {
+		cols = append(cols, fmt.Sprintf(`avatar_url = $%d`, n))
+		args = append(args, *p.AvatarURL)
+		n++
+	}
+
+	if p.UpdatedAt != nil {
+		cols = append(cols, fmt.Sprintf(`updated_at = $%d`, n))
+		args = append(args, time.Unix(*p.UpdatedAt, 0))
+		n++
+	}
+
+	b := strings.Builder{}
+	b.WriteString(" SET ")
+
+	if len(cols) == 0 {
+		b.WriteString("id = id")
+	} else {
+		b.WriteString(strings.Join(cols, " , "))
+	}
+
+	return b.String(), args, n
+}
+
 func (s Store) InsertEntity(ctx context.Context, entity user.Entity) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
@@ -139,6 +176,44 @@ func (s Store) FetchManyEntity(ctx context.Context, f user.FilterEntity) ([]user
 
 	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, postgres.Error(err, "entity", filterEntity(f).index())
+	}
+
+	var entities []user.Entity
+
+	for rows.Next() {
+		var p sqlEntity
+		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
+			return nil, postgres.Error(err, "entity", filterEntity(f).index())
+		}
+
+		entities = append(entities, p.entity())
+	}
+
+	return entities, nil
+}
+
+func (s Store) UpdateEntity(ctx context.Context, f user.FilterEntity, p user.PatchEntity) ([]user.Entity, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`UPDATE "user"."entity" `)
+
+	cols, args, n := patchEntity(p).set()
+	b.WriteString(cols)
+
+	clause, wargs := filterEntity(f).where(n)
+	b.WriteString(clause)
+
+	args = append(args, wargs...)
+
+	b.WriteString(` RETURNING id, name, avatar_url, created_at, updated_at`)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
