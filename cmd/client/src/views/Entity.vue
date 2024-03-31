@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Entity from '@/components/Entity.vue';
 </script>
 
 <template>

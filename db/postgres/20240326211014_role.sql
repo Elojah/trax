@@ -1,6 +1,11 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TYPE "user"."resource" AS ENUM('R_user', 'R_asset', 'R_operation');
+CREATE TYPE "user"."resource" AS ENUM(
+	'R_user',
+	'R_role',
+	'R_asset',
+	'R_operation'
+);
 CREATE TYPE "user"."command" AS ENUM('C_read', 'C_create', 'C_update', 'C_delete');
 CREATE TABLE IF NOT EXISTS "user"."role" (
 	"id" UUID NOT NULL,
