@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router';
-import { ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 
 const form = ref<VForm | null>(null);
@@ -42,6 +42,8 @@ const updateFirstName = async function () {
 	firstNameEdit.value = !firstNameEdit.value
 };
 
+const initials = computed(() => (profile?.value?.firstName.at(0)?.toUpperCase() ?? '').concat(profile?.value?.lastName.at(0)?.toUpperCase() ?? ''))
+
 </script>
 
 <template>
@@ -50,9 +52,8 @@ const updateFirstName = async function () {
 			<v-form v-if="profile" ref="form" v-model="valid" lazy-validation>
 				<v-avatar class="mb-4" size="96" :color="!profile.avatarURL ? 'primary' : ''">
 					<img v-if="profile.avatarURL" :src="profile.avatarURL" alt="Avatar">
-					<span v-if="!profile.avatarURL" class=" mx-auto text-center text-h5">
-						{{ (profile.firstName.at(0)?.toUpperCase() ?? '')
-		.concat(profile.lastName.at(0)?.toUpperCase() ?? '') }}
+					<span v-else-if="!profile.avatarURL" class=" mx-auto text-center text-h5">
+						{{ initials }}
 					</span>
 				</v-avatar>
 				<v-text-field class="justify-center text-h6" density="compact" v-model="profile.lastName"

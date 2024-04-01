@@ -5,9 +5,7 @@ import Entity from '@/components/Entity.vue';
 <template>
 	<v-main class="bg">
 		<v-container fluid>
-			<v-sheet class="px-1 rounded-xl" outlined color="primary">
-				<Entity />
-			</v-sheet>
+			<Entity />
 		</v-container>
 	</v-main>
 </template>
