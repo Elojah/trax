@@ -72,7 +72,7 @@ const updateFirstName = async function () {
 			</v-form>
 		</v-card-title>
 		<v-card-actions class="justify-center mt-6">
-			<v-btn class="px-4" size="large" variant="tonal" append-icon="mdi-account-circle" @click="signout">Signout
+			<v-btn class="px-4" size="large" variant="tonal" append-icon="mdi-export" @click="signout">Signout
 				<template v-slot:append>
 					<v-icon color="error"></v-icon>
 				</template>
