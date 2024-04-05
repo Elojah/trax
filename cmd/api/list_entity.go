@@ -1,0 +1,50 @@
+package main
+
+import (
+	"context"
+
+	"github.com/elojah/trax/internal/user"
+	"github.com/elojah/trax/internal/user/dto"
+	gerrors "github.com/elojah/trax/pkg/errors"
+	"github.com/elojah/trax/pkg/transaction"
+	"github.com/rs/zerolog/log"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.ListEntityResp, error) {
+	logger := log.With().Str("method", "list_entity").Logger()
+
+	if req == nil {
+		return &dto.ListEntityResp{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+	}
+
+	// #MARK:Authenticate
+	u, err := h.user.Auth(ctx, "access")
+	if err != nil {
+		return &dto.ListEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
+	}
+
+	var entities []user.Entity
+	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		entities, err = h.user.ListEntity(ctx, user.FilterEntity{
+			RoleUserID: u.ID,
+			Paginate:   req.Paginate,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to list entity")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		return transaction.Commit, nil
+	}); err != nil {
+		return &dto.ListEntityResp{}, err
+	}
+
+	logger.Info().Msg("success")
+
+	return &dto.ListEntityResp{
+		Entities: entities,
+	}, nil
+}

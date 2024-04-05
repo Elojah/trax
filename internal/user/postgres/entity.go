@@ -8,9 +8,18 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	ppostgres "github.com/elojah/trax/pkg/paginate/postgres"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
+)
+
+var (
+	sortEntity = map[string]string{
+		"name":       "e.name",
+		"created_at": "e.created_at",
+		"updated_at": "e.updated_at",
+	}
 )
 
 type sqlEntity struct {
@@ -60,6 +69,18 @@ func (f filterEntity) where(n int) (string, []any) {
 	}
 
 	b := strings.Builder{}
+
+	if f.RoleUserID != nil {
+		b.WriteString(`
+		JOIN "user"."role" r ON r.entity_id = e.id
+		JOIN "user"."role_user" ru ON ru.role_id = r.id
+		`)
+
+		clause = append(clause, fmt.Sprintf(`ru.user_id = $%d`, n))
+		args = append(args, f.RoleUserID)
+		n++
+	}
+
 	b.WriteString(" WHERE ")
 
 	if len(clause) == 0 {
@@ -133,11 +154,11 @@ func (s Store) InsertEntity(ctx context.Context, entity user.Entity) error {
 
 	b := strings.Builder{}
 	b.WriteString(`INSERT INTO "user"."entity" (id, name, avatar_url, created_at, updated_at) VALUES (`)
-	b.WriteString(postgres.Array(1, 6))
+	b.WriteString(postgres.Array(1, 5))
 	b.WriteString(`)`)
 
 	if _, err := tx.Exec(ctx, b.String(), p.ID, p.Name, p.AvatarURL, p.CreatedAt, p.UpdatedAt); err != nil {
-		return postgres.Error(err, "entity", p.ID.String())
+		return postgres.Error(err, "entity", p.Name)
 	}
 
 	return nil
@@ -150,7 +171,7 @@ func (s Store) FetchEntity(ctx context.Context, f user.FilterEntity) (user.Entit
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, name, avatar_url, created_at, updated_at FROM "user"."entity" `)
+	b.WriteString(`SELECT e.id, e.name, e.avatar_url, e.created_at, e.updated_at FROM "user"."entity" e `)
 
 	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
@@ -165,17 +186,29 @@ func (s Store) FetchEntity(ctx context.Context, f user.FilterEntity) (user.Entit
 	return p.entity(), nil
 }
 
-func (s Store) FetchManyEntity(ctx context.Context, f user.FilterEntity) ([]user.Entity, error) {
+func (s Store) ListEntity(ctx context.Context, f user.FilterEntity) ([]user.Entity, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, name, avatar_url, created_at, updated_at FROM "user"."entity" `)
+	b.WriteString(`SELECT e.id, e.name, e.avatar_url, e.created_at, e.updated_at`)
+	if f.Paginate != nil {
+		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortEntity))
+	} else {
+		b.WriteString(`, 0`)
+	}
+	b.WriteString(` FROM "user"."entity" e `)
 
 	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
+
+	if f.Paginate != nil {
+		p := ppostgres.Paginate(*f.Paginate).CTE(b.String())
+		b.Reset()
+		b.WriteString(p)
+	}
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
@@ -184,9 +217,10 @@ func (s Store) FetchManyEntity(ctx context.Context, f user.FilterEntity) ([]user
 
 	var entities []user.Entity
 
+	var row_number int
 	for rows.Next() {
 		var p sqlEntity
-		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt, &row_number); err != nil {
 			return nil, postgres.Error(err, "entity", filterEntity(f).index())
 		}
 

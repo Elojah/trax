@@ -90,13 +90,17 @@ export enum Resource {
      */
     R_user = 0,
     /**
-     * @generated from protobuf enum value: R_asset = 1;
+     * @generated from protobuf enum value: R_role = 1;
      */
-    R_asset = 1,
+    R_role = 1,
     /**
-     * @generated from protobuf enum value: R_operation = 2;
+     * @generated from protobuf enum value: R_asset = 2;
      */
-    R_operation = 2
+    R_asset = 2,
+    /**
+     * @generated from protobuf enum value: R_operation = 3;
+     */
+    R_operation = 3
 }
 /**
  * @generated from protobuf enum user.Command

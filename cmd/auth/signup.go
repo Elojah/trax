@@ -25,7 +25,7 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 		return &pbtypes.Empty{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
-	// #Create user
+	// #MARK:Create user
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		now := time.Now().Unix()
 		hash, salt := user.Encrypt(req.Password)

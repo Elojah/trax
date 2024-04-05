@@ -24,7 +24,7 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 		return &dto.SigninResp{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
-	// #Validate token
+	// #MARK:Validate token
 	gid, claims, err := h.google.Signin(ctx, req.Value)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to validate token")
@@ -36,7 +36,7 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		logger = logger.With().Str("google_id", gid).Logger()
 
-		// #Check if user exist
+		// #MARK:Check if user exist
 		u, err = h.user.Fetch(ctx, user.Filter{GoogleID: &gid})
 		if err != nil {
 			if !errors.As(err, &gerrors.ErrNotFound{}) {
@@ -85,7 +85,7 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 		return &dto.SigninResp{}, err
 	}
 
-	// #Create JWT
+	// #MARK:Create JWT
 	jwt, err := h.user.CreateJWT(ctx, u, "access", time.Hour)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")
@@ -93,7 +93,7 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 		return &dto.SigninResp{}, status.New(codes.Internal, err.Error()).Err()
 	}
 
-	// #Create refresh token
+	// #MARK:Create refresh token
 	rt, err := h.user.CreateJWT(ctx, u, "refresh", 24*time.Hour)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")

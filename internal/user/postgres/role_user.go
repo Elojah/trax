@@ -145,7 +145,7 @@ func (s Store) FetchRoleUser(ctx context.Context, f user.FilterRoleUser) (user.R
 	return p.roleUser(), nil
 }
 
-func (s Store) FetchManyRoleUser(ctx context.Context, f user.FilterRoleUser) ([]user.RoleUser, error) {
+func (s Store) ListRoleUser(ctx context.Context, f user.FilterRoleUser) ([]user.RoleUser, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return nil, err

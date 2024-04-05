@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
+import { useEntityStore } from '@/stores/entity';
 import { Entity } from '@internal/user/entity';
-import { ref, toRefs } from 'vue';
+import { onMounted, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { ulid } from '@/utils/ulid';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
 
-const authStore = useAuthStore();
+const entityStore = useEntityStore();
 const {
-	profile: profile,
-} = toRefs(authStore);
-
+	entity: entity,
+	entities: entities,
+} = toRefs(entityStore);
 
 const dialog = ref(false);
 const close = () => {
@@ -20,12 +20,16 @@ const close = () => {
 	entity.value = Entity.create({})
 };
 
-const blankEntity = Entity.create({});
+const nameRules = [
+	(v: string) => !!v || 'Required',
+	(v: string) => (v && v.length >= 1) || 'Min 1 character',
+];
 
-const save = () => {
-	// TODO: save new entity
+const create = async () => {
+	await entityStore.createEntity();
 	dialog.value = false;
-	entity.value = blankEntity;
+	entity.value = {} as Entity;
+	await entityStore.listEntity();
 };
 
 const dialogDelete = ref(false);
@@ -38,59 +42,58 @@ const confirmDeleteEntity = () => {
 	dialogDelete.value = false;
 };
 
-const entities: Entity[] = [
-	Entity.create({ name: 'test1', avatarURL: 'https://gravatar.com/avatar/a7bb3266897ad708becc0a5eaff0b557?s=400&d=robohash&r=x' }),
-	Entity.create({ name: 'test2', avatarURL: 'https://gravatar.com/avatar/a7bb3266897ad708becc0a5eaff0b557?s=400&d=robohash&r=x' }),
-	Entity.create({ name: 'test3', avatarURL: 'https://gravatar.com/avatar/a7bb3266897ad708becc0a5eaff0b557?s=400&d=robohash&r=x' }),
-]
-const entity = ref(Entity.create({ name: 'test_init' }) as Entity);
-
 const editEntity = (entity: Entity) => {
 };
 const deleteEntity = (entity: Entity) => {
 };
 
+onMounted(async () => {
+	entityStore.listEntity();
+})
+
 </script>
 
 <template>
-	<v-toolbar class="bar-bg rounded-t-xl px-6" color="transparent" floating>
+	<v-toolbar class="bar-bg px-6" floating>
 		<v-icon color="primary" size="large" icon="mdi-domain"></v-icon>
-		<v-toolbar-title class="text-h6"> ENTITIES </v-toolbar-title>
-		<v-dialog v-model="dialog" max-width="500px">
+		<v-toolbar-title class="text-h5 font-weight-black font-italic"> Entities </v-toolbar-title>
+		<v-dialog v-model="dialog" max-width="800px">
 			<template v-slot:activator="{ props }">
-				<v-btn class="rounded-xl" variant="outlined" color="primary" prepend-icon="mdi-plus-box" v-bind="props">
+				<v-btn variant="tonal" prepend-icon="mdi-plus-box" v-bind="props">
 					New entity
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>
 					</template>
 				</v-btn>
 			</template>
-			<v-card class="px-6 py-6 rounded-xl" variant="elevated">
-				<v-card-title>
-					<span class="text-h6">New entity</span>
-				</v-card-title>
-				<v-card-text>
-					<v-container>
-						<v-row>
-							<v-col cols="12" md="4">
-								<v-text-field v-model="entity.name" label="Name"></v-text-field>
-							</v-col>
-							<v-col cols="12" md="4">
-								<v-text-field v-model="entity.avatarURL" label="Avatar URL"></v-text-field>
-							</v-col>
-						</v-row>
-					</v-container>
-				</v-card-text>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn variant="text" @click="close">
-						Cancel
-					</v-btn>
-					<v-btn color="primary" variant="text" @click="save">
-						Save
-					</v-btn>
-				</v-card-actions>
-			</v-card>
+			<v-sheet class="px-1 rounded-xl" outlined color="primary">
+				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+					<v-card-title>
+						<span class="text-h6">New entity</span>
+					</v-card-title>
+					<v-card-text>
+						<v-container>
+							<v-row>
+								<v-col cols="12" md="4">
+									<v-text-field v-model="entity.name" :rules="nameRules" label="Name"></v-text-field>
+								</v-col>
+								<v-col cols="12" md="4">
+									<v-text-field v-model="entity.avatarURL" label="Avatar URL"></v-text-field>
+								</v-col>
+							</v-row>
+						</v-container>
+					</v-card-text>
+					<v-card-actions>
+						<v-spacer></v-spacer>
+						<v-btn variant="text" @click="close">
+							Cancel
+						</v-btn>
+						<v-btn color="primary" variant="text" @click="create">
+							Create
+						</v-btn>
+					</v-card-actions>
+				</v-card>
+			</v-sheet>
 		</v-dialog>
 		<v-dialog v-model="dialogDelete" max-width="500px">
 			<v-card>
@@ -107,7 +110,7 @@ const deleteEntity = (entity: Entity) => {
 	<v-row>
 		<v-col class="mx-auto" cols="4">
 			<v-list lines="three" bg-color="rgba(0, 0, 0, 0)">
-				<v-list-item v-for="(entity, i) in entities" :key="ulid(entity.iD)" :prepend-avatar="entity.avatarURL"
+				<v-list-item v-for="(entity) in entities" :key="ulid(entity.iD)" :prepend-avatar="entity.avatarURL"
 					variant="plain" @click="() => { }">
 					<v-list-item-title class="text-h6">{{ entity.name }}</v-list-item-title>
 					<v-list-item-subtitle>{{ 'admin' }}</v-list-item-subtitle>
@@ -125,7 +128,7 @@ const deleteEntity = (entity: Entity) => {
 					<v-icon color="primary"></v-icon>
 				</template>
 			</v-card-item>
-			<v-divider color="primary"></v-divider>
+			<v-divider></v-divider>
 		</v-col>
 	</v-row>
 </template>

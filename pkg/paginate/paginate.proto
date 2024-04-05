@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package grpc;
+package paginate;
 
 option (gogoproto.testgen_all)  = true;
 option (gogoproto.benchgen_all) = true;
@@ -13,20 +13,10 @@ option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 
-import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
-import "github.com/elojah/trax/pkg/pbtypes/string.proto";
+message Paginate {
+	int64 Start   = 1;
+	int64 End     = 2;
 
-service Admin {
-	// #MARK:## TECHNICAL ADMIN ###
-
-    // DB migrations
-    rpc MigrateUp(pbtypes.String) returns (pbtypes.Empty);
-
-	// Cookie secure management
-	rpc RotateCookieKeys(pbtypes.Empty) returns (pbtypes.Empty);
-
-	// Ping
-	rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
-
-	// #MARK:## WEB ADMIN ###
+	string Sort   = 3;
+	bool Order    = 4;
 }

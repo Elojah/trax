@@ -3,11 +3,13 @@ import { config, logger } from "@/config"
 import { APIClient } from '@api/api.client';
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import { Entity } from '@internal/user/entity';
+import { ListEntityReq } from '@internal/user/dto/entity';
 import { useAuthStore } from './auth';
 import { computed, ref } from 'vue';
 
 export const useEntityStore = defineStore('entity', () => {
-  const entity = ref(null as Entity | null)
+  const entity = ref({} as Entity)
+  const entities = ref([] as Entity[] | null)
 
   const api = new APIClient(new GrpcWebFetchTransport({
     baseUrl: config.api_url,
@@ -31,8 +33,32 @@ export const useEntityStore = defineStore('entity', () => {
     }
   };
 
+  const listEntity = async function () {
+    try {
+      const req = ListEntityReq.create({
+        paginate: {
+          start: 1,
+          end: 10,
+          sort: "created_at",
+          order: false,
+        }
+      });
+
+      const resp = await api.listEntity(req, { meta: { token: token.value } })
+      console.log(resp)
+      entities.value = resp.response.entities;
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err);
+      }
+    }
+  };
+
   return {
     entity,
-    createEntity
+    entities,
+    createEntity,
+    listEntity,
   }
 });

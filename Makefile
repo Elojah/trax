@@ -96,6 +96,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$(info $(M) running protobuf $(PB_LANG)) @
 	$(info $(M) generate utils) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/gogoproto/gogo.proto
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/paginate/paginate.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/empty.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/string.proto
 	$(info $(M) generate pkg) @
@@ -106,6 +107,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto
 	$(info $(M) generate clients) @
 	$(info $(M) generate dto) @
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/entity.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/profile.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/user.proto
 	$(info $(M) generate services) @

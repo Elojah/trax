@@ -21,7 +21,7 @@ func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) 
 		return &user.Profile{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
-	// #Authenticate
+	// #MARK:Authenticate
 	u, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &user.Profile{}, status.New(codes.Unauthenticated, err.Error()).Err()

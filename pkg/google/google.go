@@ -17,7 +17,7 @@ type App interface {
 }
 
 func (c Claims) GetString(key string) (string, error) {
-	// #Retrieve Google ID
+	// #MARK:Retrieve Google ID
 	val, ok := c[key]
 	if !ok {
 		return "", ErrInvalidClaim{Claim: "claim not found"}
@@ -57,7 +57,7 @@ func (c Claims) CreateUser(ctx context.Context) (user.U, user.Profile, error) {
 		return user.U{}, user.Profile{}, err
 	}
 
-	// #Create user
+	// #MARK:Create user
 	now := time.Now().Unix()
 	// generate a random password for google sign
 	hash, salt := user.Encrypt(ulid.NewID().String())

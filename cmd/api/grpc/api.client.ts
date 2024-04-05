@@ -4,6 +4,8 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
+import type { ListEntityResp } from "../../../internal/user/dto/entity";
+import type { ListEntityReq } from "../../../internal/user/dto/entity";
 import type { Entity } from "../../../internal/user/entity";
 import type { UpdateProfileReq } from "../../../internal/user/dto/profile";
 import type { Profile } from "../../../internal/user/user";
@@ -34,12 +36,15 @@ export interface IAPIClient {
     /**
      * Entity
      *
-     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
-     * rpc FetchEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
-     *
      * @generated from protobuf rpc: CreateEntity(user.Entity) returns (user.Entity);
      */
     createEntity(input: Entity, options?: RpcOptions): UnaryCall<Entity, Entity>;
+    /**
+     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
+     */
+    listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -78,13 +83,19 @@ export class APIClient implements IAPIClient, ServiceInfo {
     /**
      * Entity
      *
-     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
-     * rpc FetchEntity(pbtypes.Empty) returns (user.Entity); // TODO: IMPLEMENT
-     *
      * @generated from protobuf rpc: CreateEntity(user.Entity) returns (user.Entity);
      */
     createEntity(input: Entity, options?: RpcOptions): UnaryCall<Entity, Entity> {
         const method = this.methods[3], opt = this._transport.mergeOptions(options);
         return stackIntercept<Entity, Entity>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
+     */
+    listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp> {
+        const method = this.methods[4], opt = this._transport.mergeOptions(options);
+        return stackIntercept<ListEntityReq, ListEntityResp>("unary", this._transport, method, opt, input);
     }
 }

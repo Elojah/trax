@@ -159,7 +159,7 @@ func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 	return u.user(), nil
 }
 
-func (s Store) FetchMany(ctx context.Context, f user.Filter) ([]user.U, error) {
+func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return nil, err

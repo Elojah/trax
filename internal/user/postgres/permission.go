@@ -135,13 +135,13 @@ func (s Store) InsertPermission(ctx context.Context, permission user.Permission)
 	return nil
 }
 
-func (s Store) InsertManyPermission(ctx context.Context, permissions []user.Permission) error {
+func (s Store) InsertPermissions(ctx context.Context, permissions []user.Permission) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return err
 	}
 
-	n := 0
+	n := 1
 	values := make([]string, 0, len(permissions))
 	args := make([]any, 0, len(permissions)*5)
 
@@ -149,9 +149,8 @@ func (s Store) InsertManyPermission(ctx context.Context, permissions []user.Perm
 		b := strings.Builder{}
 		b.WriteString(`(`)
 
-		n += 1
-		b.WriteString(postgres.Array(n, n+4))
-		n += 4
+		b.WriteString(postgres.Array(n, 5))
+		n += 5
 
 		p := newPermission(permission)
 		args = append(args, p.RoleID, p.Resource, p.Command, p.CreatedAt, p.UpdatedAt)
@@ -193,7 +192,7 @@ func (s Store) FetchPermission(ctx context.Context, f user.FilterPermission) (us
 	return p.permission()
 }
 
-func (s Store) FetchManyPermission(ctx context.Context, f user.FilterPermission) ([]user.Permission, error) {
+func (s Store) ListPermission(ctx context.Context, f user.FilterPermission) ([]user.Permission, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return nil, err

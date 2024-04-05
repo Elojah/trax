@@ -39,7 +39,7 @@ type Filter struct {
 type Store interface {
 	Insert(context.Context, U) error
 	Fetch(context.Context, Filter) (U, error)
-	FetchMany(context.Context, Filter) ([]U, error)
+	List(context.Context, Filter) ([]U, error)
 	Delete(context.Context, Filter) error
 }
 
@@ -57,7 +57,7 @@ type PatchProfile struct {
 type StoreProfile interface {
 	InsertProfile(context.Context, Profile) error
 	FetchProfile(context.Context, FilterProfile) (Profile, error)
-	FetchManyProfile(context.Context, FilterProfile) ([]Profile, error)
+	ListProfile(context.Context, FilterProfile) ([]Profile, error)
 	UpdateProfile(context.Context, FilterProfile, PatchProfile) ([]Profile, error)
 	DeleteProfile(context.Context, FilterProfile) error
 }

@@ -34,7 +34,7 @@ func (h handler) redirectGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// #Fetch token
+	// #MARK:Fetch token
 	oa := h.google.OAuth()
 
 	token, err := oa.Exchange(ctx, r.FormValue("code"))
@@ -45,7 +45,7 @@ func (h handler) redirectGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// #Fetch JWT
+	// #MARK:Fetch JWT
 	jwt, err := h.AuthClient.SigninGoogle(ctx, &pbtypes.String{Value: token.AccessToken})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to signin")

@@ -168,7 +168,7 @@ func (s Store) FetchProfile(ctx context.Context, f user.FilterProfile) (user.Pro
 	return p.profile(), nil
 }
 
-func (s Store) FetchManyProfile(ctx context.Context, f user.FilterProfile) ([]user.Profile, error) {
+func (s Store) ListProfile(ctx context.Context, f user.FilterProfile) ([]user.Profile, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return nil, err

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"github.com/elojah/trax/pkg/paginate"
 	"github.com/elojah/trax/pkg/ulid"
 )
 
@@ -15,13 +16,16 @@ type PatchEntity struct {
 type FilterEntity struct {
 	ID  ulid.ID
 	IDs []ulid.ID
+
+	RoleUserID ulid.ID
+	*paginate.Paginate
 }
 
 type StoreEntity interface {
 	InsertEntity(context.Context, Entity) error
 	UpdateEntity(context.Context, FilterEntity, PatchEntity) ([]Entity, error)
 	FetchEntity(context.Context, FilterEntity) (Entity, error)
-	FetchManyEntity(context.Context, FilterEntity) ([]Entity, error)
+	ListEntity(context.Context, FilterEntity) ([]Entity, error)
 	DeleteEntity(context.Context, FilterEntity) error
 }
 

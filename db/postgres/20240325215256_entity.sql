@@ -8,6 +8,9 @@ CREATE TABLE IF NOT EXISTS "user"."entity" (
 	"updated_at" TIMESTAMP NOT NULL,
 	PRIMARY KEY ("id")
 );
+CREATE UNIQUE INDEX idx_entity_name ON "user"."entity" ("name");
+CREATE INDEX idx_entity_created_at ON "user"."entity" ("created_at");
+CREATE INDEX idx_entity_updated_at ON "user"."entity" ("updated_at");
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin

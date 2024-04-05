@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/pbtypes"
-	"github.com/elojah/trax/internal/user/dto"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,13 +21,13 @@ func (h *handler) RefreshToken(ctx context.Context, req *pbtypes.String) (*dto.S
 		return &dto.SigninResp{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
-	// #Authenticate
+	// #MARK:Authenticate
 	u, err := h.user.Auth(ctx, "refresh")
 	if err != nil {
 		return &dto.SigninResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	// #Create JWT
+	// #MARK:Create JWT
 	jwt, err := h.user.CreateJWT(ctx, u, "access", time.Hour)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")
@@ -35,7 +35,7 @@ func (h *handler) RefreshToken(ctx context.Context, req *pbtypes.String) (*dto.S
 		return &dto.SigninResp{}, status.New(codes.Internal, err.Error()).Err()
 	}
 
-	// #Create refresh token
+	// #MARK:Create refresh token
 	rt, err := h.user.CreateJWT(ctx, u, "refresh", 24*time.Hour)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")

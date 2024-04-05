@@ -36,7 +36,7 @@ func (a *App) Dial(ctx context.Context) error {
 }
 
 func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity time.Duration) (string, error) {
-	// #Create JWT
+	// #MARK:Create JWT
 	id := ulid.NewID()
 
 	// use cookie rotation encoding to generate a rotating secret for JWT

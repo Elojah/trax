@@ -20,13 +20,13 @@ func (h *handler) CreateEntity(ctx context.Context, req *user.Entity) (*user.Ent
 		return &user.Entity{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
-	// #Authenticate
+	// #MARK:Authenticate
 	u, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	// #Check request
+	// #MARK:Check request
 	if err := req.Check(); err != nil {
 		return &user.Entity{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
@@ -57,7 +57,7 @@ func (h *handler) CreateEntity(ctx context.Context, req *user.Entity) (*user.Ent
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		if err := h.user.InsertManyPermission(ctx, user.AllPermissions(role.ID)); err != nil {
+		if err := h.user.InsertPermissions(ctx, user.AllPermissions(role.ID)); err != nil {
 			logger.Error().Err(err).Msg("failed to insert permissions")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()

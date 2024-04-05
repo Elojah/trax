@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package grpc;
+package dto;
 
 option (gogoproto.testgen_all)  = true;
 option (gogoproto.benchgen_all) = true;
@@ -12,21 +12,13 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+import "github.com/elojah/trax/pkg/paginate/paginate.proto";
+import "github.com/elojah/trax/internal/user/entity.proto";
 
-import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
-import "github.com/elojah/trax/pkg/pbtypes/string.proto";
+message ListEntityReq {
+	paginate.Paginate Paginate    = 1 [(gogoproto.nullable) = true];
+}
 
-service Admin {
-	// #MARK:## TECHNICAL ADMIN ###
-
-    // DB migrations
-    rpc MigrateUp(pbtypes.String) returns (pbtypes.Empty);
-
-	// Cookie secure management
-	rpc RotateCookieKeys(pbtypes.Empty) returns (pbtypes.Empty);
-
-	// Ping
-	rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
-
-	// #MARK:## WEB ADMIN ###
+message ListEntityResp {
+	repeated user.Entity Entities = 1 [(gogoproto.nullable) = false];
 }

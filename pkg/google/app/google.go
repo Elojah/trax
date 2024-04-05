@@ -34,7 +34,7 @@ func (a App) OAuth() *oauth2.Config {
 }
 
 func (a App) Signin(ctx context.Context, token string) (string, google.Claims, error) {
-	// #Validate token
+	// #MARK:Validate token
 	p, err := idtoken.Validate(ctx, token, a.config.ClientID)
 	if err != nil {
 		return "", nil, err
