@@ -26,8 +26,10 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 	}
 
 	var entities []user.Entity
+	var total uint64
+
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		entities, err = h.user.ListEntity(ctx, user.FilterEntity{
+		entities, total, err = h.user.ListEntity(ctx, user.FilterEntity{
 			RoleUserID: u.ID,
 			Paginate:   req.Paginate,
 		})
@@ -46,5 +48,6 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 
 	return &dto.ListEntityResp{
 		Entities: entities,
+		Total:    total,
 	}, nil
 }

@@ -21,4 +21,5 @@ message ListEntityReq {
 
 message ListEntityResp {
 	repeated user.Entity Entities = 1 [(gogoproto.nullable) = false];
+	uint64 Total                  = 2;
 }

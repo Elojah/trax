@@ -29,6 +29,10 @@ export interface ListEntityResp {
      * @generated from protobuf field: repeated user.Entity Entities = 1 [json_name = "Entities"];
      */
     entities: Entity[];
+    /**
+     * @generated from protobuf field: uint64 Total = 2 [json_name = "Total"];
+     */
+    total: bigint;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class ListEntityReq$Type extends MessageType<ListEntityReq> {
@@ -80,12 +84,14 @@ export const ListEntityReq = new ListEntityReq$Type();
 class ListEntityResp$Type extends MessageType<ListEntityResp> {
     constructor() {
         super("dto.ListEntityResp", [
-            { no: 1, name: "Entities", kind: "message", jsonName: "Entities", repeat: 1 /*RepeatType.PACKED*/, T: () => Entity, options: { "gogoproto.nullable": false } }
+            { no: 1, name: "Entities", kind: "message", jsonName: "Entities", repeat: 1 /*RepeatType.PACKED*/, T: () => Entity, options: { "gogoproto.nullable": false } },
+            { no: 2, name: "Total", kind: "scalar", jsonName: "Total", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
     create(value?: PartialMessage<ListEntityResp>): ListEntityResp {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.entities = [];
+        message.total = 0n;
         if (value !== undefined)
             reflectionMergePartial<ListEntityResp>(this, message, value);
         return message;
@@ -97,6 +103,9 @@ class ListEntityResp$Type extends MessageType<ListEntityResp> {
             switch (fieldNo) {
                 case /* repeated user.Entity Entities = 1 [json_name = "Entities"];*/ 1:
                     message.entities.push(Entity.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* uint64 Total = 2 [json_name = "Total"];*/ 2:
+                    message.total = reader.uint64().toBigInt();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -113,6 +122,9 @@ class ListEntityResp$Type extends MessageType<ListEntityResp> {
         /* repeated user.Entity Entities = 1 [json_name = "Entities"]; */
         for (let i = 0; i < message.entities.length; i++)
             Entity.internalBinaryWrite(message.entities[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* uint64 Total = 2 [json_name = "Total"]; */
+        if (message.total !== 0n)
+            writer.tag(2, WireType.Varint).uint64(message.total);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
 import { Entity } from '@internal/user/entity';
-import { onMounted, ref, toRefs } from 'vue';
+import { computed, onMounted, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
-import { ulid } from '@/utils/ulid';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -12,7 +11,62 @@ const entityStore = useEntityStore();
 const {
 	entity: entity,
 	entities: entities,
+	total: total,
+	newEntity: newEntity,
 } = toRefs(entityStore);
+
+const itemsPerPage = ref(10);
+const loading = ref(true);
+const search = ref('');
+
+const headers = [
+	{
+		text: 'Name',
+		key: 'name',
+		align: 'start',
+		sortable: true,
+	},
+	{
+		text: 'Actions',
+		key: 'actions',
+		align: 'end',
+		sortable: false,
+	},
+];
+
+const tableEntities = computed(() => {
+	return entities.value?.map((entity) => {
+		return {
+			...entity,
+			actions: [
+				{
+					icon: 'mdi-pencil',
+					handler: () => editEntity(entity),
+				},
+				{
+					icon: 'mdi-delete',
+					handler: () => deleteEntity(entity),
+				},
+			],
+		};
+	});
+});
+
+const listEntity = async (options: any) => {
+	loading.value = true;
+	const { page, itemsPerPage } = options;
+	await entityStore.listEntity({
+		start: BigInt((page - 1) * itemsPerPage), // page starts at 1
+		end: BigInt(page * itemsPerPage),
+		sort: 'created_at',
+		order: false,
+	});
+	console.log('listEntity', entities.value);
+	console.log('total', total.value);
+
+
+	loading.value = false;
+};
 
 const dialog = ref(false);
 const close = () => {
@@ -29,7 +83,6 @@ const create = async () => {
 	await entityStore.createEntity();
 	dialog.value = false;
 	entity.value = {} as Entity;
-	await entityStore.listEntity();
 };
 
 const dialogDelete = ref(false);
@@ -46,10 +99,6 @@ const editEntity = (entity: Entity) => {
 };
 const deleteEntity = (entity: Entity) => {
 };
-
-onMounted(async () => {
-	entityStore.listEntity();
-})
 
 </script>
 
@@ -75,10 +124,11 @@ onMounted(async () => {
 						<v-container>
 							<v-row>
 								<v-col cols="12" md="4">
-									<v-text-field v-model="entity.name" :rules="nameRules" label="Name"></v-text-field>
+									<v-text-field v-model="newEntity.name" :rules="nameRules"
+										label="Name"></v-text-field>
 								</v-col>
 								<v-col cols="12" md="4">
-									<v-text-field v-model="entity.avatarURL" label="Avatar URL"></v-text-field>
+									<v-text-field v-model="newEntity.avatarURL" label="Avatar URL"></v-text-field>
 								</v-col>
 							</v-row>
 						</v-container>
@@ -109,14 +159,10 @@ onMounted(async () => {
 	</v-toolbar>
 	<v-row>
 		<v-col class="mx-auto" cols="4">
-			<v-list lines="three" bg-color="rgba(0, 0, 0, 0)">
-				<v-list-item v-for="(entity) in entities" :key="ulid(entity.iD)" :prepend-avatar="entity.avatarURL"
-					variant="plain" @click="() => { }">
-					<v-list-item-title class="text-h6">{{ entity.name }}</v-list-item-title>
-					<v-list-item-subtitle>{{ 'admin' }}</v-list-item-subtitle>
-					<v-divider class="my-2"></v-divider>
-				</v-list-item>
-			</v-list>
+			<v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="tableEntities"
+				:items-length="Number(total)" :loading="loading" :search="search" item-value="name"
+				@update:options="listEntity">
+			</v-data-table-server>
 		</v-col>
 		<v-divider vertical></v-divider>
 		<v-col class="mx-auto" cols="8">

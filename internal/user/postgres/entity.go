@@ -186,14 +186,14 @@ func (s Store) FetchEntity(ctx context.Context, f user.FilterEntity) (user.Entit
 	return p.entity(), nil
 }
 
-func (s Store) ListEntity(ctx context.Context, f user.FilterEntity) ([]user.Entity, error) {
+func (s Store) ListEntity(ctx context.Context, f user.FilterEntity) ([]user.Entity, uint64, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT e.id, e.name, e.avatar_url, e.created_at, e.updated_at`)
+	b.WriteString(`SELECT e.id, e.name, e.avatar_url, e.created_at, e.updated_at, COUNT(1) OVER()`)
 	if f.Paginate != nil {
 		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortEntity))
 	} else {
@@ -212,22 +212,24 @@ func (s Store) ListEntity(ctx context.Context, f user.FilterEntity) ([]user.Enti
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, postgres.Error(err, "entity", filterEntity(f).index())
+		return nil, 0, postgres.Error(err, "entity", filterEntity(f).index())
 	}
 
 	var entities []user.Entity
 
+	var count uint64
 	var row_number int
+
 	for rows.Next() {
 		var p sqlEntity
-		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt, &row_number); err != nil {
-			return nil, postgres.Error(err, "entity", filterEntity(f).index())
+		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt, &count, &row_number); err != nil {
+			return nil, 0, postgres.Error(err, "entity", filterEntity(f).index())
 		}
 
 		entities = append(entities, p.entity())
 	}
 
-	return entities, nil
+	return entities, count, nil
 }
 
 func (s Store) UpdateEntity(ctx context.Context, f user.FilterEntity, p user.PatchEntity) ([]user.Entity, error) {

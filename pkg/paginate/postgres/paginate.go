@@ -13,7 +13,7 @@ func (p Paginate) Row(sortCols map[string]string) string {
 	sort, ok := sortCols[p.Sort]
 
 	b := strings.Builder{}
-	b.WriteString(` ,ROW_NUMBER() OVER (`)
+	b.WriteString(`, ROW_NUMBER() OVER (`)
 	if ok {
 		b.WriteString(` ORDER BY `)
 		b.WriteString(sort)

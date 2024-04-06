@@ -10,7 +10,7 @@ import type { String$ } from "../../../pkg/pbtypes/string";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
 /**
- * ### TECHNICAL ADMIN ###
+ * #MARK:## TECHNICAL ADMIN ###
  *
  * @generated from protobuf service grpc.Admin
  */
@@ -35,7 +35,7 @@ export interface IAdminClient {
     ping(input: Empty, options?: RpcOptions): UnaryCall<Empty, Empty>;
 }
 /**
- * ### TECHNICAL ADMIN ###
+ * #MARK:## TECHNICAL ADMIN ###
  *
  * @generated from protobuf service grpc.Admin
  */
