@@ -21,16 +21,16 @@ const search = ref('');
 
 const headers = [
 	{
-		text: 'Name',
+		title: 'Name',
 		key: 'name',
 		align: 'start',
 		sortable: true,
 	},
 	{
-		text: 'Actions',
-		key: 'actions',
+		title: 'Created',
+		key: 'created_at',
 		align: 'end',
-		sortable: false,
+		sortable: true,
 	},
 ];
 
@@ -38,32 +38,19 @@ const tableEntities = computed(() => {
 	return entities.value?.map((entity) => {
 		return {
 			...entity,
-			actions: [
-				{
-					icon: 'mdi-pencil',
-					handler: () => editEntity(entity),
-				},
-				{
-					icon: 'mdi-delete',
-					handler: () => deleteEntity(entity),
-				},
-			],
 		};
 	});
 });
 
 const listEntity = async (options: any) => {
 	loading.value = true;
-	const { page, itemsPerPage } = options;
+	const { page, itemsPerPage, sortBy } = options;
 	await entityStore.listEntity({
 		start: BigInt((page - 1) * itemsPerPage), // page starts at 1
 		end: BigInt(page * itemsPerPage),
-		sort: 'created_at',
-		order: false,
+		sort: sortBy?.at(0)?.key ?? '',
+		order: sortBy?.at(0)?.order === 'asc' ? true : false,
 	});
-	console.log('listEntity', entities.value);
-	console.log('total', total.value);
-
 
 	loading.value = false;
 };
@@ -83,6 +70,12 @@ const create = async () => {
 	await entityStore.createEntity();
 	dialog.value = false;
 	entity.value = {} as Entity;
+};
+
+const displayEntity = (item: Entity, row: any) => {
+	console.log(item, row);
+	row.select();
+	// entityStore.displayEntity(entity);
 };
 
 const dialogDelete = ref(false);
@@ -159,9 +152,30 @@ const deleteEntity = (entity: Entity) => {
 	</v-toolbar>
 	<v-row>
 		<v-col class="mx-auto" cols="4">
-			<v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="tableEntities"
-				:items-length="Number(total)" :loading="loading" :search="search" item-value="name"
-				@update:options="listEntity">
+			<v-data-table-server class="transparent-background" v-model:items-per-page="itemsPerPage" :headers="headers"
+				:items="tableEntities" :items-length="Number(total)" :loading="loading" :search="search"
+				item-value="name" :options="{ sortBy: [{ key: 'created_at', order: 'desc' }] }"
+				@update:options="listEntity" @click:row="displayEntity" select-strategy="single" item-selectable="true">
+				<template v-slot:item="{ item, index, props }">
+					<v-hover v-slot="{ isHovering }">
+						<tr v-bind="props"
+							v-bind:class="(index + (isHovering ? 1 : 0)) % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
+							<td class="text-h6">
+								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
+									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
+									<span v-else-if="!item.avatarURL" class=" mx-auto text-center text-h5">
+										{{ item?.name?.at(0)?.toUpperCase() }}
+									</span>
+								</v-avatar>
+
+								{{ item.name }}
+							</td>
+							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+								1000).toLocaleDateString('en-GB')
+								}}</td>
+						</tr>
+					</v-hover>
+				</template>
 			</v-data-table-server>
 		</v-col>
 		<v-divider vertical></v-divider>
@@ -182,5 +196,17 @@ const deleteEntity = (entity: Entity) => {
 .bar-bg {
 	background: url('@/assets/img/bar-background.svg') no-repeat bottom center;
 	background-size: cover;
+}
+
+.transparent-background {
+	background-color: transparent;
+}
+
+.row-bg-odd {
+	background-color: rgba(151, 88, 170, 0.7);
+}
+
+.row-bg-even {
+	background-color: rgba(106, 57, 116, 0.7);
 }
 </style>
