@@ -18,7 +18,8 @@ message Entity {
 
 	string Name            = 2;
 	string AvatarURL       = 3;
+	string Description     = 4;
 
-	int64 CreatedAt        = 4;
-	int64 UpdatedAt        = 5;
+	int64 CreatedAt        = 5;
+	int64 UpdatedAt        = 6;
 }

@@ -8,9 +8,10 @@ import (
 )
 
 type PatchEntity struct {
-	Name      *string
-	AvatarURL *string
-	UpdatedAt *int64
+	Name        *string
+	Description *string
+	AvatarURL   *string
+	UpdatedAt   *int64
 }
 
 type FilterEntity struct {

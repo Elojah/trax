@@ -23,30 +23,33 @@ var (
 )
 
 type sqlEntity struct {
-	ID        ulid.ID
-	Name      string
-	AvatarURL sql.NullString
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID          ulid.ID
+	Name        string
+	Description string
+	AvatarURL   sql.NullString
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func newEntity(p user.Entity) sqlEntity {
 	return sqlEntity{
-		ID:        p.ID,
-		Name:      p.Name,
-		AvatarURL: sql.NullString{String: p.AvatarURL, Valid: p.AvatarURL != ""},
-		CreatedAt: time.Unix(p.CreatedAt, 0),
-		UpdatedAt: time.Unix(p.UpdatedAt, 0),
+		ID:          p.ID,
+		Name:        p.Name,
+		Description: p.Description,
+		AvatarURL:   sql.NullString{String: p.AvatarURL, Valid: p.AvatarURL != ""},
+		CreatedAt:   time.Unix(p.CreatedAt, 0),
+		UpdatedAt:   time.Unix(p.UpdatedAt, 0),
 	}
 }
 
 func (sqlp sqlEntity) entity() user.Entity {
 	return user.Entity{
-		ID:        sqlp.ID,
-		Name:      sqlp.Name,
-		AvatarURL: sqlp.AvatarURL.String,
-		CreatedAt: sqlp.CreatedAt.Unix(),
-		UpdatedAt: sqlp.UpdatedAt.Unix(),
+		ID:          sqlp.ID,
+		Name:        sqlp.Name,
+		Description: sqlp.Description,
+		AvatarURL:   sqlp.AvatarURL.String,
+		CreatedAt:   sqlp.CreatedAt.Unix(),
+		UpdatedAt:   sqlp.UpdatedAt.Unix(),
 	}
 }
 
@@ -120,6 +123,12 @@ func (p patchEntity) set() (string, []any, int) {
 		n++
 	}
 
+	if p.Description != nil {
+		cols = append(cols, fmt.Sprintf(`description = $%d`, n))
+		args = append(args, *p.Description)
+		n++
+	}
+
 	if p.AvatarURL != nil {
 		cols = append(cols, fmt.Sprintf(`avatar_url = $%d`, n))
 		args = append(args, *p.AvatarURL)
@@ -153,11 +162,11 @@ func (s Store) InsertEntity(ctx context.Context, entity user.Entity) error {
 	p := newEntity(entity)
 
 	b := strings.Builder{}
-	b.WriteString(`INSERT INTO "user"."entity" (id, name, avatar_url, created_at, updated_at) VALUES (`)
-	b.WriteString(postgres.Array(1, 5))
+	b.WriteString(`INSERT INTO "user"."entity" (id, name, description, avatar_url, created_at, updated_at) VALUES (`)
+	b.WriteString(postgres.Array(1, 6))
 	b.WriteString(`)`)
 
-	if _, err := tx.Exec(ctx, b.String(), p.ID, p.Name, p.AvatarURL, p.CreatedAt, p.UpdatedAt); err != nil {
+	if _, err := tx.Exec(ctx, b.String(), p.ID, p.Name, p.Description, p.AvatarURL, p.CreatedAt, p.UpdatedAt); err != nil {
 		return postgres.Error(err, "entity", p.Name)
 	}
 
@@ -171,7 +180,7 @@ func (s Store) FetchEntity(ctx context.Context, f user.FilterEntity) (user.Entit
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT e.id, e.name, e.avatar_url, e.created_at, e.updated_at FROM "user"."entity" e `)
+	b.WriteString(`SELECT e.id, e.name, e.description, e.avatar_url, e.created_at, e.updated_at FROM "user"."entity" e `)
 
 	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
@@ -179,7 +188,7 @@ func (s Store) FetchEntity(ctx context.Context, f user.FilterEntity) (user.Entit
 	q := tx.QueryRow(ctx, b.String(), args...)
 
 	var p sqlEntity
-	if err := q.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
+	if err := q.Scan(&p.ID, &p.Name, &p.Description, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
 		return user.Entity{}, postgres.Error(err, "entity", filterEntity(f).index())
 	}
 
@@ -193,7 +202,7 @@ func (s Store) ListEntity(ctx context.Context, f user.FilterEntity) ([]user.Enti
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT e.id, e.name, e.avatar_url, e.created_at, e.updated_at, COUNT(1) OVER()`)
+	b.WriteString(`SELECT e.id, e.name, e.description, e.avatar_url, e.created_at, e.updated_at, COUNT(1) OVER()`)
 	if f.Paginate != nil {
 		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortEntity))
 	} else {
@@ -222,7 +231,7 @@ func (s Store) ListEntity(ctx context.Context, f user.FilterEntity) ([]user.Enti
 
 	for rows.Next() {
 		var p sqlEntity
-		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt, &count, &row_number); err != nil {
+		if err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt, &count, &row_number); err != nil {
 			return nil, 0, postgres.Error(err, "entity", filterEntity(f).index())
 		}
 
@@ -249,7 +258,7 @@ func (s Store) UpdateEntity(ctx context.Context, f user.FilterEntity, p user.Pat
 
 	args = append(args, wargs...)
 
-	b.WriteString(` RETURNING id, name, avatar_url, created_at, updated_at`)
+	b.WriteString(` RETURNING id, name, description, avatar_url, created_at, updated_at`)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
@@ -260,7 +269,7 @@ func (s Store) UpdateEntity(ctx context.Context, f user.FilterEntity, p user.Pat
 
 	for rows.Next() {
 		var p sqlEntity
-		if err := rows.Scan(&p.ID, &p.Name, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.AvatarURL, &p.CreatedAt, &p.UpdatedAt); err != nil {
 			return nil, postgres.Error(err, "entity", filterEntity(f).index())
 		}
 

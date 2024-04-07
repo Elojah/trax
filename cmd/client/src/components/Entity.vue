@@ -58,7 +58,7 @@ const listEntity = async (options: any) => {
 const dialog = ref(false);
 const close = () => {
 	dialog.value = false;
-	entity.value = Entity.create({})
+	newEntity.value = Entity.create({})
 };
 
 const nameRules = [
@@ -69,13 +69,12 @@ const nameRules = [
 const create = async () => {
 	await entityStore.createEntity();
 	dialog.value = false;
-	entity.value = {} as Entity;
+	newEntity.value = {} as Entity;
 };
 
-const displayEntity = (item: Entity, row: any) => {
-	console.log(item, row);
-	row.select();
-	// entityStore.displayEntity(entity);
+const displayEntity = (_: any, row: { item: Entity }) => {
+	entity.value = row.item;
+	// fetch role for this entity into role store map[entity.id] = roles
 };
 
 const dialogDelete = ref(false);
@@ -88,9 +87,9 @@ const confirmDeleteEntity = () => {
 	dialogDelete.value = false;
 };
 
-const editEntity = (entity: Entity) => {
+const editEntity = () => {
 };
-const deleteEntity = (entity: Entity) => {
+const deleteEntity = () => {
 };
 
 </script>
@@ -151,42 +150,51 @@ const deleteEntity = (entity: Entity) => {
 		</v-dialog>
 	</v-toolbar>
 	<v-row>
-		<v-col class="mx-auto" cols="4">
+		<v-col class="mx-auto" cols="5">
 			<v-data-table-server class="transparent-background" v-model:items-per-page="itemsPerPage" :headers="headers"
 				:items="tableEntities" :items-length="Number(total)" :loading="loading" :search="search"
 				item-value="name" :options="{ sortBy: [{ key: 'created_at', order: 'desc' }] }"
 				@update:options="listEntity" @click:row="displayEntity" select-strategy="single" item-selectable="true">
 				<template v-slot:item="{ item, index, props }">
-					<v-hover v-slot="{ isHovering }">
-						<tr v-bind="props"
-							v-bind:class="(index + (isHovering ? 1 : 0)) % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
-							<td class="text-h6">
-								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
-									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
-									<span v-else-if="!item.avatarURL" class=" mx-auto text-center text-h5">
-										{{ item?.name?.at(0)?.toUpperCase() }}
-									</span>
-								</v-avatar>
-
-								{{ item.name }}
-							</td>
-							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-								1000).toLocaleDateString('en-GB')
-								}}</td>
-						</tr>
-					</v-hover>
+					<tr v-bind="props" v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
+						<td class="text-h5">
+							<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
+								<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
+								<span v-else-if="!item.avatarURL" class=" mx-auto text-center text-h5">
+									{{ item?.name?.at(0)?.toUpperCase() }}
+								</span>
+							</v-avatar>
+							{{ item.name }}
+						</td>
+						<td class="text-subtitle-1 text-left">
+						</td>
+						<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+							1000).toLocaleDateString('en-GB')
+							}}
+						</td>
+					</tr>
 				</template>
 			</v-data-table-server>
 		</v-col>
 		<v-divider vertical></v-divider>
-		<v-col class="mx-auto" cols="8">
-			<v-card-item class="justify-center mb-2" prepend-icon="mdi-account-plus">
+		<v-col class="mx-auto" cols="7">
+			<v-card-item v-if="entity" class="justify-center mb-2">
 				<v-card-title>
-					Entity
+					<v-avatar class="mt-4 mr-4" size="32" :color="!entity.avatarURL ? 'primary' : ''">
+						<img v-if="entity.avatarURL" :src="entity.avatarURL" alt="Avatar">
+						<span v-else-if="!entity.avatarURL" class=" mx-auto text-center text-h5">
+							{{ entity?.name?.at(0)?.toUpperCase() }}
+						</span>
+					</v-avatar>
+					{{ entity.name }}
 				</v-card-title>
-				<template v-slot:prepend>
-					<v-icon color="primary"></v-icon>
-				</template>
+				<v-card-text>
+				</v-card-text>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="primary" @click="editEntity()">Edit</v-btn>
+					<v-btn color="error" @click="deleteEntity()">Delete</v-btn>
+				</v-card-actions>
 			</v-card-item>
 			<v-divider></v-divider>
 		</v-col>
@@ -203,10 +211,18 @@ const deleteEntity = (entity: Entity) => {
 }
 
 .row-bg-odd {
-	background-color: rgba(151, 88, 170, 0.7);
+	background-color: rgba(33, 33, 33, 0.7);
+}
+
+.row-bg-odd:hover {
+	background-color: rgba(38, 50, 56, 0.7);
 }
 
 .row-bg-even {
-	background-color: rgba(106, 57, 116, 0.7);
+	background-color: rgba(66, 66, 66, 0.7);
+}
+
+.row-bg-even:hover {
+	background-color: rgba(55, 71, 79, 0.7);
 }
 </style>

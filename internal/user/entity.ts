@@ -27,11 +27,15 @@ export interface Entity {
      */
     avatarURL: string;
     /**
-     * @generated from protobuf field: int64 CreatedAt = 4 [json_name = "CreatedAt"];
+     * @generated from protobuf field: string Description = 4 [json_name = "Description"];
+     */
+    description: string;
+    /**
+     * @generated from protobuf field: int64 CreatedAt = 5 [json_name = "CreatedAt"];
      */
     createdAt: bigint;
     /**
-     * @generated from protobuf field: int64 UpdatedAt = 5 [json_name = "UpdatedAt"];
+     * @generated from protobuf field: int64 UpdatedAt = 6 [json_name = "UpdatedAt"];
      */
     updatedAt: bigint;
 }
@@ -42,8 +46,9 @@ class Entity$Type extends MessageType<Entity> {
             { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 2, name: "Name", kind: "scalar", jsonName: "Name", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "AvatarURL", kind: "scalar", jsonName: "AvatarURL", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 5, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 4, name: "Description", kind: "scalar", jsonName: "Description", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 6, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
     create(value?: PartialMessage<Entity>): Entity {
@@ -51,6 +56,7 @@ class Entity$Type extends MessageType<Entity> {
         message.iD = new Uint8Array(0);
         message.name = "";
         message.avatarURL = "";
+        message.description = "";
         message.createdAt = 0n;
         message.updatedAt = 0n;
         if (value !== undefined)
@@ -71,10 +77,13 @@ class Entity$Type extends MessageType<Entity> {
                 case /* string AvatarURL = 3 [json_name = "AvatarURL"];*/ 3:
                     message.avatarURL = reader.string();
                     break;
-                case /* int64 CreatedAt = 4 [json_name = "CreatedAt"];*/ 4:
+                case /* string Description = 4 [json_name = "Description"];*/ 4:
+                    message.description = reader.string();
+                    break;
+                case /* int64 CreatedAt = 5 [json_name = "CreatedAt"];*/ 5:
                     message.createdAt = reader.int64().toBigInt();
                     break;
-                case /* int64 UpdatedAt = 5 [json_name = "UpdatedAt"];*/ 5:
+                case /* int64 UpdatedAt = 6 [json_name = "UpdatedAt"];*/ 6:
                     message.updatedAt = reader.int64().toBigInt();
                     break;
                 default:
@@ -98,12 +107,15 @@ class Entity$Type extends MessageType<Entity> {
         /* string AvatarURL = 3 [json_name = "AvatarURL"]; */
         if (message.avatarURL !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.avatarURL);
-        /* int64 CreatedAt = 4 [json_name = "CreatedAt"]; */
+        /* string Description = 4 [json_name = "Description"]; */
+        if (message.description !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.description);
+        /* int64 CreatedAt = 5 [json_name = "CreatedAt"]; */
         if (message.createdAt !== 0n)
-            writer.tag(4, WireType.Varint).int64(message.createdAt);
-        /* int64 UpdatedAt = 5 [json_name = "UpdatedAt"]; */
+            writer.tag(5, WireType.Varint).int64(message.createdAt);
+        /* int64 UpdatedAt = 6 [json_name = "UpdatedAt"]; */
         if (message.updatedAt !== 0n)
-            writer.tag(5, WireType.Varint).int64(message.updatedAt);
+            writer.tag(6, WireType.Varint).int64(message.updatedAt);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -10,8 +10,8 @@ CREATE TYPE "user"."command" AS ENUM(
 	'C_read',
 	'C_create',
 	'C_update',
-	'C_delete',
-	);
+	'C_delete'
+);
 CREATE TABLE IF NOT EXISTS "user"."role" (
 	"id" UUID NOT NULL,
 	"name" VARCHAR(255) NOT NULL,

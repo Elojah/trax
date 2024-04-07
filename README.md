@@ -25,6 +25,8 @@ $ make client && ./bin/game_03_web_client config/web_client/local.json
 
 TODO:
 
-- Redirect in profile when already logged in
+- Add roles + description
 
-- Leaflet ?
+- Add search
+
+- Add entity show page (markdown ?)
