@@ -16,6 +16,7 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "grpc-web": "^1.4.2",
+    "marked": "^12.0.1",
     "pinia": "^2.1.7",
     "pino": "latest",
     "typescript-cookie": "^1.0.6",

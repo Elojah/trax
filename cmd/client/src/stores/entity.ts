@@ -27,7 +27,9 @@ export const useEntityStore = defineStore('entity', () => {
   const createEntity = async function () {
     try {
       const req = Entity.create({
-        name: newEntity.value?.name
+        name: newEntity.value?.name,
+        avatarURL: newEntity.value?.avatarURL,
+        description: newEntity.value?.description
       })
 
       const resp = await api.createEntity(req, { meta: { token: token.value } })
@@ -40,9 +42,10 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const listEntity = async function (p: Paginate) {
+  const listEntity = async function (search: string, p: Paginate) {
     try {
       const req = ListEntityReq.create({
+        search: search,
         paginate: p
       })
 

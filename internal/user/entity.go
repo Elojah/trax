@@ -19,7 +19,10 @@ type FilterEntity struct {
 	IDs []ulid.ID
 
 	RoleUserID ulid.ID
+
 	*paginate.Paginate
+
+	Search string
 }
 
 type StoreEntity interface {

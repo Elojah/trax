@@ -20,6 +20,10 @@ export interface ListEntityReq {
      * @generated from protobuf field: paginate.Paginate Paginate = 1 [json_name = "Paginate"];
      */
     paginate?: Paginate;
+    /**
+     * @generated from protobuf field: string Search = 2 [json_name = "Search"];
+     */
+    search: string;
 }
 /**
  * @generated from protobuf message dto.ListEntityResp
@@ -38,11 +42,13 @@ export interface ListEntityResp {
 class ListEntityReq$Type extends MessageType<ListEntityReq> {
     constructor() {
         super("dto.ListEntityReq", [
-            { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } }
+            { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
+            { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<ListEntityReq>): ListEntityReq {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.search = "";
         if (value !== undefined)
             reflectionMergePartial<ListEntityReq>(this, message, value);
         return message;
@@ -54,6 +60,9 @@ class ListEntityReq$Type extends MessageType<ListEntityReq> {
             switch (fieldNo) {
                 case /* paginate.Paginate Paginate = 1 [json_name = "Paginate"];*/ 1:
                     message.paginate = Paginate.internalBinaryRead(reader, reader.uint32(), options, message.paginate);
+                    break;
+                case /* string Search = 2 [json_name = "Search"];*/ 2:
+                    message.search = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -70,6 +79,9 @@ class ListEntityReq$Type extends MessageType<ListEntityReq> {
         /* paginate.Paginate Paginate = 1 [json_name = "Paginate"]; */
         if (message.paginate)
             Paginate.internalBinaryWrite(message.paginate, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string Search = 2 [json_name = "Search"]; */
+        if (message.search !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.search);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

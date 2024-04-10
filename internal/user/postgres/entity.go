@@ -60,15 +60,21 @@ func (f filterEntity) where(n int) (string, []any) {
 	var args []any
 
 	if f.ID != nil {
-		clause = append(clause, fmt.Sprintf(`id = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`e.id = $%d`, n))
 		args = append(args, f.ID)
 		n++
 	}
 
 	if len(f.IDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`id IN (%s)`, postgres.Array(n, len(f.IDs))))
+		clause = append(clause, fmt.Sprintf(`e.id IN (%s)`, postgres.Array(n, len(f.IDs))))
 		args = append(args, ulid.IDs(f.IDs).Any()...)
 		n += len(f.IDs)
+	}
+
+	if len(f.Search) > 0 {
+		clause = append(clause, fmt.Sprintf(`e.name ILIKE $%d`, n))
+		args = append(args, "%"+f.Search+"%")
+		n++
 	}
 
 	b := strings.Builder{}
@@ -248,7 +254,7 @@ func (s Store) UpdateEntity(ctx context.Context, f user.FilterEntity, p user.Pat
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`UPDATE "user"."entity" `)
+	b.WriteString(`UPDATE "user"."entity" e `)
 
 	cols, args, n := patchEntity(p).set()
 	b.WriteString(cols)
@@ -286,7 +292,7 @@ func (s Store) DeleteEntity(ctx context.Context, f user.FilterEntity) error {
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`DELETE FROM "user"."entity" `)
+	b.WriteString(`DELETE FROM "user"."entity" e `)
 
 	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)

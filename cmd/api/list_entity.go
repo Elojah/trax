@@ -32,6 +32,7 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 		entities, total, err = h.user.ListEntity(ctx, user.FilterEntity{
 			RoleUserID: u.ID,
 			Paginate:   req.Paginate,
+			Search:     req.Search,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list entity")

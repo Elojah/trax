@@ -17,6 +17,7 @@ import "github.com/elojah/trax/internal/user/entity.proto";
 
 message ListEntityReq {
 	paginate.Paginate Paginate    = 1 [(gogoproto.nullable) = true];
+	string Search                 = 2;
 }
 
 message ListEntityResp {
