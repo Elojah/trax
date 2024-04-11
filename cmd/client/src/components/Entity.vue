@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
 import { Entity } from '@internal/user/entity';
-import { computed, onMounted, ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { marked } from "marked";
+import type { VDataTable } from 'vuetify/components/VDataTable';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -16,15 +17,12 @@ const {
 	newEntity: newEntity,
 } = toRefs(entityStore);
 
-const mdDescription = computed(() => {
-	return marked.parse(entity.value?.description ?? '');
-});
-
-const itemsPerPage = ref(10);
 const loading = ref(true);
 const search = ref('');
 
-const headers = [
+type ReadonlyHeaders = VDataTable['$props']['headers']
+
+const headers: ReadonlyHeaders = [
 	{
 		title: 'Name',
 		key: 'name',
@@ -39,12 +37,34 @@ const headers = [
 	},
 ];
 
+const pageOptions = [
+	{
+		value: 10,
+		title: "10"
+	},
+	{
+		value: 50,
+		title: "50"
+	},
+	{
+		value: 100,
+		title: "100"
+	},
+]
+
 const tableEntities = computed(() => {
 	return entities.value?.map((entity) => {
 		return {
 			...entity,
 		};
 	});
+});
+
+const mdDescription = computed(() => {
+	console.log("DESCRIPTION", entity.value?.description);
+	const c = marked.parse(entity.value?.description ?? '');
+	console.log(c)
+	return c
 });
 
 const listEntity = async (options: any) => {
@@ -75,8 +95,7 @@ const create = async () => {
 	await entityStore.createEntity();
 	dialog.value = false;
 	newEntity.value = {} as Entity;
-	search.value = '0_0';
-	search.value = ''; // Set empty search to trigger table reload
+	search.value = ''; // Set empty search to trigger table reload, DOESNT WORK NOW
 };
 
 const displayEntity = (_: any, row: { item: Entity }) => {
@@ -132,7 +151,7 @@ const deleteEntity = () => {
 								</v-row>
 								<v-row>
 									<v-col cols="12">
-										<v-text-area v-model="newEntity.description" label="Description"></v-text-area>
+										<v-textarea v-model="newEntity.description" label="Description"></v-textarea>
 									</v-col>
 								</v-row>
 							</v-container>
@@ -166,9 +185,9 @@ const deleteEntity = () => {
 		<v-col class="mx-auto pt-8" cols="4">
 			<v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" variant="outlined"
 				hide-details single-line></v-text-field>
-			<v-data-table-server class="transparent-background" v-model:items-per-page="itemsPerPage" :headers="headers"
-				:items="tableEntities" :items-length="Number(total)" :loading="loading" :search="search"
-				item-value="name" :options="{ sortBy: [{ key: 'created_at', order: 'desc' }] }"
+			<v-data-table-server class="transparent-background" :headers="headers" fixed-footer min-height="50vh"
+				max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="tableEntities"
+				:items-length="Number(total)" :loading="loading" :search="search" item-value="name"
 				@update:options="listEntity" @click:row="displayEntity" select-strategy="single" item-selectable="true">
 				<template v-slot:item="{ item, index, props }">
 					<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
@@ -203,8 +222,10 @@ const deleteEntity = () => {
 							</span>
 						</v-avatar>
 					</template>
-					<v-card-text v-model="mdDescription">
+					<!-- eslint-disable vue/no-v-html vue/no-v-text-v-html-on-component -->
+					<v-card-text class="p-6 m-6" variant="tonal" v-html="mdDescription">
 					</v-card-text>
+					<!--eslint-enable-->
 					<v-card-actions>
 						<v-spacer></v-spacer>
 						<v-btn color="primary" @click="editEntity()">Edit</v-btn>
@@ -231,19 +252,19 @@ const deleteEntity = () => {
 }
 
 .row-bg-odd {
-	background-color: rgba(33, 33, 33, 0.7);
+	background-color: rgba(33, 33, 33, 0.3);
 }
 
 .row-bg-odd:hover {
-	background-color: rgba(38, 50, 56, 0.7);
+	background-color: rgba(55, 71, 79, 0.3);
 }
 
 .row-bg-even {
-	background-color: rgba(66, 66, 66, 0.7);
+	background-color: rgba(0, 229, 255, 0.3);
 }
 
 .row-bg-even:hover {
-	background-color: rgba(55, 71, 79, 0.7);
+	background-color: rgba(55, 71, 79, 0.3);
 }
 
 .cursor-pointer {

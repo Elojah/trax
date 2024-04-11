@@ -25,8 +25,7 @@ $ make client && ./bin/game_03_web_client config/web_client/local.json
 
 TODO:
 
+- Add refresh on create
+
 - Add roles + description
-
-- Add search
-
 - Add entity show page (markdown ?)
