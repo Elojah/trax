@@ -19,6 +19,7 @@ const {
 
 const loading = ref(true);
 const search = ref('');
+const tableView = ref(0)
 
 type ReadonlyHeaders = VDataTable['$props']['headers']
 
@@ -183,6 +184,20 @@ const deleteEntity = () => {
 	</v-toolbar>
 	<v-row>
 		<v-col class="mx-auto pt-8" cols="4">
+			<v-btn-toggle class="mb-8" v-model="tableView">
+				<v-btn size="large" variant="tonal" append-icon="mdi-domain">
+					By Name
+					<template v-slot:append>
+						<v-icon color="primary"></v-icon>
+					</template>
+				</v-btn>
+				<v-btn size="large" variant="tonal" append-icon="mdi-account-cog">
+					By Role
+					<template v-slot:append>
+						<v-icon color="primary"></v-icon>
+					</template>
+				</v-btn>
+			</v-btn-toggle>
 			<v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" variant="outlined"
 				hide-details single-line></v-text-field>
 			<v-data-table-server class="transparent-background" :headers="headers" fixed-footer min-height="50vh"
