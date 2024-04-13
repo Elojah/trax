@@ -12,8 +12,22 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+import "github.com/elojah/trax/pkg/pbtypes/string.proto";
+
 import "github.com/elojah/trax/pkg/paginate/paginate.proto";
 import "github.com/elojah/trax/internal/user/entity.proto";
+
+message CreateEntityReq {
+	string Name                 = 1;
+    pbtypes.String Description  = 2;
+    pbtypes.String AvatarURL    = 3;
+}
+
+message UpdateEntityReq {
+	pbtypes.String Name         = 1;
+    pbtypes.String Description  = 2;
+    pbtypes.String AvatarURL    = 3;
+}
 
 message ListEntityReq {
 	paginate.Paginate Paginate    = 1 [(gogoproto.nullable) = true];
@@ -23,4 +37,8 @@ message ListEntityReq {
 message ListEntityResp {
 	repeated user.Entity Entities = 1 [(gogoproto.nullable) = false];
 	uint64 Total                  = 2;
+}
+
+message FetchEntityProfileReq {
+	bytes EntityID                = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }

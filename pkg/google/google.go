@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	"github.com/elojah/trax/pkg/pbtypes"
 	"github.com/elojah/trax/pkg/ulid"
 	"golang.org/x/oauth2"
 )
@@ -76,7 +77,7 @@ func (c Claims) CreateUser(ctx context.Context) (user.U, user.Profile, error) {
 		UserID:    u.ID,
 		FirstName: firstname,
 		LastName:  lastname,
-		AvatarURL: avatarURL,
+		AvatarURL: &pbtypes.String{Value: avatarURL},
 		CreatedAt: now,
 		UpdatedAt: now,
 	}

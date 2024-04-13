@@ -17,15 +17,16 @@ Start:
 
 ```sh
 $ docker-compose up -d
-$ make admin && ./bin/game_03_admin config/admin/local.json
-$ make api && ./bin/game_03_api config/api/local.json
-$ make auth && ./bin/game_03_auth config/auth/local.json
-$ make client && ./bin/game_03_web_client config/web_client/local.json
+$ make admin && ./bin/trax_admin config/admin/local.json
+$ make api && ./bin/trax_api config/api/local.json
+$ make auth && ./bin/trax_auth config/auth/local.json
+$ make client && ./bin/trax_web_client config/web_client/local.json
 ```
 
 TODO:
 
-- Add refresh on create
+- Add entity profile
 
-- Add roles + description
-- Add entity show page (markdown ?)
+- Add roles routes + store + view
+
+- Add refresh on create

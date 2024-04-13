@@ -2,17 +2,17 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { Entity } from '@internal/user/entity'
+import { Entity, EntityProfile } from '@internal/user/entity'
 import { Paginate } from '@pkg/paginate/paginate'
-import { ListEntityReq } from '@internal/user/dto/entity'
+import { CreateEntityReq, ListEntityReq } from '@internal/user/dto/entity'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 
 export const useEntityStore = defineStore('entity', () => {
   const entity = ref(null as Entity | null)
-  const entities = ref([] as Entity[] | null)
+  const entityProfile = ref(null as EntityProfile | null)
 
-  const newEntity = ref({} as Entity)
+  const entities = ref([] as Entity[] | null)
 
   const total = ref(BigInt(0) as bigint)
 
@@ -24,16 +24,19 @@ export const useEntityStore = defineStore('entity', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const createEntity = async function () {
+  const createEntity = async function (
+    name: string,
+    avatarURL: string | null,
+    description: string | null
+  ) {
     try {
-      const req = Entity.create({
-        name: newEntity.value?.name,
-        avatarURL: newEntity.value?.avatarURL,
-        description: newEntity.value?.description
+      const req = CreateEntityReq.create({
+        name: name,
+        avatarURL: avatarURL ? { value: avatarURL } : null,
+        description: description ? { value: description } : null
       })
 
-      const resp = await api.createEntity(req, { meta: { token: token.value } })
-      newEntity.value = resp.response
+      return await api.createEntity(req, { meta: { token: token.value } })
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -51,8 +54,12 @@ export const useEntityStore = defineStore('entity', () => {
 
       const resp = await api.listEntity(req, { meta: { token: token.value } })
 
+      // TODO: manage errors
+
       entities.value = resp.response.entities
       total.value = resp.response.total
+
+      return resp
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -63,8 +70,8 @@ export const useEntityStore = defineStore('entity', () => {
 
   return {
     entity,
+    entityProfile,
     entities,
-    newEntity,
     total,
     createEntity,
     listEntity

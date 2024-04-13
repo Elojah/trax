@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
-import { Entity } from '@internal/user/entity';
+import { Entity, EntityProfile } from '@internal/user/entity';
 import { computed, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { marked } from "marked";
@@ -12,10 +12,14 @@ const valid = ref(null as boolean | null)
 const entityStore = useEntityStore();
 const {
 	entity: entity,
+	entityProfile: entityProfile,
 	entities: entities,
 	total: total,
-	newEntity: newEntity,
 } = toRefs(entityStore);
+
+const name = ref('');
+const avatarURL = ref('');
+const description = ref('');
 
 const loading = ref(true);
 const search = ref('');
@@ -34,6 +38,21 @@ const headers: ReadonlyHeaders = [
 		title: 'Created',
 		key: 'created_at',
 		align: 'end',
+		sortable: true,
+	},
+];
+
+const headersByRole: ReadonlyHeaders = [
+	{
+		title: 'Role',
+		key: 'role',
+		align: 'start',
+		sortable: true,
+	},
+	{
+		title: 'Name',
+		key: 'name',
+		align: 'start',
 		sortable: true,
 	},
 ];
@@ -62,10 +81,7 @@ const tableEntities = computed(() => {
 });
 
 const mdDescription = computed(() => {
-	console.log("DESCRIPTION", entity.value?.description);
-	const c = marked.parse(entity.value?.description ?? '');
-	console.log(c)
-	return c
+	return marked.parse(entityProfile.value?.description?.value ?? `*no description*`);
 });
 
 const listEntity = async (options: any) => {
@@ -84,7 +100,9 @@ const listEntity = async (options: any) => {
 const dialog = ref(false);
 const close = () => {
 	dialog.value = false;
-	newEntity.value = Entity.create({})
+	name.value = '';
+	avatarURL.value = '';
+	description.value = '';
 };
 
 const nameRules = [
@@ -93,14 +111,17 @@ const nameRules = [
 ];
 
 const create = async () => {
-	await entityStore.createEntity();
+	await entityStore.createEntity(name.value, avatarURL.value, description.value);
 	dialog.value = false;
-	newEntity.value = {} as Entity;
+	name.value = '';
+	avatarURL.value = '';
+	description.value = '';
 	search.value = ''; // Set empty search to trigger table reload, DOESNT WORK NOW
 };
 
 const displayEntity = (_: any, row: { item: Entity }) => {
 	entity.value = row.item;
+	// TODO: fetch entity profile
 };
 
 const dialogDelete = ref(false);
@@ -143,16 +164,15 @@ const deleteEntity = () => {
 							<v-container>
 								<v-row>
 									<v-col cols="6">
-										<v-text-field v-model="newEntity.name" :rules="nameRules"
-											label="Name"></v-text-field>
+										<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
 									</v-col>
 									<v-col cols="6">
-										<v-text-field v-model="newEntity.avatarURL" label="Avatar URL"></v-text-field>
+										<v-text-field v-model="avatarURL" label="Avatar URL"></v-text-field>
 									</v-col>
 								</v-row>
 								<v-row>
 									<v-col cols="12">
-										<v-textarea v-model="newEntity.description" label="Description"></v-textarea>
+										<v-textarea v-model="description" label="Description"></v-textarea>
 									</v-col>
 								</v-row>
 							</v-container>
@@ -200,10 +220,35 @@ const deleteEntity = () => {
 			</v-btn-toggle>
 			<v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" variant="outlined"
 				hide-details single-line></v-text-field>
-			<v-data-table-server class="transparent-background" :headers="headers" fixed-footer min-height="50vh"
-				max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="tableEntities"
-				:items-length="Number(total)" :loading="loading" :search="search" item-value="name"
-				@update:options="listEntity" @click:row="displayEntity" select-strategy="single" item-selectable="true">
+			<v-data-table-server v-if="tableView === 0" class="transparent-background" :headers="headers" fixed-footer
+				min-height="50vh" max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions"
+				:items="tableEntities" :items-length="Number(total)" :loading="loading" :search="search"
+				item-value="name" @update:options="listEntity" @click:row="displayEntity" select-strategy="single"
+				item-selectable="true">
+				<template v-slot:item="{ item, index, props }">
+					<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
+						v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
+						<td class="d-flex align-center">
+							<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
+								<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
+								<span v-else class=" mx-auto text-center text-h5">
+									{{ item?.name?.at(0)?.toUpperCase() }}
+								</span>
+							</v-avatar>
+							<span class="text-h6">{{ item.name }}</span>
+						</td>
+						<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+							1000).toLocaleDateString('en-GB')
+							}}
+						</td>
+					</tr>
+				</template>
+			</v-data-table-server>
+			<v-data-table-server v-if="tableView === 1" class="transparent-background" :headers="headersByRole"
+				fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+				:items-per-page-options="pageOptions" :items="tableEntities" :items-length="Number(total)"
+				:loading="loading" :search="search" item-value="name" @update:options="listEntity"
+				@click:row="displayEntity" select-strategy="single" item-selectable="true">
 				<template v-slot:item="{ item, index, props }">
 					<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
 						v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">

@@ -24,11 +24,11 @@ service API {
     rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
 
     // User
-    rpc FetchProfile(pbtypes.Empty) returns (user.Profile);
+    rpc FetchProfile(dto.FetchProfileReq) returns (user.Profile);
     rpc UpdateProfile(dto.UpdateProfileReq) returns (user.Profile);
 
     // Entity
-    rpc CreateEntity(user.Entity) returns (user.Entity);
+    rpc CreateEntity(dto.CreateEntityReq) returns (user.Entity);
     rpc ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
     // rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
 }

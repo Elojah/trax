@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package user;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_registration) = true;
+
+import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+import "github.com/elojah/trax/internal/user/role.proto";
+
+message ClaimCommands {
+	repeated user.Command Commands                = 1;
+}
+
+message ClaimEntity {
+	bytes ID                                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	// Permissions key must be a user.Resource
+	map<string, ClaimCommands> Commands           = 2 [(gogoproto.nullable) = false];
+}
+
+message ClaimAuth {
+	// Permissions key must be a entity.ID
+	map<string, ClaimEntity> Entities             = 1 [(gogoproto.nullable) = false];
+}

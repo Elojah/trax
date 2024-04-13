@@ -12,6 +12,41 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Entity } from "../entity";
 import { Paginate } from "../../../pkg/paginate/paginate";
+import { String$ } from "../../../pkg/pbtypes/string";
+/**
+ * @generated from protobuf message dto.CreateEntityReq
+ */
+export interface CreateEntityReq {
+    /**
+     * @generated from protobuf field: string Name = 1 [json_name = "Name"];
+     */
+    name: string;
+    /**
+     * @generated from protobuf field: pbtypes.String Description = 2 [json_name = "Description"];
+     */
+    description?: String$;
+    /**
+     * @generated from protobuf field: pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];
+     */
+    avatarURL?: String$;
+}
+/**
+ * @generated from protobuf message dto.UpdateEntityReq
+ */
+export interface UpdateEntityReq {
+    /**
+     * @generated from protobuf field: pbtypes.String Name = 1 [json_name = "Name"];
+     */
+    name?: String$;
+    /**
+     * @generated from protobuf field: pbtypes.String Description = 2 [json_name = "Description"];
+     */
+    description?: String$;
+    /**
+     * @generated from protobuf field: pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];
+     */
+    avatarURL?: String$;
+}
 /**
  * @generated from protobuf message dto.ListEntityReq
  */
@@ -38,6 +73,136 @@ export interface ListEntityResp {
      */
     total: bigint;
 }
+/**
+ * @generated from protobuf message dto.FetchEntityProfileReq
+ */
+export interface FetchEntityProfileReq {
+    /**
+     * @generated from protobuf field: bytes EntityID = 1 [json_name = "EntityID"];
+     */
+    entityID: Uint8Array;
+}
+// @generated message type with reflection information, may provide speed optimized methods
+class CreateEntityReq$Type extends MessageType<CreateEntityReq> {
+    constructor() {
+        super("dto.CreateEntityReq", [
+            { no: 1, name: "Name", kind: "scalar", jsonName: "Name", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "Description", kind: "message", jsonName: "Description", T: () => String$ },
+            { no: 3, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ }
+        ]);
+    }
+    create(value?: PartialMessage<CreateEntityReq>): CreateEntityReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.name = "";
+        if (value !== undefined)
+            reflectionMergePartial<CreateEntityReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateEntityReq): CreateEntityReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string Name = 1 [json_name = "Name"];*/ 1:
+                    message.name = reader.string();
+                    break;
+                case /* pbtypes.String Description = 2 [json_name = "Description"];*/ 2:
+                    message.description = String$.internalBinaryRead(reader, reader.uint32(), options, message.description);
+                    break;
+                case /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];*/ 3:
+                    message.avatarURL = String$.internalBinaryRead(reader, reader.uint32(), options, message.avatarURL);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CreateEntityReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string Name = 1 [json_name = "Name"]; */
+        if (message.name !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.name);
+        /* pbtypes.String Description = 2 [json_name = "Description"]; */
+        if (message.description)
+            String$.internalBinaryWrite(message.description, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"]; */
+        if (message.avatarURL)
+            String$.internalBinaryWrite(message.avatarURL, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.CreateEntityReq
+ */
+export const CreateEntityReq = new CreateEntityReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class UpdateEntityReq$Type extends MessageType<UpdateEntityReq> {
+    constructor() {
+        super("dto.UpdateEntityReq", [
+            { no: 1, name: "Name", kind: "message", jsonName: "Name", T: () => String$ },
+            { no: 2, name: "Description", kind: "message", jsonName: "Description", T: () => String$ },
+            { no: 3, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ }
+        ]);
+    }
+    create(value?: PartialMessage<UpdateEntityReq>): UpdateEntityReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<UpdateEntityReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UpdateEntityReq): UpdateEntityReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* pbtypes.String Name = 1 [json_name = "Name"];*/ 1:
+                    message.name = String$.internalBinaryRead(reader, reader.uint32(), options, message.name);
+                    break;
+                case /* pbtypes.String Description = 2 [json_name = "Description"];*/ 2:
+                    message.description = String$.internalBinaryRead(reader, reader.uint32(), options, message.description);
+                    break;
+                case /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];*/ 3:
+                    message.avatarURL = String$.internalBinaryRead(reader, reader.uint32(), options, message.avatarURL);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: UpdateEntityReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* pbtypes.String Name = 1 [json_name = "Name"]; */
+        if (message.name)
+            String$.internalBinaryWrite(message.name, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String Description = 2 [json_name = "Description"]; */
+        if (message.description)
+            String$.internalBinaryWrite(message.description, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"]; */
+        if (message.avatarURL)
+            String$.internalBinaryWrite(message.avatarURL, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.UpdateEntityReq
+ */
+export const UpdateEntityReq = new UpdateEntityReq$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ListEntityReq$Type extends MessageType<ListEntityReq> {
     constructor() {
@@ -147,3 +312,50 @@ class ListEntityResp$Type extends MessageType<ListEntityResp> {
  * @generated MessageType for protobuf message dto.ListEntityResp
  */
 export const ListEntityResp = new ListEntityResp$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FetchEntityProfileReq$Type extends MessageType<FetchEntityProfileReq> {
+    constructor() {
+        super("dto.FetchEntityProfileReq", [
+            { no: 1, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<FetchEntityProfileReq>): FetchEntityProfileReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.entityID = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<FetchEntityProfileReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FetchEntityProfileReq): FetchEntityProfileReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes EntityID = 1 [json_name = "EntityID"];*/ 1:
+                    message.entityID = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: FetchEntityProfileReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes EntityID = 1 [json_name = "EntityID"]; */
+        if (message.entityID.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.entityID);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.FetchEntityProfileReq
+ */
+export const FetchEntityProfileReq = new FetchEntityProfileReq$Type();

@@ -22,7 +22,7 @@ func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) 
 	}
 
 	// #MARK:Authenticate
-	u, err := h.user.Auth(ctx, "access")
+	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &user.Profile{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -32,10 +32,11 @@ func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		now := time.Now().Unix()
 		profiles, err := h.user.UpdateProfile(ctx, user.FilterProfile{
-			UserID: u.ID,
+			UserID: claims.UserID,
 		}, user.PatchProfile{
 			FirstName: pbtypes.GetString(req.Firstname),
 			LastName:  pbtypes.GetString(req.Lastname),
+			AvatarURL: pbtypes.GetString(req.AvatarURL),
 			UpdatedAt: &now,
 		})
 		if err != nil {
@@ -45,7 +46,7 @@ func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) 
 		}
 
 		if len(profiles) == 0 {
-			err := gerrors.ErrNotFound{Resource: "profile", Index: u.ID.String()}
+			err := gerrors.ErrNotFound{Resource: "profile", Index: claims.UserID.String()}
 			logger.Error().Err(err).Msg("failed to update user profile")
 
 			return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()

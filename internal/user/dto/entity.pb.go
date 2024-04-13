@@ -8,6 +8,8 @@ import (
 	user "github.com/elojah/trax/internal/user"
 	_ "github.com/elojah/trax/pkg/gogoproto"
 	paginate "github.com/elojah/trax/pkg/paginate"
+	pbtypes "github.com/elojah/trax/pkg/pbtypes"
+	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
 	io "io"
@@ -29,6 +31,82 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type CreateEntityReq struct {
+	Name        string          `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	Description *pbtypes.String `protobuf:"bytes,2,opt,name=Description,proto3" json:"Description,omitempty"`
+	AvatarURL   *pbtypes.String `protobuf:"bytes,3,opt,name=AvatarURL,proto3" json:"AvatarURL,omitempty"`
+}
+
+func (m *CreateEntityReq) Reset()      { *m = CreateEntityReq{} }
+func (*CreateEntityReq) ProtoMessage() {}
+func (*CreateEntityReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c297b660999e80b1, []int{0}
+}
+func (m *CreateEntityReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CreateEntityReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CreateEntityReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CreateEntityReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateEntityReq.Merge(m, src)
+}
+func (m *CreateEntityReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *CreateEntityReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateEntityReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateEntityReq proto.InternalMessageInfo
+
+type UpdateEntityReq struct {
+	Name        *pbtypes.String `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	Description *pbtypes.String `protobuf:"bytes,2,opt,name=Description,proto3" json:"Description,omitempty"`
+	AvatarURL   *pbtypes.String `protobuf:"bytes,3,opt,name=AvatarURL,proto3" json:"AvatarURL,omitempty"`
+}
+
+func (m *UpdateEntityReq) Reset()      { *m = UpdateEntityReq{} }
+func (*UpdateEntityReq) ProtoMessage() {}
+func (*UpdateEntityReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c297b660999e80b1, []int{1}
+}
+func (m *UpdateEntityReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UpdateEntityReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UpdateEntityReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *UpdateEntityReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateEntityReq.Merge(m, src)
+}
+func (m *UpdateEntityReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *UpdateEntityReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateEntityReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateEntityReq proto.InternalMessageInfo
+
 type ListEntityReq struct {
 	Paginate *paginate.Paginate `protobuf:"bytes,1,opt,name=Paginate,proto3" json:"Paginate,omitempty"`
 	Search   string             `protobuf:"bytes,2,opt,name=Search,proto3" json:"Search,omitempty"`
@@ -37,7 +115,7 @@ type ListEntityReq struct {
 func (m *ListEntityReq) Reset()      { *m = ListEntityReq{} }
 func (*ListEntityReq) ProtoMessage() {}
 func (*ListEntityReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c297b660999e80b1, []int{0}
+	return fileDescriptor_c297b660999e80b1, []int{2}
 }
 func (m *ListEntityReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -74,7 +152,7 @@ type ListEntityResp struct {
 func (m *ListEntityResp) Reset()      { *m = ListEntityResp{} }
 func (*ListEntityResp) ProtoMessage() {}
 func (*ListEntityResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c297b660999e80b1, []int{1}
+	return fileDescriptor_c297b660999e80b1, []int{3}
 }
 func (m *ListEntityResp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -103,11 +181,53 @@ func (m *ListEntityResp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListEntityResp proto.InternalMessageInfo
 
+type FetchEntityProfileReq struct {
+	EntityID github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,1,opt,name=EntityID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"EntityID"`
+}
+
+func (m *FetchEntityProfileReq) Reset()      { *m = FetchEntityProfileReq{} }
+func (*FetchEntityProfileReq) ProtoMessage() {}
+func (*FetchEntityProfileReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c297b660999e80b1, []int{4}
+}
+func (m *FetchEntityProfileReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *FetchEntityProfileReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_FetchEntityProfileReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *FetchEntityProfileReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FetchEntityProfileReq.Merge(m, src)
+}
+func (m *FetchEntityProfileReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *FetchEntityProfileReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_FetchEntityProfileReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FetchEntityProfileReq proto.InternalMessageInfo
+
 func init() {
+	proto.RegisterType((*CreateEntityReq)(nil), "dto.CreateEntityReq")
+	golang_proto.RegisterType((*CreateEntityReq)(nil), "dto.CreateEntityReq")
+	proto.RegisterType((*UpdateEntityReq)(nil), "dto.UpdateEntityReq")
+	golang_proto.RegisterType((*UpdateEntityReq)(nil), "dto.UpdateEntityReq")
 	proto.RegisterType((*ListEntityReq)(nil), "dto.ListEntityReq")
 	golang_proto.RegisterType((*ListEntityReq)(nil), "dto.ListEntityReq")
 	proto.RegisterType((*ListEntityResp)(nil), "dto.ListEntityResp")
 	golang_proto.RegisterType((*ListEntityResp)(nil), "dto.ListEntityResp")
+	proto.RegisterType((*FetchEntityProfileReq)(nil), "dto.FetchEntityProfileReq")
+	golang_proto.RegisterType((*FetchEntityProfileReq)(nil), "dto.FetchEntityProfileReq")
 }
 
 func init() {
@@ -118,29 +238,99 @@ func init() {
 }
 
 var fileDescriptor_c297b660999e80b1 = []byte{
-	// 318 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0x31, 0x4f, 0x32, 0x31,
-	0x1c, 0xc6, 0xfb, 0x7f, 0xe1, 0x25, 0x58, 0xd4, 0xa1, 0x31, 0x86, 0x30, 0xfc, 0x25, 0x4c, 0x4c,
-	0x6d, 0x44, 0xfd, 0x02, 0x24, 0x26, 0x0e, 0x0e, 0xe6, 0x34, 0x6e, 0x0e, 0x05, 0x9a, 0xa3, 0x8a,
-	0xd7, 0xf3, 0xae, 0x24, 0xba, 0xf9, 0x11, 0xfc, 0x18, 0x7e, 0x04, 0x47, 0x46, 0x46, 0x46, 0x26,
-	0xe3, 0xf5, 0x16, 0x47, 0x46, 0x47, 0x63, 0xc1, 0x0b, 0x8b, 0xc6, 0xed, 0x79, 0xda, 0xe7, 0xf9,
-	0xf5, 0x49, 0xe9, 0x51, 0xa8, 0xed, 0x70, 0xdc, 0xe3, 0x7d, 0x73, 0x2b, 0xd4, 0xc8, 0x5c, 0xcb,
-	0xa1, 0xb0, 0x89, 0xbc, 0x17, 0x3a, 0xb2, 0x2a, 0x89, 0xe4, 0x48, 0x8c, 0x53, 0x95, 0x88, 0x81,
-	0x35, 0x42, 0x45, 0x56, 0xdb, 0x07, 0x1e, 0x27, 0xc6, 0x1a, 0x56, 0x1a, 0x58, 0xd3, 0x10, 0x3f,
-	0x74, 0xe3, 0x9b, 0x50, 0x84, 0x26, 0x34, 0x3e, 0xea, 0xd5, 0xb2, 0xd5, 0xe8, 0xfc, 0x52, 0x88,
-	0x65, 0xa8, 0x23, 0x69, 0x55, 0x21, 0x56, 0x9d, 0xfd, 0x3f, 0x0d, 0x5c, 0x1f, 0xd7, 0xba, 0xa2,
-	0x5b, 0xa7, 0x3a, 0xb5, 0xc7, 0xfe, 0x2c, 0x50, 0x77, 0xec, 0x90, 0x56, 0xcf, 0x56, 0xd4, 0x3a,
-	0x34, 0xa1, 0x5d, 0xeb, 0x30, 0x5e, 0x3c, 0xf3, 0x7d, 0xd3, 0x2d, 0x4f, 0x5f, 0xf7, 0x20, 0x28,
-	0x92, 0x6c, 0x97, 0x56, 0xce, 0x95, 0x4c, 0xfa, 0xc3, 0xfa, 0xbf, 0x26, 0xb4, 0x37, 0x82, 0x95,
-	0x6b, 0x5d, 0xd2, 0xed, 0x75, 0x7c, 0x1a, 0x33, 0x4e, 0xab, 0xde, 0x69, 0x95, 0xd6, 0xa1, 0x59,
-	0x6a, 0xd7, 0x3a, 0x9b, 0xfc, 0x6b, 0x16, 0x5f, 0x66, 0x3c, 0x99, 0x04, 0x45, 0x86, 0xed, 0xd0,
-	0xff, 0x17, 0xc6, 0xca, 0x91, 0x07, 0x97, 0x83, 0xa5, 0xe9, 0x9e, 0x4c, 0x33, 0x24, 0xb3, 0x0c,
-	0xc9, 0x3c, 0x43, 0xb2, 0xc8, 0x10, 0x3e, 0x32, 0x84, 0x47, 0x87, 0xf0, 0xec, 0x10, 0x5e, 0x1c,
-	0xc2, 0xc4, 0x21, 0x4c, 0x1d, 0xc2, 0xcc, 0x21, 0xbc, 0x39, 0x84, 0x77, 0x87, 0x64, 0xe1, 0x10,
-	0x9e, 0x72, 0x24, 0x93, 0x1c, 0x61, 0x96, 0x23, 0x99, 0xe7, 0x48, 0x7a, 0x15, 0xff, 0x0f, 0x07,
-	0x9f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x38, 0xde, 0x5d, 0x77, 0xdd, 0x01, 0x00, 0x00,
+	// 467 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x92, 0x31, 0x6f, 0x13, 0x3d,
+	0x18, 0xc7, 0xef, 0x79, 0x93, 0xb7, 0x6a, 0x9c, 0x42, 0xa4, 0x13, 0xa0, 0x88, 0xe1, 0x69, 0x74,
+	0x2c, 0x11, 0x12, 0x67, 0x35, 0xc0, 0x07, 0x20, 0x84, 0x8a, 0x4a, 0x15, 0xaa, 0x5c, 0xca, 0x86,
+	0x90, 0x93, 0x98, 0x8b, 0xe1, 0x7a, 0x3e, 0x7c, 0x0e, 0x22, 0x1b, 0x1b, 0x2b, 0x23, 0x1f, 0x81,
+	0x8f, 0xc0, 0xd8, 0x31, 0x63, 0xc6, 0x8a, 0xa1, 0xe2, 0x9c, 0x85, 0xb1, 0x23, 0x23, 0x8a, 0x73,
+	0x5c, 0x83, 0x54, 0x22, 0x26, 0xb6, 0xe7, 0x49, 0xfe, 0xbf, 0xbf, 0x7e, 0x3e, 0x9b, 0xdc, 0x8f,
+	0xa4, 0x19, 0x8d, 0xfb, 0xe1, 0x40, 0x1d, 0x53, 0x11, 0xab, 0x57, 0x7c, 0x44, 0x8d, 0xe6, 0xef,
+	0xa8, 0x4c, 0x8c, 0xd0, 0x09, 0x8f, 0xe9, 0x38, 0x13, 0x9a, 0x0e, 0x8d, 0xa2, 0x22, 0x31, 0xd2,
+	0x4c, 0xc2, 0x54, 0x2b, 0xa3, 0xfc, 0xca, 0xd0, 0xa8, 0x9b, 0xf4, 0x0f, 0x6c, 0xfa, 0x3a, 0xa2,
+	0x91, 0x8a, 0x94, 0x8b, 0xba, 0x69, 0x49, 0xad, 0x05, 0xd2, 0xbe, 0x99, 0xa4, 0x22, 0xa3, 0x99,
+	0xd1, 0x32, 0x89, 0x0a, 0xa0, 0xb3, 0x0e, 0xe0, 0x91, 0x4c, 0xb8, 0x11, 0xe5, 0x50, 0x30, 0x3b,
+	0x7f, 0x75, 0xa2, 0xd5, 0xd3, 0x04, 0x1f, 0x80, 0x34, 0x1e, 0x6a, 0xc1, 0x8d, 0x78, 0xe4, 0x7e,
+	0x66, 0xe2, 0x8d, 0xef, 0x93, 0xea, 0x13, 0x7e, 0x2c, 0x9a, 0xd0, 0x82, 0x76, 0x8d, 0xb9, 0xd9,
+	0xdf, 0x21, 0xf5, 0x9e, 0xc8, 0x06, 0x5a, 0xa6, 0x46, 0xaa, 0xa4, 0xf9, 0x5f, 0x0b, 0xda, 0xf5,
+	0x4e, 0x23, 0x2c, 0xd4, 0xc3, 0x43, 0xa7, 0xce, 0x56, 0x33, 0xfe, 0x1d, 0x52, 0x7b, 0xf0, 0x96,
+	0x1b, 0xae, 0x8f, 0xd8, 0x7e, 0xb3, 0x72, 0x39, 0x70, 0x91, 0x08, 0x3e, 0x01, 0x69, 0x1c, 0xa5,
+	0xc3, 0xdf, 0x4c, 0x6e, 0xad, 0x98, 0x5c, 0x42, 0xff, 0x2b, 0xb5, 0xe7, 0xe4, 0xca, 0xbe, 0xcc,
+	0xcc, 0x85, 0xd7, 0x3d, 0xb2, 0x79, 0x50, 0x7c, 0xfa, 0xc2, 0xcd, 0x0f, 0xcb, 0xbb, 0xf8, 0xf5,
+	0x4f, 0xb7, 0x3a, 0x3d, 0xdb, 0x06, 0x56, 0x26, 0xfd, 0x1b, 0x64, 0xe3, 0x50, 0x70, 0x3d, 0x18,
+	0x39, 0xc7, 0x1a, 0x2b, 0xb6, 0xe0, 0x19, 0xb9, 0xba, 0x5a, 0x9f, 0xa5, 0x7e, 0x48, 0x36, 0xdd,
+	0x26, 0x45, 0xd6, 0x84, 0x56, 0xa5, 0x5d, 0xef, 0x6c, 0x85, 0x8b, 0xbb, 0x0b, 0x97, 0x19, 0xd7,
+	0xec, 0xb1, 0x32, 0xe3, 0x5f, 0x23, 0xff, 0x3f, 0x55, 0x86, 0xc7, 0xae, 0xb8, 0xca, 0x96, 0x4b,
+	0xf0, 0x82, 0x5c, 0xdf, 0x15, 0x66, 0x30, 0x5a, 0x42, 0x07, 0x5a, 0xbd, 0x94, 0xb1, 0x58, 0xe8,
+	0xef, 0x16, 0xf5, 0x93, 0xbd, 0x9e, 0xd3, 0xdf, 0xea, 0xde, 0x5e, 0x14, 0x7e, 0x3d, 0xdb, 0x0e,
+	0xd6, 0xbc, 0xba, 0x71, 0x2c, 0x87, 0xe1, 0x5e, 0x8f, 0x95, 0x6c, 0xf7, 0xf1, 0x34, 0x47, 0x6f,
+	0x96, 0xa3, 0x77, 0x9a, 0xa3, 0x77, 0x9e, 0x23, 0xfc, 0xc8, 0x11, 0xde, 0x5b, 0x84, 0xcf, 0x16,
+	0xe1, 0x8b, 0x45, 0x38, 0xb1, 0x08, 0x53, 0x8b, 0x30, 0xb3, 0x08, 0xdf, 0x2c, 0xc2, 0x77, 0x8b,
+	0xde, 0xb9, 0x45, 0xf8, 0x38, 0x47, 0xef, 0x64, 0x8e, 0x30, 0x9b, 0xa3, 0x77, 0x3a, 0x47, 0xaf,
+	0xbf, 0xe1, 0x5e, 0xe3, 0xdd, 0x9f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x8b, 0xf4, 0xdc, 0x7c, 0x94,
+	0x03, 0x00, 0x00,
 }
 
+func (this *CreateEntityReq) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*CreateEntityReq)
+	if !ok {
+		that2, ok := that.(CreateEntityReq)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if !this.Description.Equal(that1.Description) {
+		return false
+	}
+	if !this.AvatarURL.Equal(that1.AvatarURL) {
+		return false
+	}
+	return true
+}
+func (this *UpdateEntityReq) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*UpdateEntityReq)
+	if !ok {
+		that2, ok := that.(UpdateEntityReq)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Name.Equal(that1.Name) {
+		return false
+	}
+	if !this.Description.Equal(that1.Description) {
+		return false
+	}
+	if !this.AvatarURL.Equal(that1.AvatarURL) {
+		return false
+	}
+	return true
+}
 func (this *ListEntityReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -200,6 +390,64 @@ func (this *ListEntityResp) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *FetchEntityProfileReq) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*FetchEntityProfileReq)
+	if !ok {
+		that2, ok := that.(FetchEntityProfileReq)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EntityID.Equal(that1.EntityID) {
+		return false
+	}
+	return true
+}
+func (this *CreateEntityReq) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&dto.CreateEntityReq{")
+	s = append(s, "Name: "+fmt.Sprintf("%#v", this.Name)+",\n")
+	if this.Description != nil {
+		s = append(s, "Description: "+fmt.Sprintf("%#v", this.Description)+",\n")
+	}
+	if this.AvatarURL != nil {
+		s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", this.AvatarURL)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *UpdateEntityReq) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&dto.UpdateEntityReq{")
+	if this.Name != nil {
+		s = append(s, "Name: "+fmt.Sprintf("%#v", this.Name)+",\n")
+	}
+	if this.Description != nil {
+		s = append(s, "Description: "+fmt.Sprintf("%#v", this.Description)+",\n")
+	}
+	if this.AvatarURL != nil {
+		s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", this.AvatarURL)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
 func (this *ListEntityReq) GoString() string {
 	if this == nil {
 		return "nil"
@@ -230,6 +478,16 @@ func (this *ListEntityResp) GoString() string {
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
+func (this *FetchEntityProfileReq) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 5)
+	s = append(s, "&dto.FetchEntityProfileReq{")
+	s = append(s, "EntityID: "+fmt.Sprintf("%#v", this.EntityID)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
 func valueToGoStringEntity(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
 	if rv.IsNil() {
@@ -238,6 +496,119 @@ func valueToGoStringEntity(v interface{}, typ string) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
 }
+func (m *CreateEntityReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateEntityReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateEntityReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.AvatarURL != nil {
+		{
+			size, err := m.AvatarURL.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEntity(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Description != nil {
+		{
+			size, err := m.Description.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEntity(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintEntity(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *UpdateEntityReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateEntityReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateEntityReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.AvatarURL != nil {
+		{
+			size, err := m.AvatarURL.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEntity(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Description != nil {
+		{
+			size, err := m.Description.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEntity(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Name != nil {
+		{
+			size, err := m.Name.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEntity(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *ListEntityReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -322,6 +693,39 @@ func (m *ListEntityResp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *FetchEntityProfileReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FetchEntityProfileReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FetchEntityProfileReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.EntityID.Size()
+		i -= size
+		if _, err := m.EntityID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintEntity(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintEntity(dAtA []byte, offset int, v uint64) int {
 	offset -= sovEntity(v)
 	base := offset
@@ -333,6 +737,36 @@ func encodeVarintEntity(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func NewPopulatedCreateEntityReq(r randyEntity, easy bool) *CreateEntityReq {
+	this := &CreateEntityReq{}
+	this.Name = string(randStringEntity(r))
+	if r.Intn(5) != 0 {
+		this.Description = pbtypes.NewPopulatedString(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.AvatarURL = pbtypes.NewPopulatedString(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedUpdateEntityReq(r randyEntity, easy bool) *UpdateEntityReq {
+	this := &UpdateEntityReq{}
+	if r.Intn(5) != 0 {
+		this.Name = pbtypes.NewPopulatedString(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.Description = pbtypes.NewPopulatedString(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.AvatarURL = pbtypes.NewPopulatedString(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedListEntityReq(r randyEntity, easy bool) *ListEntityReq {
 	this := &ListEntityReq{}
 	if r.Intn(5) != 0 {
@@ -360,6 +794,15 @@ func NewPopulatedListEntityResp(r randyEntity, easy bool) *ListEntityResp {
 	return this
 }
 
+func NewPopulatedFetchEntityProfileReq(r randyEntity, easy bool) *FetchEntityProfileReq {
+	this := &FetchEntityProfileReq{}
+	v3 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.EntityID = *v3
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 type randyEntity interface {
 	Float32() float32
 	Float64() float64
@@ -379,9 +822,9 @@ func randUTF8RuneEntity(r randyEntity) rune {
 	return rune(ru + 61)
 }
 func randStringEntity(r randyEntity) string {
-	v3 := r.Intn(100)
-	tmps := make([]rune, v3)
-	for i := 0; i < v3; i++ {
+	v4 := r.Intn(100)
+	tmps := make([]rune, v4)
+	for i := 0; i < v4; i++ {
 		tmps[i] = randUTF8RuneEntity(r)
 	}
 	return string(tmps)
@@ -403,11 +846,11 @@ func randFieldEntity(dAtA []byte, r randyEntity, fieldNumber int, wire int) []by
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateEntity(dAtA, uint64(key))
-		v4 := r.Int63()
+		v5 := r.Int63()
 		if r.Intn(2) == 0 {
-			v4 *= -1
+			v5 *= -1
 		}
-		dAtA = encodeVarintPopulateEntity(dAtA, uint64(v4))
+		dAtA = encodeVarintPopulateEntity(dAtA, uint64(v5))
 	case 1:
 		dAtA = encodeVarintPopulateEntity(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -432,6 +875,48 @@ func encodeVarintPopulateEntity(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
+func (m *CreateEntityReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.Description != nil {
+		l = m.Description.Size()
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.AvatarURL != nil {
+		l = m.AvatarURL.Size()
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	return n
+}
+
+func (m *UpdateEntityReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Name != nil {
+		l = m.Name.Size()
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.Description != nil {
+		l = m.Description.Size()
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.AvatarURL != nil {
+		l = m.AvatarURL.Size()
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	return n
+}
+
 func (m *ListEntityReq) Size() (n int) {
 	if m == nil {
 		return 0
@@ -467,11 +952,46 @@ func (m *ListEntityResp) Size() (n int) {
 	return n
 }
 
+func (m *FetchEntityProfileReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.EntityID.Size()
+	n += 1 + l + sovEntity(uint64(l))
+	return n
+}
+
 func sovEntity(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozEntity(x uint64) (n int) {
 	return sovEntity(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (this *CreateEntityReq) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateEntityReq{`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Description:` + strings.Replace(fmt.Sprintf("%v", this.Description), "String", "pbtypes.String", 1) + `,`,
+		`AvatarURL:` + strings.Replace(fmt.Sprintf("%v", this.AvatarURL), "String", "pbtypes.String", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateEntityReq) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateEntityReq{`,
+		`Name:` + strings.Replace(fmt.Sprintf("%v", this.Name), "String", "pbtypes.String", 1) + `,`,
+		`Description:` + strings.Replace(fmt.Sprintf("%v", this.Description), "String", "pbtypes.String", 1) + `,`,
+		`AvatarURL:` + strings.Replace(fmt.Sprintf("%v", this.AvatarURL), "String", "pbtypes.String", 1) + `,`,
+		`}`,
+	}, "")
+	return s
 }
 func (this *ListEntityReq) String() string {
 	if this == nil {
@@ -500,6 +1020,16 @@ func (this *ListEntityResp) String() string {
 	}, "")
 	return s
 }
+func (this *FetchEntityProfileReq) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FetchEntityProfileReq{`,
+		`EntityID:` + fmt.Sprintf("%v", this.EntityID) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func valueToStringEntity(v interface{}) string {
 	rv := reflect.ValueOf(v)
 	if rv.IsNil() {
@@ -507,6 +1037,324 @@ func valueToStringEntity(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
+}
+func (m *CreateEntityReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEntity
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateEntityReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateEntityReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Description == nil {
+				m.Description = &pbtypes.String{}
+			}
+			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AvatarURL", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AvatarURL == nil {
+				m.AvatarURL = &pbtypes.String{}
+			}
+			if err := m.AvatarURL.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEntity(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateEntityReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEntity
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateEntityReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateEntityReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Name == nil {
+				m.Name = &pbtypes.String{}
+			}
+			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Description == nil {
+				m.Description = &pbtypes.String{}
+			}
+			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AvatarURL", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AvatarURL == nil {
+				m.AvatarURL = &pbtypes.String{}
+			}
+			if err := m.AvatarURL.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEntity(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *ListEntityReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -711,6 +1559,92 @@ func (m *ListEntityResp) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEntity(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FetchEntityProfileReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEntity
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FetchEntityProfileReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FetchEntityProfileReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EntityID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEntity(dAtA[iNdEx:])

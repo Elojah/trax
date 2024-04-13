@@ -12,6 +12,7 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 
 message U {
 	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
@@ -32,7 +33,7 @@ message Profile {
 
 	string FirstName           = 2;
 	string LastName            = 3;
-	string AvatarURL           = 4;
+	pbtypes.String AvatarURL   = 4;
 
 	int64 CreatedAt            = 5;
 	int64 UpdatedAt            = 6;

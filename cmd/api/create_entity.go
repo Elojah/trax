@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/transaction"
 	"github.com/elojah/trax/pkg/ulid"
@@ -13,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) CreateEntity(ctx context.Context, req *user.Entity) (*user.Entity, error) {
+func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*user.Entity, error) {
 	logger := log.With().Str("method", "create_entity").Logger()
 
 	if req == nil {
@@ -21,23 +22,40 @@ func (h *handler) CreateEntity(ctx context.Context, req *user.Entity) (*user.Ent
 	}
 
 	// #MARK:Authenticate
-	u, err := h.user.Auth(ctx, "access")
+	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
+	now := time.Now().Unix()
+	e := user.Entity{
+		ID:        ulid.NewID(),
+		Name:      req.Name,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
 	// #MARK:Check request
-	if err := req.Check(); err != nil {
+	if err := e.Check(); err != nil {
 		return &user.Entity{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
-	now := time.Now().Unix()
-	req.ID = ulid.NewID()
-	req.CreatedAt = now
-	req.UpdatedAt = now
+	profile := user.EntityProfile{
+		EntityID:    e.ID,
+		Description: req.Description,
+		AvatarURL:   req.AvatarURL,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		if err = h.user.InsertEntity(ctx, *req); err != nil {
+		if err = h.user.InsertEntity(ctx, e); err != nil {
+			logger.Error().Err(err).Msg("failed to insert entity")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		if err = h.user.InsertEntityProfile(ctx, profile); err != nil {
 			logger.Error().Err(err).Msg("failed to insert entity")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
@@ -46,7 +64,7 @@ func (h *handler) CreateEntity(ctx context.Context, req *user.Entity) (*user.Ent
 		// insert default admin role with all permissions
 		role := user.Role{
 			ID:        ulid.NewID(),
-			EntityID:  req.ID,
+			EntityID:  e.ID,
 			Name:      "admin",
 			UpdatedAt: now,
 			CreatedAt: now,
@@ -65,7 +83,7 @@ func (h *handler) CreateEntity(ctx context.Context, req *user.Entity) (*user.Ent
 
 		if err := h.user.InsertRoleUser(ctx, user.RoleUser{
 			RoleID:    role.ID,
-			UserID:    u.ID,
+			UserID:    claims.UserID,
 			CreatedAt: now,
 			UpdatedAt: now,
 		}); err != nil {
@@ -81,5 +99,8 @@ func (h *handler) CreateEntity(ctx context.Context, req *user.Entity) (*user.Ent
 
 	logger.Info().Msg("success")
 
-	return &user.Entity{}, nil
+	return &user.Entity{
+		ID:   e.ID,
+		Name: e.Name,
+	}, nil
 }

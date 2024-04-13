@@ -10,6 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { String$ } from "../../pkg/pbtypes/string";
 /**
  * @generated from protobuf message user.U
  */
@@ -60,9 +61,9 @@ export interface Profile {
      */
     lastName: string;
     /**
-     * @generated from protobuf field: string AvatarURL = 4 [json_name = "AvatarURL"];
+     * @generated from protobuf field: pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"];
      */
-    avatarURL: string;
+    avatarURL?: String$;
     /**
      * @generated from protobuf field: int64 CreatedAt = 5 [json_name = "CreatedAt"];
      */
@@ -174,7 +175,7 @@ class Profile$Type extends MessageType<Profile> {
             { no: 1, name: "UserID", kind: "scalar", jsonName: "UserID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 2, name: "FirstName", kind: "scalar", jsonName: "FirstName", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "LastName", kind: "scalar", jsonName: "LastName", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "AvatarURL", kind: "scalar", jsonName: "AvatarURL", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ },
             { no: 5, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
             { no: 6, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
@@ -184,7 +185,6 @@ class Profile$Type extends MessageType<Profile> {
         message.userID = new Uint8Array(0);
         message.firstName = "";
         message.lastName = "";
-        message.avatarURL = "";
         message.createdAt = 0n;
         message.updatedAt = 0n;
         if (value !== undefined)
@@ -205,8 +205,8 @@ class Profile$Type extends MessageType<Profile> {
                 case /* string LastName = 3 [json_name = "LastName"];*/ 3:
                     message.lastName = reader.string();
                     break;
-                case /* string AvatarURL = 4 [json_name = "AvatarURL"];*/ 4:
-                    message.avatarURL = reader.string();
+                case /* pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"];*/ 4:
+                    message.avatarURL = String$.internalBinaryRead(reader, reader.uint32(), options, message.avatarURL);
                     break;
                 case /* int64 CreatedAt = 5 [json_name = "CreatedAt"];*/ 5:
                     message.createdAt = reader.int64().toBigInt();
@@ -235,9 +235,9 @@ class Profile$Type extends MessageType<Profile> {
         /* string LastName = 3 [json_name = "LastName"]; */
         if (message.lastName !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.lastName);
-        /* string AvatarURL = 4 [json_name = "AvatarURL"]; */
-        if (message.avatarURL !== "")
-            writer.tag(4, WireType.LengthDelimited).string(message.avatarURL);
+        /* pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"]; */
+        if (message.avatarURL)
+            String$.internalBinaryWrite(message.avatarURL, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         /* int64 CreatedAt = 5 [json_name = "CreatedAt"]; */
         if (message.createdAt !== 0n)
             writer.tag(5, WireType.Varint).int64(message.createdAt);

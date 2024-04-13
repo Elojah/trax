@@ -86,21 +86,25 @@ export interface RoleUser {
  */
 export enum Resource {
     /**
-     * @generated from protobuf enum value: R_user = 0;
+     * @generated from protobuf enum value: R_asset = 0;
      */
-    R_user = 0,
+    R_asset = 0,
     /**
-     * @generated from protobuf enum value: R_role = 1;
+     * @generated from protobuf enum value: R_entity = 1;
      */
-    R_role = 1,
+    R_entity = 1,
     /**
-     * @generated from protobuf enum value: R_asset = 2;
+     * @generated from protobuf enum value: R_operation = 2;
      */
-    R_asset = 2,
+    R_operation = 2,
     /**
-     * @generated from protobuf enum value: R_operation = 3;
+     * @generated from protobuf enum value: R_role = 3;
      */
-    R_operation = 3
+    R_role = 3,
+    /**
+     * @generated from protobuf enum value: R_user = 4;
+     */
+    R_user = 4
 }
 /**
  * @generated from protobuf enum user.Command

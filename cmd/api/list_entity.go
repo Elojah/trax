@@ -20,19 +20,21 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 	}
 
 	// #MARK:Authenticate
-	u, err := h.user.Auth(ctx, "access")
+	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &dto.ListEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
+
+	entityIDs := claims.EntityIDs()
 
 	var entities []user.Entity
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		entities, total, err = h.user.ListEntity(ctx, user.FilterEntity{
-			RoleUserID: u.ID,
-			Paginate:   req.Paginate,
-			Search:     req.Search,
+			IDs:      entityIDs,
+			Paginate: req.Paginate,
+			Search:   req.Search,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list entity")

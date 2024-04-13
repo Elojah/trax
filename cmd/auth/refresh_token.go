@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/pbtypes"
@@ -22,13 +23,13 @@ func (h *handler) RefreshToken(ctx context.Context, req *pbtypes.String) (*dto.S
 	}
 
 	// #MARK:Authenticate
-	u, err := h.user.Auth(ctx, "refresh")
+	claims, err := h.user.Auth(ctx, "refresh")
 	if err != nil {
 		return &dto.SigninResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	// #MARK:Create JWT
-	jwt, err := h.user.CreateJWT(ctx, u, "access", time.Hour)
+	jwt, err := h.user.CreateJWT(ctx, user.U{ID: claims.UserID}, "access", time.Hour)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")
 
@@ -36,7 +37,7 @@ func (h *handler) RefreshToken(ctx context.Context, req *pbtypes.String) (*dto.S
 	}
 
 	// #MARK:Create refresh token
-	rt, err := h.user.CreateJWT(ctx, u, "refresh", 24*time.Hour)
+	rt, err := h.user.CreateJWT(ctx, user.U{ID: claims.UserID}, "refresh", 24*time.Hour)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create JWT")
 

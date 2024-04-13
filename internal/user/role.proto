@@ -14,10 +14,11 @@ option (gogoproto.goproto_registration) = true;
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 
 enum Resource {
-	R_user       = 0;
-	R_role       = 1;
-	R_asset      = 2;
-	R_operation  = 3;
+	R_asset      = 0;
+	R_entity     = 1;
+	R_operation  = 2;
+	R_role       = 3;
+	R_user       = 4;
 }
 
 enum Command {

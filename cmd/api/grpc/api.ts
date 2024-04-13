@@ -4,8 +4,10 @@
 import { ListEntityResp } from "../../../internal/user/dto/entity";
 import { ListEntityReq } from "../../../internal/user/dto/entity";
 import { Entity } from "../../../internal/user/entity";
+import { CreateEntityReq } from "../../../internal/user/dto/entity";
 import { UpdateProfileReq } from "../../../internal/user/dto/profile";
 import { Profile } from "../../../internal/user/user";
+import { FetchProfileReq } from "../../../internal/user/dto/profile";
 import { Empty } from "../../../pkg/pbtypes/empty";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 /**
@@ -13,8 +15,8 @@ import { ServiceType } from "@protobuf-ts/runtime-rpc";
  */
 export const API = new ServiceType("grpc.API", [
     { name: "Ping", options: {}, I: Empty, O: Empty },
-    { name: "FetchProfile", options: {}, I: Empty, O: Profile },
+    { name: "FetchProfile", options: {}, I: FetchProfileReq, O: Profile },
     { name: "UpdateProfile", options: {}, I: UpdateProfileReq, O: Profile },
-    { name: "CreateEntity", options: {}, I: Entity, O: Entity },
+    { name: "CreateEntity", options: {}, I: CreateEntityReq, O: Entity },
     { name: "ListEntity", options: {}, I: ListEntityReq, O: ListEntityResp }
 ]);

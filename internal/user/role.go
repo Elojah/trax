@@ -9,9 +9,11 @@ import (
 
 var (
 	Resources = map[Resource]struct{}{
-		R_user:      {},
 		R_asset:     {},
+		R_entity:    {},
 		R_operation: {},
+		R_role:      {},
+		R_user:      {},
 	}
 
 	Commands = map[Command]struct{}{

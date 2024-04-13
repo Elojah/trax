@@ -14,7 +14,15 @@ option (gogoproto.goproto_registration) = true;
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 
+message FetchProfileReq {
+    bool Me                     = 1;
+
+	bytes UserID                = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes EntityID              = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
 message UpdateProfileReq {
     pbtypes.String Firstname    = 1;
     pbtypes.String Lastname     = 2;
+    pbtypes.String AvatarURL    = 3;
 }

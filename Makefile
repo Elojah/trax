@@ -102,6 +102,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$(info $(M) generate pkg) @
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/cookie/keys.proto
 	$(info $(M) generate internal) @
+	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/claims.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/entity.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/role.proto
 	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto

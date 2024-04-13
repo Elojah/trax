@@ -23,6 +23,7 @@ type App struct {
 	user.StoreProfile
 
 	user.StoreEntity
+	user.StoreEntityProfile
 
 	user.StoreRole
 	user.StorePermission
@@ -109,11 +110,11 @@ func (a App) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
 	return *claims, nil
 }
 
-func (a App) Auth(ctx context.Context, audience string) (user.U, error) {
+func (a App) Auth(ctx context.Context, audience string) (user.Claims, error) {
 	// read & parse token
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return user.U{}, errors.ErrMissingAuth{}
+		return user.Claims{}, errors.ErrMissingAuth{}
 	}
 
 	token := func() string {
@@ -125,24 +126,24 @@ func (a App) Auth(ctx context.Context, audience string) (user.U, error) {
 	}()
 
 	if token == "" {
-		return user.U{}, errors.ErrMissingAuth{}
+		return user.Claims{}, errors.ErrMissingAuth{}
 	}
 
 	claims, err := a.ReadJWT(ctx, token)
 	if err != nil {
-		return user.U{}, err
+		return user.Claims{}, err
 	}
 
 	if len(claims.Audience) == 0 || claims.Audience[0] != audience {
-		return user.U{}, err
+		return user.Claims{}, err
 	}
 
 	id, err := ulid.Parse(claims.Subject)
 	if err != nil {
-		return user.U{}, user.ErrInvalidClaims{Err: err}
+		return user.Claims{}, user.ErrInvalidClaims{Err: err}
 	}
 
-	return user.U{
-		ID: id,
-	}, nil
+	claims.UserID = id
+
+	return claims, nil
 }

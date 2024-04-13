@@ -1,10 +1,11 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TYPE "user"."resource" AS ENUM(
-	'R_user',
-	'R_role',
 	'R_asset',
-	'R_operation'
+	'R_entity',
+	'R_operation',
+	'R_role',
+	'R_user'
 );
 CREATE TYPE "user"."command" AS ENUM(
 	'C_read',

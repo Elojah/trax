@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	_ "github.com/elojah/trax/pkg/gogoproto"
 	pbtypes "github.com/elojah/trax/pkg/pbtypes"
+	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
 	io "io"
@@ -28,15 +29,54 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type FetchProfileReq struct {
+	Me       bool                               `protobuf:"varint,1,opt,name=Me,proto3" json:"Me,omitempty"`
+	UserID   github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,2,opt,name=UserID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"UserID"`
+	EntityID github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,3,opt,name=EntityID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"EntityID"`
+}
+
+func (m *FetchProfileReq) Reset()      { *m = FetchProfileReq{} }
+func (*FetchProfileReq) ProtoMessage() {}
+func (*FetchProfileReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b4a6d37e631abfc2, []int{0}
+}
+func (m *FetchProfileReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *FetchProfileReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_FetchProfileReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *FetchProfileReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FetchProfileReq.Merge(m, src)
+}
+func (m *FetchProfileReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *FetchProfileReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_FetchProfileReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FetchProfileReq proto.InternalMessageInfo
+
 type UpdateProfileReq struct {
 	Firstname *pbtypes.String `protobuf:"bytes,1,opt,name=Firstname,proto3" json:"Firstname,omitempty"`
 	Lastname  *pbtypes.String `protobuf:"bytes,2,opt,name=Lastname,proto3" json:"Lastname,omitempty"`
+	AvatarURL *pbtypes.String `protobuf:"bytes,3,opt,name=AvatarURL,proto3" json:"AvatarURL,omitempty"`
 }
 
 func (m *UpdateProfileReq) Reset()      { *m = UpdateProfileReq{} }
 func (*UpdateProfileReq) ProtoMessage() {}
 func (*UpdateProfileReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b4a6d37e631abfc2, []int{0}
+	return fileDescriptor_b4a6d37e631abfc2, []int{1}
 }
 func (m *UpdateProfileReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -66,6 +106,8 @@ func (m *UpdateProfileReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_UpdateProfileReq proto.InternalMessageInfo
 
 func init() {
+	proto.RegisterType((*FetchProfileReq)(nil), "dto.FetchProfileReq")
+	golang_proto.RegisterType((*FetchProfileReq)(nil), "dto.FetchProfileReq")
 	proto.RegisterType((*UpdateProfileReq)(nil), "dto.UpdateProfileReq")
 	golang_proto.RegisterType((*UpdateProfileReq)(nil), "dto.UpdateProfileReq")
 }
@@ -78,26 +120,62 @@ func init() {
 }
 
 var fileDescriptor_b4a6d37e631abfc2 = []byte{
-	// 262 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0xcf, 0xb1, 0x4a, 0xc4, 0x40,
-	0x10, 0xc6, 0xf1, 0x1d, 0x05, 0xd1, 0x58, 0x28, 0xa9, 0xc4, 0x62, 0x10, 0x2b, 0x41, 0xcc, 0x82,
-	0x82, 0x0f, 0x60, 0x21, 0x16, 0x16, 0x72, 0xe2, 0x03, 0x6c, 0xcc, 0x9a, 0x5b, 0xcd, 0xed, 0xae,
-	0x9b, 0x39, 0xd0, 0xce, 0x47, 0xf0, 0x31, 0x7c, 0x04, 0xcb, 0x2b, 0xaf, 0x4c, 0x79, 0xa5, 0x3b,
-	0x69, 0x2c, 0xaf, 0xb4, 0x14, 0x92, 0x43, 0x1b, 0xbd, 0x6e, 0x8a, 0xff, 0x8f, 0xe1, 0x4b, 0x4e,
-	0x4b, 0x43, 0xc3, 0x71, 0x9e, 0xdd, 0xba, 0x91, 0xd4, 0x95, 0xbb, 0x57, 0x43, 0x49, 0x41, 0x3d,
-	0x49, 0x63, 0x49, 0x07, 0xab, 0x2a, 0x39, 0xae, 0x75, 0x90, 0x05, 0x39, 0xe9, 0x83, 0xbb, 0x33,
-	0x95, 0xce, 0x7c, 0x70, 0xe4, 0xd2, 0xd5, 0x82, 0xdc, 0xae, 0xfc, 0x07, 0xfb, 0x87, 0x52, 0x96,
-	0xae, 0x74, 0x5d, 0xda, 0x5d, 0xbd, 0x5a, 0x0a, 0x7c, 0x4e, 0xcf, 0x5e, 0xd7, 0xb2, 0xa6, 0x60,
-	0x6c, 0xd9, 0x83, 0x7d, 0x9b, 0x6c, 0xdf, 0xf8, 0x42, 0x91, 0xbe, 0xea, 0xbf, 0x0f, 0xf4, 0x63,
-	0x7a, 0x94, 0x6c, 0x9c, 0x9b, 0x50, 0x93, 0x55, 0x23, 0xbd, 0x03, 0x7b, 0x70, 0xb0, 0x79, 0xbc,
-	0x95, 0x2d, 0x74, 0x76, 0xdd, 0xe9, 0xc1, 0x6f, 0x91, 0x1e, 0x26, 0xeb, 0x97, 0x6a, 0x51, 0xaf,
-	0xfc, 0x5d, 0xff, 0x04, 0x67, 0x17, 0xd3, 0x88, 0xa2, 0x89, 0x28, 0x66, 0x11, 0xc5, 0x3c, 0x22,
-	0x7c, 0x45, 0x84, 0x17, 0x46, 0x78, 0x63, 0x84, 0x77, 0x46, 0x98, 0x30, 0xc2, 0x94, 0x11, 0x1a,
-	0x46, 0xf8, 0x60, 0x84, 0x4f, 0x46, 0x31, 0x67, 0x84, 0xd7, 0x16, 0xc5, 0xa4, 0x45, 0x68, 0x5a,
-	0x14, 0xb3, 0x16, 0x45, 0xbe, 0xd6, 0x0d, 0x38, 0xf9, 0x0e, 0x00, 0x00, 0xff, 0xff, 0xa6, 0x20,
-	0xa0, 0x6c, 0x61, 0x01, 0x00, 0x00,
+	// 361 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x91, 0x31, 0x6f, 0xda, 0x40,
+	0x18, 0x86, 0xef, 0x33, 0x12, 0xa2, 0xd7, 0xaa, 0x54, 0x9e, 0x50, 0x87, 0x0f, 0xc4, 0x84, 0x5a,
+	0xd5, 0x27, 0xb5, 0x52, 0xf7, 0x22, 0x8a, 0x8a, 0x04, 0x52, 0xe5, 0x8a, 0x1f, 0x70, 0xe0, 0xab,
+	0x71, 0x6b, 0x7c, 0xee, 0xf9, 0xa8, 0xc2, 0x96, 0x9f, 0x90, 0x3f, 0x90, 0x3d, 0x4b, 0xf6, 0x8c,
+	0x8c, 0x8c, 0x8c, 0x28, 0x03, 0x8a, 0xcf, 0x4b, 0x46, 0xc6, 0x8c, 0x51, 0x6c, 0x44, 0x32, 0x10,
+	0xa4, 0x6c, 0x37, 0x3c, 0xcf, 0xfb, 0xbd, 0xaf, 0x8e, 0x7e, 0xf5, 0x03, 0x3d, 0x99, 0x8d, 0x9c,
+	0xb1, 0x9c, 0x32, 0x11, 0xca, 0x3f, 0x7c, 0xc2, 0xb4, 0xe2, 0x27, 0x2c, 0x88, 0xb4, 0x50, 0x11,
+	0x0f, 0xd9, 0x2c, 0x11, 0x8a, 0x79, 0x5a, 0xb2, 0x58, 0xc9, 0xdf, 0x41, 0x28, 0x9c, 0x58, 0x49,
+	0x2d, 0xed, 0x92, 0xa7, 0xe5, 0x7b, 0xf6, 0x8c, 0x1c, 0xff, 0xf5, 0x99, 0x2f, 0x7d, 0x99, 0xa3,
+	0xf9, 0xab, 0xb0, 0x8e, 0x0a, 0xf1, 0x48, 0xcf, 0x63, 0x91, 0xb0, 0x44, 0xab, 0x20, 0xf2, 0x0b,
+	0xa1, 0x79, 0x09, 0xb4, 0xda, 0x15, 0x7a, 0x3c, 0xf9, 0x59, 0x5c, 0x77, 0xc5, 0x3f, 0xfb, 0x2d,
+	0xb5, 0x06, 0xa2, 0x06, 0x0d, 0x68, 0x55, 0x5c, 0x6b, 0x20, 0xec, 0x36, 0x2d, 0x0f, 0x13, 0xa1,
+	0x7a, 0x9d, 0x9a, 0xd5, 0x80, 0xd6, 0x9b, 0xf6, 0x87, 0xe5, 0xa6, 0x4e, 0xae, 0x37, 0xf5, 0xe6,
+	0x91, 0x63, 0xb3, 0x30, 0xf0, 0x9c, 0x5e, 0xc7, 0xdd, 0x99, 0x76, 0x97, 0x56, 0xbe, 0x47, 0x3a,
+	0xd0, 0xf3, 0x5e, 0xa7, 0x56, 0x7a, 0x71, 0xca, 0xde, 0x6d, 0x9e, 0x03, 0x7d, 0x37, 0x8c, 0x3d,
+	0xae, 0xc5, 0x93, 0xc2, 0x9f, 0xe8, 0xab, 0x6e, 0xa0, 0x12, 0x1d, 0xf1, 0x69, 0xd1, 0xfb, 0xf5,
+	0xe7, 0xaa, 0xb3, 0x9b, 0xeb, 0xfc, 0xca, 0xe7, 0xba, 0x8f, 0x84, 0xfd, 0x91, 0x56, 0xfa, 0x7c,
+	0x47, 0x5b, 0x87, 0xe9, 0x3d, 0xf0, 0x90, 0xfd, 0xed, 0x3f, 0xd7, 0x5c, 0x0d, 0xdd, 0x7e, 0xde,
+	0xfc, 0x50, 0xf6, 0x9e, 0x68, 0xff, 0x58, 0xa6, 0x48, 0x56, 0x29, 0x92, 0x75, 0x8a, 0x64, 0x9b,
+	0x22, 0xdc, 0xa5, 0x08, 0xa7, 0x06, 0xe1, 0xc2, 0x20, 0x5c, 0x19, 0x84, 0x85, 0x41, 0x58, 0x1a,
+	0x84, 0x95, 0x41, 0xb8, 0x31, 0x08, 0xb7, 0x06, 0xc9, 0xd6, 0x20, 0x9c, 0x65, 0x48, 0x16, 0x19,
+	0xc2, 0x2a, 0x43, 0xb2, 0xce, 0x90, 0x8c, 0xca, 0xf9, 0x07, 0x7d, 0xb9, 0x0f, 0x00, 0x00, 0xff,
+	0xff, 0x76, 0xf7, 0x7e, 0x84, 0x41, 0x02, 0x00, 0x00,
 }
 
+func (this *FetchProfileReq) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*FetchProfileReq)
+	if !ok {
+		that2, ok := that.(FetchProfileReq)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Me != that1.Me {
+		return false
+	}
+	if !this.UserID.Equal(that1.UserID) {
+		return false
+	}
+	if !this.EntityID.Equal(that1.EntityID) {
+		return false
+	}
+	return true
+}
 func (this *UpdateProfileReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -123,19 +201,37 @@ func (this *UpdateProfileReq) Equal(that interface{}) bool {
 	if !this.Lastname.Equal(that1.Lastname) {
 		return false
 	}
+	if !this.AvatarURL.Equal(that1.AvatarURL) {
+		return false
+	}
 	return true
+}
+func (this *FetchProfileReq) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&dto.FetchProfileReq{")
+	s = append(s, "Me: "+fmt.Sprintf("%#v", this.Me)+",\n")
+	s = append(s, "UserID: "+fmt.Sprintf("%#v", this.UserID)+",\n")
+	s = append(s, "EntityID: "+fmt.Sprintf("%#v", this.EntityID)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
 }
 func (this *UpdateProfileReq) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 6)
+	s := make([]string, 0, 7)
 	s = append(s, "&dto.UpdateProfileReq{")
 	if this.Firstname != nil {
 		s = append(s, "Firstname: "+fmt.Sprintf("%#v", this.Firstname)+",\n")
 	}
 	if this.Lastname != nil {
 		s = append(s, "Lastname: "+fmt.Sprintf("%#v", this.Lastname)+",\n")
+	}
+	if this.AvatarURL != nil {
+		s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", this.AvatarURL)+",\n")
 	}
 	s = append(s, "}")
 	return strings.Join(s, "")
@@ -148,6 +244,59 @@ func valueToGoStringProfile(v interface{}, typ string) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
 }
+func (m *FetchProfileReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FetchProfileReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FetchProfileReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.EntityID.Size()
+		i -= size
+		if _, err := m.EntityID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintProfile(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size := m.UserID.Size()
+		i -= size
+		if _, err := m.UserID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintProfile(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if m.Me {
+		i--
+		if m.Me {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *UpdateProfileReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -168,6 +317,18 @@ func (m *UpdateProfileReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.AvatarURL != nil {
+		{
+			size, err := m.AvatarURL.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProfile(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
 	if m.Lastname != nil {
 		{
 			size, err := m.Lastname.MarshalToSizedBuffer(dAtA[:i])
@@ -206,6 +367,18 @@ func encodeVarintProfile(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func NewPopulatedFetchProfileReq(r randyProfile, easy bool) *FetchProfileReq {
+	this := &FetchProfileReq{}
+	this.Me = bool(bool(r.Intn(2) == 0))
+	v1 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.UserID = *v1
+	v2 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.EntityID = *v2
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedUpdateProfileReq(r randyProfile, easy bool) *UpdateProfileReq {
 	this := &UpdateProfileReq{}
 	if r.Intn(5) != 0 {
@@ -213,6 +386,9 @@ func NewPopulatedUpdateProfileReq(r randyProfile, easy bool) *UpdateProfileReq {
 	}
 	if r.Intn(5) != 0 {
 		this.Lastname = pbtypes.NewPopulatedString(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.AvatarURL = pbtypes.NewPopulatedString(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -238,9 +414,9 @@ func randUTF8RuneProfile(r randyProfile) rune {
 	return rune(ru + 61)
 }
 func randStringProfile(r randyProfile) string {
-	v1 := r.Intn(100)
-	tmps := make([]rune, v1)
-	for i := 0; i < v1; i++ {
+	v3 := r.Intn(100)
+	tmps := make([]rune, v3)
+	for i := 0; i < v3; i++ {
 		tmps[i] = randUTF8RuneProfile(r)
 	}
 	return string(tmps)
@@ -262,11 +438,11 @@ func randFieldProfile(dAtA []byte, r randyProfile, fieldNumber int, wire int) []
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateProfile(dAtA, uint64(key))
-		v2 := r.Int63()
+		v4 := r.Int63()
 		if r.Intn(2) == 0 {
-			v2 *= -1
+			v4 *= -1
 		}
-		dAtA = encodeVarintPopulateProfile(dAtA, uint64(v2))
+		dAtA = encodeVarintPopulateProfile(dAtA, uint64(v4))
 	case 1:
 		dAtA = encodeVarintPopulateProfile(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -291,6 +467,22 @@ func encodeVarintPopulateProfile(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
+func (m *FetchProfileReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Me {
+		n += 2
+	}
+	l = m.UserID.Size()
+	n += 1 + l + sovProfile(uint64(l))
+	l = m.EntityID.Size()
+	n += 1 + l + sovProfile(uint64(l))
+	return n
+}
+
 func (m *UpdateProfileReq) Size() (n int) {
 	if m == nil {
 		return 0
@@ -305,6 +497,10 @@ func (m *UpdateProfileReq) Size() (n int) {
 		l = m.Lastname.Size()
 		n += 1 + l + sovProfile(uint64(l))
 	}
+	if m.AvatarURL != nil {
+		l = m.AvatarURL.Size()
+		n += 1 + l + sovProfile(uint64(l))
+	}
 	return n
 }
 
@@ -314,6 +510,18 @@ func sovProfile(x uint64) (n int) {
 func sozProfile(x uint64) (n int) {
 	return sovProfile(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
+func (this *FetchProfileReq) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FetchProfileReq{`,
+		`Me:` + fmt.Sprintf("%v", this.Me) + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
+		`EntityID:` + fmt.Sprintf("%v", this.EntityID) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *UpdateProfileReq) String() string {
 	if this == nil {
 		return "nil"
@@ -321,6 +529,7 @@ func (this *UpdateProfileReq) String() string {
 	s := strings.Join([]string{`&UpdateProfileReq{`,
 		`Firstname:` + strings.Replace(fmt.Sprintf("%v", this.Firstname), "String", "pbtypes.String", 1) + `,`,
 		`Lastname:` + strings.Replace(fmt.Sprintf("%v", this.Lastname), "String", "pbtypes.String", 1) + `,`,
+		`AvatarURL:` + strings.Replace(fmt.Sprintf("%v", this.AvatarURL), "String", "pbtypes.String", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -332,6 +541,145 @@ func valueToStringProfile(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
+}
+func (m *FetchProfileReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProfile
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FetchProfileReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FetchProfileReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Me", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProfile
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Me = bool(v != 0)
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProfile
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProfile
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProfile
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProfile
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProfile
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProfile
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EntityID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProfile(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProfile
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthProfile
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *UpdateProfileReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -431,6 +779,42 @@ func (m *UpdateProfileReq) Unmarshal(dAtA []byte) error {
 				m.Lastname = &pbtypes.String{}
 			}
 			if err := m.Lastname.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AvatarURL", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProfile
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProfile
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProfile
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AvatarURL == nil {
+				m.AvatarURL = &pbtypes.String{}
+			}
+			if err := m.AvatarURL.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

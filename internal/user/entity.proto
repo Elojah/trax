@@ -12,14 +12,23 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 
 message Entity {
 	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
 	string Name            = 2;
-	string AvatarURL       = 3;
-	string Description     = 4;
 
-	int64 CreatedAt        = 5;
-	int64 UpdatedAt        = 6;
+	int64 CreatedAt        = 3;
+	int64 UpdatedAt        = 4;
+}
+
+message EntityProfile {
+	bytes EntityID                 = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+
+	pbtypes.String AvatarURL       = 2;
+	pbtypes.String Description     = 3;
+
+	int64 CreatedAt                = 4;
+	int64 UpdatedAt                = 5;
 }

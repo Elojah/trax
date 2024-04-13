@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	ppostgres "github.com/elojah/trax/pkg/pbtypes/postgres"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
@@ -27,7 +28,7 @@ func newProfile(p user.Profile) sqlProfile {
 		UserID:    p.UserID,
 		FirstName: p.FirstName,
 		LastName:  p.LastName,
-		AvatarURL: sql.NullString{String: p.AvatarURL, Valid: p.AvatarURL != ""},
+		AvatarURL: ppostgres.NullString(p.AvatarURL),
 		CreatedAt: time.Unix(p.CreatedAt, 0),
 		UpdatedAt: time.Unix(p.UpdatedAt, 0),
 	}
@@ -38,7 +39,7 @@ func (sqlp sqlProfile) profile() user.Profile {
 		UserID:    sqlp.UserID,
 		FirstName: sqlp.FirstName,
 		LastName:  sqlp.LastName,
-		AvatarURL: sqlp.AvatarURL.String,
+		AvatarURL: ppostgres.NewString(sqlp.AvatarURL),
 		CreatedAt: sqlp.CreatedAt.Unix(),
 		UpdatedAt: sqlp.UpdatedAt.Unix(),
 	}
@@ -105,6 +106,12 @@ func (p patchProfile) set() (string, []any, int) {
 	if p.LastName != nil {
 		cols = append(cols, fmt.Sprintf(`last_name = $%d`, n))
 		args = append(args, *p.LastName)
+		n++
+	}
+
+	if p.AvatarURL != nil {
+		cols = append(cols, fmt.Sprintf(`avatar_url = $%d`, n))
+		args = append(args, *p.AvatarURL)
 		n++
 	}
 

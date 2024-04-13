@@ -17,6 +17,7 @@ type App interface {
 	StoreProfile
 
 	StoreEntity
+	StoreEntityProfile
 
 	StoreRole
 	StorePermission
@@ -25,7 +26,7 @@ type App interface {
 	CreateJWT(context.Context, U, string, time.Duration) (string, error)
 	ReadJWT(context.Context, string) (Claims, error)
 
-	Auth(context.Context, string) (U, error)
+	Auth(context.Context, string) (Claims, error)
 }
 
 type Filter struct {
@@ -51,6 +52,7 @@ type FilterProfile struct {
 type PatchProfile struct {
 	FirstName *string
 	LastName  *string
+	AvatarURL *string
 	UpdatedAt *int64
 }
 
