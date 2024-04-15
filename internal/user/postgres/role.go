@@ -118,7 +118,7 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" r `)
+	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at FROM "user"."role" r `)
 
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
@@ -140,7 +140,7 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, er
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" r `)
+	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at FROM "user"."role" r `)
 
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)

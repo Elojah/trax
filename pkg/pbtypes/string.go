@@ -7,3 +7,11 @@ func GetString(s *String) *string {
 
 	return &s.Value
 }
+
+func GetStringEmpty(s *String) string {
+	if s == nil {
+		return ""
+	}
+
+	return s.Value
+}

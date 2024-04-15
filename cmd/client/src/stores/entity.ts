@@ -23,16 +23,12 @@ export const useEntityStore = defineStore('entity', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const createEntity = async function (
-    name: string,
-    avatarURL: string | null,
-    description: string | null
-  ) {
+  const createEntity = async function (name: string, avatarURL: string, description: string) {
     try {
       const req = CreateEntityReq.create({
         name: name,
-        avatarURL: avatarURL ? { value: avatarURL } : null,
-        description: description ? { value: description } : null
+        avatarURL: avatarURL,
+        description: description
       })
 
       return await api.createEntity(req, { meta: { token: token.value } })

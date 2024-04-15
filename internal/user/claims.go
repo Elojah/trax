@@ -32,16 +32,14 @@ func (c Claims) Require(entityID ulid.ID, resource Resource, command Command) er
 		return ErrUnknownEntity{EntityID: entityID.String()}
 	}
 
-	commands, ok := entities.Commands[resource.String()]
+	resources, ok := entities.Resources[resource.String()]
 	if !ok {
 		return ErrUnauthorizedResource{Resource: resource.String()}
 	}
 
-	for _, c := range commands.Commands {
-		if command == c {
-			return nil
-		}
+	if _, ok := resources.Commands[command.String()]; !ok {
+		return ErrUnauthorizedCommand{Resource: resource.String(), Command: command.String()}
 	}
 
-	return ErrUnauthorizedCommand{Resource: resource.String(), Command: command.String()}
+	return nil
 }

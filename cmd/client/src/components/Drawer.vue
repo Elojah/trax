@@ -13,29 +13,31 @@ const redirect = function (name: string) {
 </script>
 
 <template>
-	<v-navigation-drawer rail v-if="authStore.user">
+	<v-navigation-drawer v-if="authStore.user">
 		<v-list nav>
-			<v-list-item prepend-icon="mdi-domain" title="Entity" value="entity" @click="redirect('entity')">
+			<v-list-item prepend-icon="mdi-domain" title="Entities" value="entities" @click="redirect('entity')"
+				active-class="bar-bg">
 				<template v-slot:prepend>
 					<v-icon color="primary"></v-icon>
 				</template>
 			</v-list-item>
 			<v-divider></v-divider>
 			<v-list-item prepend-icon="mdi-chart-box-multiple" title="Dashboard" value="dashboard"
-				@click="redirect('dashboard')">
+				@click="redirect('dashboard')" active-class="bar-bg">
 				<template v-slot:prepend>
 					<v-icon color="primary"></v-icon>
 				</template>
 			</v-list-item>
 			<v-divider></v-divider>
-			<v-list-item v-if="authStore.user" prepend-icon="mdi-map" title="Map" value="map" @click="redirect('map')">
+			<v-list-item v-if="authStore.user" prepend-icon="mdi-map" title="Map" value="map" @click="redirect('map')"
+				active-class="bar-bg">
 				<template v-slot:prepend>
 					<v-icon color="primary"></v-icon>
 				</template>
 			</v-list-item>
 			<v-divider></v-divider>
 			<v-list-item v-if="authStore.user" prepend-icon="mdi-library-shelves" title="Stocks" value="stocks"
-				@click="redirect('stocks')">
+				@click="redirect('stocks')" active-class="bar-bg">
 				<template v-slot:prepend>
 					<v-icon color="primary"></v-icon>
 				</template>
@@ -45,7 +47,8 @@ const redirect = function (name: string) {
 		<template v-slot:append>
 			<v-divider thickness="3"></v-divider>
 			<v-list nav>
-				<v-list-item prepend-icon="mdi-account-circle" title="User" value="user" @click="redirect('user')">
+				<v-list-item prepend-icon="mdi-account-circle" title="User" value="user" @click="redirect('user')"
+					active-class="bar-bg">
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>
 					</template>
@@ -55,4 +58,9 @@ const redirect = function (name: string) {
 	</v-navigation-drawer>
 </template>
 
-<style scoped></style>
+<style scoped>
+.bar-bg {
+	background: url('@/assets/img/bar-background.svg') no-repeat bottom center;
+	background-size: cover;
+}
+</style>

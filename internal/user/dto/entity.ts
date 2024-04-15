@@ -22,13 +22,13 @@ export interface CreateEntityReq {
      */
     name: string;
     /**
-     * @generated from protobuf field: pbtypes.String Description = 2 [json_name = "Description"];
+     * @generated from protobuf field: string Description = 2 [json_name = "Description"];
      */
-    description?: String$;
+    description: string;
     /**
-     * @generated from protobuf field: pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];
+     * @generated from protobuf field: string AvatarURL = 3 [json_name = "AvatarURL"];
      */
-    avatarURL?: String$;
+    avatarURL: string;
 }
 /**
  * @generated from protobuf message dto.UpdateEntityReq
@@ -87,13 +87,15 @@ class CreateEntityReq$Type extends MessageType<CreateEntityReq> {
     constructor() {
         super("dto.CreateEntityReq", [
             { no: 1, name: "Name", kind: "scalar", jsonName: "Name", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "Description", kind: "message", jsonName: "Description", T: () => String$ },
-            { no: 3, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ }
+            { no: 2, name: "Description", kind: "scalar", jsonName: "Description", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "AvatarURL", kind: "scalar", jsonName: "AvatarURL", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<CreateEntityReq>): CreateEntityReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.name = "";
+        message.description = "";
+        message.avatarURL = "";
         if (value !== undefined)
             reflectionMergePartial<CreateEntityReq>(this, message, value);
         return message;
@@ -106,11 +108,11 @@ class CreateEntityReq$Type extends MessageType<CreateEntityReq> {
                 case /* string Name = 1 [json_name = "Name"];*/ 1:
                     message.name = reader.string();
                     break;
-                case /* pbtypes.String Description = 2 [json_name = "Description"];*/ 2:
-                    message.description = String$.internalBinaryRead(reader, reader.uint32(), options, message.description);
+                case /* string Description = 2 [json_name = "Description"];*/ 2:
+                    message.description = reader.string();
                     break;
-                case /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];*/ 3:
-                    message.avatarURL = String$.internalBinaryRead(reader, reader.uint32(), options, message.avatarURL);
+                case /* string AvatarURL = 3 [json_name = "AvatarURL"];*/ 3:
+                    message.avatarURL = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -127,12 +129,12 @@ class CreateEntityReq$Type extends MessageType<CreateEntityReq> {
         /* string Name = 1 [json_name = "Name"]; */
         if (message.name !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.name);
-        /* pbtypes.String Description = 2 [json_name = "Description"]; */
-        if (message.description)
-            String$.internalBinaryWrite(message.description, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"]; */
-        if (message.avatarURL)
-            String$.internalBinaryWrite(message.avatarURL, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* string Description = 2 [json_name = "Description"]; */
+        if (message.description !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.description);
+        /* string AvatarURL = 3 [json_name = "AvatarURL"]; */
+        if (message.avatarURL !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.avatarURL);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

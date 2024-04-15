@@ -140,132 +140,140 @@ const deleteEntity = () => {
 </script>
 
 <template>
-	<v-toolbar class="bar-bg px-6" floating>
-		<v-icon color="primary" size="large" icon="mdi-domain"></v-icon>
-		<v-toolbar-title class="text-h5 font-weight-black font-italic"> Entities </v-toolbar-title>
-		<v-dialog v-model="dialog" max-width="800px">
-			<template v-slot:activator="{ props }">
-				<v-btn variant="tonal" prepend-icon="mdi-plus-box" v-bind="props">
-					New entity
-					<template v-slot:prepend>
-						<v-icon color="primary"></v-icon>
-					</template>
-				</v-btn>
-			</template>
-			<v-sheet class="px-1 rounded-xl" outlined color="primary">
-				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
-					<v-form ref="form" v-model="valid" lazy-validation>
-						<v-card-title>
-							<span class="text-h6">New entity</span>
-						</v-card-title>
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="6">
-										<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
-									</v-col>
-									<v-col cols="6">
-										<v-text-field v-model="avatarURL" label="Avatar URL"></v-text-field>
-									</v-col>
-								</v-row>
-								<v-row>
-									<v-col cols="12">
-										<v-textarea v-model="description" label="Description"></v-textarea>
-									</v-col>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn variant="text" @click="close">
-								Cancel
-							</v-btn>
-							<v-btn color="primary" variant="text" @click="create">
-								Create
-							</v-btn>
-						</v-card-actions>
-					</v-form>
-				</v-card>
-			</v-sheet>
-		</v-dialog>
-		<v-dialog v-model="dialogDelete" max-width="500px">
-			<v-card>
-				<v-card-title class="text-h5">Are you sure you want to delete this entity ?</v-card-title>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn variant="text" @click="closeDelete">Cancel</v-btn>
-					<v-btn color="danger" variant="text" @click="confirmDeleteEntity">OK</v-btn>
-					<v-spacer></v-spacer>
-				</v-card-actions>
-			</v-card>
-		</v-dialog>
-	</v-toolbar>
+	<v-dialog v-model="dialogDelete" max-width="500px">
+		<v-card>
+			<v-card-title class="text-h5">Are you sure you want to delete this entity ?</v-card-title>
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn variant="text" @click="closeDelete">Cancel</v-btn>
+				<v-btn color="danger" variant="text" @click="confirmDeleteEntity">OK</v-btn>
+				<v-spacer></v-spacer>
+			</v-card-actions>
+		</v-card>
+	</v-dialog>
+
 	<v-row>
-		<v-col class="mx-auto pt-8" cols="4">
-			<v-btn-toggle class="mb-8" v-model="tableView">
-				<v-btn size="large" variant="tonal" append-icon="mdi-domain">
-					By Name
-					<template v-slot:append>
-						<v-icon color="primary"></v-icon>
+		<v-col class="mx-auto pt-4" cols="4">
+			<v-row>
+				<v-col cols="9">
+					<v-btn-toggle v-model="tableView">
+						<v-btn size="large" variant="outlined" append-icon="mdi-domain">
+							By Name
+							<template v-slot:append>
+								<v-icon color="primary"></v-icon>
+							</template>
+						</v-btn>
+						<v-btn size="large" variant="outlined" append-icon="mdi-account-cog">
+							By Role
+							<template v-slot:append>
+								<v-icon color="primary"></v-icon>
+							</template>
+						</v-btn>
+					</v-btn-toggle>
+				</v-col>
+				<v-col class="d-flex justify-end align-center" cols="3">
+					<v-dialog v-model="dialog" max-width="800px">
+						<template v-slot:activator="{ props }">
+							<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+								New
+								<template v-slot:prepend>
+									<v-icon color="primary"></v-icon>
+								</template>
+							</v-btn>
+						</template>
+						<v-sheet class="px-1 rounded-xl" outlined color="primary">
+							<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+								<v-form ref="form" v-model="valid" lazy-validation>
+									<v-card-title>
+										<span class="text-h6">New entity</span>
+									</v-card-title>
+									<v-card-text>
+										<v-container>
+											<v-row>
+												<v-col cols="6">
+													<v-text-field v-model="name" :rules="nameRules"
+														label="Name"></v-text-field>
+												</v-col>
+												<v-col cols="6">
+													<v-text-field v-model="avatarURL" label="Avatar URL"></v-text-field>
+												</v-col>
+											</v-row>
+											<v-row>
+												<v-col cols="12">
+													<v-textarea v-model="description" label="Description"></v-textarea>
+												</v-col>
+											</v-row>
+										</v-container>
+									</v-card-text>
+									<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn variant="text" @click="close">
+											Cancel
+										</v-btn>
+										<v-btn color="primary" variant="text" @click="create">
+											Create
+										</v-btn>
+									</v-card-actions>
+								</v-form>
+							</v-card>
+						</v-sheet>
+					</v-dialog>
+				</v-col>
+			</v-row>
+			<v-row>
+				<v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" variant="outlined"
+					hide-details single-line></v-text-field>
+			</v-row>
+			<v-row>
+				<v-data-table-server v-if="tableView === 0" class="transparent-background" :headers="headers"
+					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+					:items-per-page-options="pageOptions" :items="tableEntities" :items-length="Number(total)"
+					:loading="loading" :search="search" item-value="name" @update:options="listEntity"
+					@click:row="displayEntity" select-strategy="single" item-selectable="true">
+					<template v-slot:item="{ item, index, props }">
+						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
+							v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
+							<td class="d-flex align-center">
+								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
+									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
+									<span v-else class=" mx-auto text-center text-h5">
+										{{ item?.name?.at(0)?.toUpperCase() }}
+									</span>
+								</v-avatar>
+								<span class="text-h6">{{ item.name }}</span>
+							</td>
+							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+								1000).toLocaleDateString('en-GB')
+								}}
+							</td>
+						</tr>
 					</template>
-				</v-btn>
-				<v-btn size="large" variant="tonal" append-icon="mdi-account-cog">
-					By Role
-					<template v-slot:append>
-						<v-icon color="primary"></v-icon>
+				</v-data-table-server>
+				<v-data-table-server v-if="tableView === 1" class="transparent-background" :headers="headersByRole"
+					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+					:items-per-page-options="pageOptions" :items="tableEntities" :items-length="Number(total)"
+					:loading="loading" :search="search" item-value="name" @update:options="listEntity"
+					@click:row="displayEntity" select-strategy="single" item-selectable="true">
+					<template v-slot:item="{ item, index, props }">
+						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
+							v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
+							<td class="d-flex align-center">
+								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
+									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
+									<span v-else class=" mx-auto text-center text-h5">
+										{{ item?.name?.at(0)?.toUpperCase() }}
+									</span>
+								</v-avatar>
+								<span class="text-h6">{{ item.name }}</span>
+							</td>
+							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+								1000).toLocaleDateString('en-GB')
+								}}
+							</td>
+						</tr>
 					</template>
-				</v-btn>
-			</v-btn-toggle>
-			<v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" variant="outlined"
-				hide-details single-line></v-text-field>
-			<v-data-table-server v-if="tableView === 0" class="transparent-background" :headers="headers" fixed-footer
-				min-height="50vh" max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions"
-				:items="tableEntities" :items-length="Number(total)" :loading="loading" :search="search"
-				item-value="name" @update:options="listEntity" @click:row="displayEntity" select-strategy="single"
-				item-selectable="true">
-				<template v-slot:item="{ item, index, props }">
-					<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
-						v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
-						<td class="d-flex align-center">
-							<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
-								<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
-								<span v-else class=" mx-auto text-center text-h5">
-									{{ item?.name?.at(0)?.toUpperCase() }}
-								</span>
-							</v-avatar>
-							<span class="text-h6">{{ item.name }}</span>
-						</td>
-						<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-							1000).toLocaleDateString('en-GB')
-							}}
-						</td>
-					</tr>
-				</template>
-			</v-data-table-server>
-			<v-data-table-server v-if="tableView === 1" class="transparent-background" :headers="headersByRole"
-				fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
-				:items-per-page-options="pageOptions" :items="tableEntities" :items-length="Number(total)"
-				:loading="loading" :search="search" item-value="name" @update:options="listEntity"
-				@click:row="displayEntity" select-strategy="single" item-selectable="true">
-				<template v-slot:item="{ item, index, props }">
-					<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
-						v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
-						<td class="d-flex align-center">
-							<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
-								<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
-								<span v-else class=" mx-auto text-center text-h5">
-									{{ item?.name?.at(0)?.toUpperCase() }}
-								</span>
-							</v-avatar>
-							<span class="text-h6">{{ item.name }}</span>
-						</td>
-						<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-							1000).toLocaleDateString('en-GB')
-							}}
-						</td>
-					</tr>
-				</template>
-			</v-data-table-server>
+				</v-data-table-server>
+			</v-row>
 		</v-col>
 		<v-divider vertical></v-divider>
 		<v-col class="mx-auto" cols="8">
@@ -296,11 +304,6 @@ const deleteEntity = () => {
 	</v-row>
 </template>
 <style scoped>
-.bar-bg {
-	background: url('@/assets/img/bar-background.svg') no-repeat bottom center;
-	background-size: cover;
-}
-
 .main-color-background {
 	background-color: #263238;
 }

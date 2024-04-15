@@ -181,7 +181,7 @@ func (s Store) Insert(ctx context.Context, u user.U) error {
 	if _, err := tx.Exec(
 		ctx,
 		b.String(),
-		sqlu.ID, sqlu.Email, sqlu.PasswordHash, sqlu.PasswordSalt, sqlu.GoogleID, sqlu.CreatedAt, sqlu.UpdatedAt,
+		sqlu.ID, sqlu.Email, sqlu.PasswordHash, sqlu.PasswordSalt, sqlu.FirstName, sqlu.LastName, sqlu.AvatarURL, sqlu.GoogleID, sqlu.CreatedAt, sqlu.UpdatedAt,
 	); err != nil {
 		return postgres.Error(err, "user", u.ID.String())
 	}

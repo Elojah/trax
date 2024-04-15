@@ -67,6 +67,8 @@ type StoreRoleUser interface {
 	FetchRoleUser(context.Context, FilterRoleUser) (RoleUser, error)
 	ListRoleUser(context.Context, FilterRoleUser) ([]RoleUser, error)
 	DeleteRoleUser(context.Context, FilterRoleUser) error
+
+	ListClaims(context.Context, FilterRoleUser) (ClaimAuth, error)
 }
 
 func AllPermissions(roleID ulid.ID) []Permission {

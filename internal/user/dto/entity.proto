@@ -19,8 +19,8 @@ import "github.com/elojah/trax/internal/user/entity.proto";
 
 message CreateEntityReq {
 	string Name                 = 1;
-    pbtypes.String Description  = 2;
-    pbtypes.String AvatarURL    = 3;
+    string Description          = 2;
+    string AvatarURL            = 3;
 }
 
 message UpdateEntityReq {

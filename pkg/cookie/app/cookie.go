@@ -7,6 +7,8 @@ import (
 	"github.com/gorilla/securecookie"
 )
 
+const maxCookieLength = 131072
+
 type A struct {
 	cookie.CacheKeys
 }
@@ -48,7 +50,7 @@ func (a A) Encode(ctx context.Context, key string, value string) (string, error)
 	ck, err := securecookie.New(
 		ks[len(ks)-1].Hash,
 		ks[len(ks)-1].Block,
-	).Encode(key, value)
+	).MaxLength(maxCookieLength).Encode(key, value)
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +67,7 @@ func (a A) Decode(ctx context.Context, key string, value string) (string, error)
 	scs := func() []securecookie.Codec {
 		result := make([]securecookie.Codec, 0, len(keys))
 		for _, k := range keys {
-			result = append(result, securecookie.New(k.Hash, k.Block))
+			result = append(result, securecookie.New(k.Hash, k.Block).MaxLength(maxCookieLength))
 		}
 
 		return result

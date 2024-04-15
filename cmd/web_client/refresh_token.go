@@ -47,17 +47,6 @@ func (h handler) refreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set access token
-	http.SetCookie(w, &http.Cookie{
-		Name:     "access",
-		Value:    jwt.AccessToken,
-		Path:     "/",
-		Secure:   true,
-		HttpOnly: false,
-		SameSite: http.SameSiteDefaultMode,
-		Domain:   ".legacyfactory.com",
-	})
-
 	// Set refresh token
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh",
@@ -68,6 +57,8 @@ func (h handler) refreshToken(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteDefaultMode,
 		Domain:   ".legacyfactory.com",
 	})
+
+	w.Write([]byte(jwt.AccessToken))
 
 	w.WriteHeader(http.StatusOK)
 

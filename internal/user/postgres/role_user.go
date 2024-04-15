@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	"github.com/elojah/trax/pkg/pbtypes"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
@@ -130,7 +131,7 @@ func (s Store) FetchRoleUser(ctx context.Context, f user.FilterRoleUser) (user.R
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" ru `)
+	b.WriteString(`SELECT ru.role_id, ru.user_id, ru.created_at, ru.updated_at FROM "user"."role_user" ru `)
 
 	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)
@@ -152,7 +153,7 @@ func (s Store) ListRoleUser(ctx context.Context, f user.FilterRoleUser) ([]user.
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" ru `)
+	b.WriteString(`SELECT ru.role_id, ru.user_id, ru.created_at, ru.updated_at FROM "user"."role_user" ru `)
 
 	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)
@@ -193,4 +194,61 @@ func (s Store) DeleteRoleUser(ctx context.Context, f user.FilterRoleUser) error 
 	}
 
 	return err
+}
+
+func (s Store) ListClaims(ctx context.Context, f user.FilterRoleUser) (user.ClaimAuth, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return user.ClaimAuth{}, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`
+		SELECT r.entity_id, p.resource, p.command
+		FROM "user"."role_user" ru
+		JOIN "user"."role" r ON ru.role_id = r.id
+		JOIN "user"."permission" p ON r.id = p.role_id
+		WHERE ru.user_id = $1
+	`)
+
+	rows, err := tx.Query(ctx, b.String(), f.UserID)
+	if err != nil {
+		return user.ClaimAuth{}, postgres.Error(err, "role_user", filterRoleUser(f).index())
+	}
+
+	var claim user.ClaimAuth
+
+	for rows.Next() {
+		var entityID ulid.ID
+		var resource, command string
+
+		if err := rows.Scan(&entityID, &resource, &command); err != nil {
+			return user.ClaimAuth{}, postgres.Error(err, "role_user+claim", filterRoleUser(f).index())
+		}
+
+		eid := entityID.String()
+
+		if claim.Entities == nil {
+			claim.Entities = make(map[string]user.ClaimEntity)
+		}
+
+		if _, ok := claim.Entities[eid]; !ok {
+			claim.Entities[eid] = user.ClaimEntity{
+				ID:        entityID,
+				Resources: make(map[string]user.ClaimResources),
+			}
+		}
+
+		if _, ok := claim.Entities[eid].Resources[resource]; !ok {
+			claim.Entities[eid].Resources[resource] = user.ClaimResources{
+				Commands: make(map[string]pbtypes.Empty),
+			}
+		}
+
+		if _, ok := claim.Entities[eid].Resources[resource].Commands[command]; !ok {
+			claim.Entities[eid].Resources[resource].Commands[command] = pbtypes.Empty{}
+		}
+	}
+
+	return claim, nil
 }

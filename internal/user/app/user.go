@@ -44,6 +44,25 @@ func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 		return "", err
 	}
 
+	var ca user.ClaimAuth
+
+	if audience == "access" {
+		if err := a.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+			var err error
+
+			ca, err = a.ListClaims(ctx, user.FilterRoleUser{
+				UserID: u.ID,
+			})
+			if err != nil {
+				return transaction.Rollback, err
+			}
+
+			return transaction.Commit, nil
+		}); err != nil {
+			return "", err
+		}
+	}
+
 	now := time.Now()
 	claims := &user.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -56,8 +75,7 @@ func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 			ID:        secret,
 		},
 		UserID: u.ID,
-		// TODO: populate with user roles
-		// Auth:   nil,
+		Auth:   ca,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

@@ -31,8 +31,8 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 	e := user.Entity{
 		ID:          ulid.NewID(),
 		Name:        req.Name,
-		Description: req.Description.Value,
-		AvatarURL:   req.AvatarURL.Value,
+		Description: req.Description,
+		AvatarURL:   req.AvatarURL,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}

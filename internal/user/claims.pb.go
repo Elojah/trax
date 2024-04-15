@@ -6,6 +6,7 @@ package user
 import (
 	fmt "fmt"
 	_ "github.com/elojah/trax/pkg/gogoproto"
+	pbtypes "github.com/elojah/trax/pkg/pbtypes"
 	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
@@ -29,21 +30,22 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type ClaimCommands struct {
-	Commands []Command `protobuf:"varint,1,rep,packed,name=Commands,proto3,enum=user.Command" json:"Commands,omitempty"`
+type ClaimResources struct {
+	// Commands key must be a user.Commands
+	Commands map[string]pbtypes.Empty `protobuf:"bytes,1,rep,name=Commands,proto3" json:"Commands" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
-func (m *ClaimCommands) Reset()      { *m = ClaimCommands{} }
-func (*ClaimCommands) ProtoMessage() {}
-func (*ClaimCommands) Descriptor() ([]byte, []int) {
+func (m *ClaimResources) Reset()      { *m = ClaimResources{} }
+func (*ClaimResources) ProtoMessage() {}
+func (*ClaimResources) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f8ce1bb4770ff0ca, []int{0}
 }
-func (m *ClaimCommands) XXX_Unmarshal(b []byte) error {
+func (m *ClaimResources) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ClaimCommands) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ClaimResources) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ClaimCommands.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ClaimResources.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -53,22 +55,22 @@ func (m *ClaimCommands) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (m *ClaimCommands) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClaimCommands.Merge(m, src)
+func (m *ClaimResources) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClaimResources.Merge(m, src)
 }
-func (m *ClaimCommands) XXX_Size() int {
+func (m *ClaimResources) XXX_Size() int {
 	return m.Size()
 }
-func (m *ClaimCommands) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClaimCommands.DiscardUnknown(m)
+func (m *ClaimResources) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClaimResources.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ClaimCommands proto.InternalMessageInfo
+var xxx_messageInfo_ClaimResources proto.InternalMessageInfo
 
 type ClaimEntity struct {
 	ID github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,1,opt,name=ID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"ID"`
-	// Permissions key must be a user.Resource
-	Commands map[string]ClaimCommands `protobuf:"bytes,2,rep,name=Commands,proto3" json:"Commands" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Resources key must be a user.Resource
+	Resources map[string]ClaimResources `protobuf:"bytes,2,rep,name=Resources,proto3" json:"Resources" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (m *ClaimEntity) Reset()      { *m = ClaimEntity{} }
@@ -104,7 +106,7 @@ func (m *ClaimEntity) XXX_DiscardUnknown() {
 var xxx_messageInfo_ClaimEntity proto.InternalMessageInfo
 
 type ClaimAuth struct {
-	// Permissions key must be a entity.ID
+	// Entities key must be a entity.ID
 	Entities map[string]ClaimEntity `protobuf:"bytes,1,rep,name=Entities,proto3" json:"Entities" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -141,12 +143,14 @@ func (m *ClaimAuth) XXX_DiscardUnknown() {
 var xxx_messageInfo_ClaimAuth proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*ClaimCommands)(nil), "user.ClaimCommands")
-	golang_proto.RegisterType((*ClaimCommands)(nil), "user.ClaimCommands")
+	proto.RegisterType((*ClaimResources)(nil), "user.ClaimResources")
+	golang_proto.RegisterType((*ClaimResources)(nil), "user.ClaimResources")
+	proto.RegisterMapType((map[string]pbtypes.Empty)(nil), "user.ClaimResources.CommandsEntry")
+	golang_proto.RegisterMapType((map[string]pbtypes.Empty)(nil), "user.ClaimResources.CommandsEntry")
 	proto.RegisterType((*ClaimEntity)(nil), "user.ClaimEntity")
 	golang_proto.RegisterType((*ClaimEntity)(nil), "user.ClaimEntity")
-	proto.RegisterMapType((map[string]ClaimCommands)(nil), "user.ClaimEntity.CommandsEntry")
-	golang_proto.RegisterMapType((map[string]ClaimCommands)(nil), "user.ClaimEntity.CommandsEntry")
+	proto.RegisterMapType((map[string]ClaimResources)(nil), "user.ClaimEntity.ResourcesEntry")
+	golang_proto.RegisterMapType((map[string]ClaimResources)(nil), "user.ClaimEntity.ResourcesEntry")
 	proto.RegisterType((*ClaimAuth)(nil), "user.ClaimAuth")
 	golang_proto.RegisterType((*ClaimAuth)(nil), "user.ClaimAuth")
 	proto.RegisterMapType((map[string]ClaimEntity)(nil), "user.ClaimAuth.EntitiesEntry")
@@ -161,43 +165,45 @@ func init() {
 }
 
 var fileDescriptor_f8ce1bb4770ff0ca = []byte{
-	// 404 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0xc1, 0x8e, 0x93, 0x50,
-	0x14, 0x86, 0xef, 0xa1, 0xa3, 0x99, 0xb9, 0x88, 0x51, 0xdc, 0x34, 0x4d, 0x3c, 0x25, 0x6c, 0x64,
-	0x5c, 0x40, 0xc4, 0x8d, 0xe9, 0xc6, 0x4c, 0xa7, 0x93, 0xd8, 0x8d, 0x31, 0xbc, 0x01, 0x33, 0x43,
-	0x28, 0x0e, 0x70, 0x1b, 0xb8, 0x18, 0xbb, 0xf3, 0x11, 0x7c, 0x00, 0x1f, 0xc0, 0x47, 0x70, 0xd9,
-	0x65, 0x97, 0x5d, 0x36, 0x2e, 0x1a, 0xb9, 0x6c, 0x5c, 0x76, 0xe9, 0xd2, 0x00, 0xc5, 0x42, 0xb4,
-	0xee, 0x4e, 0xce, 0xf9, 0xbf, 0xfc, 0x1f, 0x37, 0xd0, 0x17, 0x7e, 0xc0, 0x67, 0xd9, 0xb5, 0x79,
-	0xc3, 0x22, 0xcb, 0x0b, 0xd9, 0x7b, 0x77, 0x66, 0xf1, 0xc4, 0xfd, 0x68, 0x05, 0x31, 0xf7, 0x92,
-	0xd8, 0x0d, 0xad, 0x2c, 0xf5, 0x12, 0xeb, 0x26, 0x74, 0x83, 0x28, 0x35, 0xe7, 0x09, 0xe3, 0x4c,
-	0x3d, 0x29, 0x57, 0x03, 0xeb, 0x08, 0x38, 0xbf, 0xf3, 0x2d, 0x9f, 0xf9, 0xac, 0xca, 0x56, 0x53,
-	0x8d, 0x1d, 0x05, 0xba, 0x4d, 0x09, 0x0b, 0xbd, 0x1a, 0xd0, 0x47, 0x54, 0xb9, 0x2c, 0x7b, 0x2f,
-	0x59, 0x14, 0xb9, 0xf1, 0x6d, 0xaa, 0x9e, 0xd3, 0xd3, 0x66, 0xee, 0x83, 0xd6, 0x33, 0x1e, 0xda,
-	0x8a, 0x59, 0x42, 0xe6, 0x7e, 0xeb, 0xfc, 0x39, 0xeb, 0x5b, 0xa0, 0x72, 0x05, 0x5f, 0xc5, 0x3c,
-	0xe0, 0x0b, 0x75, 0x44, 0xa5, 0xe9, 0xa4, 0x0f, 0x1a, 0x18, 0x0f, 0xc6, 0xcf, 0x57, 0xdb, 0x21,
-	0xf9, 0xbe, 0x1d, 0xea, 0xff, 0xf9, 0x82, 0x2c, 0x0c, 0x6e, 0xcd, 0xe9, 0xc4, 0x91, 0xa6, 0x13,
-	0xf5, 0xa2, 0x55, 0x2b, 0x69, 0x3d, 0x43, 0xb6, 0x87, 0xfb, 0xda, 0x43, 0x41, 0xa3, 0x90, 0x5e,
-	0xc5, 0x3c, 0x59, 0x8c, 0x4f, 0xca, 0x8a, 0x83, 0xce, 0xe0, 0x1d, 0x55, 0x3a, 0x01, 0xf5, 0x11,
-	0xed, 0xdd, 0x79, 0x8b, 0x4a, 0xe8, 0xcc, 0x29, 0x47, 0xf5, 0x9c, 0xde, 0xfb, 0xe0, 0x86, 0x99,
-	0xd7, 0x97, 0x34, 0x30, 0x64, 0xfb, 0x49, 0xab, 0xa2, 0x41, 0x9d, 0x3a, 0x31, 0x92, 0x5e, 0x81,
-	0xfe, 0x05, 0xe8, 0x59, 0x75, 0xbc, 0xc8, 0xf8, 0x4c, 0x7d, 0x4d, 0x4f, 0x2b, 0x8f, 0xc0, 0xab,
-	0x5f, 0x46, 0xb6, 0x9f, 0xb6, 0xf8, 0x32, 0x62, 0x36, 0xf7, 0x8e, 0x60, 0xb3, 0x1c, 0xbc, 0xa5,
-	0x4a, 0x27, 0xf0, 0x0f, 0xc1, 0x67, 0x5d, 0xc1, 0xc7, 0x7f, 0xbd, 0x41, 0x4b, 0x6f, 0xfc, 0x66,
-	0x95, 0x23, 0x59, 0xe7, 0x48, 0x36, 0x39, 0x92, 0x5d, 0x8e, 0xf0, 0x2b, 0x47, 0xf8, 0x24, 0x10,
-	0xbe, 0x0a, 0x84, 0x6f, 0x02, 0x61, 0x29, 0x10, 0x56, 0x02, 0x61, 0x2d, 0x10, 0x7e, 0x08, 0x84,
-	0x9f, 0x02, 0xc9, 0x4e, 0x20, 0x7c, 0x2e, 0x90, 0x2c, 0x0b, 0x84, 0x75, 0x81, 0x64, 0x53, 0x20,
-	0xb9, 0xbe, 0x5f, 0xfd, 0x0c, 0x2f, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0x89, 0x87, 0x36, 0xda,
-	0xa9, 0x02, 0x00, 0x00,
+	// 441 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0xb1, 0x6e, 0xd3, 0x40,
+	0x1c, 0xc6, 0xfd, 0x77, 0x0b, 0x6a, 0x2e, 0x34, 0x02, 0x8b, 0x21, 0xb2, 0xc4, 0xbf, 0x51, 0x84,
+	0x44, 0xd4, 0xe1, 0x4e, 0x94, 0x05, 0x75, 0x41, 0xa4, 0x8e, 0x44, 0x84, 0xc4, 0xe0, 0x37, 0x70,
+	0xd2, 0x53, 0x62, 0x6a, 0xfb, 0x2c, 0xfb, 0x8c, 0xf0, 0xc6, 0x23, 0xf0, 0x00, 0x6c, 0x2c, 0x3c,
+	0x02, 0x63, 0xc7, 0x8c, 0x19, 0x2b, 0x86, 0x0a, 0x9f, 0x17, 0xc6, 0x8e, 0x8c, 0xc8, 0x17, 0x1c,
+	0x6c, 0x91, 0x76, 0x3b, 0xdd, 0xff, 0xf7, 0xdd, 0xf7, 0x7d, 0x77, 0x47, 0x9e, 0x2f, 0x7c, 0xb9,
+	0xcc, 0x66, 0x74, 0x2e, 0x42, 0xc6, 0x03, 0xf1, 0xde, 0x5b, 0x32, 0x99, 0x78, 0x1f, 0x99, 0x1f,
+	0x49, 0x9e, 0x44, 0x5e, 0xc0, 0xb2, 0x94, 0x27, 0x6c, 0x1e, 0x78, 0x7e, 0x98, 0xd2, 0x38, 0x11,
+	0x52, 0x58, 0xfb, 0xd5, 0x96, 0xcd, 0x6e, 0x11, 0xc6, 0x17, 0x0b, 0xb6, 0x10, 0x0b, 0xa1, 0x59,
+	0xbd, 0xda, 0xc8, 0x6c, 0x7a, 0x87, 0x20, 0x9e, 0xc9, 0x3c, 0xe6, 0x29, 0xe3, 0x61, 0x2c, 0xf3,
+	0x0d, 0x3f, 0xfc, 0x0a, 0xa4, 0x77, 0x56, 0xf9, 0xba, 0x3c, 0x15, 0x59, 0x32, 0xe7, 0xa9, 0xe5,
+	0x90, 0x83, 0x33, 0x11, 0x86, 0x5e, 0x74, 0x9e, 0xf6, 0x61, 0xb0, 0x37, 0xea, 0x9e, 0x0c, 0x69,
+	0x15, 0x86, 0xb6, 0x39, 0x5a, 0x43, 0x93, 0x48, 0x26, 0xf9, 0x78, 0x7f, 0x75, 0x7d, 0x64, 0xb8,
+	0x5b, 0xa5, 0xfd, 0x96, 0x1c, 0xb6, 0x00, 0xeb, 0x21, 0xd9, 0xbb, 0xe0, 0x79, 0x1f, 0x06, 0x30,
+	0xea, 0xb8, 0xd5, 0xd2, 0x7a, 0x4a, 0xee, 0x7d, 0xf0, 0x82, 0x8c, 0xf7, 0xcd, 0x01, 0x8c, 0xba,
+	0x27, 0x3d, 0xfa, 0x37, 0x20, 0x9d, 0x54, 0x01, 0xdd, 0xcd, 0xf0, 0xd4, 0x7c, 0x09, 0xc3, 0x12,
+	0x48, 0x57, 0xbb, 0x4f, 0x22, 0xe9, 0xcb, 0xdc, 0x3a, 0x25, 0xe6, 0xd4, 0xd1, 0x47, 0x3d, 0x18,
+	0x1f, 0x57, 0xc6, 0x3f, 0xae, 0x8f, 0x86, 0x77, 0x34, 0xcf, 0x02, 0xff, 0x9c, 0x4e, 0x1d, 0xd7,
+	0x9c, 0x3a, 0x96, 0x43, 0x3a, 0xdb, 0x0e, 0x7d, 0x53, 0xf7, 0x1b, 0x34, 0xfa, 0x6d, 0x1c, 0xe8,
+	0x16, 0x69, 0xb6, 0xfb, 0x27, 0xb4, 0x5d, 0xd2, 0x6b, 0x23, 0x3b, 0xfa, 0x1d, 0xb7, 0xfb, 0x3d,
+	0xde, 0x75, 0x8b, 0xcd, 0x96, 0x5f, 0x80, 0x74, 0xf4, 0xf4, 0x75, 0x26, 0x97, 0xd6, 0x2b, 0x72,
+	0xa0, 0xb3, 0xf8, 0xbc, 0x7e, 0x86, 0x27, 0x8d, 0x03, 0x2a, 0x84, 0xd6, 0xf3, 0xd6, 0x0b, 0xd4,
+	0x9b, 0xf6, 0x3b, 0x72, 0xd8, 0x02, 0x76, 0x24, 0x7c, 0xd6, 0x4e, 0xf8, 0xe8, 0xbf, 0x7b, 0x68,
+	0xc4, 0x1b, 0xbf, 0x59, 0x15, 0x68, 0xac, 0x0b, 0x34, 0xae, 0x0a, 0x34, 0x6e, 0x0a, 0x84, 0xdf,
+	0x05, 0xc2, 0x27, 0x85, 0xf0, 0x4d, 0x21, 0x7c, 0x57, 0x08, 0x97, 0x0a, 0x61, 0xa5, 0x10, 0xd6,
+	0x0a, 0xe1, 0xa7, 0x42, 0xf8, 0xa5, 0xd0, 0xb8, 0x51, 0x08, 0x9f, 0x4b, 0x34, 0x2e, 0x4b, 0x84,
+	0x75, 0x89, 0xc6, 0x55, 0x89, 0xc6, 0xec, 0xbe, 0xfe, 0x7b, 0x2f, 0xfe, 0x04, 0x00, 0x00, 0xff,
+	0xff, 0x46, 0x4c, 0x1f, 0x43, 0x17, 0x03, 0x00, 0x00,
 }
 
-func (this *ClaimCommands) Equal(that interface{}) bool {
+func (this *ClaimResources) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*ClaimCommands)
+	that1, ok := that.(*ClaimResources)
 	if !ok {
-		that2, ok := that.(ClaimCommands)
+		that2, ok := that.(ClaimResources)
 		if ok {
 			that1 = &that2
 		} else {
@@ -213,7 +219,9 @@ func (this *ClaimCommands) Equal(that interface{}) bool {
 		return false
 	}
 	for i := range this.Commands {
-		if this.Commands[i] != that1.Commands[i] {
+		a := this.Commands[i]
+		b := that1.Commands[i]
+		if !(&a).Equal(&b) {
 			return false
 		}
 	}
@@ -241,12 +249,12 @@ func (this *ClaimEntity) Equal(that interface{}) bool {
 	if !this.ID.Equal(that1.ID) {
 		return false
 	}
-	if len(this.Commands) != len(that1.Commands) {
+	if len(this.Resources) != len(that1.Resources) {
 		return false
 	}
-	for i := range this.Commands {
-		a := this.Commands[i]
-		b := that1.Commands[i]
+	for i := range this.Resources {
+		a := this.Resources[i]
+		b := that1.Resources[i]
 		if !(&a).Equal(&b) {
 			return false
 		}
@@ -284,13 +292,25 @@ func (this *ClaimAuth) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ClaimCommands) GoString() string {
+func (this *ClaimResources) GoString() string {
 	if this == nil {
 		return "nil"
 	}
 	s := make([]string, 0, 5)
-	s = append(s, "&user.ClaimCommands{")
-	s = append(s, "Commands: "+fmt.Sprintf("%#v", this.Commands)+",\n")
+	s = append(s, "&user.ClaimResources{")
+	keysForCommands := make([]string, 0, len(this.Commands))
+	for k, _ := range this.Commands {
+		keysForCommands = append(keysForCommands, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForCommands)
+	mapStringForCommands := "map[string]pbtypes.Empty{"
+	for _, k := range keysForCommands {
+		mapStringForCommands += fmt.Sprintf("%#v: %#v,", k, this.Commands[k])
+	}
+	mapStringForCommands += "}"
+	if this.Commands != nil {
+		s = append(s, "Commands: "+mapStringForCommands+",\n")
+	}
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -301,18 +321,18 @@ func (this *ClaimEntity) GoString() string {
 	s := make([]string, 0, 6)
 	s = append(s, "&user.ClaimEntity{")
 	s = append(s, "ID: "+fmt.Sprintf("%#v", this.ID)+",\n")
-	keysForCommands := make([]string, 0, len(this.Commands))
-	for k, _ := range this.Commands {
-		keysForCommands = append(keysForCommands, k)
+	keysForResources := make([]string, 0, len(this.Resources))
+	for k, _ := range this.Resources {
+		keysForResources = append(keysForResources, k)
 	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForCommands)
-	mapStringForCommands := "map[string]ClaimCommands{"
-	for _, k := range keysForCommands {
-		mapStringForCommands += fmt.Sprintf("%#v: %#v,", k, this.Commands[k])
+	github_com_gogo_protobuf_sortkeys.Strings(keysForResources)
+	mapStringForResources := "map[string]ClaimResources{"
+	for _, k := range keysForResources {
+		mapStringForResources += fmt.Sprintf("%#v: %#v,", k, this.Resources[k])
 	}
-	mapStringForCommands += "}"
-	if this.Commands != nil {
-		s = append(s, "Commands: "+mapStringForCommands+",\n")
+	mapStringForResources += "}"
+	if this.Resources != nil {
+		s = append(s, "Resources: "+mapStringForResources+",\n")
 	}
 	s = append(s, "}")
 	return strings.Join(s, "")
@@ -347,7 +367,7 @@ func valueToGoStringClaims(v interface{}, typ string) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
 }
-func (m *ClaimCommands) Marshal() (dAtA []byte, err error) {
+func (m *ClaimResources) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -357,33 +377,39 @@ func (m *ClaimCommands) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ClaimCommands) MarshalTo(dAtA []byte) (int, error) {
+func (m *ClaimResources) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ClaimCommands) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ClaimResources) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Commands) > 0 {
-		dAtA2 := make([]byte, len(m.Commands)*10)
-		var j1 int
-		for _, num := range m.Commands {
-			for num >= 1<<7 {
-				dAtA2[j1] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j1++
+		for k := range m.Commands {
+			v := m.Commands[k]
+			baseI := i
+			{
+				size, err := (&v).MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintClaims(dAtA, i, uint64(size))
 			}
-			dAtA2[j1] = uint8(num)
-			j1++
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintClaims(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintClaims(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0xa
 		}
-		i -= j1
-		copy(dAtA[i:], dAtA2[:j1])
-		i = encodeVarintClaims(dAtA, i, uint64(j1))
-		i--
-		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -408,9 +434,9 @@ func (m *ClaimEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Commands) > 0 {
-		for k := range m.Commands {
-			v := m.Commands[k]
+	if len(m.Resources) > 0 {
+		for k := range m.Resources {
+			v := m.Resources[k]
 			baseI := i
 			{
 				size, err := (&v).MarshalToSizedBuffer(dAtA[:i])
@@ -503,12 +529,14 @@ func encodeVarintClaims(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func NewPopulatedClaimCommands(r randyClaims, easy bool) *ClaimCommands {
-	this := &ClaimCommands{}
-	v1 := r.Intn(10)
-	this.Commands = make([]Command, v1)
-	for i := 0; i < v1; i++ {
-		this.Commands[i] = Command([]int32{0, 1, 2, 3}[r.Intn(4)])
+func NewPopulatedClaimResources(r randyClaims, easy bool) *ClaimResources {
+	this := &ClaimResources{}
+	if r.Intn(5) != 0 {
+		v1 := r.Intn(10)
+		this.Commands = make(map[string]pbtypes.Empty)
+		for i := 0; i < v1; i++ {
+			this.Commands[randStringClaims(r)] = *pbtypes.NewPopulatedEmpty(r, easy)
+		}
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -521,9 +549,9 @@ func NewPopulatedClaimEntity(r randyClaims, easy bool) *ClaimEntity {
 	this.ID = *v2
 	if r.Intn(5) != 0 {
 		v3 := r.Intn(10)
-		this.Commands = make(map[string]ClaimCommands)
+		this.Resources = make(map[string]ClaimResources)
 		for i := 0; i < v3; i++ {
-			this.Commands[randStringClaims(r)] = *NewPopulatedClaimCommands(r, easy)
+			this.Resources[randStringClaims(r)] = *NewPopulatedClaimResources(r, easy)
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -617,18 +645,20 @@ func encodeVarintPopulateClaims(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *ClaimCommands) Size() (n int) {
+func (m *ClaimResources) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
 	if len(m.Commands) > 0 {
-		l = 0
-		for _, e := range m.Commands {
-			l += sovClaims(uint64(e))
+		for k, v := range m.Commands {
+			_ = k
+			_ = v
+			l = v.Size()
+			mapEntrySize := 1 + len(k) + sovClaims(uint64(len(k))) + 1 + l + sovClaims(uint64(l))
+			n += mapEntrySize + 1 + sovClaims(uint64(mapEntrySize))
 		}
-		n += 1 + sovClaims(uint64(l)) + l
 	}
 	return n
 }
@@ -641,8 +671,8 @@ func (m *ClaimEntity) Size() (n int) {
 	_ = l
 	l = m.ID.Size()
 	n += 1 + l + sovClaims(uint64(l))
-	if len(m.Commands) > 0 {
-		for k, v := range m.Commands {
+	if len(m.Resources) > 0 {
+		for k, v := range m.Resources {
 			_ = k
 			_ = v
 			l = v.Size()
@@ -677,17 +707,7 @@ func sovClaims(x uint64) (n int) {
 func sozClaims(x uint64) (n int) {
 	return sovClaims(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (this *ClaimCommands) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ClaimCommands{`,
-		`Commands:` + fmt.Sprintf("%v", this.Commands) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ClaimEntity) String() string {
+func (this *ClaimResources) String() string {
 	if this == nil {
 		return "nil"
 	}
@@ -696,14 +716,34 @@ func (this *ClaimEntity) String() string {
 		keysForCommands = append(keysForCommands, k)
 	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForCommands)
-	mapStringForCommands := "map[string]ClaimCommands{"
+	mapStringForCommands := "map[string]pbtypes.Empty{"
 	for _, k := range keysForCommands {
 		mapStringForCommands += fmt.Sprintf("%v: %v,", k, this.Commands[k])
 	}
 	mapStringForCommands += "}"
+	s := strings.Join([]string{`&ClaimResources{`,
+		`Commands:` + mapStringForCommands + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ClaimEntity) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForResources := make([]string, 0, len(this.Resources))
+	for k, _ := range this.Resources {
+		keysForResources = append(keysForResources, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForResources)
+	mapStringForResources := "map[string]ClaimResources{"
+	for _, k := range keysForResources {
+		mapStringForResources += fmt.Sprintf("%v: %v,", k, this.Resources[k])
+	}
+	mapStringForResources += "}"
 	s := strings.Join([]string{`&ClaimEntity{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`Commands:` + mapStringForCommands + `,`,
+		`Resources:` + mapStringForResources + `,`,
 		`}`,
 	}, "")
 	return s
@@ -736,7 +776,7 @@ func valueToStringClaims(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *ClaimCommands) Unmarshal(dAtA []byte) error {
+func (m *ClaimResources) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -759,62 +799,66 @@ func (m *ClaimCommands) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ClaimCommands: wiretype end group for non-group")
+			return fmt.Errorf("proto: ClaimResources: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ClaimCommands: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ClaimResources: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
-			if wireType == 0 {
-				var v Command
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowClaims
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= Command(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Commands", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClaims
 				}
-				m.Commands = append(m.Commands, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowClaims
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthClaims
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthClaims
-				}
-				if postIndex > l {
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
 				}
-				var elementCount int
-				if elementCount != 0 && len(m.Commands) == 0 {
-					m.Commands = make([]Command, 0, elementCount)
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
 				}
-				for iNdEx < postIndex {
-					var v Command
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthClaims
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthClaims
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Commands == nil {
+				m.Commands = make(map[string]pbtypes.Empty)
+			}
+			var mapkey string
+			mapvalue := &pbtypes.Empty{}
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowClaims
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowClaims
@@ -824,16 +868,72 @@ func (m *ClaimCommands) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= Command(b&0x7F) << shift
+						stringLenmapkey |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
 					}
-					m.Commands = append(m.Commands, v)
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthClaims
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthClaims
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowClaims
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthClaims
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthClaims
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &pbtypes.Empty{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipClaims(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthClaims
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
 				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Commands", wireType)
 			}
+			m.Commands[mapkey] = *mapvalue
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipClaims(dAtA[iNdEx:])
@@ -922,7 +1022,7 @@ func (m *ClaimEntity) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Commands", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -949,11 +1049,11 @@ func (m *ClaimEntity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Commands == nil {
-				m.Commands = make(map[string]ClaimCommands)
+			if m.Resources == nil {
+				m.Resources = make(map[string]ClaimResources)
 			}
 			var mapkey string
-			mapvalue := &ClaimCommands{}
+			mapvalue := &ClaimResources{}
 			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
@@ -1027,7 +1127,7 @@ func (m *ClaimEntity) Unmarshal(dAtA []byte) error {
 					if postmsgIndex > l {
 						return io.ErrUnexpectedEOF
 					}
-					mapvalue = &ClaimCommands{}
+					mapvalue = &ClaimResources{}
 					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
 						return err
 					}
@@ -1047,7 +1147,7 @@ func (m *ClaimEntity) Unmarshal(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.Commands[mapkey] = *mapvalue
+			m.Resources[mapkey] = *mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -37,19 +37,21 @@ export const useAuthStore = defineStore('auth', () => {
     })
 
     if (resp.status === 200) {
+      token.value = await resp.text()
       refreshUser()
     }
 
     return resp
   }
 
-  const signinGoogle = async (token: string) => {
+  const signinGoogle = async (body: string) => {
     const resp = await fetch(signinGoogleURL, {
       method: 'POST',
-      body: token
+      body: body
     })
 
     if (resp.status === 200) {
+      token.value = await resp.text()
       refreshUser()
     }
 
@@ -57,8 +59,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const refreshUser = async () => {
-    token.value = getCookie('access') ?? ''
-
     if (!token.value) {
       return
     }
@@ -100,9 +100,16 @@ export const useAuthStore = defineStore('auth', () => {
       return
     }
 
-    await fetch(refreshTokenURL, {
+    const resp = await fetch(refreshTokenURL, {
       method: 'POST'
     })
+
+    if (resp.status === 200) {
+      token.value = await resp.text()
+      refreshUser()
+    }
+
+    return resp
   }
 
   const signout = async () => {

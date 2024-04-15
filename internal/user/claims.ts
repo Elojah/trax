@@ -3,22 +3,26 @@
 // tslint:disable
 import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
 import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import { WireType } from "@protobuf-ts/runtime";
 import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import { UnknownFieldHandler } from "@protobuf-ts/runtime";
-import { WireType } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Command } from "./role";
+import { Empty } from "../../pkg/pbtypes/empty";
 /**
- * @generated from protobuf message user.ClaimCommands
+ * @generated from protobuf message user.ClaimResources
  */
-export interface ClaimCommands {
+export interface ClaimResources {
     /**
-     * @generated from protobuf field: repeated user.Command Commands = 1 [json_name = "Commands"];
+     * Commands key must be a user.Commands
+     *
+     * @generated from protobuf field: map<string, pbtypes.Empty> Commands = 1 [json_name = "Commands"];
      */
-    commands: Command[];
+    commands: {
+        [key: string]: Empty;
+    };
 }
 /**
  * @generated from protobuf message user.ClaimEntity
@@ -29,12 +33,12 @@ export interface ClaimEntity {
      */
     iD: Uint8Array;
     /**
-     * Permissions key must be a user.Resource
+     * Resources key must be a user.Resource
      *
-     * @generated from protobuf field: map<string, user.ClaimCommands> Commands = 2 [json_name = "Commands"];
+     * @generated from protobuf field: map<string, user.ClaimResources> Resources = 2 [json_name = "Resources"];
      */
-    commands: {
-        [key: string]: ClaimCommands;
+    resources: {
+        [key: string]: ClaimResources;
     };
 }
 /**
@@ -42,7 +46,7 @@ export interface ClaimEntity {
  */
 export interface ClaimAuth {
     /**
-     * Permissions key must be a entity.ID
+     * Entities key must be a entity.ID
      *
      * @generated from protobuf field: map<string, user.ClaimEntity> Entities = 1 [json_name = "Entities"];
      */
@@ -51,30 +55,26 @@ export interface ClaimAuth {
     };
 }
 // @generated message type with reflection information, may provide speed optimized methods
-class ClaimCommands$Type extends MessageType<ClaimCommands> {
+class ClaimResources$Type extends MessageType<ClaimResources> {
     constructor() {
-        super("user.ClaimCommands", [
-            { no: 1, name: "Commands", kind: "enum", jsonName: "Commands", repeat: 1 /*RepeatType.PACKED*/, T: () => ["user.Command", Command] }
+        super("user.ClaimResources", [
+            { no: 1, name: "Commands", kind: "map", jsonName: "Commands", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Empty }, options: { "gogoproto.nullable": false } }
         ]);
     }
-    create(value?: PartialMessage<ClaimCommands>): ClaimCommands {
+    create(value?: PartialMessage<ClaimResources>): ClaimResources {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.commands = [];
+        message.commands = {};
         if (value !== undefined)
-            reflectionMergePartial<ClaimCommands>(this, message, value);
+            reflectionMergePartial<ClaimResources>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ClaimCommands): ClaimCommands {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ClaimResources): ClaimResources {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated user.Command Commands = 1 [json_name = "Commands"];*/ 1:
-                    if (wireType === WireType.LengthDelimited)
-                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.commands.push(reader.int32());
-                    else
-                        message.commands.push(reader.int32());
+                case /* map<string, pbtypes.Empty> Commands = 1 [json_name = "Commands"];*/ 1:
+                    this.binaryReadMap1(message.commands, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -87,13 +87,29 @@ class ClaimCommands$Type extends MessageType<ClaimCommands> {
         }
         return message;
     }
-    internalBinaryWrite(message: ClaimCommands, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated user.Command Commands = 1 [json_name = "Commands"]; */
-        if (message.commands.length) {
-            writer.tag(1, WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.commands.length; i++)
-                writer.int32(message.commands[i]);
-            writer.join();
+    private binaryReadMap1(map: ClaimResources["commands"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof ClaimResources["commands"] | undefined, val: ClaimResources["commands"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = Empty.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field user.ClaimResources.Commands");
+            }
+        }
+        map[key ?? ""] = val ?? Empty.create();
+    }
+    internalBinaryWrite(message: ClaimResources, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* map<string, pbtypes.Empty> Commands = 1 [json_name = "Commands"]; */
+        for (let k of globalThis.Object.keys(message.commands)) {
+            writer.tag(1, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            Empty.internalBinaryWrite(message.commands[k], writer, options);
+            writer.join().join();
         }
         let u = options.writeUnknownFields;
         if (u !== false)
@@ -102,21 +118,21 @@ class ClaimCommands$Type extends MessageType<ClaimCommands> {
     }
 }
 /**
- * @generated MessageType for protobuf message user.ClaimCommands
+ * @generated MessageType for protobuf message user.ClaimResources
  */
-export const ClaimCommands = new ClaimCommands$Type();
+export const ClaimResources = new ClaimResources$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ClaimEntity$Type extends MessageType<ClaimEntity> {
     constructor() {
         super("user.ClaimEntity", [
             { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 2, name: "Commands", kind: "map", jsonName: "Commands", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => ClaimCommands }, options: { "gogoproto.nullable": false } }
+            { no: 2, name: "Resources", kind: "map", jsonName: "Resources", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => ClaimResources }, options: { "gogoproto.nullable": false } }
         ]);
     }
     create(value?: PartialMessage<ClaimEntity>): ClaimEntity {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.iD = new Uint8Array(0);
-        message.commands = {};
+        message.resources = {};
         if (value !== undefined)
             reflectionMergePartial<ClaimEntity>(this, message, value);
         return message;
@@ -129,8 +145,8 @@ class ClaimEntity$Type extends MessageType<ClaimEntity> {
                 case /* bytes ID = 1 [json_name = "ID"];*/ 1:
                     message.iD = reader.bytes();
                     break;
-                case /* map<string, user.ClaimCommands> Commands = 2 [json_name = "Commands"];*/ 2:
-                    this.binaryReadMap2(message.commands, reader, options);
+                case /* map<string, user.ClaimResources> Resources = 2 [json_name = "Resources"];*/ 2:
+                    this.binaryReadMap2(message.resources, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -143,8 +159,8 @@ class ClaimEntity$Type extends MessageType<ClaimEntity> {
         }
         return message;
     }
-    private binaryReadMap2(map: ClaimEntity["commands"], reader: IBinaryReader, options: BinaryReadOptions): void {
-        let len = reader.uint32(), end = reader.pos + len, key: keyof ClaimEntity["commands"] | undefined, val: ClaimEntity["commands"][any] | undefined;
+    private binaryReadMap2(map: ClaimEntity["resources"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof ClaimEntity["resources"] | undefined, val: ClaimEntity["resources"][any] | undefined;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
@@ -152,22 +168,22 @@ class ClaimEntity$Type extends MessageType<ClaimEntity> {
                     key = reader.string();
                     break;
                 case 2:
-                    val = ClaimCommands.internalBinaryRead(reader, reader.uint32(), options);
+                    val = ClaimResources.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field user.ClaimEntity.Commands");
+                default: throw new globalThis.Error("unknown map entry field for field user.ClaimEntity.Resources");
             }
         }
-        map[key ?? ""] = val ?? ClaimCommands.create();
+        map[key ?? ""] = val ?? ClaimResources.create();
     }
     internalBinaryWrite(message: ClaimEntity, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* bytes ID = 1 [json_name = "ID"]; */
         if (message.iD.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
-        /* map<string, user.ClaimCommands> Commands = 2 [json_name = "Commands"]; */
-        for (let k of globalThis.Object.keys(message.commands)) {
+        /* map<string, user.ClaimResources> Resources = 2 [json_name = "Resources"]; */
+        for (let k of globalThis.Object.keys(message.resources)) {
             writer.tag(2, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
             writer.tag(2, WireType.LengthDelimited).fork();
-            ClaimCommands.internalBinaryWrite(message.commands[k], writer, options);
+            ClaimResources.internalBinaryWrite(message.resources[k], writer, options);
             writer.join().join();
         }
         let u = options.writeUnknownFields;

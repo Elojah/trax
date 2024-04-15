@@ -15,8 +15,5 @@ CREATE INDEX idx_entity_updated_at ON "user"."entity" ("updated_at");
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
-DROP INDEX idx_entity_name;
-DROP INDEX idx_entity_created_at;
-DROP INDEX idx_entity_updated_at;
 DROP TABLE IF EXISTS "user"."entity";
 -- +goose StatementEnd

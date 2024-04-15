@@ -177,7 +177,7 @@ func (s Store) FetchPermission(ctx context.Context, f user.FilterPermission) (us
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, resource, command, created_at, updated_at FROM "user"."permission" p `)
+	b.WriteString(`SELECT p.role_id, p.resource, p.command, p.created_at, p.updated_at FROM "user"."permission" p `)
 
 	clause, args := filterPermission(f).where()
 	b.WriteString(clause)
@@ -199,7 +199,7 @@ func (s Store) ListPermission(ctx context.Context, f user.FilterPermission) ([]u
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, resource, command, created_at, updated_at FROM "user"."permission" p `)
+	b.WriteString(`SELECT p.role_id, p.resource, p.command, p.created_at, p.updated_at FROM "user"."permission" p `)
 
 	clause, args := filterPermission(f).where()
 	b.WriteString(clause)
