@@ -102,15 +102,13 @@ func run(prog string, filename string) {
 	userStore := &userpostgres.Store{}
 	// userCache := &userredis.Cache{Service: rediss}
 	userApp := userapp.App{
-		Transactioner:      postgress,
-		Store:              userStore,
-		StoreProfile:       userStore,
-		StoreEntity:        userStore,
-		StoreEntityProfile: userStore,
-		StoreRole:          userStore,
-		StorePermission:    userStore,
-		StoreRoleUser:      userStore,
-		Cookie:             cookieApp,
+		Transactioner:   postgress,
+		Store:           userStore,
+		StoreEntity:     userStore,
+		StoreRole:       userStore,
+		StorePermission: userStore,
+		StoreRoleUser:   userStore,
+		Cookie:          cookieApp,
 		// Cache: userCache,
 	}
 

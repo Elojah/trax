@@ -14,60 +14,60 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) FetchProfile(ctx context.Context, req *dto.FetchProfileReq) (*user.Profile, error) {
-	logger := log.With().Str("method", "fetch_profile").Logger()
+func (h *handler) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U, error) {
+	logger := log.With().Str("method", "fetch_user").Logger()
 
 	if req == nil {
-		return &user.Profile{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &user.U{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &user.Profile{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &user.U{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	var userID ulid.ID
+	var id ulid.ID
 
 	if req.Me {
-		userID = claims.UserID
+		id = claims.UserID
 	} else {
-		if err := claims.Require(req.UserID, user.R_user, user.C_read); err != nil {
+		if err := claims.Require(req.EntityID, user.R_user, user.C_read); err != nil {
 			logger.Error().Err(err).Msg("failed to require permission")
 
-			return &user.Profile{}, status.New(codes.PermissionDenied, err.Error()).Err()
+			return &user.U{}, status.New(codes.PermissionDenied, err.Error()).Err()
 		}
 
 		// TODO: Check if user has at least one role in this entity
 
-		userID = req.UserID
+		id = req.ID
 	}
 
-	var profile user.Profile
+	var u user.U
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
-		profile, err = h.user.FetchProfile(ctx, user.FilterProfile{
-			UserID: userID,
+		u, err = h.user.Fetch(ctx, user.Filter{
+			ID: id,
 		})
 		if err != nil {
 			if errors.As(err, &gerrors.ErrNotFound{}) {
-				logger.Error().Err(err).Msg("failed to fetch user profile")
+				logger.Error().Err(err).Msg("failed to fetch user")
 
 				return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
 			}
-			logger.Error().Err(err).Msg("failed to fetch user profile")
+			logger.Error().Err(err).Msg("failed to fetch user")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &user.Profile{}, err
+		return &user.U{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &profile, nil
+	return &u, nil
 }

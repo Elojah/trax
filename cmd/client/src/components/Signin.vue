@@ -55,7 +55,7 @@ const signInGoogle = async function (credentials: CredentialResponse) {
 
   switch (resp.status) {
     case 200: // success
-      authStore.refreshProfile()
+      authStore.refreshUser()
       router.push({ name: 'dashboard' })
       break;
     case 401: // unauthorized

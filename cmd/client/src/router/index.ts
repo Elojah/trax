@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '@/views/Dashboard.vue'
 import Sign from '@/views/Sign.vue'
-import Profile from '@/views/Profile.vue'
+import User from '@/views/User.vue'
 import Map from '@/views/Map.vue'
 import Entity from '@/views/Entity.vue'
 import NotFound from '@/views/NotFound.vue'
@@ -16,36 +16,36 @@ const router = createRouter({
       path: '/',
       name: 'dashboard',
       component: Dashboard,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true }
     },
     {
       path: '/map',
       name: 'map',
       component: Map,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true }
     },
     {
       path: '/sign',
       name: 'sign',
       component: Sign,
-      meta: { missingAuth: true },
+      meta: { missingAuth: true }
     },
     {
-      path: '/profile',
-      name: 'profile',
-      component: Profile,
-      meta: { requiresAuth: true },
+      path: '/user',
+      name: 'user',
+      component: User,
+      meta: { requiresAuth: true }
     },
     {
       path: '/entity',
       name: 'entity',
       component: Entity,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true }
     },
     {
       path: '/:catchAll(.*)',
       name: 'not-found',
-      component: NotFound,
+      component: NotFound
     }
   ]
 })
@@ -53,17 +53,17 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.matched.some(record => record.meta.requiresAuth) && !authStore.profile) {
-    authStore.refreshProfile().then(() => {
-      if (!authStore.profile) {
+  if (to.matched.some((record) => record.meta.requiresAuth) && !authStore.user) {
+    authStore.refreshUser().then(() => {
+      if (!authStore.user) {
         next({ name: 'sign' })
       } else {
         next()
       }
     })
-  } else if (to.matched.some(record => record.meta.missingAuth)) {
-    authStore.refreshProfile().then(() => {
-      if (!authStore.profile) {
+  } else if (to.matched.some((record) => record.meta.missingAuth)) {
+    authStore.refreshUser().then(() => {
+      if (!authStore.user) {
         next()
       } else {
         next({ name: 'dashboard' })

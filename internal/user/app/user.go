@@ -20,10 +20,8 @@ type App struct {
 	transaction.Transactioner
 
 	user.Store
-	user.StoreProfile
 
 	user.StoreEntity
-	user.StoreEntityProfile
 
 	user.StoreRole
 	user.StorePermission
@@ -57,6 +55,9 @@ func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 			IssuedAt:  jwt.NewNumericDate(now),
 			ID:        secret,
 		},
+		UserID: u.ID,
+		// TODO: populate with user roles
+		// Auth:   nil,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

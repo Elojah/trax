@@ -7,7 +7,6 @@ import (
 	bytes "bytes"
 	fmt "fmt"
 	_ "github.com/elojah/trax/pkg/gogoproto"
-	pbtypes "github.com/elojah/trax/pkg/pbtypes"
 	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
@@ -36,8 +35,11 @@ type U struct {
 	PasswordHash []byte                             `protobuf:"bytes,3,opt,name=PasswordHash,proto3" json:"PasswordHash,omitempty"`
 	PasswordSalt []byte                             `protobuf:"bytes,4,opt,name=PasswordSalt,proto3" json:"PasswordSalt,omitempty"`
 	GoogleID     string                             `protobuf:"bytes,5,opt,name=GoogleID,proto3" json:"GoogleID,omitempty"`
-	CreatedAt    int64                              `protobuf:"varint,6,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
-	UpdatedAt    int64                              `protobuf:"varint,7,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
+	FirstName    string                             `protobuf:"bytes,6,opt,name=FirstName,proto3" json:"FirstName,omitempty"`
+	LastName     string                             `protobuf:"bytes,7,opt,name=LastName,proto3" json:"LastName,omitempty"`
+	AvatarURL    string                             `protobuf:"bytes,8,opt,name=AvatarURL,proto3" json:"AvatarURL,omitempty"`
+	CreatedAt    int64                              `protobuf:"varint,9,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
+	UpdatedAt    int64                              `protobuf:"varint,10,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
 }
 
 func (m *U) Reset()      { *m = U{} }
@@ -72,52 +74,9 @@ func (m *U) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_U proto.InternalMessageInfo
 
-type Profile struct {
-	UserID    github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,1,opt,name=UserID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"UserID"`
-	FirstName string                             `protobuf:"bytes,2,opt,name=FirstName,proto3" json:"FirstName,omitempty"`
-	LastName  string                             `protobuf:"bytes,3,opt,name=LastName,proto3" json:"LastName,omitempty"`
-	AvatarURL *pbtypes.String                    `protobuf:"bytes,4,opt,name=AvatarURL,proto3" json:"AvatarURL,omitempty"`
-	CreatedAt int64                              `protobuf:"varint,5,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
-	UpdatedAt int64                              `protobuf:"varint,6,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
-}
-
-func (m *Profile) Reset()      { *m = Profile{} }
-func (*Profile) ProtoMessage() {}
-func (*Profile) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c833e8dbf581e4f7, []int{1}
-}
-func (m *Profile) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Profile) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Profile.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Profile) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Profile.Merge(m, src)
-}
-func (m *Profile) XXX_Size() int {
-	return m.Size()
-}
-func (m *Profile) XXX_DiscardUnknown() {
-	xxx_messageInfo_Profile.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Profile proto.InternalMessageInfo
-
 func init() {
 	proto.RegisterType((*U)(nil), "user.U")
 	golang_proto.RegisterType((*U)(nil), "user.U")
-	proto.RegisterType((*Profile)(nil), "user.Profile")
-	golang_proto.RegisterType((*Profile)(nil), "user.Profile")
 }
 
 func init() {
@@ -128,34 +87,30 @@ func init() {
 }
 
 var fileDescriptor_c833e8dbf581e4f7 = []byte{
-	// 420 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x52, 0x4f, 0x8b, 0xd3, 0x40,
-	0x14, 0x9f, 0xd7, 0x6e, 0xbb, 0x76, 0x5c, 0x10, 0x06, 0x0f, 0x61, 0x91, 0xb7, 0xa5, 0xa7, 0x22,
-	0x98, 0x80, 0xde, 0xbc, 0x6d, 0xad, 0xba, 0x81, 0x45, 0x96, 0x2c, 0xf9, 0x00, 0x53, 0x33, 0xa6,
-	0xd1, 0xb4, 0x13, 0x66, 0xa6, 0xfe, 0xb9, 0xf9, 0x11, 0xfc, 0x18, 0x7e, 0x04, 0x8f, 0x7b, 0xec,
-	0xb1, 0xc7, 0xc5, 0xc3, 0x62, 0x26, 0x17, 0x8f, 0x8b, 0x20, 0x78, 0x94, 0xfc, 0xb1, 0xb5, 0x82,
-	0x3d, 0xec, 0x25, 0xcc, 0xfb, 0xfd, 0x79, 0x8f, 0xdf, 0x7b, 0xa1, 0x5e, 0x9c, 0x98, 0xe9, 0x62,
-	0xe2, 0xbe, 0x94, 0x33, 0x4f, 0xa4, 0xf2, 0x35, 0x9f, 0x7a, 0x46, 0xf1, 0xf7, 0x5e, 0x32, 0x37,
-	0x42, 0xcd, 0x79, 0xea, 0x2d, 0xb4, 0x50, 0xd5, 0xc7, 0xcd, 0x94, 0x34, 0x92, 0xed, 0x95, 0xef,
-	0xc3, 0xff, 0xd9, 0xb2, 0x37, 0xb1, 0x17, 0xcb, 0x58, 0x56, 0xda, 0xea, 0x55, 0xdb, 0x76, 0x1a,
-	0xb2, 0x89, 0xf9, 0x90, 0x09, 0xed, 0x69, 0xa3, 0x92, 0x79, 0x5c, 0x1b, 0x06, 0x3f, 0x81, 0x42,
-	0xc8, 0x1e, 0xd3, 0x96, 0x3f, 0x76, 0xa0, 0x0f, 0xc3, 0x83, 0xd1, 0xfd, 0xe5, 0xd5, 0x11, 0xf9,
-	0x7a, 0x75, 0x34, 0xd8, 0xd1, 0x6a, 0x91, 0x26, 0x91, 0xeb, 0x8f, 0x83, 0x96, 0x3f, 0x66, 0x77,
-	0x69, 0xe7, 0xe9, 0x8c, 0x27, 0xa9, 0xd3, 0xea, 0xc3, 0xb0, 0x17, 0xd4, 0x05, 0x1b, 0xd0, 0x83,
-	0x33, 0xae, 0xf5, 0x3b, 0xa9, 0xa2, 0x13, 0xae, 0xa7, 0x4e, 0xbb, 0xec, 0x1d, 0x6c, 0x61, 0x7f,
-	0x6b, 0xce, 0x79, 0x6a, 0x9c, 0xbd, 0x6d, 0x4d, 0x89, 0xb1, 0x43, 0x7a, 0xeb, 0xb9, 0x94, 0x71,
-	0x2a, 0xfc, 0xb1, 0xd3, 0xa9, 0x06, 0xac, 0x6b, 0x76, 0x8f, 0xf6, 0x9e, 0x28, 0xc1, 0x8d, 0x88,
-	0x8e, 0x8d, 0xd3, 0xed, 0xc3, 0xb0, 0x1d, 0x6c, 0x80, 0x92, 0x0d, 0xb3, 0xa8, 0x61, 0xf7, 0x6b,
-	0x76, 0x0d, 0x0c, 0x7e, 0x00, 0xdd, 0x3f, 0x53, 0xf2, 0x55, 0x92, 0x0a, 0x36, 0xa2, 0xdd, 0x50,
-	0x0b, 0x75, 0xa3, 0x0d, 0x34, 0xce, 0x72, 0xda, 0xb3, 0x44, 0x69, 0xf3, 0x82, 0xcf, 0x44, 0xb3,
-	0x89, 0x0d, 0x50, 0xa6, 0x38, 0xe5, 0x0d, 0xd9, 0xae, 0x53, 0xfc, 0xa9, 0xd9, 0x03, 0xda, 0x3b,
-	0x7e, 0xcb, 0x0d, 0x57, 0x61, 0x70, 0x5a, 0xad, 0xe0, 0xf6, 0xc3, 0x3b, 0x6e, 0x73, 0x2b, 0xf7,
-	0xbc, 0xba, 0x55, 0xb0, 0x51, 0x6c, 0x87, 0xee, 0xec, 0x0c, 0xdd, 0xfd, 0x27, 0xf4, 0xe8, 0x64,
-	0x99, 0x23, 0x59, 0xe5, 0x48, 0x2e, 0x73, 0x24, 0xd7, 0x39, 0xc2, 0xaf, 0x1c, 0xe1, 0xa3, 0x45,
-	0xf8, 0x6c, 0x11, 0xbe, 0x58, 0x84, 0x0b, 0x8b, 0xb0, 0xb4, 0x08, 0x2b, 0x8b, 0xf0, 0xcd, 0x22,
-	0x7c, 0xb7, 0x48, 0xae, 0x2d, 0xc2, 0xa7, 0x02, 0xc9, 0x45, 0x81, 0xb0, 0x2a, 0x90, 0x5c, 0x16,
-	0x48, 0x26, 0xdd, 0xea, 0xef, 0x79, 0xf4, 0x3b, 0x00, 0x00, 0xff, 0xff, 0xd6, 0xa4, 0x8a, 0xb7,
-	0xd8, 0x02, 0x00, 0x00,
+	// 360 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x91, 0x3f, 0x6f, 0xda, 0x40,
+	0x18, 0xc6, 0xef, 0x35, 0x7f, 0x0a, 0x27, 0x26, 0xab, 0xc3, 0x09, 0x55, 0x2f, 0x88, 0x09, 0x75,
+	0xc0, 0x43, 0xb7, 0x6e, 0x50, 0xb7, 0xc5, 0x12, 0xaa, 0x2a, 0x57, 0x7c, 0x80, 0xa3, 0xb6, 0x8c,
+	0x5b, 0xc3, 0xa1, 0xf3, 0xd1, 0x66, 0xcc, 0x47, 0xc8, 0xc7, 0xc8, 0x47, 0xc8, 0xc8, 0xc8, 0x12,
+	0x89, 0x11, 0x65, 0x40, 0xf1, 0x79, 0xc9, 0xc8, 0x98, 0x31, 0xb2, 0x4d, 0x20, 0x0c, 0xc9, 0x62,
+	0xbd, 0xef, 0xf3, 0x7b, 0x7e, 0xaf, 0x87, 0xa3, 0x56, 0x10, 0xaa, 0xe9, 0x72, 0xd2, 0xfb, 0x2d,
+	0x66, 0x96, 0x1f, 0x89, 0x3f, 0x7c, 0x6a, 0x29, 0xc9, 0x2f, 0xac, 0x70, 0xae, 0x7c, 0x39, 0xe7,
+	0x91, 0xb5, 0x8c, 0x7d, 0x99, 0x7f, 0x7a, 0x0b, 0x29, 0x94, 0x30, 0xcb, 0xd9, 0xdc, 0x7c, 0x4d,
+	0x5b, 0xfc, 0x0d, 0xac, 0x40, 0x04, 0x22, 0xef, 0xe6, 0x53, 0xa1, 0x75, 0x6e, 0x0d, 0x0a, 0x63,
+	0xf3, 0x33, 0x35, 0x1c, 0x9b, 0x41, 0x1b, 0xba, 0x8d, 0xc1, 0xc7, 0xf5, 0xae, 0x45, 0xee, 0x76,
+	0xad, 0xce, 0x1b, 0xa7, 0x96, 0x51, 0xe8, 0xf5, 0x1c, 0xdb, 0x35, 0x1c, 0xdb, 0x7c, 0x4f, 0x2b,
+	0x5f, 0x67, 0x3c, 0x8c, 0x98, 0xd1, 0x86, 0x6e, 0xdd, 0x2d, 0x16, 0xb3, 0x43, 0x1b, 0x3f, 0x79,
+	0x1c, 0xff, 0x17, 0xd2, 0x1b, 0xf2, 0x78, 0xca, 0x4a, 0xd9, 0x6d, 0xf7, 0x2c, 0x7b, 0xd9, 0xf9,
+	0xc5, 0x23, 0xc5, 0xca, 0xe7, 0x9d, 0x2c, 0x33, 0x9b, 0xb4, 0xf6, 0x5d, 0x88, 0x20, 0xf2, 0x1d,
+	0x9b, 0x55, 0xf2, 0x1f, 0x1c, 0x77, 0xf3, 0x03, 0xad, 0x7f, 0x0b, 0x65, 0xac, 0x7e, 0xf0, 0x99,
+	0xcf, 0xaa, 0x39, 0x3c, 0x05, 0x99, 0x39, 0xe2, 0x07, 0xf8, 0xae, 0x30, 0x9f, 0xf7, 0xcc, 0xec,
+	0xff, 0xe3, 0x8a, 0xcb, 0xb1, 0x3b, 0x62, 0xb5, 0xc2, 0x3c, 0x06, 0x19, 0xfd, 0x22, 0x7d, 0xae,
+	0x7c, 0xaf, 0xaf, 0x58, 0xbd, 0x0d, 0xdd, 0x92, 0x7b, 0x0a, 0x32, 0x3a, 0x5e, 0x78, 0x07, 0x4a,
+	0x0b, 0x7a, 0x0c, 0x06, 0xc3, 0x75, 0x82, 0x64, 0x93, 0x20, 0xd9, 0x26, 0x48, 0xf6, 0x09, 0xc2,
+	0x63, 0x82, 0x70, 0xa9, 0x11, 0xae, 0x35, 0xc2, 0x8d, 0x46, 0x58, 0x69, 0x84, 0xb5, 0x46, 0xd8,
+	0x68, 0x84, 0x7b, 0x8d, 0xf0, 0xa0, 0x91, 0xec, 0x35, 0xc2, 0x55, 0x8a, 0x64, 0x95, 0x22, 0x6c,
+	0x52, 0x24, 0xdb, 0x14, 0xc9, 0xa4, 0x9a, 0x3f, 0xd0, 0xa7, 0xa7, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x4d, 0xcd, 0xfd, 0xfc, 0x0a, 0x02, 0x00, 0x00,
 }
 
 func (this *U) Equal(that interface{}) bool {
@@ -192,43 +147,13 @@ func (this *U) Equal(that interface{}) bool {
 	if this.GoogleID != that1.GoogleID {
 		return false
 	}
-	if this.CreatedAt != that1.CreatedAt {
-		return false
-	}
-	if this.UpdatedAt != that1.UpdatedAt {
-		return false
-	}
-	return true
-}
-func (this *Profile) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*Profile)
-	if !ok {
-		that2, ok := that.(Profile)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.UserID.Equal(that1.UserID) {
-		return false
-	}
 	if this.FirstName != that1.FirstName {
 		return false
 	}
 	if this.LastName != that1.LastName {
 		return false
 	}
-	if !this.AvatarURL.Equal(that1.AvatarURL) {
+	if this.AvatarURL != that1.AvatarURL {
 		return false
 	}
 	if this.CreatedAt != that1.CreatedAt {
@@ -243,30 +168,16 @@ func (this *U) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 11)
+	s := make([]string, 0, 14)
 	s = append(s, "&user.U{")
 	s = append(s, "ID: "+fmt.Sprintf("%#v", this.ID)+",\n")
 	s = append(s, "Email: "+fmt.Sprintf("%#v", this.Email)+",\n")
 	s = append(s, "PasswordHash: "+fmt.Sprintf("%#v", this.PasswordHash)+",\n")
 	s = append(s, "PasswordSalt: "+fmt.Sprintf("%#v", this.PasswordSalt)+",\n")
 	s = append(s, "GoogleID: "+fmt.Sprintf("%#v", this.GoogleID)+",\n")
-	s = append(s, "CreatedAt: "+fmt.Sprintf("%#v", this.CreatedAt)+",\n")
-	s = append(s, "UpdatedAt: "+fmt.Sprintf("%#v", this.UpdatedAt)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *Profile) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 10)
-	s = append(s, "&user.Profile{")
-	s = append(s, "UserID: "+fmt.Sprintf("%#v", this.UserID)+",\n")
 	s = append(s, "FirstName: "+fmt.Sprintf("%#v", this.FirstName)+",\n")
 	s = append(s, "LastName: "+fmt.Sprintf("%#v", this.LastName)+",\n")
-	if this.AvatarURL != nil {
-		s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", this.AvatarURL)+",\n")
-	}
+	s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", this.AvatarURL)+",\n")
 	s = append(s, "CreatedAt: "+fmt.Sprintf("%#v", this.CreatedAt)+",\n")
 	s = append(s, "UpdatedAt: "+fmt.Sprintf("%#v", this.UpdatedAt)+",\n")
 	s = append(s, "}")
@@ -303,12 +214,33 @@ func (m *U) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.UpdatedAt != 0 {
 		i = encodeVarintUser(dAtA, i, uint64(m.UpdatedAt))
 		i--
-		dAtA[i] = 0x38
+		dAtA[i] = 0x50
 	}
 	if m.CreatedAt != 0 {
 		i = encodeVarintUser(dAtA, i, uint64(m.CreatedAt))
 		i--
-		dAtA[i] = 0x30
+		dAtA[i] = 0x48
+	}
+	if len(m.AvatarURL) > 0 {
+		i -= len(m.AvatarURL)
+		copy(dAtA[i:], m.AvatarURL)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.AvatarURL)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.LastName) > 0 {
+		i -= len(m.LastName)
+		copy(dAtA[i:], m.LastName)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.LastName)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.FirstName) > 0 {
+		i -= len(m.FirstName)
+		copy(dAtA[i:], m.FirstName)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.FirstName)))
+		i--
+		dAtA[i] = 0x32
 	}
 	if len(m.GoogleID) > 0 {
 		i -= len(m.GoogleID)
@@ -351,75 +283,6 @@ func (m *U) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Profile) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Profile) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Profile) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.UpdatedAt != 0 {
-		i = encodeVarintUser(dAtA, i, uint64(m.UpdatedAt))
-		i--
-		dAtA[i] = 0x30
-	}
-	if m.CreatedAt != 0 {
-		i = encodeVarintUser(dAtA, i, uint64(m.CreatedAt))
-		i--
-		dAtA[i] = 0x28
-	}
-	if m.AvatarURL != nil {
-		{
-			size, err := m.AvatarURL.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintUser(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.LastName) > 0 {
-		i -= len(m.LastName)
-		copy(dAtA[i:], m.LastName)
-		i = encodeVarintUser(dAtA, i, uint64(len(m.LastName)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.FirstName) > 0 {
-		i -= len(m.FirstName)
-		copy(dAtA[i:], m.FirstName)
-		i = encodeVarintUser(dAtA, i, uint64(len(m.FirstName)))
-		i--
-		dAtA[i] = 0x12
-	}
-	{
-		size := m.UserID.Size()
-		i -= size
-		if _, err := m.UserID.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintUser(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintUser(dAtA []byte, offset int, v uint64) int {
 	offset -= sovUser(v)
 	base := offset
@@ -447,28 +310,9 @@ func NewPopulatedU(r randyUser, easy bool) *U {
 		this.PasswordSalt[i] = byte(r.Intn(256))
 	}
 	this.GoogleID = string(randStringUser(r))
-	this.CreatedAt = int64(r.Int63())
-	if r.Intn(2) == 0 {
-		this.CreatedAt *= -1
-	}
-	this.UpdatedAt = int64(r.Int63())
-	if r.Intn(2) == 0 {
-		this.UpdatedAt *= -1
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedProfile(r randyUser, easy bool) *Profile {
-	this := &Profile{}
-	v4 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.UserID = *v4
 	this.FirstName = string(randStringUser(r))
 	this.LastName = string(randStringUser(r))
-	if r.Intn(5) != 0 {
-		this.AvatarURL = pbtypes.NewPopulatedString(r, easy)
-	}
+	this.AvatarURL = string(randStringUser(r))
 	this.CreatedAt = int64(r.Int63())
 	if r.Intn(2) == 0 {
 		this.CreatedAt *= -1
@@ -501,9 +345,9 @@ func randUTF8RuneUser(r randyUser) rune {
 	return rune(ru + 61)
 }
 func randStringUser(r randyUser) string {
-	v5 := r.Intn(100)
-	tmps := make([]rune, v5)
-	for i := 0; i < v5; i++ {
+	v4 := r.Intn(100)
+	tmps := make([]rune, v4)
+	for i := 0; i < v4; i++ {
 		tmps[i] = randUTF8RuneUser(r)
 	}
 	return string(tmps)
@@ -525,11 +369,11 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
-		v6 := r.Int63()
+		v5 := r.Int63()
 		if r.Intn(2) == 0 {
-			v6 *= -1
+			v5 *= -1
 		}
-		dAtA = encodeVarintPopulateUser(dAtA, uint64(v6))
+		dAtA = encodeVarintPopulateUser(dAtA, uint64(v5))
 	case 1:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -578,23 +422,6 @@ func (m *U) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
-	if m.CreatedAt != 0 {
-		n += 1 + sovUser(uint64(m.CreatedAt))
-	}
-	if m.UpdatedAt != 0 {
-		n += 1 + sovUser(uint64(m.UpdatedAt))
-	}
-	return n
-}
-
-func (m *Profile) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.UserID.Size()
-	n += 1 + l + sovUser(uint64(l))
 	l = len(m.FirstName)
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
@@ -603,8 +430,8 @@ func (m *Profile) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
-	if m.AvatarURL != nil {
-		l = m.AvatarURL.Size()
+	l = len(m.AvatarURL)
+	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
 	if m.CreatedAt != 0 {
@@ -632,21 +459,9 @@ func (this *U) String() string {
 		`PasswordHash:` + fmt.Sprintf("%v", this.PasswordHash) + `,`,
 		`PasswordSalt:` + fmt.Sprintf("%v", this.PasswordSalt) + `,`,
 		`GoogleID:` + fmt.Sprintf("%v", this.GoogleID) + `,`,
-		`CreatedAt:` + fmt.Sprintf("%v", this.CreatedAt) + `,`,
-		`UpdatedAt:` + fmt.Sprintf("%v", this.UpdatedAt) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *Profile) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&Profile{`,
-		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`FirstName:` + fmt.Sprintf("%v", this.FirstName) + `,`,
 		`LastName:` + fmt.Sprintf("%v", this.LastName) + `,`,
-		`AvatarURL:` + strings.Replace(fmt.Sprintf("%v", this.AvatarURL), "String", "pbtypes.String", 1) + `,`,
+		`AvatarURL:` + fmt.Sprintf("%v", this.AvatarURL) + `,`,
 		`CreatedAt:` + fmt.Sprintf("%v", this.CreatedAt) + `,`,
 		`UpdatedAt:` + fmt.Sprintf("%v", this.UpdatedAt) + `,`,
 		`}`,
@@ -856,130 +671,6 @@ func (m *U) Unmarshal(dAtA []byte) error {
 			m.GoogleID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
-			}
-			m.CreatedAt = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUser
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.CreatedAt |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			}
-			m.UpdatedAt = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUser
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.UpdatedAt |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipUser(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthUser
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthUser
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Profile) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowUser
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Profile: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Profile: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUser
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthUser
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthUser
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.UserID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FirstName", wireType)
 			}
@@ -1011,7 +702,7 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 			}
 			m.FirstName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastName", wireType)
 			}
@@ -1043,11 +734,11 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 			}
 			m.LastName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AvatarURL", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowUser
@@ -1057,29 +748,25 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthUser
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthUser
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.AvatarURL == nil {
-				m.AvatarURL = &pbtypes.String{}
-			}
-			if err := m.AvatarURL.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.AvatarURL = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 9:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
 			}
@@ -1098,7 +785,7 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 6:
+		case 10:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
 			}

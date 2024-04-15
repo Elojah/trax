@@ -44,25 +44,25 @@ func (f filterRoleUser) where(n int) (string, []any) {
 	var args []any
 
 	if f.RoleID != nil {
-		clause = append(clause, fmt.Sprintf(`role_id = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`ru.role_id = $%d`, n))
 		args = append(args, f.RoleID)
 		n++
 	}
 
 	if len(f.RoleIDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`role_id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
+		clause = append(clause, fmt.Sprintf(`ru.role_id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
 		args = append(args, ulid.IDs(f.RoleIDs).Any()...)
 		n += len(f.RoleIDs)
 	}
 
 	if f.UserID != nil {
-		clause = append(clause, fmt.Sprintf(`user_id = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`ru.user_id = $%d`, n))
 		args = append(args, f.UserID)
 		n++
 	}
 
 	if len(f.UserIDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`user_id IN (%s)`, postgres.Array(n, len(f.UserIDs))))
+		clause = append(clause, fmt.Sprintf(`ru.user_id IN (%s)`, postgres.Array(n, len(f.UserIDs))))
 		args = append(args, ulid.IDs(f.UserIDs).Any()...)
 		n += len(f.UserIDs)
 	}
@@ -130,7 +130,7 @@ func (s Store) FetchRoleUser(ctx context.Context, f user.FilterRoleUser) (user.R
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" `)
+	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" ru `)
 
 	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)
@@ -152,7 +152,7 @@ func (s Store) ListRoleUser(ctx context.Context, f user.FilterRoleUser) ([]user.
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" `)
+	b.WriteString(`SELECT role_id, user_id, created_at, updated_at FROM "user"."role_user" ru `)
 
 	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)
@@ -183,7 +183,7 @@ func (s Store) DeleteRoleUser(ctx context.Context, f user.FilterRoleUser) error 
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`DELETE FROM "user"."role_user" `)
+	b.WriteString(`DELETE FROM "user"."role_user" ru `)
 
 	clause, args := filterRoleUser(f).where(1)
 	b.WriteString(clause)

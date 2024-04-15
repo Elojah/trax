@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
-	"github.com/elojah/trax/pkg/pbtypes"
 	"github.com/elojah/trax/pkg/ulid"
 	"golang.org/x/oauth2"
 )
@@ -32,30 +31,30 @@ func (c Claims) GetString(key string) (string, error) {
 	return result, nil
 }
 
-func (c Claims) CreateUser(ctx context.Context) (user.U, user.Profile, error) {
+func (c Claims) CreateUser(ctx context.Context) (user.U, error) {
 	gid, err := c.GetString("sub")
 	if err != nil {
-		return user.U{}, user.Profile{}, err
+		return user.U{}, err
 	}
 
 	email, err := c.GetString("email")
 	if err != nil {
-		return user.U{}, user.Profile{}, err
+		return user.U{}, err
 	}
 
 	lastname, err := c.GetString("family_name")
 	if err != nil {
-		return user.U{}, user.Profile{}, err
+		return user.U{}, err
 	}
 
 	firstname, err := c.GetString("given_name")
 	if err != nil {
-		return user.U{}, user.Profile{}, err
+		return user.U{}, err
 	}
 
 	avatarURL, err := c.GetString("picture")
 	if err != nil {
-		return user.U{}, user.Profile{}, err
+		return user.U{}, err
 	}
 
 	// #MARK:Create user
@@ -69,18 +68,12 @@ func (c Claims) CreateUser(ctx context.Context) (user.U, user.Profile, error) {
 		PasswordHash: hash,
 		PasswordSalt: salt,
 		GoogleID:     gid,
+		FirstName:    firstname,
+		LastName:     lastname,
+		AvatarURL:    avatarURL,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
 
-	profile := user.Profile{
-		UserID:    u.ID,
-		FirstName: firstname,
-		LastName:  lastname,
-		AvatarURL: &pbtypes.String{Value: avatarURL},
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
-
-	return u, profile, nil
+	return u, nil
 }

@@ -10,7 +10,6 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { String$ } from "../../pkg/pbtypes/string";
 /**
  * @generated from protobuf message user.U
  */
@@ -36,40 +35,23 @@ export interface U {
      */
     googleID: string;
     /**
-     * @generated from protobuf field: int64 CreatedAt = 6 [json_name = "CreatedAt"];
-     */
-    createdAt: bigint;
-    /**
-     * @generated from protobuf field: int64 UpdatedAt = 7 [json_name = "UpdatedAt"];
-     */
-    updatedAt: bigint;
-}
-/**
- * @generated from protobuf message user.Profile
- */
-export interface Profile {
-    /**
-     * @generated from protobuf field: bytes UserID = 1 [json_name = "UserID"];
-     */
-    userID: Uint8Array;
-    /**
-     * @generated from protobuf field: string FirstName = 2 [json_name = "FirstName"];
+     * @generated from protobuf field: string FirstName = 6 [json_name = "FirstName"];
      */
     firstName: string;
     /**
-     * @generated from protobuf field: string LastName = 3 [json_name = "LastName"];
+     * @generated from protobuf field: string LastName = 7 [json_name = "LastName"];
      */
     lastName: string;
     /**
-     * @generated from protobuf field: pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"];
+     * @generated from protobuf field: string AvatarURL = 8 [json_name = "AvatarURL"];
      */
-    avatarURL?: String$;
+    avatarURL: string;
     /**
-     * @generated from protobuf field: int64 CreatedAt = 5 [json_name = "CreatedAt"];
+     * @generated from protobuf field: int64 CreatedAt = 9 [json_name = "CreatedAt"];
      */
     createdAt: bigint;
     /**
-     * @generated from protobuf field: int64 UpdatedAt = 6 [json_name = "UpdatedAt"];
+     * @generated from protobuf field: int64 UpdatedAt = 10 [json_name = "UpdatedAt"];
      */
     updatedAt: bigint;
 }
@@ -82,8 +64,11 @@ class U$Type extends MessageType<U> {
             { no: 3, name: "PasswordHash", kind: "scalar", jsonName: "PasswordHash", T: 12 /*ScalarType.BYTES*/ },
             { no: 4, name: "PasswordSalt", kind: "scalar", jsonName: "PasswordSalt", T: 12 /*ScalarType.BYTES*/ },
             { no: 5, name: "GoogleID", kind: "scalar", jsonName: "GoogleID", T: 9 /*ScalarType.STRING*/ },
-            { no: 6, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 7, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 6, name: "FirstName", kind: "scalar", jsonName: "FirstName", T: 9 /*ScalarType.STRING*/ },
+            { no: 7, name: "LastName", kind: "scalar", jsonName: "LastName", T: 9 /*ScalarType.STRING*/ },
+            { no: 8, name: "AvatarURL", kind: "scalar", jsonName: "AvatarURL", T: 9 /*ScalarType.STRING*/ },
+            { no: 9, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 10, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
     create(value?: PartialMessage<U>): U {
@@ -93,6 +78,9 @@ class U$Type extends MessageType<U> {
         message.passwordHash = new Uint8Array(0);
         message.passwordSalt = new Uint8Array(0);
         message.googleID = "";
+        message.firstName = "";
+        message.lastName = "";
+        message.avatarURL = "";
         message.createdAt = 0n;
         message.updatedAt = 0n;
         if (value !== undefined)
@@ -119,10 +107,19 @@ class U$Type extends MessageType<U> {
                 case /* string GoogleID = 5 [json_name = "GoogleID"];*/ 5:
                     message.googleID = reader.string();
                     break;
-                case /* int64 CreatedAt = 6 [json_name = "CreatedAt"];*/ 6:
+                case /* string FirstName = 6 [json_name = "FirstName"];*/ 6:
+                    message.firstName = reader.string();
+                    break;
+                case /* string LastName = 7 [json_name = "LastName"];*/ 7:
+                    message.lastName = reader.string();
+                    break;
+                case /* string AvatarURL = 8 [json_name = "AvatarURL"];*/ 8:
+                    message.avatarURL = reader.string();
+                    break;
+                case /* int64 CreatedAt = 9 [json_name = "CreatedAt"];*/ 9:
                     message.createdAt = reader.int64().toBigInt();
                     break;
-                case /* int64 UpdatedAt = 7 [json_name = "UpdatedAt"];*/ 7:
+                case /* int64 UpdatedAt = 10 [json_name = "UpdatedAt"];*/ 10:
                     message.updatedAt = reader.int64().toBigInt();
                     break;
                 default:
@@ -152,12 +149,21 @@ class U$Type extends MessageType<U> {
         /* string GoogleID = 5 [json_name = "GoogleID"]; */
         if (message.googleID !== "")
             writer.tag(5, WireType.LengthDelimited).string(message.googleID);
-        /* int64 CreatedAt = 6 [json_name = "CreatedAt"]; */
+        /* string FirstName = 6 [json_name = "FirstName"]; */
+        if (message.firstName !== "")
+            writer.tag(6, WireType.LengthDelimited).string(message.firstName);
+        /* string LastName = 7 [json_name = "LastName"]; */
+        if (message.lastName !== "")
+            writer.tag(7, WireType.LengthDelimited).string(message.lastName);
+        /* string AvatarURL = 8 [json_name = "AvatarURL"]; */
+        if (message.avatarURL !== "")
+            writer.tag(8, WireType.LengthDelimited).string(message.avatarURL);
+        /* int64 CreatedAt = 9 [json_name = "CreatedAt"]; */
         if (message.createdAt !== 0n)
-            writer.tag(6, WireType.Varint).int64(message.createdAt);
-        /* int64 UpdatedAt = 7 [json_name = "UpdatedAt"]; */
+            writer.tag(9, WireType.Varint).int64(message.createdAt);
+        /* int64 UpdatedAt = 10 [json_name = "UpdatedAt"]; */
         if (message.updatedAt !== 0n)
-            writer.tag(7, WireType.Varint).int64(message.updatedAt);
+            writer.tag(10, WireType.Varint).int64(message.updatedAt);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -168,89 +174,3 @@ class U$Type extends MessageType<U> {
  * @generated MessageType for protobuf message user.U
  */
 export const U = new U$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Profile$Type extends MessageType<Profile> {
-    constructor() {
-        super("user.Profile", [
-            { no: 1, name: "UserID", kind: "scalar", jsonName: "UserID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 2, name: "FirstName", kind: "scalar", jsonName: "FirstName", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "LastName", kind: "scalar", jsonName: "LastName", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ },
-            { no: 5, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 6, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
-        ]);
-    }
-    create(value?: PartialMessage<Profile>): Profile {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.userID = new Uint8Array(0);
-        message.firstName = "";
-        message.lastName = "";
-        message.createdAt = 0n;
-        message.updatedAt = 0n;
-        if (value !== undefined)
-            reflectionMergePartial<Profile>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Profile): Profile {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bytes UserID = 1 [json_name = "UserID"];*/ 1:
-                    message.userID = reader.bytes();
-                    break;
-                case /* string FirstName = 2 [json_name = "FirstName"];*/ 2:
-                    message.firstName = reader.string();
-                    break;
-                case /* string LastName = 3 [json_name = "LastName"];*/ 3:
-                    message.lastName = reader.string();
-                    break;
-                case /* pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"];*/ 4:
-                    message.avatarURL = String$.internalBinaryRead(reader, reader.uint32(), options, message.avatarURL);
-                    break;
-                case /* int64 CreatedAt = 5 [json_name = "CreatedAt"];*/ 5:
-                    message.createdAt = reader.int64().toBigInt();
-                    break;
-                case /* int64 UpdatedAt = 6 [json_name = "UpdatedAt"];*/ 6:
-                    message.updatedAt = reader.int64().toBigInt();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: Profile, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bytes UserID = 1 [json_name = "UserID"]; */
-        if (message.userID.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.userID);
-        /* string FirstName = 2 [json_name = "FirstName"]; */
-        if (message.firstName !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.firstName);
-        /* string LastName = 3 [json_name = "LastName"]; */
-        if (message.lastName !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.lastName);
-        /* pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"]; */
-        if (message.avatarURL)
-            String$.internalBinaryWrite(message.avatarURL, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* int64 CreatedAt = 5 [json_name = "CreatedAt"]; */
-        if (message.createdAt !== 0n)
-            writer.tag(5, WireType.Varint).int64(message.createdAt);
-        /* int64 UpdatedAt = 6 [json_name = "UpdatedAt"]; */
-        if (message.updatedAt !== 0n)
-            writer.tag(6, WireType.Varint).int64(message.updatedAt);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message user.Profile
- */
-export const Profile = new Profile$Type();

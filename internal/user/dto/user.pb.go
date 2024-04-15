@@ -6,6 +6,8 @@ package dto
 import (
 	fmt "fmt"
 	_ "github.com/elojah/trax/pkg/gogoproto"
+	pbtypes "github.com/elojah/trax/pkg/pbtypes"
+	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
 	io "io"
@@ -140,6 +142,82 @@ func (m *SigninReq) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SigninReq proto.InternalMessageInfo
 
+type FetchUserReq struct {
+	Me       bool                               `protobuf:"varint,1,opt,name=Me,proto3" json:"Me,omitempty"`
+	ID       github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,2,opt,name=ID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"ID"`
+	EntityID github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,3,opt,name=EntityID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"EntityID"`
+}
+
+func (m *FetchUserReq) Reset()      { *m = FetchUserReq{} }
+func (*FetchUserReq) ProtoMessage() {}
+func (*FetchUserReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_1ee1e55532d5bda9, []int{3}
+}
+func (m *FetchUserReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *FetchUserReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_FetchUserReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *FetchUserReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FetchUserReq.Merge(m, src)
+}
+func (m *FetchUserReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *FetchUserReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_FetchUserReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FetchUserReq proto.InternalMessageInfo
+
+type UpdateUserReq struct {
+	Firstname *pbtypes.String `protobuf:"bytes,1,opt,name=Firstname,proto3" json:"Firstname,omitempty"`
+	Lastname  *pbtypes.String `protobuf:"bytes,2,opt,name=Lastname,proto3" json:"Lastname,omitempty"`
+	AvatarURL *pbtypes.String `protobuf:"bytes,3,opt,name=AvatarURL,proto3" json:"AvatarURL,omitempty"`
+}
+
+func (m *UpdateUserReq) Reset()      { *m = UpdateUserReq{} }
+func (*UpdateUserReq) ProtoMessage() {}
+func (*UpdateUserReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_1ee1e55532d5bda9, []int{4}
+}
+func (m *UpdateUserReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UpdateUserReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UpdateUserReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *UpdateUserReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateUserReq.Merge(m, src)
+}
+func (m *UpdateUserReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *UpdateUserReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateUserReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateUserReq proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*SigninResp)(nil), "dto.SigninResp")
 	golang_proto.RegisterType((*SigninResp)(nil), "dto.SigninResp")
@@ -147,6 +225,10 @@ func init() {
 	golang_proto.RegisterType((*SignupReq)(nil), "dto.SignupReq")
 	proto.RegisterType((*SigninReq)(nil), "dto.SigninReq")
 	golang_proto.RegisterType((*SigninReq)(nil), "dto.SigninReq")
+	proto.RegisterType((*FetchUserReq)(nil), "dto.FetchUserReq")
+	golang_proto.RegisterType((*FetchUserReq)(nil), "dto.FetchUserReq")
+	proto.RegisterType((*UpdateUserReq)(nil), "dto.UpdateUserReq")
+	golang_proto.RegisterType((*UpdateUserReq)(nil), "dto.UpdateUserReq")
 }
 
 func init() {
@@ -157,27 +239,36 @@ func init() {
 }
 
 var fileDescriptor_1ee1e55532d5bda9 = []byte{
-	// 313 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x90, 0xb1, 0x52, 0x32, 0x31,
-	0x14, 0x85, 0x73, 0xe1, 0xff, 0x1d, 0x89, 0x56, 0x3b, 0x16, 0x0c, 0xe3, 0xdc, 0x61, 0xb6, 0xb2,
-	0x22, 0x05, 0xb5, 0x85, 0xce, 0xe8, 0x58, 0x58, 0x38, 0xab, 0x2f, 0x10, 0x20, 0x2e, 0x2b, 0x90,
-	0x2c, 0x49, 0x18, 0x2c, 0x7d, 0x04, 0x1f, 0xc3, 0x47, 0xb0, 0xa4, 0xa4, 0xa4, 0xa4, 0x74, 0xb3,
-	0x8d, 0x25, 0xa5, 0xa5, 0x43, 0x82, 0x22, 0x05, 0xdd, 0x3d, 0xe7, 0x9e, 0xef, 0x64, 0x72, 0x69,
-	0x3b, 0xcd, 0x6c, 0x7f, 0xd2, 0x69, 0x75, 0xd5, 0x88, 0x89, 0xa1, 0x7a, 0xe2, 0x7d, 0x66, 0x35,
-	0x7f, 0x66, 0x99, 0xb4, 0x42, 0x4b, 0x3e, 0x64, 0x13, 0x23, 0x34, 0xeb, 0x59, 0xe5, 0x87, 0x56,
-	0xae, 0x95, 0x55, 0x51, 0xb5, 0x67, 0x55, 0x83, 0xed, 0x21, 0xf3, 0x41, 0xca, 0x52, 0x95, 0x2a,
-	0x1f, 0xf5, 0x53, 0xa0, 0xe2, 0x84, 0xd2, 0xfb, 0x2c, 0x95, 0x99, 0x4c, 0x84, 0xc9, 0xa3, 0x26,
-	0x3d, 0xba, 0xe8, 0x76, 0x85, 0x31, 0x0f, 0x6a, 0x20, 0x64, 0x1d, 0x9a, 0x70, 0x56, 0x4b, 0xfe,
-	0x5a, 0x51, 0x4c, 0x8f, 0x13, 0xf1, 0xa8, 0x85, 0xe9, 0x87, 0x48, 0xc5, 0x47, 0x76, 0xbc, 0x78,
-	0x4a, 0x6b, 0xeb, 0xce, 0x49, 0x9e, 0x88, 0x71, 0x74, 0x4a, 0x6b, 0xd7, 0x99, 0x36, 0x56, 0xf2,
-	0x91, 0xd8, 0x14, 0x6e, 0x8d, 0xa8, 0x41, 0x0f, 0x6f, 0xf9, 0x66, 0x19, 0xaa, 0x7e, 0x75, 0x74,
-	0x42, 0xff, 0x5f, 0x8d, 0x78, 0x36, 0xac, 0x57, 0xfd, 0x22, 0x88, 0x35, 0x71, 0xc7, 0x8d, 0x99,
-	0x2a, 0xdd, 0xab, 0xff, 0x0b, 0xc4, 0x8f, 0x8e, 0xcf, 0xc3, 0xc3, 0xeb, 0xcf, 0x8c, 0xb7, 0x38,
-	0xec, 0xc3, 0x2b, 0xbb, 0xf8, 0xe5, 0xcd, 0xbc, 0x40, 0xb2, 0x28, 0x90, 0x2c, 0x0b, 0x24, 0xab,
-	0x02, 0xe1, 0xab, 0x40, 0x78, 0x71, 0x08, 0x6f, 0x0e, 0xe1, 0xdd, 0x21, 0xcc, 0x1c, 0xc2, 0xdc,
-	0x21, 0x2c, 0x1c, 0xc2, 0x87, 0x43, 0xf8, 0x74, 0x48, 0x56, 0x0e, 0xe1, 0xb5, 0x44, 0x32, 0x2b,
-	0x11, 0x16, 0x25, 0x92, 0x65, 0x89, 0xa4, 0x73, 0xe0, 0x8f, 0xdb, 0xfe, 0x0e, 0x00, 0x00, 0xff,
-	0xff, 0x5c, 0x69, 0xe5, 0x38, 0xc9, 0x01, 0x00, 0x00,
+	// 462 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0x31, 0x6f, 0xd3, 0x40,
+	0x14, 0xc7, 0xfd, 0x5c, 0x40, 0xc9, 0x35, 0x80, 0x64, 0x31, 0x44, 0x15, 0x7a, 0xad, 0x3c, 0x21,
+	0x50, 0x6d, 0x89, 0x6e, 0x48, 0x0c, 0xad, 0xd2, 0x88, 0x48, 0xad, 0x84, 0x5c, 0xf2, 0x01, 0x2e,
+	0xf1, 0xe1, 0x1c, 0x4d, 0x7c, 0xee, 0xdd, 0x85, 0xd2, 0x8d, 0x8f, 0xc0, 0xcc, 0xc8, 0xc4, 0x47,
+	0x60, 0xec, 0x98, 0x31, 0x63, 0xc5, 0x50, 0xe1, 0xcb, 0xc2, 0xd8, 0x91, 0x11, 0xe5, 0x2e, 0x4d,
+	0x4a, 0xd4, 0x46, 0x62, 0xbb, 0xf7, 0xee, 0xff, 0xfb, 0xfb, 0xdd, 0xff, 0x99, 0xec, 0x64, 0x5c,
+	0xf7, 0x86, 0x9d, 0xa8, 0x2b, 0x06, 0x31, 0xeb, 0x8b, 0x0f, 0xb4, 0x17, 0x6b, 0x49, 0x3f, 0xc5,
+	0x3c, 0xd7, 0x4c, 0xe6, 0xb4, 0x1f, 0x0f, 0x15, 0x93, 0x71, 0xaa, 0x85, 0x3d, 0x44, 0x85, 0x14,
+	0x5a, 0x04, 0x6b, 0xa9, 0x16, 0x1b, 0xf1, 0x1d, 0x64, 0x71, 0x9c, 0xc5, 0x99, 0xc8, 0x84, 0x95,
+	0xda, 0x93, 0xa3, 0x56, 0x02, 0x45, 0x47, 0x9f, 0x15, 0x4c, 0xc5, 0x4a, 0x4b, 0x9e, 0x67, 0x0e,
+	0x08, 0x13, 0x42, 0x8e, 0x78, 0x96, 0xf3, 0x3c, 0x61, 0xaa, 0x08, 0xb6, 0xc8, 0xfa, 0x6e, 0xb7,
+	0xcb, 0x94, 0x7a, 0x27, 0x8e, 0x59, 0x5e, 0x87, 0x2d, 0x78, 0x56, 0x4d, 0x6e, 0xb6, 0x82, 0x90,
+	0xd4, 0x12, 0xf6, 0x5e, 0x32, 0xd5, 0x73, 0x12, 0xdf, 0x4a, 0xfe, 0xe9, 0x85, 0xa7, 0xa4, 0x3a,
+	0xf5, 0x1c, 0x16, 0x09, 0x3b, 0x09, 0x9e, 0x92, 0x6a, 0x93, 0x4b, 0xa5, 0x73, 0x3a, 0x60, 0x33,
+	0xc3, 0x45, 0x23, 0xd8, 0x20, 0x95, 0x03, 0x3a, 0xbb, 0x74, 0x56, 0xf3, 0x3a, 0x78, 0x42, 0xee,
+	0xef, 0x0f, 0x28, 0xef, 0xd7, 0xd7, 0xec, 0x85, 0x2b, 0xa6, 0xc4, 0x5b, 0xaa, 0xd4, 0xa9, 0x90,
+	0x69, 0xfd, 0x9e, 0x23, 0xae, 0xeb, 0xf0, 0xb5, 0xfb, 0xf0, 0xf4, 0x31, 0x27, 0x0b, 0x1c, 0xee,
+	0xc2, 0xfd, 0x25, 0xfc, 0x1b, 0x90, 0x5a, 0x93, 0xe9, 0x6e, 0xaf, 0xad, 0x98, 0x9c, 0x5a, 0x3c,
+	0x22, 0xfe, 0xa1, 0x1b, 0xba, 0x92, 0xf8, 0x87, 0x2c, 0x78, 0x45, 0xfc, 0x56, 0xc3, 0x62, 0xb5,
+	0xbd, 0xe7, 0xa3, 0xcb, 0x4d, 0xef, 0xe7, 0xe5, 0x66, 0xb8, 0x22, 0xf1, 0x61, 0x9f, 0xa7, 0x51,
+	0xab, 0x91, 0xf8, 0xad, 0x46, 0xd0, 0x24, 0x95, 0xfd, 0x5c, 0x73, 0x7d, 0xd6, 0x6a, 0xd8, 0x07,
+	0xfd, 0x9f, 0xc3, 0x9c, 0x0d, 0xbf, 0x02, 0x79, 0xd8, 0x2e, 0x52, 0xaa, 0xd9, 0xf5, 0x94, 0xdb,
+	0xcb, 0x09, 0xaf, 0xbf, 0x7c, 0x1c, 0xcd, 0x96, 0x1d, 0x1d, 0xd9, 0x65, 0xdf, 0x8c, 0xfc, 0xc5,
+	0x52, 0xe4, 0xb7, 0xa8, 0x17, 0x3b, 0xd8, 0x26, 0xd5, 0xdd, 0x8f, 0x54, 0x53, 0xd9, 0x4e, 0x0e,
+	0xec, 0xd8, 0xb7, 0x79, 0xcf, 0x15, 0x7b, 0x6f, 0x46, 0x25, 0x7a, 0xe3, 0x12, 0xbd, 0x8b, 0x12,
+	0xbd, 0xab, 0x12, 0xe1, 0x4f, 0x89, 0xf0, 0xd9, 0x20, 0x7c, 0x37, 0x08, 0x3f, 0x0c, 0xc2, 0xb9,
+	0x41, 0x18, 0x19, 0x84, 0xb1, 0x41, 0xf8, 0x65, 0x10, 0x7e, 0x1b, 0xf4, 0xae, 0x0c, 0xc2, 0x97,
+	0x09, 0x7a, 0xe7, 0x13, 0x84, 0xf1, 0x04, 0xbd, 0x8b, 0x09, 0x7a, 0x9d, 0x07, 0xf6, 0xf7, 0xdc,
+	0xf9, 0x1b, 0x00, 0x00, 0xff, 0xff, 0xb0, 0x57, 0xfd, 0x0d, 0x3c, 0x03, 0x00, 0x00,
 }
 
 func (this *SigninResp) Equal(that interface{}) bool {
@@ -267,6 +358,66 @@ func (this *SigninReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *FetchUserReq) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*FetchUserReq)
+	if !ok {
+		that2, ok := that.(FetchUserReq)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Me != that1.Me {
+		return false
+	}
+	if !this.ID.Equal(that1.ID) {
+		return false
+	}
+	if !this.EntityID.Equal(that1.EntityID) {
+		return false
+	}
+	return true
+}
+func (this *UpdateUserReq) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*UpdateUserReq)
+	if !ok {
+		that2, ok := that.(UpdateUserReq)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Firstname.Equal(that1.Firstname) {
+		return false
+	}
+	if !this.Lastname.Equal(that1.Lastname) {
+		return false
+	}
+	if !this.AvatarURL.Equal(that1.AvatarURL) {
+		return false
+	}
+	return true
+}
 func (this *SigninResp) GoString() string {
 	if this == nil {
 		return "nil"
@@ -299,6 +450,36 @@ func (this *SigninReq) GoString() string {
 	s = append(s, "&dto.SigninReq{")
 	s = append(s, "Email: "+fmt.Sprintf("%#v", this.Email)+",\n")
 	s = append(s, "Password: "+fmt.Sprintf("%#v", this.Password)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *FetchUserReq) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&dto.FetchUserReq{")
+	s = append(s, "Me: "+fmt.Sprintf("%#v", this.Me)+",\n")
+	s = append(s, "ID: "+fmt.Sprintf("%#v", this.ID)+",\n")
+	s = append(s, "EntityID: "+fmt.Sprintf("%#v", this.EntityID)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *UpdateUserReq) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&dto.UpdateUserReq{")
+	if this.Firstname != nil {
+		s = append(s, "Firstname: "+fmt.Sprintf("%#v", this.Firstname)+",\n")
+	}
+	if this.Lastname != nil {
+		s = append(s, "Lastname: "+fmt.Sprintf("%#v", this.Lastname)+",\n")
+	}
+	if this.AvatarURL != nil {
+		s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", this.AvatarURL)+",\n")
+	}
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -435,6 +616,118 @@ func (m *SigninReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *FetchUserReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FetchUserReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FetchUserReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.EntityID.Size()
+		i -= size
+		if _, err := m.EntityID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size := m.ID.Size()
+		i -= size
+		if _, err := m.ID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if m.Me {
+		i--
+		if m.Me {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *UpdateUserReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateUserReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateUserReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.AvatarURL != nil {
+		{
+			size, err := m.AvatarURL.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintUser(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Lastname != nil {
+		{
+			size, err := m.Lastname.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintUser(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Firstname != nil {
+		{
+			size, err := m.Firstname.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintUser(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintUser(dAtA []byte, offset int, v uint64) int {
 	offset -= sovUser(v)
 	base := offset
@@ -475,6 +768,34 @@ func NewPopulatedSigninReq(r randyUser, easy bool) *SigninReq {
 	return this
 }
 
+func NewPopulatedFetchUserReq(r randyUser, easy bool) *FetchUserReq {
+	this := &FetchUserReq{}
+	this.Me = bool(bool(r.Intn(2) == 0))
+	v1 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.ID = *v1
+	v2 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.EntityID = *v2
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedUpdateUserReq(r randyUser, easy bool) *UpdateUserReq {
+	this := &UpdateUserReq{}
+	if r.Intn(5) != 0 {
+		this.Firstname = pbtypes.NewPopulatedString(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.Lastname = pbtypes.NewPopulatedString(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.AvatarURL = pbtypes.NewPopulatedString(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 type randyUser interface {
 	Float32() float32
 	Float64() float64
@@ -494,9 +815,9 @@ func randUTF8RuneUser(r randyUser) rune {
 	return rune(ru + 61)
 }
 func randStringUser(r randyUser) string {
-	v1 := r.Intn(100)
-	tmps := make([]rune, v1)
-	for i := 0; i < v1; i++ {
+	v3 := r.Intn(100)
+	tmps := make([]rune, v3)
+	for i := 0; i < v3; i++ {
 		tmps[i] = randUTF8RuneUser(r)
 	}
 	return string(tmps)
@@ -518,11 +839,11 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
-		v2 := r.Int63()
+		v4 := r.Int63()
 		if r.Intn(2) == 0 {
-			v2 *= -1
+			v4 *= -1
 		}
-		dAtA = encodeVarintPopulateUser(dAtA, uint64(v2))
+		dAtA = encodeVarintPopulateUser(dAtA, uint64(v4))
 	case 1:
 		dAtA = encodeVarintPopulateUser(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -606,6 +927,43 @@ func (m *SigninReq) Size() (n int) {
 	return n
 }
 
+func (m *FetchUserReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Me {
+		n += 2
+	}
+	l = m.ID.Size()
+	n += 1 + l + sovUser(uint64(l))
+	l = m.EntityID.Size()
+	n += 1 + l + sovUser(uint64(l))
+	return n
+}
+
+func (m *UpdateUserReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Firstname != nil {
+		l = m.Firstname.Size()
+		n += 1 + l + sovUser(uint64(l))
+	}
+	if m.Lastname != nil {
+		l = m.Lastname.Size()
+		n += 1 + l + sovUser(uint64(l))
+	}
+	if m.AvatarURL != nil {
+		l = m.AvatarURL.Size()
+		n += 1 + l + sovUser(uint64(l))
+	}
+	return n
+}
+
 func sovUser(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -643,6 +1001,30 @@ func (this *SigninReq) String() string {
 	s := strings.Join([]string{`&SigninReq{`,
 		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
 		`Password:` + fmt.Sprintf("%v", this.Password) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FetchUserReq) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FetchUserReq{`,
+		`Me:` + fmt.Sprintf("%v", this.Me) + `,`,
+		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
+		`EntityID:` + fmt.Sprintf("%v", this.EntityID) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateUserReq) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateUserReq{`,
+		`Firstname:` + strings.Replace(fmt.Sprintf("%v", this.Firstname), "String", "pbtypes.String", 1) + `,`,
+		`Lastname:` + strings.Replace(fmt.Sprintf("%v", this.Lastname), "String", "pbtypes.String", 1) + `,`,
+		`AvatarURL:` + strings.Replace(fmt.Sprintf("%v", this.AvatarURL), "String", "pbtypes.String", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1045,6 +1427,306 @@ func (m *SigninReq) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Password = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipUser(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthUser
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthUser
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FetchUserReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowUser
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FetchUserReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FetchUserReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Me", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Me = bool(v != 0)
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthUser
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthUser
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EntityID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipUser(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthUser
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthUser
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateUserReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowUser
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateUserReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateUserReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Firstname", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthUser
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Firstname == nil {
+				m.Firstname = &pbtypes.String{}
+			}
+			if err := m.Firstname.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Lastname", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthUser
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Lastname == nil {
+				m.Lastname = &pbtypes.String{}
+			}
+			if err := m.Lastname.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AvatarURL", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowUser
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthUser
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthUser
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AvatarURL == nil {
+				m.AvatarURL = &pbtypes.String{}
+			}
+			if err := m.AvatarURL.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

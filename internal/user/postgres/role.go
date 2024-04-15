@@ -47,19 +47,19 @@ func (f filterRole) where(n int) (string, []any) {
 	var args []any
 
 	if f.ID != nil {
-		clause = append(clause, fmt.Sprintf(`id = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`r.id = $%d`, n))
 		args = append(args, f.ID)
 		n++
 	}
 
 	if len(f.IDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`id IN (%s)`, postgres.Array(n, len(f.IDs))))
+		clause = append(clause, fmt.Sprintf(`r.id IN (%s)`, postgres.Array(n, len(f.IDs))))
 		args = append(args, ulid.IDs(f.IDs).Any()...)
 		n += len(f.IDs)
 	}
 
 	if f.EntityID != nil {
-		clause = append(clause, fmt.Sprintf(`entity_id = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`r.entity_id = $%d`, n))
 		args = append(args, f.EntityID)
 		n++
 	}
@@ -118,7 +118,7 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" `)
+	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" r `)
 
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
@@ -140,7 +140,7 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, er
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" `)
+	b.WriteString(`SELECT id, entity_id, name, created_at, updated_at FROM "user"."role" r `)
 
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
@@ -171,7 +171,7 @@ func (s Store) DeleteRole(ctx context.Context, f user.FilterRole) error {
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`DELETE FROM "user"."role" `)
+	b.WriteString(`DELETE FROM "user"."role" r `)
 
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)

@@ -10,6 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { String$ } from "../../../pkg/pbtypes/string";
 /**
  * @generated from protobuf message dto.SigninResp
  */
@@ -56,6 +57,40 @@ export interface SigninReq {
      * @generated from protobuf field: string Password = 2 [json_name = "Password"];
      */
     password: string;
+}
+/**
+ * @generated from protobuf message dto.FetchUserReq
+ */
+export interface FetchUserReq {
+    /**
+     * @generated from protobuf field: bool Me = 1 [json_name = "Me"];
+     */
+    me: boolean;
+    /**
+     * @generated from protobuf field: bytes ID = 2 [json_name = "ID"];
+     */
+    iD: Uint8Array;
+    /**
+     * @generated from protobuf field: bytes EntityID = 3 [json_name = "EntityID"];
+     */
+    entityID: Uint8Array;
+}
+/**
+ * @generated from protobuf message dto.UpdateUserReq
+ */
+export interface UpdateUserReq {
+    /**
+     * @generated from protobuf field: pbtypes.String Firstname = 1 [json_name = "Firstname"];
+     */
+    firstname?: String$;
+    /**
+     * @generated from protobuf field: pbtypes.String Lastname = 2 [json_name = "Lastname"];
+     */
+    lastname?: String$;
+    /**
+     * @generated from protobuf field: pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];
+     */
+    avatarURL?: String$;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SigninResp$Type extends MessageType<SigninResp> {
@@ -238,3 +273,126 @@ class SigninReq$Type extends MessageType<SigninReq> {
  * @generated MessageType for protobuf message dto.SigninReq
  */
 export const SigninReq = new SigninReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FetchUserReq$Type extends MessageType<FetchUserReq> {
+    constructor() {
+        super("dto.FetchUserReq", [
+            { no: 1, name: "Me", kind: "scalar", jsonName: "Me", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 3, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<FetchUserReq>): FetchUserReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.me = false;
+        message.iD = new Uint8Array(0);
+        message.entityID = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<FetchUserReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FetchUserReq): FetchUserReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool Me = 1 [json_name = "Me"];*/ 1:
+                    message.me = reader.bool();
+                    break;
+                case /* bytes ID = 2 [json_name = "ID"];*/ 2:
+                    message.iD = reader.bytes();
+                    break;
+                case /* bytes EntityID = 3 [json_name = "EntityID"];*/ 3:
+                    message.entityID = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: FetchUserReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bool Me = 1 [json_name = "Me"]; */
+        if (message.me !== false)
+            writer.tag(1, WireType.Varint).bool(message.me);
+        /* bytes ID = 2 [json_name = "ID"]; */
+        if (message.iD.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.iD);
+        /* bytes EntityID = 3 [json_name = "EntityID"]; */
+        if (message.entityID.length)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.entityID);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.FetchUserReq
+ */
+export const FetchUserReq = new FetchUserReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class UpdateUserReq$Type extends MessageType<UpdateUserReq> {
+    constructor() {
+        super("dto.UpdateUserReq", [
+            { no: 1, name: "Firstname", kind: "message", jsonName: "Firstname", T: () => String$ },
+            { no: 2, name: "Lastname", kind: "message", jsonName: "Lastname", T: () => String$ },
+            { no: 3, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ }
+        ]);
+    }
+    create(value?: PartialMessage<UpdateUserReq>): UpdateUserReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        if (value !== undefined)
+            reflectionMergePartial<UpdateUserReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UpdateUserReq): UpdateUserReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* pbtypes.String Firstname = 1 [json_name = "Firstname"];*/ 1:
+                    message.firstname = String$.internalBinaryRead(reader, reader.uint32(), options, message.firstname);
+                    break;
+                case /* pbtypes.String Lastname = 2 [json_name = "Lastname"];*/ 2:
+                    message.lastname = String$.internalBinaryRead(reader, reader.uint32(), options, message.lastname);
+                    break;
+                case /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];*/ 3:
+                    message.avatarURL = String$.internalBinaryRead(reader, reader.uint32(), options, message.avatarURL);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: UpdateUserReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* pbtypes.String Firstname = 1 [json_name = "Firstname"]; */
+        if (message.firstname)
+            String$.internalBinaryWrite(message.firstname, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String Lastname = 2 [json_name = "Lastname"]; */
+        if (message.lastname)
+            String$.internalBinaryWrite(message.lastname, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"]; */
+        if (message.avatarURL)
+            String$.internalBinaryWrite(message.avatarURL, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.UpdateUserReq
+ */
+export const UpdateUserReq = new UpdateUserReq$Type();

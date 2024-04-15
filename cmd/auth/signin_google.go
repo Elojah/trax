@@ -51,8 +51,7 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 			return transaction.Commit, nil
 		}
 
-		var p user.Profile
-		u, p, err = claims.CreateUser(ctx)
+		u, err = claims.CreateUser(ctx)
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to create user")
 
@@ -63,17 +62,6 @@ func (h *handler) SigninGoogle(ctx context.Context, req *pbtypes.String) (*dto.S
 
 		if err := h.user.Insert(ctx, u); err != nil {
 			logger.Error().Err(err).Msg("failed to insert user")
-
-			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
-		}
-
-		if err := h.user.InsertProfile(ctx, p); err != nil {
-			if errors.As(err, &gerrors.ErrConflict{}) {
-				logger.Error().Err(err).Msg("failed to insert profile")
-
-				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
-			}
-			logger.Error().Err(err).Msg("failed to insert profile")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}

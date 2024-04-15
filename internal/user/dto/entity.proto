@@ -29,6 +29,10 @@ message UpdateEntityReq {
     pbtypes.String AvatarURL    = 3;
 }
 
+message FetchEntityReq {
+	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
 message ListEntityReq {
 	paginate.Paginate Paginate    = 1 [(gogoproto.nullable) = true];
 	string Search                 = 2;
@@ -39,6 +43,3 @@ message ListEntityResp {
 	uint64 Total                  = 2;
 }
 
-message FetchEntityProfileReq {
-	bytes EntityID                = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-}

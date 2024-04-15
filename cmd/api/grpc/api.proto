@@ -16,7 +16,7 @@ import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
 
 import "github.com/elojah/trax/internal/user/user.proto";
 import "github.com/elojah/trax/internal/user/entity.proto";
-import "github.com/elojah/trax/internal/user/dto/profile.proto";
+import "github.com/elojah/trax/internal/user/dto/user.proto";
 import "github.com/elojah/trax/internal/user/dto/entity.proto";
 
 service API {
@@ -24,11 +24,13 @@ service API {
     rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
 
     // User
-    rpc FetchProfile(dto.FetchProfileReq) returns (user.Profile);
-    rpc UpdateProfile(dto.UpdateProfileReq) returns (user.Profile);
+    rpc FetchUser(dto.FetchUserReq) returns (user.U);
+    rpc UpdateUser(dto.UpdateUserReq) returns (user.U);
+    // rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp); // TODO: IMPLEMENT
 
     // Entity
     rpc CreateEntity(dto.CreateEntityReq) returns (user.Entity);
     rpc ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
+    rpc FetchEntity(dto.FetchEntityReq) returns (user.Entity);
     // rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
 }

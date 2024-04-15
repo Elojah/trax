@@ -12,29 +12,21 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
-import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 
 message U {
-	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                   = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
-	string Email           = 2;
+	string Email               = 2;
 
-	bytes PasswordHash     = 3;
-	bytes PasswordSalt     = 4;
+	bytes PasswordHash         = 3;
+	bytes PasswordSalt         = 4;
 
-	string GoogleID        = 5;
+	string GoogleID            = 5;
 
-	int64 CreatedAt        = 6;
-	int64 UpdatedAt        = 7;
-}
+	string FirstName           = 6;
+	string LastName            = 7;
+	string AvatarURL           = 8;
 
-message Profile {
-	bytes UserID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-
-	string FirstName           = 2;
-	string LastName            = 3;
-	pbtypes.String AvatarURL   = 4;
-
-	int64 CreatedAt            = 5;
-	int64 UpdatedAt            = 6;
+	int64 CreatedAt            = 9;
+	int64 UpdatedAt            = 10;
 }

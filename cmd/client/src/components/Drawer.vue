@@ -13,7 +13,7 @@ const redirect = function (name: string) {
 </script>
 
 <template>
-	<v-navigation-drawer rail v-if="authStore.profile">
+	<v-navigation-drawer rail v-if="authStore.user">
 		<v-list nav>
 			<v-list-item prepend-icon="mdi-domain" title="Entity" value="entity" @click="redirect('entity')">
 				<template v-slot:prepend>
@@ -28,14 +28,13 @@ const redirect = function (name: string) {
 				</template>
 			</v-list-item>
 			<v-divider></v-divider>
-			<v-list-item v-if="authStore.profile" prepend-icon="mdi-map" title="Map" value="map"
-				@click="redirect('map')">
+			<v-list-item v-if="authStore.user" prepend-icon="mdi-map" title="Map" value="map" @click="redirect('map')">
 				<template v-slot:prepend>
 					<v-icon color="primary"></v-icon>
 				</template>
 			</v-list-item>
 			<v-divider></v-divider>
-			<v-list-item v-if="authStore.profile" prepend-icon="mdi-library-shelves" title="Stocks" value="stocks"
+			<v-list-item v-if="authStore.user" prepend-icon="mdi-library-shelves" title="Stocks" value="stocks"
 				@click="redirect('stocks')">
 				<template v-slot:prepend>
 					<v-icon color="primary"></v-icon>
@@ -46,8 +45,7 @@ const redirect = function (name: string) {
 		<template v-slot:append>
 			<v-divider thickness="3"></v-divider>
 			<v-list nav>
-				<v-list-item prepend-icon="mdi-account-circle" title="Profile" value="profile"
-					@click="redirect('profile')">
+				<v-list-item prepend-icon="mdi-account-circle" title="User" value="user" @click="redirect('user')">
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>
 					</template>

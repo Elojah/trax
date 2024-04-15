@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
-import { Entity, EntityProfile } from '@internal/user/entity';
+import { Entity } from '@internal/user/entity';
 import { computed, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { marked } from "marked";
@@ -12,7 +12,6 @@ const valid = ref(null as boolean | null)
 const entityStore = useEntityStore();
 const {
 	entity: entity,
-	entityProfile: entityProfile,
 	entities: entities,
 	total: total,
 } = toRefs(entityStore);
@@ -81,7 +80,7 @@ const tableEntities = computed(() => {
 });
 
 const mdDescription = computed(() => {
-	return marked.parse(entityProfile.value?.description?.value ?? `*no description*`);
+	return marked.parse(entity.value?.description ?? `*no description*`);
 });
 
 const listEntity = async (options: any) => {
@@ -121,7 +120,6 @@ const create = async () => {
 
 const displayEntity = (_: any, row: { item: Entity }) => {
 	entity.value = row.item;
-	// TODO: fetch entity profile
 };
 
 const dialogDelete = ref(false);

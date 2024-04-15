@@ -58,25 +58,25 @@ func (f filterPermission) where() (string, []any) {
 	n := 1
 
 	if f.RoleID != nil {
-		clause = append(clause, fmt.Sprintf(`role_id = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`p.role_id = $%d`, n))
 		args = append(args, f.RoleID)
 		n++
 	}
 
 	if len(f.RoleIDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`role_id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
+		clause = append(clause, fmt.Sprintf(`p.role_id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
 		args = append(args, ulid.IDs(f.RoleIDs).Any()...)
 		n += len(f.RoleIDs)
 	}
 
 	if f.Resource != nil {
-		clause = append(clause, fmt.Sprintf(`resource = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`p.resource = $%d`, n))
 		args = append(args, f.Resource.String())
 		n++
 	}
 
 	if f.Command != nil {
-		clause = append(clause, fmt.Sprintf(`command = $%d`, n))
+		clause = append(clause, fmt.Sprintf(`p.command = $%d`, n))
 		args = append(args, f.Command.String())
 		n++
 	}
@@ -177,7 +177,7 @@ func (s Store) FetchPermission(ctx context.Context, f user.FilterPermission) (us
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, resource, command, created_at, updated_at FROM "user"."permission" `)
+	b.WriteString(`SELECT role_id, resource, command, created_at, updated_at FROM "user"."permission" p `)
 
 	clause, args := filterPermission(f).where()
 	b.WriteString(clause)
@@ -199,7 +199,7 @@ func (s Store) ListPermission(ctx context.Context, f user.FilterPermission) ([]u
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT role_id, resource, command, created_at, updated_at FROM "user"."permission" `)
+	b.WriteString(`SELECT role_id, resource, command, created_at, updated_at FROM "user"."permission" p `)
 
 	clause, args := filterPermission(f).where()
 	b.WriteString(clause)
@@ -235,7 +235,7 @@ func (s Store) DeletePermission(ctx context.Context, f user.FilterPermission) er
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`DELETE FROM "user"."permission" `)
+	b.WriteString(`DELETE FROM "user"."permission" p `)
 
 	clause, args := filterPermission(f).where()
 	b.WriteString(clause)

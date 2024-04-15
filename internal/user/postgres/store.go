@@ -5,7 +5,6 @@ import (
 )
 
 var _ user.Store = (*Store)(nil)
-var _ user.StoreProfile = (*Store)(nil)
 
 var _ user.StoreEntity = (*Store)(nil)
 

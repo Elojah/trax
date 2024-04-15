@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
-import { Profile } from '@internal/user/user'
+import { U } from '@internal/user/user'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import type { SigninReq, SignupReq } from '@internal/user/dto/user'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { getCookie, removeCookie } from 'typescript-cookie'
-import { FetchProfileReq, UpdateProfileReq } from '@internal/user/dto/profile'
+import { FetchUserReq, UpdateUserReq } from '@internal/user/dto/user'
 import { ref } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref('' as string)
-  const profile = ref(null as Profile | null)
+  const user = ref(null as U | null)
 
   const signupURL = new URL('signup', config.web_client_url).href
   const signinURL = new URL('signin', config.web_client_url).href
@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
     })
 
     if (resp.status === 200) {
-      refreshProfile()
+      refreshUser()
     }
 
     return resp
@@ -50,13 +50,13 @@ export const useAuthStore = defineStore('auth', () => {
     })
 
     if (resp.status === 200) {
-      refreshProfile()
+      refreshUser()
     }
 
     return resp
   }
 
-  const refreshProfile = async () => {
+  const refreshUser = async () => {
     token.value = getCookie('access') ?? ''
 
     if (!token.value) {
@@ -64,12 +64,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     try {
-      const req = FetchProfileReq.create({
+      const req = FetchUserReq.create({
         me: true
       })
 
-      const resp = await api.fetchProfile(req, { meta: { token: token.value } })
-      profile.value = resp.response
+      const resp = await api.fetchUser(req, { meta: { token: token.value } })
+      user.value = resp.response
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -78,15 +78,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const updateProfile = async () => {
+  const updateUser = async (firstName: string | null, lastName: string | null) => {
     try {
-      const req = UpdateProfileReq.create({
-        firstname: { value: profile?.value?.firstName },
-        lastname: { value: profile?.value?.lastName }
+      const req = UpdateUserReq.create({
+        ...(firstName && { firstname: { value: firstName } }),
+        ...(lastName && { lastname: { value: lastName } })
       })
 
-      const resp = await api.updateProfile(req, { meta: { token: token.value } })
-      profile.value = resp.response
+      const resp = await api.updateUser(req, { meta: { token: token.value } })
+      user.value = resp.response
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -107,7 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const signout = async () => {
     token.value = ''
-    profile.value = null
+    user.value = null
     removeCookie('g_state')
     removeCookie('refresh', { path: '', domain: '.legacyfactory.com' })
     removeCookie('access', { path: '', domain: '.legacyfactory.com' })
@@ -115,13 +115,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     token,
-    profile,
+    user,
     signup,
     signin,
     signout,
     signinGoogle,
-    refreshProfile,
-    updateProfile,
+    refreshUser,
+    updateUser,
     refreshToken
   }
 })

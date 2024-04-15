@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { Entity, EntityProfile } from '@internal/user/entity'
+import { Entity } from '@internal/user/entity'
 import { Paginate } from '@pkg/paginate/paginate'
 import { CreateEntityReq, ListEntityReq } from '@internal/user/dto/entity'
 import { useAuthStore } from './auth'
@@ -10,7 +10,6 @@ import { computed, ref } from 'vue'
 
 export const useEntityStore = defineStore('entity', () => {
   const entity = ref(null as Entity | null)
-  const entityProfile = ref(null as EntityProfile | null)
 
   const entities = ref([] as Entity[] | null)
 
@@ -70,7 +69,6 @@ export const useEntityStore = defineStore('entity', () => {
 
   return {
     entity,
-    entityProfile,
     entities,
     total,
     createEntity,

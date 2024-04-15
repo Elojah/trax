@@ -12,6 +12,7 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 
 message SigninResp {
     string AccessToken    = 1;
@@ -28,4 +29,17 @@ message SignupReq {
 message SigninReq {
     string Email        = 1;
     string Password     = 2;
+}
+
+message FetchUserReq {
+    bool Me                     = 1;
+
+	bytes ID                    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes EntityID              = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
+message UpdateUserReq {
+    pbtypes.String Firstname    = 1;
+    pbtypes.String Lastname     = 2;
+    pbtypes.String AvatarURL    = 3;
 }

@@ -4,13 +4,14 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
+import type { FetchEntityReq } from "../../../internal/user/dto/entity";
 import type { ListEntityResp } from "../../../internal/user/dto/entity";
 import type { ListEntityReq } from "../../../internal/user/dto/entity";
 import type { Entity } from "../../../internal/user/entity";
 import type { CreateEntityReq } from "../../../internal/user/dto/entity";
-import type { UpdateProfileReq } from "../../../internal/user/dto/profile";
-import type { Profile } from "../../../internal/user/user";
-import type { FetchProfileReq } from "../../../internal/user/dto/profile";
+import type { UpdateUserReq } from "../../../internal/user/dto/user";
+import type { U } from "../../../internal/user/user";
+import type { FetchUserReq } from "../../../internal/user/dto/user";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
 import type { Empty } from "../../../pkg/pbtypes/empty";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
@@ -28,13 +29,15 @@ export interface IAPIClient {
     /**
      * User
      *
-     * @generated from protobuf rpc: FetchProfile(dto.FetchProfileReq) returns (user.Profile);
+     * @generated from protobuf rpc: FetchUser(dto.FetchUserReq) returns (user.U);
      */
-    fetchProfile(input: FetchProfileReq, options?: RpcOptions): UnaryCall<FetchProfileReq, Profile>;
+    fetchUser(input: FetchUserReq, options?: RpcOptions): UnaryCall<FetchUserReq, U>;
     /**
-     * @generated from protobuf rpc: UpdateProfile(dto.UpdateProfileReq) returns (user.Profile);
+     * rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: UpdateUser(dto.UpdateUserReq) returns (user.U);
      */
-    updateProfile(input: UpdateProfileReq, options?: RpcOptions): UnaryCall<UpdateProfileReq, Profile>;
+    updateUser(input: UpdateUserReq, options?: RpcOptions): UnaryCall<UpdateUserReq, U>;
     /**
      * Entity
      *
@@ -42,11 +45,15 @@ export interface IAPIClient {
      */
     createEntity(input: CreateEntityReq, options?: RpcOptions): UnaryCall<CreateEntityReq, Entity>;
     /**
-     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
-     *
      * @generated from protobuf rpc: ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
      */
     listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp>;
+    /**
+     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: FetchEntity(dto.FetchEntityReq) returns (user.Entity);
+     */
+    fetchEntity(input: FetchEntityReq, options?: RpcOptions): UnaryCall<FetchEntityReq, Entity>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -69,18 +76,20 @@ export class APIClient implements IAPIClient, ServiceInfo {
     /**
      * User
      *
-     * @generated from protobuf rpc: FetchProfile(dto.FetchProfileReq) returns (user.Profile);
+     * @generated from protobuf rpc: FetchUser(dto.FetchUserReq) returns (user.U);
      */
-    fetchProfile(input: FetchProfileReq, options?: RpcOptions): UnaryCall<FetchProfileReq, Profile> {
+    fetchUser(input: FetchUserReq, options?: RpcOptions): UnaryCall<FetchUserReq, U> {
         const method = this.methods[1], opt = this._transport.mergeOptions(options);
-        return stackIntercept<FetchProfileReq, Profile>("unary", this._transport, method, opt, input);
+        return stackIntercept<FetchUserReq, U>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: UpdateProfile(dto.UpdateProfileReq) returns (user.Profile);
+     * rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: UpdateUser(dto.UpdateUserReq) returns (user.U);
      */
-    updateProfile(input: UpdateProfileReq, options?: RpcOptions): UnaryCall<UpdateProfileReq, Profile> {
+    updateUser(input: UpdateUserReq, options?: RpcOptions): UnaryCall<UpdateUserReq, U> {
         const method = this.methods[2], opt = this._transport.mergeOptions(options);
-        return stackIntercept<UpdateProfileReq, Profile>("unary", this._transport, method, opt, input);
+        return stackIntercept<UpdateUserReq, U>("unary", this._transport, method, opt, input);
     }
     /**
      * Entity
@@ -92,12 +101,19 @@ export class APIClient implements IAPIClient, ServiceInfo {
         return stackIntercept<CreateEntityReq, Entity>("unary", this._transport, method, opt, input);
     }
     /**
-     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
-     *
      * @generated from protobuf rpc: ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
      */
     listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp> {
         const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept<ListEntityReq, ListEntityResp>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
+     *
+     * @generated from protobuf rpc: FetchEntity(dto.FetchEntityReq) returns (user.Entity);
+     */
+    fetchEntity(input: FetchEntityReq, options?: RpcOptions): UnaryCall<FetchEntityReq, Entity> {
+        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        return stackIntercept<FetchEntityReq, Entity>("unary", this._transport, method, opt, input);
     }
 }

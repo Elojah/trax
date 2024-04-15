@@ -13,49 +13,49 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) FetchEntityProfile(ctx context.Context, req *dto.FetchEntityProfileReq) (*user.EntityProfile, error) {
-	logger := log.With().Str("method", "fetch_entity_profile").Logger()
+func (h *handler) FetchEntity(ctx context.Context, req *dto.FetchEntityReq) (*user.Entity, error) {
+	logger := log.With().Str("method", "fetch_entity").Logger()
 
 	if req == nil {
-		return &user.EntityProfile{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &user.Entity{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &user.EntityProfile{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	if err := claims.Require(req.EntityID, user.R_entity, user.C_read); err != nil {
+	if err := claims.Require(req.ID, user.R_entity, user.C_read); err != nil {
 		logger.Error().Err(err).Msg("failed to require permission")
 
-		return &user.EntityProfile{}, status.New(codes.PermissionDenied, err.Error()).Err()
+		return &user.Entity{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 
-	var profile user.EntityProfile
+	var entity user.Entity
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
-		profile, err = h.user.FetchEntityProfile(ctx, user.FilterEntityProfile{
-			EntityID: req.EntityID,
+		entity, err = h.user.FetchEntity(ctx, user.FilterEntity{
+			ID: req.ID,
 		})
 		if err != nil {
 			if errors.As(err, &gerrors.ErrNotFound{}) {
-				logger.Error().Err(err).Msg("failed to fetch user entity profile")
+				logger.Error().Err(err).Msg("failed to fetch user entity")
 
 				return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
 			}
-			logger.Error().Err(err).Msg("failed to fetch user entity profile")
+			logger.Error().Err(err).Msg("failed to fetch user entity")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &user.EntityProfile{}, err
+		return &user.Entity{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &profile, nil
+	return &entity, nil
 }

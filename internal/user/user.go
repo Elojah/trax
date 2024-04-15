@@ -14,10 +14,8 @@ type App interface {
 	transaction.Transactioner
 
 	Store
-	StoreProfile
 
 	StoreEntity
-	StoreEntityProfile
 
 	StoreRole
 	StorePermission
@@ -37,31 +35,19 @@ type Filter struct {
 	GoogleID *string
 }
 
-type Store interface {
-	Insert(context.Context, U) error
-	Fetch(context.Context, Filter) (U, error)
-	List(context.Context, Filter) ([]U, error)
-	Delete(context.Context, Filter) error
-}
-
-type FilterProfile struct {
-	UserID  ulid.ID
-	UserIDs []ulid.ID
-}
-
-type PatchProfile struct {
+type Patch struct {
 	FirstName *string
 	LastName  *string
 	AvatarURL *string
 	UpdatedAt *int64
 }
 
-type StoreProfile interface {
-	InsertProfile(context.Context, Profile) error
-	FetchProfile(context.Context, FilterProfile) (Profile, error)
-	ListProfile(context.Context, FilterProfile) ([]Profile, error)
-	UpdateProfile(context.Context, FilterProfile, PatchProfile) ([]Profile, error)
-	DeleteProfile(context.Context, FilterProfile) error
+type Store interface {
+	Insert(context.Context, U) error
+	Fetch(context.Context, Filter) (U, error)
+	List(context.Context, Filter) ([]U, error)
+	Update(context.Context, Filter, Patch) ([]U, error)
+	Delete(context.Context, Filter) error
 }
 
 const (

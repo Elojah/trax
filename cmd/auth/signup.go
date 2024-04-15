@@ -34,17 +34,11 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 			Email:        req.Email,
 			PasswordHash: hash,
 			PasswordSalt: salt,
+			FirstName:    req.Firstname,
+			LastName:     req.Lastname,
 			GoogleID:     "",
 			CreatedAt:    now,
 			UpdatedAt:    now,
-		}
-
-		p := user.Profile{
-			UserID:    u.ID,
-			FirstName: req.Firstname,
-			LastName:  req.Lastname,
-			CreatedAt: now,
-			UpdatedAt: now,
 		}
 
 		logger = logger.With().Str("user_id", u.ID.String()).Str("user_email", u.Email).Logger()
@@ -56,17 +50,6 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
 			}
 			logger.Error().Err(err).Msg("failed to insert user")
-
-			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
-		}
-
-		if err := h.user.InsertProfile(ctx, p); err != nil {
-			if errors.As(err, &gerrors.ErrConflict{}) {
-				logger.Error().Err(err).Msg("failed to insert profile")
-
-				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
-			}
-			logger.Error().Err(err).Msg("failed to insert profile")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}

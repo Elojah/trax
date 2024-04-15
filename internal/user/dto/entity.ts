@@ -48,6 +48,15 @@ export interface UpdateEntityReq {
     avatarURL?: String$;
 }
 /**
+ * @generated from protobuf message dto.FetchEntityReq
+ */
+export interface FetchEntityReq {
+    /**
+     * @generated from protobuf field: bytes ID = 1 [json_name = "ID"];
+     */
+    iD: Uint8Array;
+}
+/**
  * @generated from protobuf message dto.ListEntityReq
  */
 export interface ListEntityReq {
@@ -72,15 +81,6 @@ export interface ListEntityResp {
      * @generated from protobuf field: uint64 Total = 2 [json_name = "Total"];
      */
     total: bigint;
-}
-/**
- * @generated from protobuf message dto.FetchEntityProfileReq
- */
-export interface FetchEntityProfileReq {
-    /**
-     * @generated from protobuf field: bytes EntityID = 1 [json_name = "EntityID"];
-     */
-    entityID: Uint8Array;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class CreateEntityReq$Type extends MessageType<CreateEntityReq> {
@@ -204,6 +204,53 @@ class UpdateEntityReq$Type extends MessageType<UpdateEntityReq> {
  */
 export const UpdateEntityReq = new UpdateEntityReq$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class FetchEntityReq$Type extends MessageType<FetchEntityReq> {
+    constructor() {
+        super("dto.FetchEntityReq", [
+            { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<FetchEntityReq>): FetchEntityReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.iD = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<FetchEntityReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FetchEntityReq): FetchEntityReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes ID = 1 [json_name = "ID"];*/ 1:
+                    message.iD = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: FetchEntityReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes ID = 1 [json_name = "ID"]; */
+        if (message.iD.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.FetchEntityReq
+ */
+export const FetchEntityReq = new FetchEntityReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class ListEntityReq$Type extends MessageType<ListEntityReq> {
     constructor() {
         super("dto.ListEntityReq", [
@@ -312,50 +359,3 @@ class ListEntityResp$Type extends MessageType<ListEntityResp> {
  * @generated MessageType for protobuf message dto.ListEntityResp
  */
 export const ListEntityResp = new ListEntityResp$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class FetchEntityProfileReq$Type extends MessageType<FetchEntityProfileReq> {
-    constructor() {
-        super("dto.FetchEntityProfileReq", [
-            { no: 1, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
-        ]);
-    }
-    create(value?: PartialMessage<FetchEntityProfileReq>): FetchEntityProfileReq {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.entityID = new Uint8Array(0);
-        if (value !== undefined)
-            reflectionMergePartial<FetchEntityProfileReq>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FetchEntityProfileReq): FetchEntityProfileReq {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bytes EntityID = 1 [json_name = "EntityID"];*/ 1:
-                    message.entityID = reader.bytes();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: FetchEntityProfileReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bytes EntityID = 1 [json_name = "EntityID"]; */
-        if (message.entityID.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.entityID);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message dto.FetchEntityProfileReq
- */
-export const FetchEntityProfileReq = new FetchEntityProfileReq$Type();

@@ -29,10 +29,12 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 
 	now := time.Now().Unix()
 	e := user.Entity{
-		ID:        ulid.NewID(),
-		Name:      req.Name,
-		CreatedAt: now,
-		UpdatedAt: now,
+		ID:          ulid.NewID(),
+		Name:        req.Name,
+		Description: req.Description.Value,
+		AvatarURL:   req.AvatarURL.Value,
+		CreatedAt:   now,
+		UpdatedAt:   now,
 	}
 
 	// #MARK:Check request
@@ -40,22 +42,8 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 		return &user.Entity{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
-	profile := user.EntityProfile{
-		EntityID:    e.ID,
-		Description: req.Description,
-		AvatarURL:   req.AvatarURL,
-		CreatedAt:   now,
-		UpdatedAt:   now,
-	}
-
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		if err = h.user.InsertEntity(ctx, e); err != nil {
-			logger.Error().Err(err).Msg("failed to insert entity")
-
-			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
-		}
-
-		if err = h.user.InsertEntityProfile(ctx, profile); err != nil {
 			logger.Error().Err(err).Msg("failed to insert entity")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()

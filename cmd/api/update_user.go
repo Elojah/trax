@@ -14,52 +14,52 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) UpdateProfile(ctx context.Context, req *dto.UpdateProfileReq) (*user.Profile, error) {
-	logger := log.With().Str("method", "update_profile").Logger()
+func (h *handler) UpdateUser(ctx context.Context, req *dto.UpdateUserReq) (*user.U, error) {
+	logger := log.With().Str("method", "update_user").Logger()
 
 	if req == nil {
-		return &user.Profile{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &user.U{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &user.Profile{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &user.U{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	var profile user.Profile
+	var u user.U
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		now := time.Now().Unix()
-		profiles, err := h.user.UpdateProfile(ctx, user.FilterProfile{
-			UserID: claims.UserID,
-		}, user.PatchProfile{
+		us, err := h.user.Update(ctx, user.Filter{
+			ID: claims.UserID,
+		}, user.Patch{
 			FirstName: pbtypes.GetString(req.Firstname),
 			LastName:  pbtypes.GetString(req.Lastname),
 			AvatarURL: pbtypes.GetString(req.AvatarURL),
 			UpdatedAt: &now,
 		})
 		if err != nil {
-			logger.Error().Err(err).Msg("failed to update user profile")
+			logger.Error().Err(err).Msg("failed to update user")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		if len(profiles) == 0 {
-			err := gerrors.ErrNotFound{Resource: "profile", Index: claims.UserID.String()}
-			logger.Error().Err(err).Msg("failed to update user profile")
+		if len(us) == 0 {
+			err := gerrors.ErrNotFound{Resource: "user", Index: claims.UserID.String()}
+			logger.Error().Err(err).Msg("failed to update user")
 
 			return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
 		}
 
-		profile = profiles[0]
+		u = us[0]
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &user.Profile{}, err
+		return &user.U{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &profile, nil
+	return &u, nil
 }
