@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -47,8 +48,7 @@ const redirect = function (name: string) {
 		<template v-slot:append>
 			<v-divider thickness="3"></v-divider>
 			<v-list nav>
-				<v-list-item prepend-icon="mdi-account-circle" title="User" value="user" @click="redirect('user')"
-					active-class="bar-bg">
+				<v-list-item prepend-icon="mdi-account-circle" title="User" value="user" @click="redirect('user')">
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>
 					</template>

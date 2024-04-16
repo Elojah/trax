@@ -25,10 +25,7 @@ $ make client && ./bin/trax_web_client config/web_client/local.json
 
 TODO:
 
-- Remove both profiles
-
 - Add roles routes + store + view
 
-- Add refresh on create
-
-- Add listUser + UpdateEntity
+- Populate Entity page
+  - Add listUser + UpdateEntity

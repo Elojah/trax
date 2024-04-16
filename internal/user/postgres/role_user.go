@@ -204,7 +204,7 @@ func (s Store) ListClaims(ctx context.Context, f user.FilterRoleUser) (user.Clai
 
 	b := strings.Builder{}
 	b.WriteString(`
-		SELECT r.entity_id, p.resource, p.command
+		SELECT r.entity_id, r.id, p.resource, p.command
 		FROM "user"."role_user" ru
 		JOIN "user"."role" r ON ru.role_id = r.id
 		JOIN "user"."permission" p ON r.id = p.role_id
@@ -219,14 +219,15 @@ func (s Store) ListClaims(ctx context.Context, f user.FilterRoleUser) (user.Clai
 	var claim user.ClaimAuth
 
 	for rows.Next() {
-		var entityID ulid.ID
+		var entityID, roleID ulid.ID
 		var resource, command string
 
-		if err := rows.Scan(&entityID, &resource, &command); err != nil {
+		if err := rows.Scan(&entityID, &roleID, &resource, &command); err != nil {
 			return user.ClaimAuth{}, postgres.Error(err, "role_user+claim", filterRoleUser(f).index())
 		}
 
 		eid := entityID.String()
+		rid := roleID.String()
 
 		if claim.Entities == nil {
 			claim.Entities = make(map[string]user.ClaimEntity)
@@ -235,8 +236,13 @@ func (s Store) ListClaims(ctx context.Context, f user.FilterRoleUser) (user.Clai
 		if _, ok := claim.Entities[eid]; !ok {
 			claim.Entities[eid] = user.ClaimEntity{
 				ID:        entityID,
+				Roles:     make(map[string]pbtypes.Empty),
 				Resources: make(map[string]user.ClaimResources),
 			}
+		}
+
+		if _, ok := claim.Entities[eid].Roles[rid]; !ok {
+			claim.Entities[eid].Roles[rid] = pbtypes.Empty{}
 		}
 
 		if _, ok := claim.Entities[eid].Resources[resource]; !ok {

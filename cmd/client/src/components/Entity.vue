@@ -5,9 +5,12 @@ import { computed, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { marked } from "marked";
 import type { VDataTable } from 'vuetify/components/VDataTable';
+import { useAuthStore } from '@/stores/auth';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
+
+const authStore = useAuthStore();
 
 const entityStore = useEntityStore();
 const {
@@ -115,7 +118,9 @@ const create = async () => {
 	name.value = '';
 	avatarURL.value = '';
 	description.value = '';
-	search.value = ''; // Set empty search to trigger table reload, DOESNT WORK NOW
+
+	await authStore.refreshToken();
+	await listEntity({ page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] })
 };
 
 const displayEntity = (_: any, row: { item: Entity }) => {
@@ -153,7 +158,7 @@ const deleteEntity = () => {
 	</v-dialog>
 
 	<v-row>
-		<v-col class="mx-auto pt-4" cols="4">
+		<v-col class="ml-8 mt-8 main-color-background" cols="4">
 			<v-row>
 				<v-col cols="9">
 					<v-btn-toggle v-model="tableView">
@@ -276,10 +281,10 @@ const deleteEntity = () => {
 			</v-row>
 		</v-col>
 		<v-divider vertical></v-divider>
-		<v-col class="mx-auto" cols="8">
+		<v-col class="mx-auto" cols="6">
 			<v-sheet class="px-1 rounded-xl" outlined color="primary">
 				<v-card class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background justify-center"
-					v-if="entity" :title="entity.name">
+					variant="flat" v-if="entity" :title="entity.name">
 					<template v-slot:prepend>
 						<v-avatar size="32" :color="!entity.avatarURL ? 'primary' : ''">
 							<img v-if="entity.avatarURL" :src="entity.avatarURL" alt="Avatar">

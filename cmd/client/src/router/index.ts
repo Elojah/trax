@@ -54,7 +54,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
   if (to.matched.some((record) => record.meta.requiresAuth) && !authStore.user) {
-    authStore.refreshUser().then(() => {
+    authStore.refreshToken().then(() => {
       if (!authStore.user) {
         next({ name: 'sign' })
       } else {
@@ -62,7 +62,7 @@ router.beforeEach((to, from, next) => {
       }
     })
   } else if (to.matched.some((record) => record.meta.missingAuth)) {
-    authStore.refreshUser().then(() => {
+    authStore.refreshToken().then(() => {
       if (!authStore.user) {
         next()
       } else {

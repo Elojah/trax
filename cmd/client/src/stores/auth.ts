@@ -60,7 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const refreshUser = async () => {
     if (!token.value) {
-      return
+      refreshToken()
     }
 
     try {
@@ -96,17 +96,13 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const refreshToken = async () => {
-    if (!token.value) {
-      return
-    }
-
     const resp = await fetch(refreshTokenURL, {
       method: 'POST'
     })
 
     if (resp.status === 200) {
       token.value = await resp.text()
-      refreshUser()
+      await refreshUser()
     }
 
     return resp
@@ -117,7 +113,6 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     removeCookie('g_state')
     removeCookie('refresh', { path: '', domain: '.legacyfactory.com' })
-    removeCookie('access', { path: '', domain: '.legacyfactory.com' })
   }
 
   return {
