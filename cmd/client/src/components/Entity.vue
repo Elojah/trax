@@ -6,6 +6,7 @@ import type { VForm } from 'vuetify/components/VForm';
 import { marked } from "marked";
 import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
+import { useRoleStore } from '@/stores/role';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -14,10 +15,15 @@ const authStore = useAuthStore();
 
 const entityStore = useEntityStore();
 const {
-	entity: entity,
 	entities: entities,
-	total: total,
+	total: entityTotal,
 } = toRefs(entityStore);
+
+const roleStore = useRoleStore();
+const {
+	roles: roles,
+	total: roleTotal,
+} = toRefs(roleStore);
 
 const name = ref('');
 const avatarURL = ref('');
@@ -74,22 +80,29 @@ const pageOptions = [
 	},
 ]
 
-const tableEntities = computed(() => {
-	return entities.value?.map((entity) => {
-		return {
-			...entity,
-		};
-	});
-});
+const selected = ref<Entity[]>([]);
 
 const mdDescription = computed(() => {
-	return marked.parse(entity.value?.description ?? `*no description*`);
+	return marked.parse(selected.value?.at(0)?.description || `*no description*`);
 });
 
 const listEntity = async (options: any) => {
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
 	await entityStore.listEntity(search.value, {
+		start: BigInt((page - 1) * itemsPerPage), // page starts at 1
+		end: BigInt(page * itemsPerPage),
+		sort: sortBy?.at(0)?.key ?? '',
+		order: sortBy?.at(0)?.order === 'asc' ? true : false,
+	});
+
+	loading.value = false;
+};
+
+const listRole = async (options: any) => {
+	loading.value = true;
+	const { page, itemsPerPage, sortBy } = options;
+	await roleStore.listRole(search.value, {
 		start: BigInt((page - 1) * itemsPerPage), // page starts at 1
 		end: BigInt(page * itemsPerPage),
 		sort: sortBy?.at(0)?.key ?? '',
@@ -124,7 +137,12 @@ const create = async () => {
 };
 
 const displayEntity = (_: any, row: { item: Entity }) => {
-	entity.value = row.item;
+	console.log(_, row)
+	// entity.value = row.item;
+};
+
+const selectEntity = (_: any, row: any) => {
+	row.toggleSelect({ value: row.item, selectable: true });
 };
 
 const dialogDelete = ref(false);
@@ -158,7 +176,7 @@ const deleteEntity = () => {
 	</v-dialog>
 
 	<v-row>
-		<v-col class="ml-8 mt-8 main-color-background" cols="4">
+		<v-col class="ml-8 mt-8 rounded-xl-lg main-color-background" cols="4">
 			<v-row>
 				<v-col cols="9">
 					<v-btn-toggle v-model="tableView">
@@ -225,19 +243,20 @@ const deleteEntity = () => {
 					</v-dialog>
 				</v-col>
 			</v-row>
-			<v-row>
+			<v-row class="px-3">
 				<v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" variant="outlined"
 					hide-details single-line></v-text-field>
 			</v-row>
 			<v-row>
 				<v-data-table-server v-if="tableView === 0" class="transparent-background" :headers="headers"
 					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
-					:items-per-page-options="pageOptions" :items="tableEntities" :items-length="Number(total)"
-					:loading="loading" :search="search" item-value="name" @update:options="listEntity"
-					@click:row="displayEntity" select-strategy="single" item-selectable="true">
-					<template v-slot:item="{ item, index, props }">
-						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
-							v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
+					:items-per-page-options="pageOptions" :items="(entities as readonly any[])"
+					:items-length="Number(entityTotal)" :loading="loading" :search="search" item-value="name"
+					item-key="iD" @update:options="listEntity" v-model="selected" @click:row="selectEntity"
+					return-object item-selectable select-strategy="single">
+					<template v-slot:item="{ item, isSelected, index, props }">
+						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
 							<td class="d-flex align-center">
 								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
 									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
@@ -256,19 +275,14 @@ const deleteEntity = () => {
 				</v-data-table-server>
 				<v-data-table-server v-if="tableView === 1" class="transparent-background" :headers="headersByRole"
 					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
-					:items-per-page-options="pageOptions" :items="tableEntities" :items-length="Number(total)"
-					:loading="loading" :search="search" item-value="name" @update:options="listEntity"
-					@click:row="displayEntity" select-strategy="single" item-selectable="true">
-					<template v-slot:item="{ item, index, props }">
-						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props"
-							v-bind:class="index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'">
+					:items-per-page-options="pageOptions" :items="(roles as readonly any[])"
+					:items-length="Number(roleTotal)" :loading="loading" :search="search" item-value="name"
+					item-key="iD" @update:options="listRole" v-model="selected" @click:row="selectEntity" return-object
+					item-selectable select-strategy="single">
+					<template v-slot:item="{ item, isSelected, index, props }">
+						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
 							<td class="d-flex align-center">
-								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
-									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
-									<span v-else class=" mx-auto text-center text-h5">
-										{{ item?.name?.at(0)?.toUpperCase() }}
-									</span>
-								</v-avatar>
 								<span class="text-h6">{{ item.name }}</span>
 							</td>
 							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
@@ -284,12 +298,12 @@ const deleteEntity = () => {
 		<v-col class="mx-auto" cols="6">
 			<v-sheet class="px-1 rounded-xl" outlined color="primary">
 				<v-card class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background justify-center"
-					variant="flat" v-if="entity" :title="entity.name">
+					variant="flat" v-if="selected?.at(0)" :title="selected.at(0)?.name">
 					<template v-slot:prepend>
-						<v-avatar size="32" :color="!entity.avatarURL ? 'primary' : ''">
-							<img v-if="entity.avatarURL" :src="entity.avatarURL" alt="Avatar">
-							<span v-else-if="!entity.avatarURL" class=" mx-auto text-center text-h5">
-								{{ entity?.name?.at(0)?.toUpperCase() }}
+						<v-avatar size="32" :color="!selected.at(0)?.avatarURL ? 'primary' : ''">
+							<img v-if="selected.at(0)?.avatarURL" :src="selected.at(0)?.avatarURL" alt="Avatar">
+							<span v-else-if="!selected.at(0)?.avatarURL" class=" mx-auto text-center text-h5">
+								{{ selected.at(0)?.name?.at(0)?.toUpperCase() }}
 							</span>
 						</v-avatar>
 					</template>
@@ -309,6 +323,11 @@ const deleteEntity = () => {
 	</v-row>
 </template>
 <style scoped>
+.active-bg {
+	background: url('@/assets/img/bar-background.svg') no-repeat bottom center;
+	background-size: cover;
+}
+
 .main-color-background {
 	background-color: #263238;
 }

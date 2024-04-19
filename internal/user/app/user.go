@@ -34,6 +34,32 @@ func (a *App) Dial(ctx context.Context) error {
 	return nil
 }
 
+func (a App) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string) (user.ClaimAuth, error) {
+	var ca user.ClaimAuth
+
+	// don't populate any claims for token other than access
+	if audience != "access" {
+		return ca, nil
+	}
+
+	if err := a.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		var err error
+
+		ca, err = a.ListClaims(ctx, user.FilterRoleUser{
+			UserID: userID,
+		})
+		if err != nil {
+			return transaction.Rollback, err
+		}
+
+		return transaction.Commit, nil
+	}); err != nil {
+		return user.ClaimAuth{}, err
+	}
+
+	return ca, nil
+}
+
 func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity time.Duration) (string, error) {
 	// #MARK:Create JWT
 	id := ulid.NewID()
@@ -44,23 +70,9 @@ func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 		return "", err
 	}
 
-	var ca user.ClaimAuth
-
-	if audience == "access" {
-		if err := a.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-			var err error
-
-			ca, err = a.ListClaims(ctx, user.FilterRoleUser{
-				UserID: u.ID,
-			})
-			if err != nil {
-				return transaction.Rollback, err
-			}
-
-			return transaction.Commit, nil
-		}); err != nil {
-			return "", err
-		}
+	ca, err := a.fetchClaimAuth(ctx, u.ID, audience)
+	if err != nil {
+		return "", err
 	}
 
 	now := time.Now()

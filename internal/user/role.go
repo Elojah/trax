@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/elojah/trax/pkg/paginate"
 	"github.com/elojah/trax/pkg/ulid"
 )
 
@@ -29,12 +30,15 @@ type FilterRole struct {
 	IDs []ulid.ID
 
 	EntityID ulid.ID
+
+	*paginate.Paginate
+	Search string
 }
 
 type StoreRole interface {
 	InsertRole(context.Context, Role) error
 	FetchRole(context.Context, FilterRole) (Role, error)
-	ListRole(context.Context, FilterRole) ([]Role, error)
+	ListRole(context.Context, FilterRole) ([]Role, uint64, error)
 	DeleteRole(context.Context, FilterRole) error
 }
 

@@ -2,17 +2,15 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { Entity } from '@internal/user/entity'
+import { Role } from '@internal/user/role'
 import { Paginate } from '@pkg/paginate/paginate'
-import { CreateEntityReq, ListEntityReq } from '@internal/user/dto/entity'
+import { CreateRoleReq, ListRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 
-export const useEntityStore = defineStore('entity', () => {
-  const entity = ref<Entity | null>(null)
-
-  const entities = ref<Entity[] | null>([])
-
+export const useRoleStore = defineStore('role', () => {
+  const role = ref<Role | null>(null)
+  const roles = ref<Role[] | null>([])
   const total = ref<bigint>(BigInt(0))
 
   const api = new APIClient(
@@ -23,15 +21,13 @@ export const useEntityStore = defineStore('entity', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const createEntity = async function (name: string, avatarURL: string, description: string) {
+  const createRole = async function (name: string) {
     try {
-      const req = CreateEntityReq.create({
-        name: name,
-        avatarURL: avatarURL,
-        description: description
+      const req = CreateRoleReq.create({
+        name: name
       })
 
-      return await api.createEntity(req, { meta: { token: token.value } })
+      return await api.createRole(req, { meta: { token: token.value } })
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -40,18 +36,18 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const listEntity = async function (search: string, p: Paginate) {
+  const listRole = async function (search: string, p: Paginate) {
     try {
-      const req = ListEntityReq.create({
+      const req = ListRoleReq.create({
         search: search,
         paginate: p
       })
 
-      const resp = await api.listEntity(req, { meta: { token: token.value } })
+      const resp = await api.listRole(req, { meta: { token: token.value } })
 
       // TODO: manage errors
 
-      entities.value = resp.response.entities
+      roles.value = resp.response.roles
       total.value = resp.response.total
 
       return resp
@@ -64,10 +60,10 @@ export const useEntityStore = defineStore('entity', () => {
   }
 
   return {
-    entity,
-    entities,
+    role,
+    roles,
     total,
-    createEntity,
-    listEntity
+    createRole,
+    listRole
   }
 })

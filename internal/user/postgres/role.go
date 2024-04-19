@@ -7,9 +7,18 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	ppostgres "github.com/elojah/trax/pkg/paginate/postgres"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
+)
+
+var (
+	sortRole = map[string]string{
+		"name":       "e.name",
+		"created_at": "e.created_at",
+		"updated_at": "e.updated_at",
+	}
 )
 
 type sqlRole struct {
@@ -61,6 +70,12 @@ func (f filterRole) where(n int) (string, []any) {
 	if f.EntityID != nil {
 		clause = append(clause, fmt.Sprintf(`r.entity_id = $%d`, n))
 		args = append(args, f.EntityID)
+		n++
+	}
+
+	if len(f.Search) > 0 {
+		clause = append(clause, fmt.Sprintf(`r.name ILIKE $%d`, n))
+		args = append(args, "%"+f.Search+"%")
 		n++
 	}
 
@@ -133,35 +148,50 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 	return p.role(), nil
 }
 
-func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, error) {
+func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, uint64, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at FROM "user"."role" r `)
+	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at, COUNT(1) OVER() `)
+	if f.Paginate != nil {
+		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortRole))
+	} else {
+		b.WriteString(`, 0`)
+	}
+	b.WriteString(` FROM "user"."role" r `)
 
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
 
+	if f.Paginate != nil {
+		pag := ppostgres.Paginate(*f.Paginate).CTE(b.String())
+		b.Reset()
+		b.WriteString(pag)
+	}
+
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, postgres.Error(err, "role", filterRole(f).index())
+		return nil, 0, postgres.Error(err, "role", filterRole(f).index())
 	}
 
 	var roles []user.Role
 
+	var count uint64
+	var row_number int
+
 	for rows.Next() {
 		var p sqlRole
-		if err := rows.Scan(&p.ID, &p.EntityID, &p.Name, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, postgres.Error(err, "role", filterRole(f).index())
+		if err := rows.Scan(&p.ID, &p.EntityID, &p.Name, &p.CreatedAt, &p.UpdatedAt, &count, &row_number); err != nil {
+			return nil, 0, postgres.Error(err, "role", filterRole(f).index())
 		}
 
 		roles = append(roles, p.role())
 	}
 
-	return roles, nil
+	return roles, count, nil
 }
 
 func (s Store) DeleteRole(ctx context.Context, f user.FilterRole) error {

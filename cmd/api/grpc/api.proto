@@ -15,10 +15,12 @@ import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 
 import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
 
-import "github.com/elojah/trax/internal/user/user.proto";
 import "github.com/elojah/trax/internal/user/entity.proto";
-import "github.com/elojah/trax/internal/user/dto/user.proto";
+import "github.com/elojah/trax/internal/user/role.proto";
+import "github.com/elojah/trax/internal/user/user.proto";
 import "github.com/elojah/trax/internal/user/dto/entity.proto";
+import "github.com/elojah/trax/internal/user/dto/role.proto";
+import "github.com/elojah/trax/internal/user/dto/user.proto";
 
 service API {
     // Ping
@@ -36,5 +38,6 @@ service API {
     // rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
 
     // Roles
-    // rpc ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
+    rpc CreateRole(dto.CreateRoleReq) returns (user.Role);
+    rpc ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
 }

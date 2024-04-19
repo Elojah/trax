@@ -198,7 +198,7 @@ func (s Store) ListEntity(ctx context.Context, f user.FilterEntity) ([]user.Enti
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT e.id, e.name, e.description, e.avatar_url, e.created_at, e.updated_at, COUNT(1) OVER()`)
+	b.WriteString(`SELECT e.id, e.name, e.description, e.avatar_url, e.created_at, e.updated_at, COUNT(1) OVER() `)
 	if f.Paginate != nil {
 		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortEntity))
 	} else {

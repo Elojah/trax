@@ -26,6 +26,21 @@ func (c Claims) EntityIDs() []ulid.ID {
 	return result
 }
 
+func (c Claims) RoleIDs() []ulid.ID {
+	result := make([]ulid.ID, 0, len(c.Auth.Entities))
+	for _, entity := range c.Auth.Entities {
+		for roleID := range entity.Roles {
+			id, err := ulid.Parse(roleID)
+			if err != nil {
+				continue
+			}
+			result = append(result, id)
+		}
+	}
+
+	return result
+}
+
 func (c Claims) Require(entityID ulid.ID, resource Resource, command Command) error {
 	entities, ok := c.Auth.Entities[entityID.String()]
 	if !ok {

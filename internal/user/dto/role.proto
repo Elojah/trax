@@ -12,11 +12,13 @@ option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
-import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 
 import "github.com/elojah/trax/pkg/paginate/paginate.proto";
-import "github.com/elojah/trax/internal/user/entity.proto";
 import "github.com/elojah/trax/internal/user/role.proto";
+
+message CreateRoleReq {
+	string Name                       = 1;
+}
 
 message ListRoleReq {
 	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
@@ -26,8 +28,5 @@ message ListRoleReq {
 message ListRoleResp {
 	repeated user.Role Roles          = 1 [(gogoproto.nullable) = false];
 	uint64 Total                      = 2;
-
-	// Entities key must be a user.Entity ID
-	map<string, user.Entity> Entities = 3 [(gogoproto.nullable) = false];
 }
 

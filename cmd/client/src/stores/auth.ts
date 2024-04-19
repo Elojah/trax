@@ -9,8 +9,8 @@ import { FetchUserReq, UpdateUserReq } from '@internal/user/dto/user'
 import { ref } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref('' as string)
-  const user = ref(null as U | null)
+  const token = ref<string>('')
+  const user = ref<U | null>(null)
 
   const signupURL = new URL('signup', config.web_client_url).href
   const signinURL = new URL('signin', config.web_client_url).href
