@@ -60,7 +60,6 @@ const redirect = function (name: string) {
 
 <style scoped>
 .active-bg {
-	background: url('@/assets/img/bar-background.svg') no-repeat bottom center;
-	background-size: cover;
+	background-color: #950c75;
 }
 </style>

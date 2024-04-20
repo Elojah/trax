@@ -25,8 +25,12 @@ func (h *handler) FetchEntity(ctx context.Context, req *dto.FetchEntityReq) (*us
 		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	if err := claims.Require(req.ID, user.R_entity, user.C_read); err != nil {
-		logger.Error().Err(err).Msg("failed to require permission")
+	if err := claims.Require(user.Requirement{
+		EntityID: req.ID,
+		Resource: user.R_entity,
+		Command:  user.C_read,
+	}); err != nil {
+		logger.Error().Err(err).Msg("permission denied")
 
 		return &user.Entity{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}

@@ -32,8 +32,8 @@ func (h *handler) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U
 	if req.Me {
 		id = claims.UserID
 	} else {
-		if err := claims.Require(req.EntityID, user.R_user, user.C_read); err != nil {
-			logger.Error().Err(err).Msg("failed to require permission")
+		if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_user, Command: user.C_read}); err != nil {
+			logger.Error().Err(err).Msg("permission denied")
 
 			return &user.U{}, status.New(codes.PermissionDenied, err.Error()).Err()
 		}

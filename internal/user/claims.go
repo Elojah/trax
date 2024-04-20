@@ -5,6 +5,25 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+type Requirement struct {
+	EntityID ulid.ID
+	Resource Resource
+	Command  Command
+}
+
+func NewRequirements(entityIDs []ulid.ID, resource Resource, command Command) []Requirement {
+	requirements := make([]Requirement, 0, len(entityIDs))
+	for _, id := range entityIDs {
+		requirements = append(requirements, Requirement{
+			EntityID: id,
+			Resource: resource,
+			Command:  command,
+		})
+	}
+
+	return requirements
+}
+
 type Claims struct {
 	jwt.RegisteredClaims
 
@@ -41,19 +60,21 @@ func (c Claims) RoleIDs() []ulid.ID {
 	return result
 }
 
-func (c Claims) Require(entityID ulid.ID, resource Resource, command Command) error {
-	entities, ok := c.Auth.Entities[entityID.String()]
-	if !ok {
-		return ErrUnknownEntity{EntityID: entityID.String()}
-	}
+func (c Claims) Require(rs ...Requirement) error {
+	for _, r := range rs {
+		entities, ok := c.Auth.Entities[r.EntityID.String()]
+		if !ok {
+			return ErrUnknownEntity{EntityID: r.EntityID.String()}
+		}
 
-	resources, ok := entities.Resources[resource.String()]
-	if !ok {
-		return ErrUnauthorizedResource{Resource: resource.String()}
-	}
+		resources, ok := entities.Resources[r.Resource.String()]
+		if !ok {
+			return ErrUnauthorizedResource{Resource: r.Resource.String()}
+		}
 
-	if _, ok := resources.Commands[command.String()]; !ok {
-		return ErrUnauthorizedCommand{Resource: resource.String(), Command: command.String()}
+		if _, ok := resources.Commands[r.Command.String()]; !ok {
+			return ErrUnauthorizedCommand{Resource: r.Resource.String(), Command: r.Command.String()}
+		}
 	}
 
 	return nil

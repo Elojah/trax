@@ -7,6 +7,7 @@ import (
 	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/transaction"
+	"github.com/elojah/trax/pkg/ulid"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,7 +26,19 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 		return &dto.ListEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	entityIDs := claims.EntityIDs()
+	var entityIDs []ulid.ID
+
+	if req.IDs != nil {
+		if err := claims.Require(user.NewRequirements(req.IDs, user.R_entity, user.C_read)...); err != nil {
+			logger.Error().Err(err).Msg("permission denied")
+
+			return &dto.ListEntityResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
+		}
+
+		entityIDs = req.IDs
+	} else {
+		entityIDs = claims.EntityIDs()
+	}
 
 	var entities []user.Entity
 	var total uint64
