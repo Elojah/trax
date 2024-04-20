@@ -68,7 +68,7 @@ export const useEntityStore = defineStore('entity', () => {
       const req = ListEntityReq.create({
         search: search,
         paginate: p,
-        ids: ids
+        iDs: ids
       })
 
       const resp = await api.listEntity(req, { meta: { token: token.value } })

@@ -29,13 +29,13 @@ type sqlRole struct {
 	UpdatedAt time.Time
 }
 
-func newRole(p user.Role) sqlRole {
+func newRole(r user.Role) sqlRole {
 	return sqlRole{
-		ID:        p.ID,
-		EntityID:  p.EntityID,
-		Name:      p.Name,
-		CreatedAt: time.Unix(p.CreatedAt, 0),
-		UpdatedAt: time.Unix(p.UpdatedAt, 0),
+		ID:        r.ID,
+		EntityID:  r.EntityID,
+		Name:      r.Name,
+		CreatedAt: time.Unix(r.CreatedAt, 0),
+		UpdatedAt: time.Unix(r.UpdatedAt, 0),
 	}
 }
 
@@ -112,15 +112,15 @@ func (s Store) InsertRole(ctx context.Context, role user.Role) error {
 		return err
 	}
 
-	p := newRole(role)
+	r := newRole(role)
 
 	b := strings.Builder{}
 	b.WriteString(`INSERT INTO "user"."role" (id, entity_id, name, created_at, updated_at) VALUES (`)
 	b.WriteString(postgres.Array(1, 5))
 	b.WriteString(`)`)
 
-	if _, err := tx.Exec(ctx, b.String(), p.ID, p.EntityID, p.Name, p.CreatedAt, p.UpdatedAt); err != nil {
-		return postgres.Error(err, "role", p.ID.String())
+	if _, err := tx.Exec(ctx, b.String(), r.ID, r.EntityID, r.Name, r.CreatedAt, r.UpdatedAt); err != nil {
+		return postgres.Error(err, "role", r.ID.String())
 	}
 
 	return nil
@@ -140,12 +140,12 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 
 	q := tx.QueryRow(ctx, b.String(), args...)
 
-	var p sqlRole
-	if err := q.Scan(&p.ID, &p.EntityID, &p.Name, &p.CreatedAt, &p.UpdatedAt); err != nil {
+	var r sqlRole
+	if err := q.Scan(&r.ID, &r.EntityID, &r.Name, &r.CreatedAt, &r.UpdatedAt); err != nil {
 		return user.Role{}, postgres.Error(err, "role", filterRole(f).index())
 	}
 
-	return p.role(), nil
+	return r.role(), nil
 }
 
 func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, uint64, error) {
@@ -183,12 +183,12 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 	var row_number int
 
 	for rows.Next() {
-		var p sqlRole
-		if err := rows.Scan(&p.ID, &p.EntityID, &p.Name, &p.CreatedAt, &p.UpdatedAt, &count, &row_number); err != nil {
+		var r sqlRole
+		if err := rows.Scan(&r.ID, &r.EntityID, &r.Name, &r.CreatedAt, &r.UpdatedAt, &count, &row_number); err != nil {
 			return nil, 0, postgres.Error(err, "role", filterRole(f).index())
 		}
 
-		roles = append(roles, p.role())
+		roles = append(roles, r.role())
 	}
 
 	return roles, count, nil

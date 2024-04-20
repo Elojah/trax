@@ -113,7 +113,7 @@ const listEntity = async (options: any) => {
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
 	await entityStore.listEntity(search.value, {
-		start: BigInt((page - 1) * itemsPerPage), // page starts at 1
+		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1
 		end: BigInt(page * itemsPerPage),
 		sort: sortBy?.at(0)?.key ?? '',
 		order: sortBy?.at(0)?.order === 'asc' ? true : false,
@@ -122,34 +122,35 @@ const listEntity = async (options: any) => {
 	loading.value = false;
 };
 
+const rolesWithEntity = ref<RoleEntity[]>([]);
+
 const listRole = async (options: any) => {
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
 	await roleStore.listRole(search.value, {
-		start: BigInt((page - 1) * itemsPerPage), // page starts at 1
-		end: BigInt(page * itemsPerPage),
+		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1
+		end: BigInt((page * itemsPerPage)),
 		sort: sortBy?.at(0)?.key ?? '',
 		order: sortBy?.at(0)?.order === 'asc' ? true : false,
 	});
-
-	loading.value = false;
 
 	const roleEntities = roles.value?.map((role: Role) => role.entityID);
 
 	if (roleEntities?.length) {
 		await entityStore.populateEntityByID(roleEntities);
 	}
-};
 
-const rolesWithEntity = computed(() => {
-	return roles.value?.map((role: Role) => {
-		const entity = entitiesByID.value?.get(ulid(role.entityID));
-		return {
-			...role,
-			entity: entity,
-		};
-	});
-});
+	if (roles.value) {
+		rolesWithEntity.value = roles.value?.map((role: Role) => {
+			return {
+				...role,
+				entity: entitiesByID.value?.get(ulid(role.entityID)),
+			};
+		});
+	}
+
+	loading.value = false;
+};
 
 const dialog = ref(false);
 const close = () => {

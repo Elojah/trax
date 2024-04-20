@@ -7,6 +7,7 @@ import { Paginate } from '@pkg/paginate/paginate'
 import { CreateRoleReq, ListRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
+import { ulid } from '@/utils/ulid'
 
 export const useRoleStore = defineStore('role', () => {
   const role = ref<Role | null>(null)
