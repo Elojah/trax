@@ -18,7 +18,6 @@ const authStore = useAuthStore();
 const entityStore = useEntityStore();
 const {
 	entities: entities,
-	entitiesByID: entitiesByID,
 	total: entityTotal,
 } = toRefs(entityStore);
 
@@ -99,6 +98,24 @@ const selected = computed(() => {
 	return selectedEntity.value?.at(0) || selectedRole.value?.at(0)?.entity;
 });
 
+const viewEntityIDs = ref<string[]>([])
+
+const viewEntities = computed(() => {
+	return viewEntityIDs.value.map((entityID: string) => entities.value?.get(entityID));
+});
+
+const viewRoleIDs = ref<string[]>([])
+
+const viewRoles = computed(() => {
+	return viewRoleIDs.value.map((roleID: string) => {
+		const role = roles.value?.get(roleID);
+		return {
+			...role,
+			entity: entities.value?.get(ulid(role?.entityID!)),
+		}
+	});
+});
+
 const select = (_: any, row: any) => {
 	selectedEntity.value = [];
 	selectedRole.value = [];
@@ -111,43 +128,34 @@ const mdDescription = computed(() => {
 
 const listEntity = async (options: any) => {
 	loading.value = true;
+
 	const { page, itemsPerPage, sortBy } = options;
-	await entityStore.listEntity(search.value, {
-		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1
+	const newIDs = await entityStore.listEntity(null, search.value, {
+		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
 		end: BigInt(page * itemsPerPage),
 		sort: sortBy?.at(0)?.key ?? '',
 		order: sortBy?.at(0)?.order === 'asc' ? true : false,
 	});
 
+	viewEntityIDs.value = newIDs;
+
 	loading.value = false;
 };
 
-const rolesWithEntity = ref<RoleEntity[]>([]);
 
 const listRole = async (options: any) => {
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
-	await roleStore.listRole(search.value, {
-		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1
+	const [newRoleIDs, newEntityIDs] = await roleStore.listRole(null, search.value, {
+		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
 		end: BigInt((page * itemsPerPage)),
 		sort: sortBy?.at(0)?.key ?? '',
 		order: sortBy?.at(0)?.order === 'asc' ? true : false,
 	});
 
-	const roleEntities = roles.value?.map((role: Role) => role.entityID);
+	await entityStore.populateEntity(newEntityIDs);
 
-	if (roleEntities?.length) {
-		await entityStore.populateEntityByID(roleEntities);
-	}
-
-	if (roles.value) {
-		rolesWithEntity.value = roles.value?.map((role: Role) => {
-			return {
-				...role,
-				entity: entitiesByID.value?.get(ulid(role.entityID)),
-			};
-		});
-	}
+	viewRoleIDs.value = newRoleIDs;
 
 	loading.value = false;
 };
@@ -281,12 +289,11 @@ const deleteEntity = () => {
 			<v-row class="main-color-background">
 				<v-data-table-server v-if="tableView === 0" class="transparent-background" :headers="headers"
 					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
-					:items-per-page-options="pageOptions" :items="(entities as readonly any[])"
-					:items-length="Number(entityTotal)" :loading="loading" :search="search" item-value="name"
-					item-key="iD" @update:options="listEntity" v-model="selectedEntity" @click:row="select"
-					return-object item-selectable select-strategy="single">
+					:items-per-page-options="pageOptions" :items="viewEntities" :items-length="Number(entityTotal)"
+					:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="listEntity"
+					v-model="selectedEntity" @click:row="select" return-object item-selectable select-strategy="single">
 					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						<tr v-if="item" class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
 						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
 							<td class="d-flex align-center">
 								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
@@ -306,10 +313,9 @@ const deleteEntity = () => {
 				</v-data-table-server>
 				<v-data-table-server v-if="tableView === 1" class="transparent-background" :headers="headersByRole"
 					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
-					:items-per-page-options="pageOptions" :items="(rolesWithEntity as readonly any[])"
-					:items-length="Number(roleTotal)" :loading="loading" :search="search" item-value="name"
-					item-key="iD" @update:options="listRole" v-model="selectedRole" @click:row="select" return-object
-					item-selectable select-strategy="single">
+					:items-per-page-options="pageOptions" :items="viewRoles" :items-length="Number(roleTotal)"
+					:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="listRole"
+					v-model="selectedRole" @click:row="select" return-object item-selectable select-strategy="single">
 					<template v-slot:item="{ item, isSelected, index, props }">
 						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
 						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
@@ -337,8 +343,8 @@ const deleteEntity = () => {
 		<v-divider vertical></v-divider>
 		<v-col class="mx-auto" cols="6">
 			<v-sheet class="px-1 rounded-xl" outlined color="primary">
-				<v-card class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background justify-center"
-					variant="flat" v-if="selected" :title="selected?.name">
+				<v-card class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background" variant="flat"
+					v-if="selected" :title="selected?.name">
 					<template v-slot:prepend>
 						<v-avatar size="32" :color="!selected?.avatarURL ? 'primary' : ''">
 							<img v-if="selected?.avatarURL" :src="selected?.avatarURL" alt="Avatar">

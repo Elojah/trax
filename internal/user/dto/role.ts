@@ -33,6 +33,10 @@ export interface ListRoleReq {
      * @generated from protobuf field: string Search = 2 [json_name = "Search"];
      */
     search: string;
+    /**
+     * @generated from protobuf field: repeated bytes IDs = 3 [json_name = "IDs"];
+     */
+    iDs: Uint8Array[];
 }
 /**
  * @generated from protobuf message dto.ListRoleResp
@@ -99,12 +103,14 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
     constructor() {
         super("dto.ListRoleReq", [
             { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
-            { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ }
+            { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
     }
     create(value?: PartialMessage<ListRoleReq>): ListRoleReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.search = "";
+        message.iDs = [];
         if (value !== undefined)
             reflectionMergePartial<ListRoleReq>(this, message, value);
         return message;
@@ -119,6 +125,9 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
                     break;
                 case /* string Search = 2 [json_name = "Search"];*/ 2:
                     message.search = reader.string();
+                    break;
+                case /* repeated bytes IDs = 3 [json_name = "IDs"];*/ 3:
+                    message.iDs.push(reader.bytes());
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -138,6 +147,9 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
         /* string Search = 2 [json_name = "Search"]; */
         if (message.search !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.search);
+        /* repeated bytes IDs = 3 [json_name = "IDs"]; */
+        for (let i = 0; i < message.iDs.length; i++)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.iDs[i]);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

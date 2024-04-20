@@ -7,11 +7,10 @@ import { Paginate } from '@pkg/paginate/paginate'
 import { CreateEntityReq, ListEntityReq } from '@internal/user/dto/entity'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
-import { ulid } from '@/utils/ulid'
+import { parse, ulid } from '@/utils/ulid'
 
 export const useEntityStore = defineStore('entity', () => {
-  const entities = ref<Entity[] | null>([])
-  const entitiesByID = ref<Map<string, Entity>>(new Map())
+  const entities = ref<Map<string, Entity>>(new Map())
 
   const total = ref<bigint>(BigInt(0))
 
@@ -40,30 +39,28 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const listEntity = async function (search: string, p: Paginate) {
-    try {
-      const req = ListEntityReq.create({
-        search: search,
-        paginate: p
-      })
+  // const updateEntity = async (name: string | undefined, description: string | undefined) => {
+  //   try {
+  //     const req = UpdateEntityReq.create({
+  //       ...(name && { firstname: { value: name } }),
+  //       ...(description && { lastname: { value: description } })
+  //     })
 
-      const resp = await api.listEntity(req, { meta: { token: token.value } })
+  //     const resp = await api.updateEntity(req, { meta: { token: token.value } })
+  //     entity.value = resp.response
+  //   } catch (err: any) {
+  //     switch (err.code) {
+  //       default:
+  //         logger.error(err)
+  //     }
+  //   }
+  // }
 
-      // TODO: manage errors
-
-      entities.value = resp.response.entities
-      total.value = resp.response.total
-
-      return resp
-    } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
-    }
-  }
-
-  const listEntityByID = async function (ids: Uint8Array[], search: string, p: Paginate) {
+  const listEntity = async function (
+    ids: Uint8Array[] | null,
+    search: string,
+    p: Paginate
+  ): Promise<string[]> {
     try {
       const req = ListEntityReq.create({
         search: search,
@@ -73,27 +70,30 @@ export const useEntityStore = defineStore('entity', () => {
 
       const resp = await api.listEntity(req, { meta: { token: token.value } })
 
-      // TODO: manage errors
-
       resp.response.entities?.forEach((entity: Entity) => {
-        entitiesByID.value?.set(ulid(entity.iD), entity)
+        entities.value?.set(ulid(entity.iD), entity)
       })
 
-      return resp
+      if (ids === null) {
+        total.value = resp.response.total
+      }
+
+      return resp.response.entities.map((entity: Entity) => ulid(entity.iD))
     } catch (err: any) {
       switch (err.code) {
         default:
           logger.error(err)
       }
     }
+    return []
   }
 
-  const populateEntityByID = async function (ids: Uint8Array[]) {
-    const newIDs = ids.reduce((acc: Uint8Array[], id: Uint8Array) => {
-      if (entitiesByID.value?.has(ulid(id))) {
+  const populateEntity = async function (ids: string[]) {
+    const newIDs = ids.reduce((acc: Uint8Array[], id: string) => {
+      if (entities.value?.has(id)) {
         return acc
       } else {
-        return [...acc, id]
+        return [...acc, parse(id)]
       }
     }, [])
 
@@ -101,7 +101,7 @@ export const useEntityStore = defineStore('entity', () => {
       return
     }
 
-    await listEntityByID(newIDs, '', {
+    await listEntity(newIDs, '', {
       start: BigInt(0),
       end: BigInt(newIDs.length),
       order: true,
@@ -111,11 +111,9 @@ export const useEntityStore = defineStore('entity', () => {
 
   return {
     entities,
-    entitiesByID,
     total,
     createEntity,
     listEntity,
-    listEntityByID,
-    populateEntityByID
+    populateEntity
   }
 })

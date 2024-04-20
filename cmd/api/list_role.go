@@ -7,6 +7,7 @@ import (
 	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
 	"github.com/elojah/trax/pkg/transaction"
+	"github.com/elojah/trax/pkg/ulid"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,7 +26,18 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		return &dto.ListRoleResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	roleIDs := claims.RoleIDs()
+	var roleIDs []ulid.ID
+	if req.IDs != nil {
+		if err := claims.RequireRoles(req.IDs...); err != nil {
+			logger.Error().Err(err).Msg("permission denied")
+
+			return &dto.ListRoleResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
+		}
+
+		roleIDs = req.IDs
+	} else {
+		roleIDs = claims.RoleIDs()
+	}
 
 	var roles []user.Role
 	var total uint64

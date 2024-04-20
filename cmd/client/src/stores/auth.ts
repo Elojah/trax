@@ -4,7 +4,7 @@ import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import type { SigninReq, SignupReq } from '@internal/user/dto/user'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { getCookie, removeCookie } from 'typescript-cookie'
+import { removeCookie } from 'typescript-cookie'
 import { FetchUserReq, UpdateUserReq } from '@internal/user/dto/user'
 import { ref } from 'vue'
 
@@ -78,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const updateUser = async (firstName: string | null, lastName: string | null) => {
+  const updateUser = async (firstName: string | undefined, lastName: string | undefined) => {
     try {
       const req = UpdateUserReq.create({
         ...(firstName && { firstname: { value: firstName } }),

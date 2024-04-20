@@ -1,6 +1,9 @@
 package user
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type ErrInvalidClaims struct {
 	Err error
@@ -54,4 +57,12 @@ type ErrUnauthorizedCommand struct {
 
 func (e ErrUnauthorizedCommand) Error() string {
 	return fmt.Sprintf("unauthorized command: %s on resource %s", e.Command, e.Resource)
+}
+
+type ErrUnauthorizedRole struct {
+	Roles []string
+}
+
+func (e ErrUnauthorizedRole) Error() string {
+	return fmt.Sprintf("unauthorized roles: %s", strings.Join(e.Roles, ", "))
 }

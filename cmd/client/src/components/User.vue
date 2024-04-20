@@ -28,7 +28,7 @@ const nameRules = [
 
 const updateLastName = async function () {
 	if (lastNameEdit.value) {
-		await authStore.updateUser();
+		await authStore.updateUser(undefined, user.value?.lastName);
 	}
 
 	lastNameEdit.value = !lastNameEdit.value
@@ -36,7 +36,7 @@ const updateLastName = async function () {
 
 const updateFirstName = async function () {
 	if (firstNameEdit.value) {
-		await authStore.updateUser();
+		await authStore.updateUser(user.value?.firstName, undefined);
 	}
 
 	firstNameEdit.value = !firstNameEdit.value

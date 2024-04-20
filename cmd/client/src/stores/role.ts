@@ -10,8 +10,7 @@ import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
 
 export const useRoleStore = defineStore('role', () => {
-  const role = ref<Role | null>(null)
-  const roles = ref<Role[] | null>([])
+  const roles = ref<Map<string, Role>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
   const api = new APIClient(
@@ -37,31 +36,47 @@ export const useRoleStore = defineStore('role', () => {
     }
   }
 
-  const listRole = async function (search: string, p: Paginate) {
+  // Return roles ids and entity ids
+  const listRole = async function (
+    ids: Uint8Array[] | null,
+    search: string,
+    p: Paginate
+  ): Promise<[string[], string[]]> {
     try {
       const req = ListRoleReq.create({
         search: search,
-        paginate: p
+        paginate: p,
+        iDs: ids
       })
 
       const resp = await api.listRole(req, { meta: { token: token.value } })
 
-      // TODO: manage errors
+      resp.response.roles?.forEach((role: Role) => {
+        roles.value?.set(ulid(role.iD), role)
+      })
 
-      roles.value = resp.response.roles
-      total.value = resp.response.total
+      if (ids === null) {
+        total.value = resp.response.total
+      }
 
-      return resp
+      return resp.response.roles.reduce(
+        (acc: string[][], role: Role) => {
+          acc[0].push(ulid(role.iD))
+          acc[1].push(ulid(role.entityID))
+          return acc
+        },
+        [[], []]
+      )
     } catch (err: any) {
       switch (err.code) {
         default:
           logger.error(err)
       }
     }
+    return [[], []]
   }
 
   return {
-    role,
     roles,
     total,
     createRole,

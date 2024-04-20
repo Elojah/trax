@@ -79,3 +79,28 @@ func (c Claims) Require(rs ...Requirement) error {
 
 	return nil
 }
+
+func (c Claims) RequireRoles(ids ...ulid.ID) error {
+	mapIDs := make(map[string]struct{}, len(ids))
+	for _, id := range ids {
+		mapIDs[id.String()] = struct{}{}
+	}
+
+	for _, e := range c.Auth.Entities {
+		for id := range e.Roles {
+			if _, ok := mapIDs[id]; ok {
+				delete(mapIDs, id)
+				if len(mapIDs) == 0 {
+					return nil
+				}
+			}
+		}
+	}
+
+	missingRoleIDs := make([]string, 0, len(mapIDs))
+	for id := range mapIDs {
+		missingRoleIDs = append(missingRoleIDs, id)
+	}
+
+	return ErrUnauthorizedRole{Roles: missingRoleIDs}
+}
