@@ -6,7 +6,7 @@ import (
 )
 
 type handler struct {
-	migrate migrate.App
+	migrate migrate.Agg
 
-	cookie cookie.App
+	cookie cookie.Agg
 }

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-type App interface {
+type Agg interface {
 	transaction.Transactioner
 
 	Store

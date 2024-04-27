@@ -194,9 +194,26 @@ const confirmDeleteEntity = () => {
 	dialogDelete.value = false;
 };
 
-const editEntity = () => {
-};
 const deleteEntity = () => {
+};
+
+const nameEdit = ref(false);
+const descriptionEdit = ref(false);
+
+const updateName = async function () {
+	if (nameEdit.value) {
+		await entityStore.updateEntity(selected.value?.iD, selected.value?.name, undefined, undefined);
+	}
+
+	nameEdit.value = !nameEdit.value
+};
+
+const updateDescription = async function () {
+	if (descriptionEdit.value) {
+		await entityStore.updateEntity(selected.value?.iD, undefined, selected.value?.description, undefined);
+	}
+
+	descriptionEdit.value = !descriptionEdit.value
 };
 
 </script>
@@ -344,22 +361,38 @@ const deleteEntity = () => {
 		<v-col class="mx-auto" cols="6">
 			<v-sheet class="px-1 rounded-xl" outlined color="primary">
 				<v-card class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background" variant="flat"
-					v-if="selected" :title="selected?.name">
-					<template v-slot:prepend>
-						<v-avatar size="32" :color="!selected?.avatarURL ? 'primary' : ''">
-							<img v-if="selected?.avatarURL" :src="selected?.avatarURL" alt="Avatar">
-							<span v-else-if="!selected?.avatarURL" class=" mx-auto text-center text-h5">
-								{{ selected?.name?.at(0)?.toUpperCase() }}
-							</span>
-						</v-avatar>
-					</template>
+					v-if="selected">
+					<v-avatar class="mb-4 justify-center" size="96" :color="!selected.avatarURL ? 'primary' : ''">
+						<img v-if="selected.avatarURL" :src="selected.avatarURL" alt="Avatar">
+						<span v-else-if="!selected.avatarURL" class=" mx-auto text-center text-h5">
+							{{ selected?.name?.at(0)?.toUpperCase() }}
+						</span>
+					</v-avatar>
+					<v-text-field class="justify-center text-h3" v-model="selected.name"
+						:variant="!nameEdit ? 'plain' : 'underlined'" :readonly="!nameEdit">
+						<template v-slot:append-inner>
+							<v-icon color="primary" size="large" @click="updateName"
+								:icon="!nameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
+						</template>
+					</v-text-field>
 					<!-- eslint-disable vue/no-v-html vue/no-v-text-v-html-on-component -->
-					<v-card-text class="p-6 m-6" variant="tonal" v-html="mdDescription">
-					</v-card-text>
+					<v-textarea v-if="descriptionEdit" class="p-6 m-6" variant="solo" no-resize
+						:model-value="selected.description" :readonly="false">
+						<template v-slot:append-inner>
+							<v-icon color="primary" size="large" @click="updateDescription"
+								:icon="!descriptionEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
+						</template>
+					</v-textarea>
+					<v-text-field v-if="!descriptionEdit" class="p-6 m-6" variant="solo" no-resize
+						:v-html="mdDescription" :readonly="true">
+						<template v-slot:append-inner>
+							<v-icon color="primary" size="large" @click="updateDescription"
+								:icon="!descriptionEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
+						</template>
+					</v-text-field>
 					<!--eslint-enable-->
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn color="primary" @click="editEntity()">Edit</v-btn>
 						<v-btn color="error" @click="deleteEntity()">Delete</v-btn>
 					</v-card-actions>
 				</v-card>

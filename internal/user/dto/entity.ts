@@ -35,15 +35,19 @@ export interface CreateEntityReq {
  */
 export interface UpdateEntityReq {
     /**
-     * @generated from protobuf field: pbtypes.String Name = 1 [json_name = "Name"];
+     * @generated from protobuf field: bytes ID = 1 [json_name = "ID"];
+     */
+    iD: Uint8Array;
+    /**
+     * @generated from protobuf field: pbtypes.String Name = 2 [json_name = "Name"];
      */
     name?: String$;
     /**
-     * @generated from protobuf field: pbtypes.String Description = 2 [json_name = "Description"];
+     * @generated from protobuf field: pbtypes.String Description = 3 [json_name = "Description"];
      */
     description?: String$;
     /**
-     * @generated from protobuf field: pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];
+     * @generated from protobuf field: pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"];
      */
     avatarURL?: String$;
 }
@@ -153,13 +157,15 @@ export const CreateEntityReq = new CreateEntityReq$Type();
 class UpdateEntityReq$Type extends MessageType<UpdateEntityReq> {
     constructor() {
         super("dto.UpdateEntityReq", [
-            { no: 1, name: "Name", kind: "message", jsonName: "Name", T: () => String$ },
-            { no: 2, name: "Description", kind: "message", jsonName: "Description", T: () => String$ },
-            { no: 3, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ }
+            { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 2, name: "Name", kind: "message", jsonName: "Name", T: () => String$ },
+            { no: 3, name: "Description", kind: "message", jsonName: "Description", T: () => String$ },
+            { no: 4, name: "AvatarURL", kind: "message", jsonName: "AvatarURL", T: () => String$ }
         ]);
     }
     create(value?: PartialMessage<UpdateEntityReq>): UpdateEntityReq {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.iD = new Uint8Array(0);
         if (value !== undefined)
             reflectionMergePartial<UpdateEntityReq>(this, message, value);
         return message;
@@ -169,13 +175,16 @@ class UpdateEntityReq$Type extends MessageType<UpdateEntityReq> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* pbtypes.String Name = 1 [json_name = "Name"];*/ 1:
+                case /* bytes ID = 1 [json_name = "ID"];*/ 1:
+                    message.iD = reader.bytes();
+                    break;
+                case /* pbtypes.String Name = 2 [json_name = "Name"];*/ 2:
                     message.name = String$.internalBinaryRead(reader, reader.uint32(), options, message.name);
                     break;
-                case /* pbtypes.String Description = 2 [json_name = "Description"];*/ 2:
+                case /* pbtypes.String Description = 3 [json_name = "Description"];*/ 3:
                     message.description = String$.internalBinaryRead(reader, reader.uint32(), options, message.description);
                     break;
-                case /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];*/ 3:
+                case /* pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"];*/ 4:
                     message.avatarURL = String$.internalBinaryRead(reader, reader.uint32(), options, message.avatarURL);
                     break;
                 default:
@@ -190,15 +199,18 @@ class UpdateEntityReq$Type extends MessageType<UpdateEntityReq> {
         return message;
     }
     internalBinaryWrite(message: UpdateEntityReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* pbtypes.String Name = 1 [json_name = "Name"]; */
+        /* bytes ID = 1 [json_name = "ID"]; */
+        if (message.iD.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
+        /* pbtypes.String Name = 2 [json_name = "Name"]; */
         if (message.name)
-            String$.internalBinaryWrite(message.name, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* pbtypes.String Description = 2 [json_name = "Description"]; */
+            String$.internalBinaryWrite(message.name, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String Description = 3 [json_name = "Description"]; */
         if (message.description)
-            String$.internalBinaryWrite(message.description, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"]; */
+            String$.internalBinaryWrite(message.description, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* pbtypes.String AvatarURL = 4 [json_name = "AvatarURL"]; */
         if (message.avatarURL)
-            String$.internalBinaryWrite(message.avatarURL, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+            String$.internalBinaryWrite(message.avatarURL, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

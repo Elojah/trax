@@ -8,11 +8,11 @@ import (
 
 	admingrpc "github.com/elojah/trax/cmd/admin/grpc"
 	"github.com/elojah/trax/pkg/cookie"
-	cookieapp "github.com/elojah/trax/pkg/cookie/app"
+	cookieagg "github.com/elojah/trax/pkg/cookie/agg"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	glog "github.com/elojah/trax/pkg/log"
-	migrateapp "github.com/elojah/trax/pkg/migrate/app"
+	migrateagg "github.com/elojah/trax/pkg/migrate/agg"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
@@ -77,24 +77,24 @@ func run(prog string, filename string) {
 	cs = append(cs, &rediss)
 
 	cookieCache := &cookieredis.Cache{Service: rediss}
-	cookieApp := &cookieapp.A{
+	cookieAgg := &cookieagg.A{
 		CacheKeys: cookieCache,
 	}
 
 	// setup initial cookie keys
-	if err := cookieApp.Setup(ctx, cookie.NKeys); err != nil {
+	if err := cookieAgg.Setup(ctx, cookie.NKeys); err != nil {
 		log.Error().Err(err).Msg("failed to setup cookie keys")
 
 		return
 	}
 
-	migrateApp := &migrateapp.App{
+	migrateAgg := &migrateagg.Agg{
 		// Service: &postgress,
 	}
 
 	h := handler{
-		cookie:  cookieApp,
-		migrate: migrateApp,
+		cookie:  cookieAgg,
+		migrate: migrateAgg,
 	}
 
 	// init grpc api server

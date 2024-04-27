@@ -11,7 +11,7 @@ import (
 
 type Claims map[string]any
 
-type App interface {
+type Agg interface {
 	Signin(context.Context, string) (string, Claims, error)
 	OAuth() *oauth2.Config
 }

@@ -4,7 +4,7 @@ import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { Entity } from '@internal/user/entity'
 import { Paginate } from '@pkg/paginate/paginate'
-import { CreateEntityReq, ListEntityReq } from '@internal/user/dto/entity'
+import { CreateEntityReq, ListEntityReq, UpdateEntityReq } from '@internal/user/dto/entity'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { parse, ulid } from '@/utils/ulid'
@@ -39,22 +39,30 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  // const updateEntity = async (name: string | undefined, description: string | undefined) => {
-  //   try {
-  //     const req = UpdateEntityReq.create({
-  //       ...(name && { firstname: { value: name } }),
-  //       ...(description && { lastname: { value: description } })
-  //     })
+  const updateEntity = async (
+    id: Uint8Array | undefined,
+    name: string | undefined,
+    description: string | undefined,
+    avatarURL: string | undefined
+  ) => {
+    try {
+      const req = UpdateEntityReq.create({
+        ...(id && { iD: id }),
+        ...(name && { firstname: { value: name } }),
+        ...(description && { lastname: { value: description } }),
+        ...(avatarURL && { lastname: { value: avatarURL } })
+      })
 
-  //     const resp = await api.updateEntity(req, { meta: { token: token.value } })
-  //     entity.value = resp.response
-  //   } catch (err: any) {
-  //     switch (err.code) {
-  //       default:
-  //         logger.error(err)
-  //     }
-  //   }
-  // }
+      const resp = await api.updateEntity(req, { meta: { token: token.value } })
+
+      entities.value?.set(ulid(resp.response.iD), resp.response)
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
 
   const listEntity = async function (
     ids: Uint8Array[] | null,
@@ -114,6 +122,7 @@ export const useEntityStore = defineStore('entity', () => {
     total,
     createEntity,
     listEntity,
+    updateEntity,
     populateEntity
   }
 })

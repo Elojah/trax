@@ -2,7 +2,7 @@ package migrate
 
 import "context"
 
-type App interface {
+type Agg interface {
 	Up(context.Context, string) error
 	Down(context.Context, string) error
 }

@@ -1,4 +1,4 @@
-package app
+package agg
 
 import (
 	"context"
@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-var _ user.App = (*App)(nil)
+var _ user.Agg = (*Agg)(nil)
 
-type App struct {
+type Agg struct {
 	transaction.Transactioner
 
 	user.Store
@@ -27,14 +27,14 @@ type App struct {
 	user.StorePermission
 	user.StoreRoleUser
 
-	Cookie cookie.App
+	Cookie cookie.Agg
 }
 
-func (a *App) Dial(ctx context.Context) error {
+func (a *Agg) Dial(ctx context.Context) error {
 	return nil
 }
 
-func (a App) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string) (user.ClaimAuth, error) {
+func (a Agg) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string) (user.ClaimAuth, error) {
 	var ca user.ClaimAuth
 
 	// don't populate any claims for token other than access
@@ -60,7 +60,7 @@ func (a App) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string
 	return ca, nil
 }
 
-func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity time.Duration) (string, error) {
+func (a Agg) CreateJWT(ctx context.Context, u user.U, audience string, validity time.Duration) (string, error) {
 	// #MARK:Create JWT
 	id := ulid.NewID()
 
@@ -105,7 +105,7 @@ func (a App) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 	return ck, nil
 }
 
-func (a App) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
+func (a Agg) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
 	ck, err := a.Cookie.Decode(ctx, "token", token)
 	if err != nil {
 		return user.Claims{}, err
@@ -141,7 +141,7 @@ func (a App) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
 	return *claims, nil
 }
 
-func (a App) Auth(ctx context.Context, audience string) (user.Claims, error) {
+func (a Agg) Auth(ctx context.Context, audience string) (user.Claims, error) {
 	// read & parse token
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

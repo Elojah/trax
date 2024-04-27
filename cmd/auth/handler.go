@@ -6,7 +6,7 @@ import (
 )
 
 type handler struct {
-	google google.App
+	google google.Agg
 
-	user user.App
+	user user.Agg
 }

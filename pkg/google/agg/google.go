@@ -1,4 +1,4 @@
-package app
+package agg
 
 import (
 	"context"
@@ -9,13 +9,13 @@ import (
 	"google.golang.org/api/idtoken"
 )
 
-var _ google.App = (*App)(nil)
+var _ google.Agg = (*Agg)(nil)
 
-type App struct {
+type Agg struct {
 	config oauth2.Config
 }
 
-func (a *App) Dial(ctx context.Context, cfg oauth2.Config) error {
+func (a *Agg) Dial(ctx context.Context, cfg oauth2.Config) error {
 	a.config = cfg
 
 	a.config.Endpoint = o2google.Endpoint
@@ -23,17 +23,17 @@ func (a *App) Dial(ctx context.Context, cfg oauth2.Config) error {
 	return nil
 }
 
-func (a *App) Close(ctx context.Context) error {
+func (a *Agg) Close(ctx context.Context) error {
 	a.config = oauth2.Config{}
 
 	return nil
 }
 
-func (a App) OAuth() *oauth2.Config {
+func (a Agg) OAuth() *oauth2.Config {
 	return &a.config
 }
 
-func (a App) Signin(ctx context.Context, token string) (string, google.Claims, error) {
+func (a Agg) Signin(ctx context.Context, token string) (string, google.Claims, error) {
 	// #MARK:Validate token
 	p, err := idtoken.Validate(ctx, token, a.config.ClientID)
 	if err != nil {

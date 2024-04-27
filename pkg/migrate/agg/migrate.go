@@ -1,4 +1,4 @@
-package app
+package agg
 
 import (
 	"context"
@@ -6,15 +6,15 @@ import (
 	"github.com/elojah/trax/pkg/errors"
 )
 
-type App struct {
+type Agg struct {
 	// *postgres.Service
 }
 
-func (a App) Up(ctx context.Context, dir string) error {
+func (a Agg) Up(ctx context.Context, dir string) error {
 	return nil
 	// return migrate.Migrate(ctx, a.Session, dir)
 }
 
-func (a App) Down(context.Context, string) error {
+func (a Agg) Down(context.Context, string) error {
 	return errors.ErrNotImplemented{Version: "soontm"}
 }

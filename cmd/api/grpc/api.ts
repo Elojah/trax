@@ -5,6 +5,7 @@ import { ListRoleResp } from "../../../internal/user/dto/role";
 import { ListRoleReq } from "../../../internal/user/dto/role";
 import { Role } from "../../../internal/user/role";
 import { CreateRoleReq } from "../../../internal/user/dto/role";
+import { UpdateEntityReq } from "../../../internal/user/dto/entity";
 import { FetchEntityReq } from "../../../internal/user/dto/entity";
 import { ListEntityResp } from "../../../internal/user/dto/entity";
 import { ListEntityReq } from "../../../internal/user/dto/entity";
@@ -25,6 +26,7 @@ export const API = new ServiceType("grpc.API", [
     { name: "CreateEntity", options: {}, I: CreateEntityReq, O: Entity },
     { name: "ListEntity", options: {}, I: ListEntityReq, O: ListEntityResp },
     { name: "FetchEntity", options: {}, I: FetchEntityReq, O: Entity },
+    { name: "UpdateEntity", options: {}, I: UpdateEntityReq, O: Entity },
     { name: "CreateRole", options: {}, I: CreateRoleReq, O: Role },
     { name: "ListRole", options: {}, I: ListRoleReq, O: ListRoleResp }
 ]);

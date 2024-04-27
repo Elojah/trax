@@ -35,7 +35,7 @@ service API {
     rpc CreateEntity(dto.CreateEntityReq) returns (user.Entity);
     rpc ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
     rpc FetchEntity(dto.FetchEntityReq) returns (user.Entity);
-    // rpc UpdateEntity(user.Entity) returns (user.Entity); // TODO: IMPLEMENT
+    rpc UpdateEntity(dto.UpdateEntityReq) returns (user.Entity);
 
     // Roles
     rpc CreateRole(dto.CreateRoleReq) returns (user.Role);
