@@ -29,7 +29,7 @@ service API {
     // User
     rpc FetchUser(dto.FetchUserReq) returns (user.U);
     rpc UpdateUser(dto.UpdateUserReq) returns (user.U);
-    // rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp); // TODO: IMPLEMENT
+    rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp);
 
     // Entity
     rpc CreateEntity(dto.CreateEntityReq) returns (user.Entity);

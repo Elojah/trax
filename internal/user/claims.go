@@ -31,11 +31,31 @@ type Claims struct {
 	Auth   ClaimAuth
 }
 
-func (c Claims) EntityIDs() []ulid.ID {
+func (c ClaimEntity) Require(rs ...Requirement) error {
+	for _, r := range rs {
+		resources, ok := c.Resources[r.Resource.String()]
+		if !ok {
+			return ErrUnauthorizedResource{Resource: r.Resource.String()}
+		}
+
+		if _, ok := resources.Commands[r.Command.String()]; !ok {
+			return ErrUnauthorizedCommand{Resource: r.Resource.String(), Command: r.Command.String()}
+		}
+	}
+
+	return nil
+}
+
+func (c Claims) EntityIDs(rs ...Requirement) []ulid.ID {
 	result := make([]ulid.ID, 0, len(c.Auth.Entities))
-	for entityKey := range c.Auth.Entities {
-		entityID, err := ulid.Parse(entityKey)
+	for id, entity := range c.Auth.Entities {
+		entityID, err := ulid.Parse(id)
 		if err != nil {
+			continue
+		}
+
+		if err := entity.Require(rs...); err != nil {
+			// ignore error but don't add entityID to result
 			continue
 		}
 

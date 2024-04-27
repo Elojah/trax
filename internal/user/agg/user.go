@@ -45,9 +45,7 @@ func (a Agg) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string
 	if err := a.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
-		ca, err = a.ListClaims(ctx, user.FilterRoleUser{
-			UserID: userID,
-		})
+		ca, err = a.ListClaims(ctx, userID)
 		if err != nil {
 			return transaction.Rollback, err
 		}

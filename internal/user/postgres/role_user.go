@@ -196,7 +196,7 @@ func (s Store) DeleteRoleUser(ctx context.Context, f user.FilterRoleUser) error 
 	return err
 }
 
-func (s Store) ListClaims(ctx context.Context, f user.FilterRoleUser) (user.ClaimAuth, error) {
+func (s Store) ListClaims(ctx context.Context, userID ulid.ID) (user.ClaimAuth, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return user.ClaimAuth{}, err
@@ -211,9 +211,9 @@ func (s Store) ListClaims(ctx context.Context, f user.FilterRoleUser) (user.Clai
 		WHERE ru.user_id = $1
 	`)
 
-	rows, err := tx.Query(ctx, b.String(), f.UserID)
+	rows, err := tx.Query(ctx, b.String(), userID)
 	if err != nil {
-		return user.ClaimAuth{}, postgres.Error(err, "role_user", filterRoleUser(f).index())
+		return user.ClaimAuth{}, postgres.Error(err, "role_user", userID.String())
 	}
 
 	var claim user.ClaimAuth
@@ -223,7 +223,7 @@ func (s Store) ListClaims(ctx context.Context, f user.FilterRoleUser) (user.Clai
 		var resource, command string
 
 		if err := rows.Scan(&entityID, &roleID, &resource, &command); err != nil {
-			return user.ClaimAuth{}, postgres.Error(err, "role_user+claim", filterRoleUser(f).index())
+			return user.ClaimAuth{}, postgres.Error(err, "role_user+claim", userID.String())
 		}
 
 		eid := entityID.String()

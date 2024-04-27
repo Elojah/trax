@@ -103,6 +103,14 @@ func (f filterRole) index() string {
 		cols = append(cols, strings.Join(ss, "|"))
 	}
 
+	if f.EntityID != nil {
+		cols = append(cols, f.EntityID.String())
+	}
+
+	if f.Search != "" {
+		cols = append(cols, f.Search)
+	}
+
 	return strings.Join(cols, " - ")
 }
 

@@ -5,6 +5,7 @@ import (
 	"crypto/subtle"
 	"time"
 
+	"github.com/elojah/trax/pkg/paginate"
 	"github.com/elojah/trax/pkg/transaction"
 	"github.com/elojah/trax/pkg/ulid"
 	"golang.org/x/crypto/argon2"
@@ -33,6 +34,11 @@ type Filter struct {
 
 	Email    *string
 	GoogleID *string
+
+	EntityIDs []ulid.ID
+
+	*paginate.Paginate
+	Search string
 }
 
 type Patch struct {
@@ -45,9 +51,12 @@ type Patch struct {
 type Store interface {
 	Insert(context.Context, U) error
 	Fetch(context.Context, Filter) (U, error)
-	List(context.Context, Filter) ([]U, error)
+	List(context.Context, Filter) ([]U, uint64, error)
 	Update(context.Context, Filter, Patch) ([]U, error)
 	Delete(context.Context, Filter) error
+
+	FetchWithPassword(context.Context, Filter) (U, error)
+	ListByEntity(context.Context, Filter) ([]U, uint64, error)
 }
 
 const (

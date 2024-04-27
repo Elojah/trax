@@ -10,6 +10,8 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { U } from "../user";
+import { Paginate } from "../../../pkg/paginate/paginate";
 import { String$ } from "../../../pkg/pbtypes/string";
 /**
  * @generated from protobuf message dto.SigninResp
@@ -91,6 +93,40 @@ export interface UpdateUserReq {
      * @generated from protobuf field: pbtypes.String AvatarURL = 3 [json_name = "AvatarURL"];
      */
     avatarURL?: String$;
+}
+/**
+ * @generated from protobuf message dto.ListUserReq
+ */
+export interface ListUserReq {
+    /**
+     * @generated from protobuf field: paginate.Paginate Paginate = 1 [json_name = "Paginate"];
+     */
+    paginate?: Paginate;
+    /**
+     * @generated from protobuf field: string Search = 2 [json_name = "Search"];
+     */
+    search: string;
+    /**
+     * @generated from protobuf field: repeated bytes IDs = 3 [json_name = "IDs"];
+     */
+    iDs: Uint8Array[];
+    /**
+     * @generated from protobuf field: repeated bytes EntityIDs = 4 [json_name = "EntityIDs"];
+     */
+    entityIDs: Uint8Array[];
+}
+/**
+ * @generated from protobuf message dto.ListUserResp
+ */
+export interface ListUserResp {
+    /**
+     * @generated from protobuf field: repeated user.U Users = 1 [json_name = "Users"];
+     */
+    users: U[];
+    /**
+     * @generated from protobuf field: uint64 Total = 2 [json_name = "Total"];
+     */
+    total: bigint;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SigninResp$Type extends MessageType<SigninResp> {
@@ -396,3 +432,128 @@ class UpdateUserReq$Type extends MessageType<UpdateUserReq> {
  * @generated MessageType for protobuf message dto.UpdateUserReq
  */
 export const UpdateUserReq = new UpdateUserReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ListUserReq$Type extends MessageType<ListUserReq> {
+    constructor() {
+        super("dto.ListUserReq", [
+            { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
+            { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 4, name: "EntityIDs", kind: "scalar", jsonName: "EntityIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<ListUserReq>): ListUserReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.search = "";
+        message.iDs = [];
+        message.entityIDs = [];
+        if (value !== undefined)
+            reflectionMergePartial<ListUserReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListUserReq): ListUserReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* paginate.Paginate Paginate = 1 [json_name = "Paginate"];*/ 1:
+                    message.paginate = Paginate.internalBinaryRead(reader, reader.uint32(), options, message.paginate);
+                    break;
+                case /* string Search = 2 [json_name = "Search"];*/ 2:
+                    message.search = reader.string();
+                    break;
+                case /* repeated bytes IDs = 3 [json_name = "IDs"];*/ 3:
+                    message.iDs.push(reader.bytes());
+                    break;
+                case /* repeated bytes EntityIDs = 4 [json_name = "EntityIDs"];*/ 4:
+                    message.entityIDs.push(reader.bytes());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ListUserReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* paginate.Paginate Paginate = 1 [json_name = "Paginate"]; */
+        if (message.paginate)
+            Paginate.internalBinaryWrite(message.paginate, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string Search = 2 [json_name = "Search"]; */
+        if (message.search !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.search);
+        /* repeated bytes IDs = 3 [json_name = "IDs"]; */
+        for (let i = 0; i < message.iDs.length; i++)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.iDs[i]);
+        /* repeated bytes EntityIDs = 4 [json_name = "EntityIDs"]; */
+        for (let i = 0; i < message.entityIDs.length; i++)
+            writer.tag(4, WireType.LengthDelimited).bytes(message.entityIDs[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.ListUserReq
+ */
+export const ListUserReq = new ListUserReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ListUserResp$Type extends MessageType<ListUserResp> {
+    constructor() {
+        super("dto.ListUserResp", [
+            { no: 1, name: "Users", kind: "message", jsonName: "Users", repeat: 1 /*RepeatType.PACKED*/, T: () => U, options: { "gogoproto.nullable": false } },
+            { no: 2, name: "Total", kind: "scalar", jsonName: "Total", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ListUserResp>): ListUserResp {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.users = [];
+        message.total = 0n;
+        if (value !== undefined)
+            reflectionMergePartial<ListUserResp>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListUserResp): ListUserResp {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated user.U Users = 1 [json_name = "Users"];*/ 1:
+                    message.users.push(U.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* uint64 Total = 2 [json_name = "Total"];*/ 2:
+                    message.total = reader.uint64().toBigInt();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ListUserResp, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated user.U Users = 1 [json_name = "Users"]; */
+        for (let i = 0; i < message.users.length; i++)
+            U.internalBinaryWrite(message.users[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* uint64 Total = 2 [json_name = "Total"]; */
+        if (message.total !== 0n)
+            writer.tag(2, WireType.Varint).uint64(message.total);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.ListUserResp
+ */
+export const ListUserResp = new ListUserResp$Type();

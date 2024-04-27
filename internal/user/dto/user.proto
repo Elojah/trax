@@ -13,6 +13,9 @@ option (gogoproto.goproto_registration) = true;
 
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 import "github.com/elojah/trax/pkg/pbtypes/string.proto";
+import "github.com/elojah/trax/pkg/paginate/paginate.proto";
+
+import "github.com/elojah/trax/internal/user/user.proto";
 
 message SigninResp {
     string AccessToken    = 1;
@@ -43,3 +46,17 @@ message UpdateUserReq {
     pbtypes.String Lastname     = 2;
     pbtypes.String AvatarURL    = 3;
 }
+
+message ListUserReq {
+	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
+	string Search                     = 2;
+
+	repeated bytes IDs                = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes EntityIDs          = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
+message ListUserResp {
+	repeated user.U Users             = 1 [(gogoproto.nullable) = false];
+	uint64 Total                      = 2;
+}
+

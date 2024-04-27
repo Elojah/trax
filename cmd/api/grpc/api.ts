@@ -11,6 +11,8 @@ import { ListEntityResp } from "../../../internal/user/dto/entity";
 import { ListEntityReq } from "../../../internal/user/dto/entity";
 import { Entity } from "../../../internal/user/entity";
 import { CreateEntityReq } from "../../../internal/user/dto/entity";
+import { ListUserResp } from "../../../internal/user/dto/user";
+import { ListUserReq } from "../../../internal/user/dto/user";
 import { UpdateUserReq } from "../../../internal/user/dto/user";
 import { U } from "../../../internal/user/user";
 import { FetchUserReq } from "../../../internal/user/dto/user";
@@ -23,6 +25,7 @@ export const API = new ServiceType("grpc.API", [
     { name: "Ping", options: {}, I: Empty, O: Empty },
     { name: "FetchUser", options: {}, I: FetchUserReq, O: U },
     { name: "UpdateUser", options: {}, I: UpdateUserReq, O: U },
+    { name: "ListUser", options: {}, I: ListUserReq, O: ListUserResp },
     { name: "CreateEntity", options: {}, I: CreateEntityReq, O: Entity },
     { name: "ListEntity", options: {}, I: ListEntityReq, O: ListEntityResp },
     { name: "FetchEntity", options: {}, I: FetchEntityReq, O: Entity },

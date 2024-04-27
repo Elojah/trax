@@ -29,7 +29,7 @@ func (h *handler) Signin(ctx context.Context, req *dto.SigninReq) (*dto.SigninRe
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
-		u, err = h.user.Fetch(ctx, user.Filter{
+		u, err = h.user.FetchWithPassword(ctx, user.Filter{
 			Email: &req.Email,
 		})
 		if err != nil {

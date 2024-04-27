@@ -8,10 +8,19 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	pagpostgres "github.com/elojah/trax/pkg/paginate/postgres"
 	ppostgres "github.com/elojah/trax/pkg/pbtypes/postgres"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
 	_ "github.com/lib/pq"
+)
+
+var (
+	sortUser = map[string]string{
+		"name":       "u.last_name",
+		"created_at": "u.created_at",
+		"updated_at": "u.updated_at",
+	}
 )
 
 type sqlUser struct {
@@ -87,6 +96,19 @@ func (f filter) where(n int) (string, []any) {
 		n++
 	}
 
+	// !!! Only available if role r is joined
+	if len(f.EntityIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`r.entity_id IN (%s)`, postgres.Array(n, len(f.EntityIDs))))
+		args = append(args, ulid.IDs(f.EntityIDs).Any()...)
+		n += len(f.EntityIDs)
+	}
+
+	if len(f.Search) > 0 {
+		clause = append(clause, fmt.Sprintf(`(u.email ILIKE $%d OR u.first_name ILIKE $%d u.last_name ILIKE $%d`), n, n+1, n+2)
+		args = append(args, "%"+f.Search+"%", "%"+f.Search+"%", "%"+f.Search+"%")
+		n += 3
+	}
+
 	b := strings.Builder{}
 	b.WriteString(" WHERE ")
 
@@ -117,6 +139,10 @@ func (f filter) index() string {
 
 	if f.GoogleID != nil {
 		cols = append(cols, *f.GoogleID)
+	}
+
+	if f.Search != "" {
+		cols = append(cols, f.Search)
 	}
 
 	return strings.Join(cols, " - ")
@@ -211,35 +237,110 @@ func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 	return u.user(), nil
 }
 
-func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, error) {
+func (s Store) FetchWithPassword(ctx context.Context, f user.Filter) (user.U, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
-		return nil, err
+		return user.U{}, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at FROM "user"."user" u `)
+	b.WriteString(`SELECT u.id, u.email, u.password_hash, u.password_salt, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at FROM "user"."user" u `)
+
+	clause, args := filter(f).where(1)
+	b.WriteString(clause)
+
+	q := tx.QueryRow(ctx, b.String(), args...)
+
+	var u sqlUser
+	if err := q.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PasswordSalt, &u.FirstName, &u.LastName, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt); err != nil {
+		return user.U{}, postgres.Error(err, "user", filter(f).index())
+	}
+
+	return u.user(), nil
+}
+
+func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
+	if f.Paginate != nil {
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
+	} else {
+		b.WriteString(`, 0`)
+	}
+	b.WriteString(`FROM "user"."user" u `)
 
 	clause, args := filter(f).where(1)
 	b.WriteString(clause)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, postgres.Error(err, "user", filter(f).index())
+		return nil, 0, postgres.Error(err, "user", filter(f).index())
 	}
 
 	var users []user.U
 
+	var count uint64
+	var row_number int
+
 	for rows.Next() {
 		var u user.U
-		if err := rows.Scan(&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt); err != nil {
-			return nil, postgres.Error(err, "user", filter(f).index())
+		if err := rows.Scan(&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt, &count, &row_number); err != nil {
+			return nil, 0, postgres.Error(err, "user", filter(f).index())
 		}
 
 		users = append(users, u)
 	}
 
-	return users, nil
+	return users, count, nil
+}
+
+func (s Store) ListByEntity(ctx context.Context, f user.Filter) ([]user.U, uint64, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
+	if f.Paginate != nil {
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
+	} else {
+		b.WriteString(`, 0`)
+	}
+	b.WriteString(`
+	FROM "user"."user" u
+	JOIN "user"."role_user" ru ON u.id = ru.user_id
+	JOIN "user"."role" r ON ru.role_id = r.id
+	`)
+
+	clause, args := filter(f).where(1)
+	b.WriteString(clause)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, 0, postgres.Error(err, "user+role", filter(f).index())
+	}
+
+	var users []user.U
+
+	var count uint64
+	var row_number int
+
+	for rows.Next() {
+		var u user.U
+		if err := rows.Scan(&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt, &count, &row_number); err != nil {
+			return nil, 0, postgres.Error(err, "user+role", filter(f).index())
+		}
+
+		users = append(users, u)
+	}
+
+	return users, count, nil
 }
 
 func (s Store) Update(ctx context.Context, f user.Filter, p user.Patch) ([]user.U, error) {

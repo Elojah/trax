@@ -8,6 +8,7 @@ import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
 import { useRoleStore } from '@/stores/role';
 import type { Role } from '@internal/user/role';
+import type { U } from '@internal/user/user';
 import { ulid } from '@/utils/ulid';
 
 const form = ref<VForm | null>(null);
@@ -26,6 +27,12 @@ const {
 	roles: roles,
 	total: roleTotal,
 } = toRefs(roleStore);
+
+const userStore = useUserStore();
+const {
+	users: users,
+	total: userTotal,
+} = toRefs(userStore);
 
 const name = ref('');
 const avatarURL = ref('');
@@ -73,6 +80,33 @@ const headersByRole: ReadonlyHeaders = [
 	},
 ];
 
+const headersByUser: ReadonlyHeaders = [
+	{
+		title: 'Email',
+		key: 'email',
+		align: 'start',
+		sortable: true,
+	},
+	{
+		title: 'Username',
+		key: 'username',
+		align: 'start',
+		sortable: true,
+	},
+	{
+		title: 'Name',
+		key: 'name',
+		align: 'start',
+		sortable: false,
+	},
+	{
+		title: 'Created',
+		key: 'created_at',
+		align: 'end',
+		sortable: true,
+	},
+];
+
 const pageOptions = [
 	{
 		value: 10,
@@ -94,8 +128,12 @@ type RoleEntity = Role & { entity: Entity | undefined };
 
 const selectedRole = ref<RoleEntity[]>([]);
 
+type UserEntity = U & { entity: Entity | undefined };
+
+const selectedUser = ref<UserEntity[]>([]);
+
 const selected = computed(() => {
-	return selectedEntity.value?.at(0) || selectedRole.value?.at(0)?.entity;
+	return selectedEntity.value?.at(0) || selectedRole.value?.at(0)?.entity || selectedUser.value?.at(0)?.entity;
 });
 
 const viewEntityIDs = ref<string[]>([])
@@ -116,9 +154,22 @@ const viewRoles = computed(() => {
 	});
 });
 
+const viewUserIDs = ref<string[]>([])
+
+const viewUsers = computed(() => {
+	return viewUserIDs.value.map((userID: string) => {
+		const user = users.value?.get(userID);
+		return {
+			...user,
+			entity: entities.value?.get(ulid(user?.entityID!)),
+		}
+	});
+});
+
 const select = (_: any, row: any) => {
 	selectedEntity.value = [];
 	selectedRole.value = [];
+	selectedUser.value = [];
 	row.toggleSelect({ value: row.item, selectable: true });
 };
 
@@ -156,6 +207,23 @@ const listRole = async (options: any) => {
 	await entityStore.populateEntity(newEntityIDs);
 
 	viewRoleIDs.value = newRoleIDs;
+
+	loading.value = false;
+};
+
+const listUser = async (options: any) => {
+	loading.value = true;
+	const { page, itemsPerPage, sortBy } = options;
+	const [newUserIDs, newEntityIDs] = await userStore.listUser(null, search.value, {
+		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+		end: BigInt((page * itemsPerPage)),
+		sort: sortBy?.at(0)?.key ?? '',
+		order: sortBy?.at(0)?.order === 'asc' ? true : false,
+	});
+
+	await entityStore.populateEntity(newEntityIDs);
+
+	viewUserIDs.value = newUserIDs;
 
 	loading.value = false;
 };
@@ -244,6 +312,12 @@ const updateDescription = async function () {
 						</v-btn>
 						<v-btn size="large" variant="outlined" append-icon="mdi-account-cog">
 							By Role
+							<template v-slot:append>
+								<v-icon color="primary"></v-icon>
+							</template>
+						</v-btn>
+						<v-btn size="large" variant="outlined" append-icon="mdi-account-cog">
+							By User
 							<template v-slot:append>
 								<v-icon color="primary"></v-icon>
 							</template>
@@ -338,6 +412,36 @@ const updateDescription = async function () {
 						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
 							<td class="d-flex align-center">
 								<span class="text-h6">{{ item.name }}</span>
+							</td>
+							<td>
+								<v-avatar class="mr-4" size="32" :color="!item.entity?.avatarURL ? 'primary' : ''">
+									<img v-if="item.entity?.avatarURL" :src="item.entity?.avatarURL" alt="Avatar">
+									<span v-else class=" mx-auto text-center text-h5">
+										{{ item.entity?.name?.at(0)?.toUpperCase() }}
+									</span>
+								</v-avatar>
+								<span class="text-h6">{{ item.entity?.name }}</span>
+							</td>
+							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+								1000).toLocaleDateString('en-GB')
+								}}
+							</td>
+						</tr>
+					</template>
+				</v-data-table-server>
+				<v-data-table-server v-if="tableView === 2" class="transparent-background" :headers="headersByUser"
+					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+					:items-per-page-options="pageOptions" :items="viewUsers" :items-length="Number(userTotal)"
+					:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="listUser"
+					v-model="selectedUser" @click:row="select" return-object item-selectable select-strategy="single">
+					<template v-slot:item="{ item, isSelected, index, props }">
+						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.email" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
+							<td class="d-flex align-center">
+								<span class="text-h6">{{ item.email }}</span>
+							</td>
+							<td class="d-flex align-center">
+								<span class="text-h6">{{ item.firstname }}</span>
 							</td>
 							<td>
 								<v-avatar class="mr-4" size="32" :color="!item.entity?.avatarURL ? 'primary' : ''">
