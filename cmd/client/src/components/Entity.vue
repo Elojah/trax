@@ -7,44 +7,55 @@ import { marked } from "marked";
 import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
 import { useRoleStore } from '@/stores/role';
+import { useUserStore } from '@/stores/user';
 import type { Role } from '@internal/user/role';
 import type { U } from '@internal/user/user';
 import { ulid } from '@/utils/ulid';
 
+// #MARK:Common
+// ______________________________________________________
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
 
 const authStore = useAuthStore();
 
+// [Info, Roles, User]
+const tableView = ref(0)
+
+type ReadonlyHeaders = VDataTable['$props']['headers']
+
+const pageOptions = [
+	{
+		value: 10,
+		title: "10"
+	},
+	{
+		value: 50,
+		title: "50"
+	},
+	{
+		value: 100,
+		title: "100"
+	},
+]
+
+// #MARK:Entity
+// ______________________________________________________
 const entityStore = useEntityStore();
 const {
 	entities: entities,
 	total: entityTotal,
 } = toRefs(entityStore);
 
-const roleStore = useRoleStore();
-const {
-	roles: roles,
-	total: roleTotal,
-} = toRefs(roleStore);
-
-const userStore = useUserStore();
-const {
-	users: users,
-	total: userTotal,
-} = toRefs(userStore);
 
 const name = ref('');
 const avatarURL = ref('');
 const description = ref('');
 
-const loading = ref(true);
-const search = ref('');
-const tableView = ref(0)
+const loadingEntity = ref(true);
+const searchEntity = ref('');
 
-type ReadonlyHeaders = VDataTable['$props']['headers']
-
-const headers: ReadonlyHeaders = [
+const headersEntity: ReadonlyHeaders = [
 	{
 		title: 'Name',
 		key: 'name',
@@ -58,6 +69,109 @@ const headers: ReadonlyHeaders = [
 		sortable: true,
 	},
 ];
+
+const selectedEntities = ref<Entity[]>([]);
+const selectedEntity = computed(() => selectedEntities.value.at(0));
+
+const viewEntityIDs = ref<string[]>([])
+
+const viewEntities = computed(() => {
+	return viewEntityIDs.value.map((entityID: string) => entities.value?.get(entityID));
+});
+
+const selectEntity = (_: any, row: any) => {
+	selectedEntities.value = [];
+	row.toggleSelect({ value: row.item, selectable: true });
+};
+
+const mdDescription = computed(() => {
+	return marked.parse(selectedEntities.value.at(0)?.description || `*no description*`);
+});
+
+const listEntity = async (options: any) => {
+	loadingEntity.value = true;
+
+	const { page, itemsPerPage, sortBy } = options;
+	const newIDs = await entityStore.listEntity(null, searchEntity.value, {
+		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+		end: BigInt(page * itemsPerPage),
+		sort: sortBy?.at(0)?.key ?? '',
+		order: sortBy?.at(0)?.order === 'asc' ? true : false,
+	});
+
+	viewEntityIDs.value = newIDs;
+
+	loadingEntity.value = false;
+};
+
+// #MARK:Entity dialogs
+const nameRules = [
+	(v: string) => !!v || 'Required',
+	(v: string) => (v && v.length >= 1) || 'Min 1 character',
+];
+
+const dialogCreateEntity = ref(false);
+const closeCreateEntity = () => {
+	dialogCreateEntity.value = false;
+	name.value = '';
+	avatarURL.value = '';
+	description.value = '';
+};
+
+const createEntity = async () => {
+	await entityStore.createEntity(name.value, avatarURL.value, description.value);
+	dialogCreateEntity.value = false;
+	name.value = '';
+	avatarURL.value = '';
+	description.value = '';
+
+	await authStore.refreshToken();
+	await listEntity({ page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] })
+};
+
+const dialogDeleteEntity = ref(false);
+const closeDeleteEntity = () => {
+	dialogDeleteEntity.value = false;
+};
+
+const confirmDeleteEntity = () => {
+	// TODO: delete entity
+	dialogDeleteEntity.value = false;
+};
+
+const deleteEntity = () => {
+};
+
+const nameEdit = ref(false);
+const descriptionEdit = ref(false);
+
+const updateName = async function () {
+	if (nameEdit.value) {
+		await entityStore.updateEntity(selectedEntity.value?.iD, selectedEntity.value?.name, undefined, undefined);
+	}
+
+	nameEdit.value = !nameEdit.value
+};
+
+const updateDescription = async function () {
+	if (descriptionEdit.value) {
+		await entityStore.updateEntity(selectedEntity.value?.iD, undefined, selectedEntity.value?.description, undefined);
+	}
+
+	descriptionEdit.value = !descriptionEdit.value
+};
+
+
+// #MARK:Role
+// ______________________________________________________
+const roleStore = useRoleStore();
+const {
+	roles: roles,
+	total: roleTotal,
+} = toRefs(roleStore);
+
+const loadingRole = ref(true);
+const searchRole = ref('');
 
 const headersByRole: ReadonlyHeaders = [
 	{
@@ -79,6 +193,76 @@ const headersByRole: ReadonlyHeaders = [
 		sortable: true,
 	},
 ];
+
+const selectedRoles = ref<Role[]>([]);
+
+const selectedRole = computed(() => selectedRoles.value.at(0));
+
+const viewRoleIDs = ref<string[]>([])
+
+const viewRoles = computed(() => {
+	return viewRoleIDs.value.map((roleID: string) => { return roles.value?.get(roleID) });
+});
+
+const selectRole = (_: any, row: any) => {
+	selectedRoles.value = [];
+	row.toggleSelect({ value: row.item, selectable: true });
+};
+
+const listRole = async (options: any) => {
+	loadingRole.value = true;
+	const { page, itemsPerPage, sortBy } = options;
+	const [newRoleIDs] = await roleStore.listRole(null, searchRole.value, {
+		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+		end: BigInt((page * itemsPerPage)),
+		sort: sortBy?.at(0)?.key ?? '',
+		order: sortBy?.at(0)?.order === 'asc' ? true : false,
+	});
+
+	viewRoleIDs.value = newRoleIDs;
+
+	loadingRole.value = false;
+};
+
+// #MARK:Role dialogs
+const dialogCreateRole = ref(false);
+const closeCreateRole = () => {
+	dialogCreateRole.value = false;
+	name.value = '';
+};
+
+const createRole = async () => {
+	await roleStore.createRole(name.value);
+	dialogCreateRole.value = false;
+	name.value = '';
+
+	await authStore.refreshToken();
+	await listRole({ page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] })
+};
+
+const dialogDeleteRole = ref(false);
+const closeDeleteRole = () => {
+	dialogDeleteRole.value = false;
+};
+
+const confirmDeleteRole = () => {
+	// TODO: delete entity
+	dialogDeleteRole.value = false;
+};
+
+const deleteRole = () => {
+};
+
+// #MARK:User
+// ______________________________________________________
+const userStore = useUserStore();
+const {
+	users: users,
+	total: userTotal,
+} = toRefs(userStore);
+
+const loadingUser = ref(true);
+const searchUser = ref('');
 
 const headersByUser: ReadonlyHeaders = [
 	{
@@ -107,52 +291,11 @@ const headersByUser: ReadonlyHeaders = [
 	},
 ];
 
-const pageOptions = [
-	{
-		value: 10,
-		title: "10"
-	},
-	{
-		value: 50,
-		title: "50"
-	},
-	{
-		value: 100,
-		title: "100"
-	},
-]
-
-const selectedEntity = ref<Entity[]>([]);
-
-type RoleEntity = Role & { entity: Entity | undefined };
-
-const selectedRole = ref<RoleEntity[]>([]);
-
 type UserEntity = U & { entity: Entity | undefined };
 
-const selectedUser = ref<UserEntity[]>([]);
+const selectedUsers = ref<UserEntity[]>([]);
 
-const selected = computed(() => {
-	return selectedEntity.value?.at(0) || selectedRole.value?.at(0)?.entity || selectedUser.value?.at(0)?.entity;
-});
-
-const viewEntityIDs = ref<string[]>([])
-
-const viewEntities = computed(() => {
-	return viewEntityIDs.value.map((entityID: string) => entities.value?.get(entityID));
-});
-
-const viewRoleIDs = ref<string[]>([])
-
-const viewRoles = computed(() => {
-	return viewRoleIDs.value.map((roleID: string) => {
-		const role = roles.value?.get(roleID);
-		return {
-			...role,
-			entity: entities.value?.get(ulid(role?.entityID!)),
-		}
-	});
-});
+const selectedUser = computed(() => selectedUsers.value.at(0));
 
 const viewUserIDs = ref<string[]>([])
 
@@ -161,60 +304,20 @@ const viewUsers = computed(() => {
 		const user = users.value?.get(userID);
 		return {
 			...user,
-			entity: entities.value?.get(ulid(user?.entityID!)),
+			// entity: entities.value?.get(ulid(user?.entityID!)),
 		}
 	});
 });
 
-const select = (_: any, row: any) => {
-	selectedEntity.value = [];
-	selectedRole.value = [];
-	selectedUser.value = [];
+const selectUser = (_: any, row: any) => {
+	selectedUsers.value = [];
 	row.toggleSelect({ value: row.item, selectable: true });
 };
 
-const mdDescription = computed(() => {
-	return marked.parse(selected?.value?.description || `*no description*`);
-});
-
-const listEntity = async (options: any) => {
-	loading.value = true;
-
-	const { page, itemsPerPage, sortBy } = options;
-	const newIDs = await entityStore.listEntity(null, search.value, {
-		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-		end: BigInt(page * itemsPerPage),
-		sort: sortBy?.at(0)?.key ?? '',
-		order: sortBy?.at(0)?.order === 'asc' ? true : false,
-	});
-
-	viewEntityIDs.value = newIDs;
-
-	loading.value = false;
-};
-
-
-const listRole = async (options: any) => {
-	loading.value = true;
-	const { page, itemsPerPage, sortBy } = options;
-	const [newRoleIDs, newEntityIDs] = await roleStore.listRole(null, search.value, {
-		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-		end: BigInt((page * itemsPerPage)),
-		sort: sortBy?.at(0)?.key ?? '',
-		order: sortBy?.at(0)?.order === 'asc' ? true : false,
-	});
-
-	await entityStore.populateEntity(newEntityIDs);
-
-	viewRoleIDs.value = newRoleIDs;
-
-	loading.value = false;
-};
-
 const listUser = async (options: any) => {
-	loading.value = true;
+	loadingUser.value = true;
 	const { page, itemsPerPage, sortBy } = options;
-	const [newUserIDs, newEntityIDs] = await userStore.listUser(null, search.value, {
+	const [newUserIDs, newEntityIDs] = await userStore.listUser(null, searchUser.value, {
 		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
 		end: BigInt((page * itemsPerPage)),
 		sort: sortBy?.at(0)?.key ?? '',
@@ -225,107 +328,57 @@ const listUser = async (options: any) => {
 
 	viewUserIDs.value = newUserIDs;
 
-	loading.value = false;
+	loadingUser.value = false;
 };
 
-const dialog = ref(false);
-const close = () => {
-	dialog.value = false;
+// #MARK:User dialogs
+const dialogInviteUser = ref(false);
+const closeInviteUser = () => {
+	dialogInviteUser.value = false;
 	name.value = '';
-	avatarURL.value = '';
-	description.value = '';
 };
 
-const nameRules = [
-	(v: string) => !!v || 'Required',
-	(v: string) => (v && v.length >= 1) || 'Min 1 character',
-];
-
-const create = async () => {
-	await entityStore.createEntity(name.value, avatarURL.value, description.value);
-	dialog.value = false;
+const inviteUser = async () => {
+	await userStore.inviteUser(name.value);
+	dialogInviteUser.value = false;
 	name.value = '';
-	avatarURL.value = '';
-	description.value = '';
 
 	await authStore.refreshToken();
-	await listEntity({ page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] })
+	await listUser({ page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] })
 };
 
-const dialogDelete = ref(false);
-const closeDelete = () => {
-	dialogDelete.value = false;
+const dialogDeleteUser = ref(false);
+const closeDeleteUser = () => {
+	dialogDeleteUser.value = false;
 };
 
-const confirmDeleteEntity = () => {
+const confirmDeleteUser = () => {
 	// TODO: delete entity
-	dialogDelete.value = false;
+	dialogDeleteUser.value = false;
 };
 
-const deleteEntity = () => {
-};
-
-const nameEdit = ref(false);
-const descriptionEdit = ref(false);
-
-const updateName = async function () {
-	if (nameEdit.value) {
-		await entityStore.updateEntity(selected.value?.iD, selected.value?.name, undefined, undefined);
-	}
-
-	nameEdit.value = !nameEdit.value
-};
-
-const updateDescription = async function () {
-	if (descriptionEdit.value) {
-		await entityStore.updateEntity(selected.value?.iD, undefined, selected.value?.description, undefined);
-	}
-
-	descriptionEdit.value = !descriptionEdit.value
+const deleteUser = () => {
 };
 
 </script>
 
 <template>
-	<v-dialog v-model="dialogDelete" max-width="500px">
+	<v-dialog v-model="dialogDeleteEntity" max-width="500px">
 		<v-card>
 			<v-card-title class="text-h5">Are you sure you want to delete this entity ?</v-card-title>
 			<v-card-actions>
 				<v-spacer></v-spacer>
-				<v-btn variant="text" @click="closeDelete">Cancel</v-btn>
+				<v-btn variant="text" @click="closeDeleteEntity">Cancel</v-btn>
 				<v-btn color="danger" variant="text" @click="confirmDeleteEntity">OK</v-btn>
 				<v-spacer></v-spacer>
 			</v-card-actions>
 		</v-card>
 	</v-dialog>
-
 	<v-row>
-		<v-col class="ml-8 mt-8" cols="4">
-			<v-row class="main-color-background">
-				<v-col cols="9">
-					<v-btn-toggle v-model="tableView">
-						<v-btn size="large" variant="outlined" append-icon="mdi-domain">
-							By Name
-							<template v-slot:append>
-								<v-icon color="primary"></v-icon>
-							</template>
-						</v-btn>
-						<v-btn size="large" variant="outlined" append-icon="mdi-account-cog">
-							By Role
-							<template v-slot:append>
-								<v-icon color="primary"></v-icon>
-							</template>
-						</v-btn>
-						<v-btn size="large" variant="outlined" append-icon="mdi-account-cog">
-							By User
-							<template v-slot:append>
-								<v-icon color="primary"></v-icon>
-							</template>
-						</v-btn>
-					</v-btn-toggle>
-				</v-col>
-				<v-col class="d-flex justify-end align-center" cols="3">
-					<v-dialog v-model="dialog" max-width="800px">
+		<v-col cols="4">
+			<v-sheet class="px-1 rounded-xl" outlined color="primary">
+				<v-col class="d-flex justify-end align-center rounded-t-xl main-color-background" cols="12">
+					<v-dialog v-model="dialogCreateEntity" max-width="800px">
 						<template v-slot:activator="{ props }">
 							<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
 								New
@@ -360,10 +413,10 @@ const updateDescription = async function () {
 									</v-card-text>
 									<v-card-actions>
 										<v-spacer></v-spacer>
-										<v-btn variant="text" @click="close">
+										<v-btn variant="text" @click="closeCreateEntity">
 											Cancel
 										</v-btn>
-										<v-btn color="primary" variant="text" @click="create">
+										<v-btn color="primary" variant="text" @click="createEntity">
 											Create
 										</v-btn>
 									</v-card-actions>
@@ -372,19 +425,17 @@ const updateDescription = async function () {
 						</v-sheet>
 					</v-dialog>
 				</v-col>
-			</v-row>
-			<v-row class="px-3 main-color-background">
-				<v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" variant="outlined"
-					hide-details single-line></v-text-field>
-			</v-row>
-			<v-row class="main-color-background">
-				<v-data-table-server v-if="tableView === 0" class="transparent-background" :headers="headers"
+				<v-text-field class="main-color-background" v-model="searchEntity" label="Search"
+					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
+				</v-text-field>
+				<v-data-table-server class="main-color-background table-spacing rounded-0" :headers="headersEntity"
 					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
 					:items-per-page-options="pageOptions" :items="viewEntities" :items-length="Number(entityTotal)"
-					:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="listEntity"
-					v-model="selectedEntity" @click:row="select" return-object item-selectable select-strategy="single">
+					:loading="loadingEntity" :search="searchEntity" item-value="name" item-key="iD"
+					@update:options="listEntity" v-model="selectedEntities" @click:row="selectEntity" return-object
+					item-selectable select-strategy="single">
 					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr v-if="item" class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						<tr v-if="item" v-bind="props" class="cursor-pointer py-8" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
 						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
 							<td class="d-flex align-center">
 								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
@@ -402,77 +453,44 @@ const updateDescription = async function () {
 						</tr>
 					</template>
 				</v-data-table-server>
-				<v-data-table-server v-if="tableView === 1" class="transparent-background" :headers="headersByRole"
-					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
-					:items-per-page-options="pageOptions" :items="viewRoles" :items-length="Number(roleTotal)"
-					:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="listRole"
-					v-model="selectedRole" @click:row="select" return-object item-selectable select-strategy="single">
-					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
-						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
-							<td class="d-flex align-center">
-								<span class="text-h6">{{ item.name }}</span>
-							</td>
-							<td>
-								<v-avatar class="mr-4" size="32" :color="!item.entity?.avatarURL ? 'primary' : ''">
-									<img v-if="item.entity?.avatarURL" :src="item.entity?.avatarURL" alt="Avatar">
-									<span v-else class=" mx-auto text-center text-h5">
-										{{ item.entity?.name?.at(0)?.toUpperCase() }}
-									</span>
-								</v-avatar>
-								<span class="text-h6">{{ item.entity?.name }}</span>
-							</td>
-							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-								1000).toLocaleDateString('en-GB')
-								}}
-							</td>
-						</tr>
-					</template>
-				</v-data-table-server>
-				<v-data-table-server v-if="tableView === 2" class="transparent-background" :headers="headersByUser"
-					fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
-					:items-per-page-options="pageOptions" :items="viewUsers" :items-length="Number(userTotal)"
-					:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="listUser"
-					v-model="selectedUser" @click:row="select" return-object item-selectable select-strategy="single">
-					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr class="mt-4 mb-4 cursor-pointer" v-bind="props" :key="item.email" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
-						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
-							<td class="d-flex align-center">
-								<span class="text-h6">{{ item.email }}</span>
-							</td>
-							<td class="d-flex align-center">
-								<span class="text-h6">{{ item.firstname }}</span>
-							</td>
-							<td>
-								<v-avatar class="mr-4" size="32" :color="!item.entity?.avatarURL ? 'primary' : ''">
-									<img v-if="item.entity?.avatarURL" :src="item.entity?.avatarURL" alt="Avatar">
-									<span v-else class=" mx-auto text-center text-h5">
-										{{ item.entity?.name?.at(0)?.toUpperCase() }}
-									</span>
-								</v-avatar>
-								<span class="text-h6">{{ item.entity?.name }}</span>
-							</td>
-							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-								1000).toLocaleDateString('en-GB')
-								}}
-							</td>
-						</tr>
-					</template>
-				</v-data-table-server>
-			</v-row>
+				<v-col cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
+			</v-sheet>
 		</v-col>
 		<v-divider vertical></v-divider>
 		<v-col class="mx-auto" cols="6">
-			<v-sheet class="px-1 rounded-xl" outlined color="primary">
-				<v-card class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background" variant="flat"
-					v-if="selected">
-					<v-avatar class="mb-4 justify-center" size="96" :color="!selected.avatarURL ? 'primary' : ''">
-						<img v-if="selected.avatarURL" :src="selected.avatarURL" alt="Avatar">
-						<span v-else-if="!selected.avatarURL" class=" mx-auto text-center text-h5">
-							{{ selected?.name?.at(0)?.toUpperCase() }}
+			<v-col class="d-flex justify-center" cols="12">
+				<v-btn-toggle v-model="tableView">
+					<v-btn size="large" variant="outlined" append-icon="mdi-domain">
+						Info
+						<template v-slot:append>
+							<v-icon color="primary"></v-icon>
+						</template>
+					</v-btn>
+					<v-btn size="large" variant="outlined" append-icon="mdi-account-cog">
+						Roles
+						<template v-slot:append>
+							<v-icon color="primary"></v-icon>
+						</template>
+					</v-btn>
+					<v-btn size="large" variant="outlined" append-icon="mdi-account-multiple">
+						Users
+						<template v-slot:append>
+							<v-icon color="primary"></v-icon>
+						</template>
+					</v-btn>
+				</v-btn-toggle>
+			</v-col>
+			<v-sheet class="px-1 rounded-xl" outlined color="primary" v-if="selectedEntity">
+				<!-- Info -->
+				<v-card v-if="tableView == 0" class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background"
+					variant="flat">
+					<v-avatar class="mb-4 justify-center" size="96" :color="!selectedEntity.avatarURL ? 'primary' : ''">
+						<img v-if="selectedEntity.avatarURL" :src="selectedEntity.avatarURL" alt="Avatar">
+						<span v-else-if="!selectedEntity.avatarURL" class=" mx-auto text-center text-h5">
+							{{ selectedEntity.name?.at(0)?.toUpperCase() }}
 						</span>
 					</v-avatar>
-					<v-text-field class="justify-center text-h3" v-model="selected.name"
+					<v-text-field class="justify-center text-h3" v-model="selectedEntity.name"
 						:variant="!nameEdit ? 'plain' : 'underlined'" :readonly="!nameEdit">
 						<template v-slot:append-inner>
 							<v-icon color="primary" size="large" @click="updateName"
@@ -481,7 +499,7 @@ const updateDescription = async function () {
 					</v-text-field>
 					<!-- eslint-disable vue/no-v-html vue/no-v-text-v-html-on-component -->
 					<v-textarea v-if="descriptionEdit" class="p-6 m-6" variant="solo" no-resize
-						:model-value="selected.description" :readonly="false">
+						:model-value="selectedEntity.description" :readonly="false">
 						<template v-slot:append-inner>
 							<v-icon color="primary" size="large" @click="updateDescription"
 								:icon="!descriptionEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
@@ -500,6 +518,155 @@ const updateDescription = async function () {
 						<v-btn color="error" @click="deleteEntity()">Delete</v-btn>
 					</v-card-actions>
 				</v-card>
+				<!-- Roles -->
+				<v-col v-if="tableView == 1" class="d-flex justify-end align-center rounded-t-xl main-color-background"
+					cols="12">
+					<v-dialog v-model="dialogCreateRole" max-width="800px">
+						<template v-slot:activator="{ props }">
+							<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+								New
+								<template v-slot:prepend>
+									<v-icon color="primary"></v-icon>
+								</template>
+							</v-btn>
+						</template>
+						<v-sheet class="px-1 rounded-xl" outlined color="primary">
+							<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+								<v-form ref="form" v-model="valid" lazy-validation>
+									<v-card-title>
+										<span class="text-h6">New role</span>
+									</v-card-title>
+									<v-card-text>
+										<v-container>
+											<v-row>
+												<v-col cols="6">
+													<v-text-field v-model="name" :rules="nameRules"
+														label="Name"></v-text-field>
+												</v-col>
+												<v-col cols="6">
+													<v-text-field v-model="avatarURL" label="Avatar URL"></v-text-field>
+												</v-col>
+											</v-row>
+											<v-row>
+												<v-col cols="12">
+													<v-textarea v-model="description" label="Description"></v-textarea>
+												</v-col>
+											</v-row>
+										</v-container>
+									</v-card-text>
+									<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn variant="text" @click="closeCreateRole">
+											Cancel
+										</v-btn>
+										<v-btn color="primary" variant="text" @click="createRole">
+											Create
+										</v-btn>
+									</v-card-actions>
+								</v-form>
+							</v-card>
+						</v-sheet>
+					</v-dialog>
+				</v-col>
+				<v-text-field v-if="tableView == 1" class="main-color-background" v-model="searchEntity" label="Search"
+					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
+				</v-text-field>
+				<v-data-table-server v-if="tableView === 1" class="main-color-background rounded-0"
+					:headers="headersByRole" fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+					:items-per-page-options="pageOptions" :items="viewRoles" :items-length="Number(roleTotal)"
+					:loading="loadingRole" :search="searchRole" item-value="name" item-key="iD"
+					@update:options="listRole" v-model="selectedRoles" @click:row="selectRole" return-object
+					item-selectable select-strategy="single">
+					<template v-slot:item="{ item, isSelected, index, props }">
+						<tr class="cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
+							<td class="d-flex align-center">
+								<span class="text-h6">{{ item.name }}</span>
+							</td>
+							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+								1000).toLocaleDateString('en-GB')
+								}}
+							</td>
+						</tr>
+					</template>
+				</v-data-table-server>
+				<v-col v-if="tableView == 1" cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
+				<!-- User -->
+				<v-col v-if="tableView == 2" class="d-flex justify-end align-center rounded-t-xl main-color-background"
+					cols="12">
+					<v-dialog v-model="dialogInviteUser" max-width="800px">
+						<template v-slot:activator="{ props }">
+							<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+								New
+								<template v-slot:prepend>
+									<v-icon color="primary"></v-icon>
+								</template>
+							</v-btn>
+						</template>
+						<v-sheet class="px-1 rounded-xl" outlined color="primary">
+							<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+								<v-form ref="form" v-model="valid" lazy-validation>
+									<v-card-title>
+										<span class="text-h6">Invite user</span>
+									</v-card-title>
+									<v-card-text>
+										<v-container>
+											<v-row>
+												<v-col cols="6">
+													<v-text-field v-model="name" :rules="nameRules"
+														label="Name"></v-text-field>
+												</v-col>
+												<v-col cols="6">
+													<v-text-field v-model="avatarURL" label="Avatar URL"></v-text-field>
+												</v-col>
+											</v-row>
+											<v-row>
+												<v-col cols="12">
+													<v-textarea v-model="description" label="Description"></v-textarea>
+												</v-col>
+											</v-row>
+										</v-container>
+									</v-card-text>
+									<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn variant="text" @click="closeInviteUser">
+											Cancel
+										</v-btn>
+										<v-btn color="primary" variant="text" @click="inviteUser">
+											Invite
+										</v-btn>
+									</v-card-actions>
+								</v-form>
+							</v-card>
+						</v-sheet>
+					</v-dialog>
+				</v-col>
+				<v-text-field v-if="tableView == 2" class="main-color-background" v-model="searchUser" label="Search"
+					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
+				</v-text-field>
+				<v-data-table-server v-if="tableView === 2" class="main-color-background rounded-0"
+					:headers="headersByUser" fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+					:items-per-page-options="pageOptions" :items="viewUsers" :items-length="Number(userTotal)"
+					:loading="loadingUser" :search="searchUser" item-value="name" item-key="iD"
+					@update:options="listUser" v-model="selectedUsers" @click:row="selectUser" return-object
+					item-selectable select-strategy="single">
+					<template v-slot:item="{ item, isSelected, index, props }">
+						<tr class="cursor-pointer" v-bind="props" :key="item.email" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
+							<td class="d-flex align-center">
+								<span class="text-h6">{{ item.email }}</span>
+							</td>
+							<td class="d-flex align-center">
+								<span class="text-h6">{{ item.lastName + ' ' + item.firstName }}</span>
+							</td>
+							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+								1000).toLocaleDateString('en-GB')
+								}}
+							</td>
+						</tr>
+					</template>
+				</v-data-table-server>
+				<v-col v-if="tableView == 2" cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
 			</v-sheet>
 			<v-divider></v-divider>
 		</v-col>

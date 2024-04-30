@@ -37,6 +37,10 @@ export interface ListRoleReq {
      * @generated from protobuf field: repeated bytes IDs = 3 [json_name = "IDs"];
      */
     iDs: Uint8Array[];
+    /**
+     * @generated from protobuf field: repeated bytes EntityIDs = 4 [json_name = "EntityIDs"];
+     */
+    entityIDs: Uint8Array[];
 }
 /**
  * @generated from protobuf message dto.ListRoleResp
@@ -104,13 +108,15 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
         super("dto.ListRoleReq", [
             { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
             { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+            { no: 3, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 4, name: "EntityIDs", kind: "scalar", jsonName: "EntityIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
     }
     create(value?: PartialMessage<ListRoleReq>): ListRoleReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.search = "";
         message.iDs = [];
+        message.entityIDs = [];
         if (value !== undefined)
             reflectionMergePartial<ListRoleReq>(this, message, value);
         return message;
@@ -128,6 +134,9 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
                     break;
                 case /* repeated bytes IDs = 3 [json_name = "IDs"];*/ 3:
                     message.iDs.push(reader.bytes());
+                    break;
+                case /* repeated bytes EntityIDs = 4 [json_name = "EntityIDs"];*/ 4:
+                    message.entityIDs.push(reader.bytes());
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -150,6 +159,9 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
         /* repeated bytes IDs = 3 [json_name = "IDs"]; */
         for (let i = 0; i < message.iDs.length; i++)
             writer.tag(3, WireType.LengthDelimited).bytes(message.iDs[i]);
+        /* repeated bytes EntityIDs = 4 [json_name = "EntityIDs"]; */
+        for (let i = 0; i < message.entityIDs.length; i++)
+            writer.tag(4, WireType.LengthDelimited).bytes(message.entityIDs[i]);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -26,6 +26,19 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		return &dto.ListRoleResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
+	var entityIDs []ulid.ID
+	if req.EntityIDs != nil {
+		if err := claims.Require(user.NewRequirements(req.EntityIDs, user.R_role, user.C_read)...); err != nil {
+			logger.Error().Err(err).Msg("permission denied")
+
+			return &dto.ListRoleResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
+		}
+
+		entityIDs = req.EntityIDs
+	} else {
+		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_user, Command: user.C_read})
+	}
+
 	var roleIDs []ulid.ID
 	if req.IDs != nil {
 		if err := claims.RequireRoles(req.IDs...); err != nil {

@@ -104,7 +104,7 @@ func (f filter) where(n int) (string, []any) {
 	}
 
 	if len(f.Search) > 0 {
-		clause = append(clause, fmt.Sprintf(`(u.email ILIKE $%d OR u.first_name ILIKE $%d u.last_name ILIKE $%d`), n, n+1, n+2)
+		clause = append(clause, fmt.Sprintf(`(u.email ILIKE $%d OR u.first_name ILIKE $%d u.last_name ILIKE $%d`, n, n+1, n+2))
 		args = append(args, "%"+f.Search+"%", "%"+f.Search+"%", "%"+f.Search+"%")
 		n += 3
 	}
@@ -288,12 +288,12 @@ func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error
 	var row_number int
 
 	for rows.Next() {
-		var u user.U
+		var u sqlUser
 		if err := rows.Scan(&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt, &count, &row_number); err != nil {
 			return nil, 0, postgres.Error(err, "user", filter(f).index())
 		}
 
-		users = append(users, u)
+		users = append(users, u.user())
 	}
 
 	return users, count, nil
@@ -332,12 +332,12 @@ func (s Store) ListByEntity(ctx context.Context, f user.Filter) ([]user.U, uint6
 	var row_number int
 
 	for rows.Next() {
-		var u user.U
+		var u sqlUser
 		if err := rows.Scan(&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt, &count, &row_number); err != nil {
 			return nil, 0, postgres.Error(err, "user+role", filter(f).index())
 		}
 
-		users = append(users, u)
+		users = append(users, u.user())
 	}
 
 	return users, count, nil

@@ -24,7 +24,9 @@ message ListRoleReq {
 	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
 	string Search                     = 2;
 
-	repeated bytes IDs                = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	boolean Self                      = 3;
+	repeated bytes IDs                = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes EntityIDs          = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message ListRoleResp {

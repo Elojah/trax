@@ -21,20 +21,19 @@ export const useUserStore = defineStore('user', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  // const createUser = async function (name: string) {
-  //   try {
-  //     const req = CreateUserReq.create({
-  //       name: name
-  //     })
-
-  //     return await api.createUser(req, { meta: { token: token.value } })
-  //   } catch (err: any) {
-  //     switch (err.code) {
-  //       default:
-  //         logger.error(err)
-  //     }
-  //   }
-  // }
+  const inviteUser = async function (name: string) {
+    // try {
+    //   const req = CreateUserReq.create({
+    //     name: name
+    //   })
+    //   return await api.createUser(req, { meta: { token: token.value } })
+    // } catch (err: any) {
+    //   switch (err.code) {
+    //     default:
+    //       logger.error(err)
+    //   }
+    // }
+  }
 
   // Return users ids and entity ids
   const listUser = async function (
@@ -62,7 +61,7 @@ export const useUserStore = defineStore('user', () => {
       return resp.response.users.reduce(
         (acc: string[][], user: U) => {
           acc[0].push(ulid(user.iD))
-          acc[1].push(ulid(user.entityID))
+          // acc[1].push(ulid(user.entityID))
           return acc
         },
         [[], []]
@@ -79,7 +78,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     users,
     total,
-    createUser,
+    inviteUser,
     listUser
   }
 })
