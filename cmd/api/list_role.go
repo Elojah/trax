@@ -27,7 +27,17 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 	}
 
 	var entityIDs []ulid.ID
-	if req.EntityIDs != nil {
+	var ids []ulid.ID
+
+	if req.UserIDs {
+		ids = claims.RoleIDs()
+	} else if len(req.IDs) > 0 {
+		ids = req.IDs
+	}
+
+	if req.UserEntityIDs {
+		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_role, Command: user.C_read})
+	} else if len(req.EntityIDs) > 0 {
 		if err := claims.Require(user.NewRequirements(req.EntityIDs, user.R_role, user.C_read)...); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
@@ -35,21 +45,13 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		}
 
 		entityIDs = req.EntityIDs
-	} else {
-		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_user, Command: user.C_read})
-	}
-
-	var roleIDs []ulid.ID
-	if req.IDs != nil {
-		if err := claims.RequireRoles(req.IDs...); err != nil {
-			logger.Error().Err(err).Msg("permission denied")
-
-			return &dto.ListRoleResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
+	} else if !req.UserIDs {
+		err := gerrors.ErrMissingAtLeast{
+			AtLeast: 1,
+			Fields:  []string{"user_ids", "user_entity_ids", "entity_ids"},
 		}
 
-		roleIDs = req.IDs
-	} else {
-		roleIDs = claims.RoleIDs()
+		return &dto.ListRoleResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
 	var roles []user.Role
@@ -57,9 +59,10 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		roles, total, err = h.user.ListRole(ctx, user.FilterRole{
-			IDs:      roleIDs,
-			Paginate: req.Paginate,
-			Search:   req.Search,
+			IDs:       ids,
+			EntityIDs: entityIDs,
+			Paginate:  req.Paginate,
+			Search:    req.Search,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list role")

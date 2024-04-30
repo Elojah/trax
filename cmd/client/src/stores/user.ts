@@ -36,43 +36,26 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // Return users ids and entity ids
-  const listUser = async function (
-    ids: Uint8Array[] | null,
-    search: string,
-    p: Paginate
-  ): Promise<[string[], string[]]> {
+  const listUser = async function (req: ListUserReq): Promise<string[]> {
     try {
-      const req = ListUserReq.create({
-        search: search,
-        paginate: p,
-        iDs: ids
-      })
-
       const resp = await api.listUser(req, { meta: { token: token.value } })
 
       resp.response.users?.forEach((user: U) => {
         users.value?.set(ulid(user.iD), user)
       })
 
-      if (ids === null) {
+      if (req.iDs === null) {
         total.value = resp.response.total
       }
 
-      return resp.response.users.reduce(
-        (acc: string[][], user: U) => {
-          acc[0].push(ulid(user.iD))
-          // acc[1].push(ulid(user.entityID))
-          return acc
-        },
-        [[], []]
-      )
+      return resp.response.users.map((user: U) => ulid(user.iD))
     } catch (err: any) {
       switch (err.code) {
         default:
           logger.error(err)
       }
     }
-    return [[], []]
+    return []
   }
 
   return {

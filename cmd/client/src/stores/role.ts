@@ -3,7 +3,6 @@ import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { Role } from '@internal/user/role'
-import { Paginate } from '@pkg/paginate/paginate'
 import { CreateRoleReq, ListRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
@@ -37,25 +36,15 @@ export const useRoleStore = defineStore('role', () => {
   }
 
   // Return roles ids and entity ids
-  const listRole = async function (
-    ids: Uint8Array[] | null,
-    search: string,
-    p: Paginate
-  ): Promise<[string[], string[]]> {
+  const listRole = async function (req: ListRoleReq): Promise<[string[], string[]]> {
     try {
-      const req = ListRoleReq.create({
-        search: search,
-        paginate: p,
-        iDs: ids
-      })
-
       const resp = await api.listRole(req, { meta: { token: token.value } })
 
       resp.response.roles?.forEach((role: Role) => {
         roles.value?.set(ulid(role.iD), role)
       })
 
-      if (ids === null) {
+      if (req.iDs === null) {
         total.value = resp.response.total
       }
 

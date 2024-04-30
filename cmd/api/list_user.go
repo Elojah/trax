@@ -26,8 +26,12 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 		return &dto.ListUserResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
+	var ids []ulid.ID
 	var entityIDs []ulid.ID
-	if req.EntityIDs != nil {
+
+	if req.UserEntityIDs {
+		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_role, Command: user.C_read})
+	} else if len(req.EntityIDs) > 0 {
 		if err := claims.Require(user.NewRequirements(req.EntityIDs, user.R_user, user.C_read)...); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
@@ -36,7 +40,16 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 
 		entityIDs = req.EntityIDs
 	} else {
-		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_user, Command: user.C_read})
+		err := gerrors.ErrMissingAtLeast{
+			AtLeast: 1,
+			Fields:  []string{"user_entity_ids", "entity_ids"},
+		}
+
+		return &dto.ListUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
+	}
+
+	if len(req.IDs) == 0 {
+		ids = req.IDs
 	}
 
 	var users []user.U
@@ -44,7 +57,7 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		users, total, err = h.user.ListByEntity(ctx, user.Filter{
-			IDs:       req.IDs,
+			IDs:       ids,
 			EntityIDs: entityIDs,
 			Paginate:  req.Paginate,
 			Search:    req.Search,

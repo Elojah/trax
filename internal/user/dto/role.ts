@@ -34,11 +34,19 @@ export interface ListRoleReq {
      */
     search: string;
     /**
-     * @generated from protobuf field: repeated bytes IDs = 3 [json_name = "IDs"];
+     * @generated from protobuf field: bool UserIDs = 3 [json_name = "UserIDs"];
+     */
+    userIDs: boolean;
+    /**
+     * @generated from protobuf field: bool UserEntityIDs = 4 [json_name = "UserEntityIDs"];
+     */
+    userEntityIDs: boolean;
+    /**
+     * @generated from protobuf field: repeated bytes IDs = 5 [json_name = "IDs"];
      */
     iDs: Uint8Array[];
     /**
-     * @generated from protobuf field: repeated bytes EntityIDs = 4 [json_name = "EntityIDs"];
+     * @generated from protobuf field: repeated bytes EntityIDs = 6 [json_name = "EntityIDs"];
      */
     entityIDs: Uint8Array[];
 }
@@ -108,13 +116,17 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
         super("dto.ListRoleReq", [
             { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
             { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 4, name: "EntityIDs", kind: "scalar", jsonName: "EntityIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+            { no: 3, name: "UserIDs", kind: "scalar", jsonName: "UserIDs", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "UserEntityIDs", kind: "scalar", jsonName: "UserEntityIDs", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 6, name: "EntityIDs", kind: "scalar", jsonName: "EntityIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
     }
     create(value?: PartialMessage<ListRoleReq>): ListRoleReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.search = "";
+        message.userIDs = false;
+        message.userEntityIDs = false;
         message.iDs = [];
         message.entityIDs = [];
         if (value !== undefined)
@@ -132,10 +144,16 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
                 case /* string Search = 2 [json_name = "Search"];*/ 2:
                     message.search = reader.string();
                     break;
-                case /* repeated bytes IDs = 3 [json_name = "IDs"];*/ 3:
+                case /* bool UserIDs = 3 [json_name = "UserIDs"];*/ 3:
+                    message.userIDs = reader.bool();
+                    break;
+                case /* bool UserEntityIDs = 4 [json_name = "UserEntityIDs"];*/ 4:
+                    message.userEntityIDs = reader.bool();
+                    break;
+                case /* repeated bytes IDs = 5 [json_name = "IDs"];*/ 5:
                     message.iDs.push(reader.bytes());
                     break;
-                case /* repeated bytes EntityIDs = 4 [json_name = "EntityIDs"];*/ 4:
+                case /* repeated bytes EntityIDs = 6 [json_name = "EntityIDs"];*/ 6:
                     message.entityIDs.push(reader.bytes());
                     break;
                 default:
@@ -156,12 +174,18 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
         /* string Search = 2 [json_name = "Search"]; */
         if (message.search !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.search);
-        /* repeated bytes IDs = 3 [json_name = "IDs"]; */
+        /* bool UserIDs = 3 [json_name = "UserIDs"]; */
+        if (message.userIDs !== false)
+            writer.tag(3, WireType.Varint).bool(message.userIDs);
+        /* bool UserEntityIDs = 4 [json_name = "UserEntityIDs"]; */
+        if (message.userEntityIDs !== false)
+            writer.tag(4, WireType.Varint).bool(message.userEntityIDs);
+        /* repeated bytes IDs = 5 [json_name = "IDs"]; */
         for (let i = 0; i < message.iDs.length; i++)
-            writer.tag(3, WireType.LengthDelimited).bytes(message.iDs[i]);
-        /* repeated bytes EntityIDs = 4 [json_name = "EntityIDs"]; */
+            writer.tag(5, WireType.LengthDelimited).bytes(message.iDs[i]);
+        /* repeated bytes EntityIDs = 6 [json_name = "EntityIDs"]; */
         for (let i = 0; i < message.entityIDs.length; i++)
-            writer.tag(4, WireType.LengthDelimited).bytes(message.entityIDs[i]);
+            writer.tag(6, WireType.LengthDelimited).bytes(message.entityIDs[i]);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -29,7 +29,8 @@ type FilterRole struct {
 	ID  ulid.ID
 	IDs []ulid.ID
 
-	EntityID ulid.ID
+	EntityID  ulid.ID
+	EntityIDs []ulid.ID
 
 	*paginate.Paginate
 	Search string

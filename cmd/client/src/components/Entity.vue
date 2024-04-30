@@ -11,6 +11,10 @@ import { useUserStore } from '@/stores/user';
 import type { Role } from '@internal/user/role';
 import type { U } from '@internal/user/user';
 import { ulid } from '@/utils/ulid';
+import { ListRoleReq } from '@internal/user/dto/role';
+import { ListEntityReq } from '@internal/user/dto/entity';
+import { en } from 'vuetify/locale';
+import { ListUserReq } from '@internal/user/dto/user';
 
 // #MARK:Common
 // ______________________________________________________
@@ -92,12 +96,16 @@ const listEntity = async (options: any) => {
 	loadingEntity.value = true;
 
 	const { page, itemsPerPage, sortBy } = options;
-	const newIDs = await entityStore.listEntity(null, searchEntity.value, {
-		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-		end: BigInt(page * itemsPerPage),
-		sort: sortBy?.at(0)?.key ?? '',
-		order: sortBy?.at(0)?.order === 'asc' ? true : false,
-	});
+	const newIDs = await entityStore.listEntity(ListEntityReq.create({
+		userIDs: true,
+		search: searchEntity.value,
+		pagination: {
+			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+			end: BigInt(page * itemsPerPage),
+			sort: sortBy?.at(0)?.key ?? '',
+			order: sortBy?.at(0)?.order === 'asc' ? true : false,
+		}
+	}));
 
 	viewEntityIDs.value = newIDs;
 
@@ -212,12 +220,16 @@ const selectRole = (_: any, row: any) => {
 const listRole = async (options: any) => {
 	loadingRole.value = true;
 	const { page, itemsPerPage, sortBy } = options;
-	const [newRoleIDs] = await roleStore.listRole(null, searchRole.value, {
-		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-		end: BigInt((page * itemsPerPage)),
-		sort: sortBy?.at(0)?.key ?? '',
-		order: sortBy?.at(0)?.order === 'asc' ? true : false,
-	});
+	const [newRoleIDs] = await roleStore.listRole(ListRoleReq.create({
+		entityIDs: selectedEntity.value ? [selectedEntity.value.iD!] : [],
+		search: searchRole.value,
+		pagination: {
+			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+			end: BigInt((page * itemsPerPage)),
+			sort: sortBy?.at(0)?.key ?? '',
+			order: sortBy?.at(0)?.order === 'asc' ? true : false,
+		}
+	}));
 
 	viewRoleIDs.value = newRoleIDs;
 
@@ -317,14 +329,16 @@ const selectUser = (_: any, row: any) => {
 const listUser = async (options: any) => {
 	loadingUser.value = true;
 	const { page, itemsPerPage, sortBy } = options;
-	const [newUserIDs, newEntityIDs] = await userStore.listUser(null, searchUser.value, {
-		start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-		end: BigInt((page * itemsPerPage)),
-		sort: sortBy?.at(0)?.key ?? '',
-		order: sortBy?.at(0)?.order === 'asc' ? true : false,
-	});
-
-	await entityStore.populateEntity(newEntityIDs);
+	const newUserIDs = await userStore.listUser(ListUserReq.create({
+		entityIDs: selectedEntity.value ? [selectedEntity.value.iD!] : [],
+		search: searchUser.value,
+		pagination: {
+			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+			end: BigInt((page * itemsPerPage)),
+			sort: sortBy?.at(0)?.key ?? '',
+			order: sortBy?.at(0)?.order === 'asc' ? true : false,
+		}
+	}));
 
 	viewUserIDs.value = newUserIDs;
 

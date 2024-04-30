@@ -64,25 +64,15 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const listEntity = async function (
-    ids: Uint8Array[] | null,
-    search: string,
-    p: Paginate
-  ): Promise<string[]> {
+  const listEntity = async function (req: ListEntityReq): Promise<string[]> {
     try {
-      const req = ListEntityReq.create({
-        search: search,
-        paginate: p,
-        iDs: ids
-      })
-
       const resp = await api.listEntity(req, { meta: { token: token.value } })
 
       resp.response.entities?.forEach((entity: Entity) => {
         entities.value?.set(ulid(entity.iD), entity)
       })
 
-      if (ids === null) {
+      if (req.iDs === null) {
         total.value = resp.response.total
       }
 

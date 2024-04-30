@@ -26,18 +26,22 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 		return &dto.ListEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	var entityIDs []ulid.ID
+	var ids []ulid.ID
 
-	if req.IDs != nil {
+	if req.UserIDs {
+		ids = claims.EntityIDs()
+	} else if req.IDs != nil {
 		if err := claims.Require(user.NewRequirements(req.IDs, user.R_entity, user.C_read)...); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.ListEntityResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
 		}
 
-		entityIDs = req.IDs
+		ids = req.IDs
 	} else {
-		entityIDs = claims.EntityIDs()
+		err := gerrors.ErrMissingAtLeast{AtLeast: 1, Fields: []string{"user_all", "ids"}}
+
+		return &dto.ListEntityResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
 	var entities []user.Entity
@@ -45,7 +49,7 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		entities, total, err = h.user.ListEntity(ctx, user.FilterEntity{
-			IDs:      entityIDs,
+			IDs:      ids,
 			Paginate: req.Paginate,
 			Search:   req.Search,
 		})

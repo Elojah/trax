@@ -73,6 +73,12 @@ func (f filterRole) where(n int) (string, []any) {
 		n++
 	}
 
+	if len(f.EntityIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`r.entity_id IN (%s)`, postgres.Array(n, len(f.EntityIDs))))
+		args = append(args, ulid.IDs(f.EntityIDs).Any()...)
+		n += len(f.EntityIDs)
+	}
+
 	if len(f.Search) > 0 {
 		clause = append(clause, fmt.Sprintf(`r.name ILIKE $%d`, n))
 		args = append(args, "%"+f.Search+"%")
@@ -105,6 +111,11 @@ func (f filterRole) index() string {
 
 	if f.EntityID != nil {
 		cols = append(cols, f.EntityID.String())
+	}
+
+	if f.EntityIDs != nil {
+		ss := ulid.IDs(f.EntityIDs).String()
+		cols = append(cols, strings.Join(ss, "|"))
 	}
 
 	if f.Search != "" {

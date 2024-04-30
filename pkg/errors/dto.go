@@ -33,3 +33,20 @@ type ErrInvalidNumericalRange struct {
 func (e ErrInvalidNumericalRange) Error() string {
 	return fmt.Sprintf("key %s must be between %d and %d. current value: %d", e.Key, e.Min, e.Max, e.Value)
 }
+
+type ErrMissingAtLeast struct {
+	AtLeast int
+	Fields  []string
+}
+
+func (e ErrMissingAtLeast) Error() string {
+	return fmt.Sprintf("missing at least %d field among %v", e.AtLeast, e.Fields)
+}
+
+type ErrMissingField struct {
+	Field string
+}
+
+func (e ErrMissingField) Error() string {
+	return fmt.Sprintf("missing field %s", e.Field)
+}
