@@ -25,6 +25,5 @@ $ make client && ./bin/trax_web_client config/web_client/local.json
 
 TODO:
 
-- Change list DTO with Self -> Change to SQL queries (use EntityID for roles and user)
 - Change & fix front
 - Add Create & Update on everything

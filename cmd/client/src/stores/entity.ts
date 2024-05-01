@@ -3,7 +3,6 @@ import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { Entity } from '@internal/user/entity'
-import { Paginate } from '@pkg/paginate/paginate'
 import { CreateEntityReq, ListEntityReq, UpdateEntityReq } from '@internal/user/dto/entity'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
@@ -39,20 +38,8 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const updateEntity = async (
-    id: Uint8Array | undefined,
-    name: string | undefined,
-    description: string | undefined,
-    avatarURL: string | undefined
-  ) => {
+  const updateEntity = async (req: UpdateEntityReq) => {
     try {
-      const req = UpdateEntityReq.create({
-        ...(id && { iD: id }),
-        ...(name && { firstname: { value: name } }),
-        ...(description && { lastname: { value: description } }),
-        ...(avatarURL && { lastname: { value: avatarURL } })
-      })
-
       const resp = await api.updateEntity(req, { meta: { token: token.value } })
 
       entities.value?.set(ulid(resp.response.iD), resp.response)
@@ -72,7 +59,7 @@ export const useEntityStore = defineStore('entity', () => {
         entities.value?.set(ulid(entity.iD), entity)
       })
 
-      if (req.iDs === null) {
+      if (req?.iDs.length === 0) {
         total.value = resp.response.total
       }
 
@@ -99,12 +86,17 @@ export const useEntityStore = defineStore('entity', () => {
       return
     }
 
-    await listEntity(newIDs, '', {
-      start: BigInt(0),
-      end: BigInt(newIDs.length),
-      order: true,
-      sort: 'created_at'
-    })
+    await listEntity(
+      ListEntityReq.create({
+        iDs: newIDs,
+        paginate: {
+          start: BigInt(0),
+          end: BigInt(newIDs.length),
+          order: true,
+          sort: 'created_at'
+        }
+      })
+    )
   }
 
   return {

@@ -44,7 +44,7 @@ export const useRoleStore = defineStore('role', () => {
         roles.value?.set(ulid(role.iD), role)
       })
 
-      if (req.iDs === null) {
+      if (req?.iDs.length === 0) {
         total.value = resp.response.total
       }
 

@@ -10,10 +10,8 @@ import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
 import type { Role } from '@internal/user/role';
 import type { U } from '@internal/user/user';
-import { ulid } from '@/utils/ulid';
 import { ListRoleReq } from '@internal/user/dto/role';
-import { ListEntityReq } from '@internal/user/dto/entity';
-import { en } from 'vuetify/locale';
+import { ListEntityReq, UpdateEntityReq } from '@internal/user/dto/entity';
 import { ListUserReq } from '@internal/user/dto/user';
 
 // #MARK:Common
@@ -99,7 +97,7 @@ const listEntity = async (options: any) => {
 	const newIDs = await entityStore.listEntity(ListEntityReq.create({
 		userIDs: true,
 		search: searchEntity.value,
-		pagination: {
+		paginate: {
 			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
 			end: BigInt(page * itemsPerPage),
 			sort: sortBy?.at(0)?.key ?? '',
@@ -155,7 +153,10 @@ const descriptionEdit = ref(false);
 
 const updateName = async function () {
 	if (nameEdit.value) {
-		await entityStore.updateEntity(selectedEntity.value?.iD, selectedEntity.value?.name, undefined, undefined);
+		await entityStore.updateEntity(UpdateEntityReq.create({
+			iD: selectedEntity.value?.iD,
+			name: { value: selectedEntity.value?.name },
+		}));
 	}
 
 	nameEdit.value = !nameEdit.value
@@ -163,7 +164,10 @@ const updateName = async function () {
 
 const updateDescription = async function () {
 	if (descriptionEdit.value) {
-		await entityStore.updateEntity(selectedEntity.value?.iD, undefined, selectedEntity.value?.description, undefined);
+		await entityStore.updateEntity(UpdateEntityReq.create({
+			iD: selectedEntity.value?.iD,
+			description: { value: selectedEntity.value?.description },
+		}));
 	}
 
 	descriptionEdit.value = !descriptionEdit.value
@@ -223,7 +227,7 @@ const listRole = async (options: any) => {
 	const [newRoleIDs] = await roleStore.listRole(ListRoleReq.create({
 		entityIDs: selectedEntity.value ? [selectedEntity.value.iD!] : [],
 		search: searchRole.value,
-		pagination: {
+		paginate: {
 			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
 			end: BigInt((page * itemsPerPage)),
 			sort: sortBy?.at(0)?.key ?? '',
@@ -332,7 +336,7 @@ const listUser = async (options: any) => {
 	const newUserIDs = await userStore.listUser(ListUserReq.create({
 		entityIDs: selectedEntity.value ? [selectedEntity.value.iD!] : [],
 		search: searchUser.value,
-		pagination: {
+		paginate: {
 			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
 			end: BigInt((page * itemsPerPage)),
 			sort: sortBy?.at(0)?.key ?? '',
@@ -512,20 +516,22 @@ const deleteUser = () => {
 						</template>
 					</v-text-field>
 					<!-- eslint-disable vue/no-v-html vue/no-v-text-v-html-on-component -->
-					<v-textarea v-if="descriptionEdit" class="p-6 m-6" variant="solo" no-resize
-						:model-value="selectedEntity.description" :readonly="false">
+					<v-textarea v-if="descriptionEdit" class="p-6 m-6" variant="solo"
+						v-model="selectedEntity.description" :readonly="false">
 						<template v-slot:append-inner>
 							<v-icon color="primary" size="large" @click="updateDescription"
 								:icon="!descriptionEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
 						</template>
 					</v-textarea>
-					<v-text-field v-if="!descriptionEdit" class="p-6 m-6" variant="solo" no-resize
-						:v-html="mdDescription" :readonly="true">
+					<v-text-field v-if="!descriptionEdit" class="p-6 m-6 font-italic" variant="solo" no-resize
+						:readonly="true">
+						Edit description
 						<template v-slot:append-inner>
 							<v-icon color="primary" size="large" @click="updateDescription"
 								:icon="!descriptionEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
 						</template>
 					</v-text-field>
+					<div class="px-4" v-if="!descriptionEdit" v-html="mdDescription"></div>
 					<!--eslint-enable-->
 					<v-card-actions>
 						<v-spacer></v-spacer>
@@ -592,7 +598,7 @@ const deleteUser = () => {
 					@update:options="listRole" v-model="selectedRoles" @click:row="selectRole" return-object
 					item-selectable select-strategy="single">
 					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr class="cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						<tr v-if="item" class="cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
 						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
 							<td class="d-flex align-center">
 								<span class="text-h6">{{ item.name }}</span>
@@ -665,7 +671,7 @@ const deleteUser = () => {
 					@update:options="listUser" v-model="selectedUsers" @click:row="selectUser" return-object
 					item-selectable select-strategy="single">
 					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr class="cursor-pointer" v-bind="props" :key="item.email" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
+						<tr v-if="item" class="cursor-pointer" v-bind="props" :key="item.email" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
 						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
 							<td class="d-flex align-center">
 								<span class="text-h6">{{ item.email }}</span>

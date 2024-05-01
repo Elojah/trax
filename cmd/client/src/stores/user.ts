@@ -44,7 +44,7 @@ export const useUserStore = defineStore('user', () => {
         users.value?.set(ulid(user.iD), user)
       })
 
-      if (req.iDs === null) {
+      if (req?.iDs.length === 0) {
         total.value = resp.response.total
       }
 
