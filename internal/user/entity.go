@@ -27,7 +27,7 @@ type StoreEntity interface {
 	UpdateEntity(context.Context, FilterEntity, PatchEntity) ([]Entity, error)
 	FetchEntity(context.Context, FilterEntity) (Entity, error)
 	ListEntity(context.Context, FilterEntity) ([]Entity, uint64, error)
-	DeleteEntity(context.Context, FilterEntity) error
+	DeleteEntity(context.Context, FilterEntity) ([]Entity, error)
 }
 
 func (e Entity) Check() error {

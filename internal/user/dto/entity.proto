@@ -48,3 +48,10 @@ message ListEntityResp {
 	uint64 Total                  = 2;
 }
 
+message DeleteEntityReq {
+	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
+message DeleteEntityResp {
+	user.Entity Entity            = 1 [(gogoproto.nullable) = false];
+}

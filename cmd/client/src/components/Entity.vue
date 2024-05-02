@@ -6,12 +6,13 @@ import type { VForm } from 'vuetify/components/VForm';
 import { marked } from "marked";
 import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
+import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
 import type { Role } from '@internal/user/role';
 import type { U } from '@internal/user/user';
 import { ListRoleReq } from '@internal/user/dto/role';
-import { ListEntityReq, UpdateEntityReq } from '@internal/user/dto/entity';
+import { DeleteEntityReq, ListEntityReq, UpdateEntityReq } from '@internal/user/dto/entity';
 import { ListUserReq } from '@internal/user/dto/user';
 
 // #MARK:Common
@@ -140,12 +141,14 @@ const closeDeleteEntity = () => {
 	dialogDeleteEntity.value = false;
 };
 
-const confirmDeleteEntity = () => {
-	// TODO: delete entity
-	dialogDeleteEntity.value = false;
-};
+const confirmDeleteEntity = async () => {
+	await entityStore.deleteEntity(DeleteEntityReq.create({ iD: selectedEntity.value?.iD }));
 
-const deleteEntity = () => {
+	selectedEntities.value = [];
+	await authStore.refreshToken();
+	await listEntity({ page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] })
+
+	dialogDeleteEntity.value = false;
 };
 
 const nameEdit = ref(false);
@@ -185,13 +188,7 @@ const {
 const loadingRole = ref(true);
 const searchRole = ref('');
 
-const headersByRole: ReadonlyHeaders = [
-	{
-		title: 'Role',
-		key: 'role',
-		align: 'start',
-		sortable: true,
-	},
+const headersRole: ReadonlyHeaders = [
 	{
 		title: 'Name',
 		key: 'name',
@@ -280,16 +277,10 @@ const {
 const loadingUser = ref(true);
 const searchUser = ref('');
 
-const headersByUser: ReadonlyHeaders = [
+const headersUser: ReadonlyHeaders = [
 	{
 		title: 'Email',
 		key: 'email',
-		align: 'start',
-		sortable: true,
-	},
-	{
-		title: 'Username',
-		key: 'username',
 		align: 'start',
 		sortable: true,
 	},
@@ -381,17 +372,6 @@ const deleteUser = () => {
 </script>
 
 <template>
-	<v-dialog v-model="dialogDeleteEntity" max-width="500px">
-		<v-card>
-			<v-card-title class="text-h5">Are you sure you want to delete this entity ?</v-card-title>
-			<v-card-actions>
-				<v-spacer></v-spacer>
-				<v-btn variant="text" @click="closeDeleteEntity">Cancel</v-btn>
-				<v-btn color="danger" variant="text" @click="confirmDeleteEntity">OK</v-btn>
-				<v-spacer></v-spacer>
-			</v-card-actions>
-		</v-card>
-	</v-dialog>
 	<v-row>
 		<v-col cols="4">
 			<v-sheet class="px-1 rounded-xl" outlined color="primary">
@@ -452,23 +432,30 @@ const deleteUser = () => {
 					:loading="loadingEntity" :search="searchEntity" item-value="name" item-key="iD"
 					@update:options="listEntity" v-model="selectedEntities" @click:row="selectEntity" return-object
 					item-selectable select-strategy="single">
-					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr v-if="item" v-bind="props" class="cursor-pointer py-8" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
-						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
-							<td class="d-flex align-center">
-								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
-									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
-									<span v-else class=" mx-auto text-center text-h5">
-										{{ item?.name?.at(0)?.toUpperCase() }}
-									</span>
-								</v-avatar>
-								<span class="text-h6">{{ item.name }}</span>
-							</td>
-							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-								1000).toLocaleDateString('en-GB')
-								}}
-							</td>
-						</tr>
+					<template v-slot:item="{ item, isSelected, index, props: itemProps }">
+						<v-hover v-slot="{ isHovering, props: hoverProps }">
+							<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
+								:key="ulid(item.iD)" :class="{
+									'row-hovered': isHovering,
+									'row-selected': isSelected({ value: item, selectable: true }),
+									'row-even': index % 2 === 0,
+									'row-odd': index % 2 !== 0,
+								}">
+								<td>
+									<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
+										<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
+										<span v-else class=" mx-auto text-center text-h5">
+											{{ item?.name?.at(0)?.toUpperCase() }}
+										</span>
+									</v-avatar>
+									<span class="text-h6">{{ item.name }}</span>
+								</td>
+								<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+									1000).toLocaleDateString('en-GB')
+									}}
+								</td>
+							</tr>
+						</v-hover>
 					</template>
 				</v-data-table-server>
 				<v-col cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
@@ -478,19 +465,20 @@ const deleteUser = () => {
 		<v-col class="mx-auto" cols="6">
 			<v-col class="d-flex justify-center" cols="12">
 				<v-btn-toggle v-model="tableView">
-					<v-btn size="large" variant="outlined" append-icon="mdi-domain">
+					<v-btn class="main-color-background" size="large" variant="outlined" append-icon="mdi-domain">
 						Info
 						<template v-slot:append>
 							<v-icon color="primary"></v-icon>
 						</template>
 					</v-btn>
-					<v-btn size="large" variant="outlined" append-icon="mdi-account-cog">
+					<v-btn class="main-color-background" size="large" variant="outlined" append-icon="mdi-account-cog">
 						Roles
 						<template v-slot:append>
 							<v-icon color="primary"></v-icon>
 						</template>
 					</v-btn>
-					<v-btn size="large" variant="outlined" append-icon="mdi-account-multiple">
+					<v-btn class="main-color-background" size="large" variant="outlined"
+						append-icon="mdi-account-multiple">
 						Users
 						<template v-slot:append>
 							<v-icon color="primary"></v-icon>
@@ -500,7 +488,7 @@ const deleteUser = () => {
 			</v-col>
 			<v-sheet class="px-1 rounded-xl" outlined color="primary" v-if="selectedEntity">
 				<!-- Info -->
-				<v-card v-if="tableView == 0" class="mt-8 px-6 py-6 justify-center rounded-xl main-color-background"
+				<v-card v-if="tableView == 0" class="px-6 py-6 justify-center rounded-xl main-color-background"
 					variant="flat">
 					<v-avatar class="mb-4 justify-center" size="96" :color="!selectedEntity.avatarURL ? 'primary' : ''">
 						<img v-if="selectedEntity.avatarURL" :src="selectedEntity.avatarURL" alt="Avatar">
@@ -533,9 +521,30 @@ const deleteUser = () => {
 					</v-text-field>
 					<div class="px-4" v-if="!descriptionEdit" v-html="mdDescription"></div>
 					<!--eslint-enable-->
-					<v-card-actions>
-						<v-spacer></v-spacer>
-						<v-btn color="error" @click="deleteEntity()">Delete</v-btn>
+					<v-card-actions class="d-flex justify-center">
+						<v-divider></v-divider>
+						<v-dialog v-model="dialogDeleteEntity" max-width="800px">
+							<template v-slot:activator="{ props }">
+								<v-btn variant="tonal" prepend-icon="mdi-trash-can" color="error" v-bind="props">
+									Delete
+									<template v-slot:prepend>
+										<v-icon color="error"></v-icon>
+									</template>
+								</v-btn>
+							</template>
+							<v-sheet class="px-1 rounded-xl" outlined color="error">
+								<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+									<v-card-title class="text-h5">Are you sure you want to delete this entity
+										?</v-card-title>
+									<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn variant="text" @click="closeDeleteEntity">Cancel</v-btn>
+										<v-btn color="error" variant="text" @click="confirmDeleteEntity">OK</v-btn>
+										<v-spacer></v-spacer>
+									</v-card-actions>
+								</v-card>
+							</v-sheet>
+						</v-dialog>
 					</v-card-actions>
 				</v-card>
 				<!-- Roles -->
@@ -588,26 +597,33 @@ const deleteUser = () => {
 						</v-sheet>
 					</v-dialog>
 				</v-col>
-				<v-text-field v-if="tableView == 1" class="main-color-background" v-model="searchEntity" label="Search"
+				<v-text-field v-if="tableView == 1" class="main-color-background" v-model="searchRole" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 				<v-data-table-server v-if="tableView === 1" class="main-color-background rounded-0"
-					:headers="headersByRole" fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+					:headers="headersRole" fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
 					:items-per-page-options="pageOptions" :items="viewRoles" :items-length="Number(roleTotal)"
 					:loading="loadingRole" :search="searchRole" item-value="name" item-key="iD"
 					@update:options="listRole" v-model="selectedRoles" @click:row="selectRole" return-object
 					item-selectable select-strategy="single">
-					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr v-if="item" class="cursor-pointer" v-bind="props" :key="item.name" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
-						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
-							<td class="d-flex align-center">
-								<span class="text-h6">{{ item.name }}</span>
-							</td>
-							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-								1000).toLocaleDateString('en-GB')
-								}}
-							</td>
-						</tr>
+					<template v-slot:item="{ item, isSelected, index, props: itemProps }">
+						<v-hover v-slot="{ isHovering, props: hoverProps }">
+							<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
+								:key="ulid(item.iD)" :class="{
+									'row-hovered': isHovering,
+									'row-selected': isSelected({ value: item, selectable: true }),
+									'row-even': index % 2 === 0,
+									'row-odd': index % 2 !== 0,
+								}">
+								<td>
+									<span class="text-h6">{{ item.name }}</span>
+								</td>
+								<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+									1000).toLocaleDateString('en-GB')
+									}}
+								</td>
+							</tr>
+						</v-hover>
 					</template>
 				</v-data-table-server>
 				<v-col v-if="tableView == 1" cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
@@ -665,25 +681,32 @@ const deleteUser = () => {
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 				<v-data-table-server v-if="tableView === 2" class="main-color-background rounded-0"
-					:headers="headersByUser" fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
+					:headers="headersUser" fixed-footer min-height="50vh" max-height="100vh" items-per-page-text=""
 					:items-per-page-options="pageOptions" :items="viewUsers" :items-length="Number(userTotal)"
 					:loading="loadingUser" :search="searchUser" item-value="name" item-key="iD"
 					@update:options="listUser" v-model="selectedUsers" @click:row="selectUser" return-object
 					item-selectable select-strategy="single">
-					<template v-slot:item="{ item, isSelected, index, props }">
-						<tr v-if="item" class="cursor-pointer" v-bind="props" :key="item.email" :class="[(index % 2 === 0 ? 'row-bg-even' : 'row-bg-odd'),
-						(isSelected({ value: item, selectable: true }) ? 'active-bg' : '')]">
-							<td class="d-flex align-center">
-								<span class="text-h6">{{ item.email }}</span>
-							</td>
-							<td class="d-flex align-center">
-								<span class="text-h6">{{ item.lastName + ' ' + item.firstName }}</span>
-							</td>
-							<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-								1000).toLocaleDateString('en-GB')
-								}}
-							</td>
-						</tr>
+					<template v-slot:item="{ item, isSelected, index, props: itemProps }">
+						<v-hover v-slot="{ isHovering, props: hoverProps }">
+							<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
+								:key="ulid(item.iD!)" :class="{
+									'row-hovered': isHovering,
+									'row-selected': isSelected({ value: item, selectable: true }),
+									'row-even': index % 2 === 0,
+									'row-odd': index % 2 !== 0,
+								}">
+								<td>
+									<span class="text-h6">{{ item.email }}</span>
+								</td>
+								<td>
+									<span class="text-h6">{{ item.lastName + ' ' + item.firstName }}</span>
+								</td>
+								<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+									1000).toLocaleDateString('en-GB')
+									}}
+								</td>
+							</tr>
+						</v-hover>
 					</template>
 				</v-data-table-server>
 				<v-col v-if="tableView == 2" cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
@@ -705,20 +728,26 @@ const deleteUser = () => {
 	background-color: transparent;
 }
 
-.row-bg-odd {
+.row-odd {
+	transition: background-color .2s ease-in-out;
+	background-color: rgba(55, 71, 79, 0.3);
+}
+
+.row-odd:not(.row-hovered) {
 	background-color: rgba(33, 33, 33, 0.3);
 }
 
-.row-bg-odd:hover {
+.row-even {
+	transition: background-color .2s ease-in-out;
 	background-color: rgba(55, 71, 79, 0.3);
 }
 
-.row-bg-even {
+.row-even:not(.row-hovered) {
 	background-color: rgba(0, 229, 255, 0.3);
 }
 
-.row-bg-even:hover {
-	background-color: rgba(55, 71, 79, 0.3);
+.row-selected {
+	background-color: rgba(149, 12, 117, 0.6) !important;
 }
 
 .cursor-pointer {

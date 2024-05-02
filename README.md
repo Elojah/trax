@@ -25,5 +25,13 @@ $ make client && ./bin/trax_web_client config/web_client/local.json
 
 TODO:
 
-- Change & fix front
 - Add Create & Update on everything
+
+  - Create Role
+  - Create (add at least 1 role) User
+  - Display + Update Role w permission
+  - Display + Update User w roles
+  - Delete Role
+  - Delete (remove \* roles) User
+
+- Clean UI (table, cards, etc.)

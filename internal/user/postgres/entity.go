@@ -275,10 +275,10 @@ func (s Store) UpdateEntity(ctx context.Context, f user.FilterEntity, p user.Pat
 	return entities, nil
 }
 
-func (s Store) DeleteEntity(ctx context.Context, f user.FilterEntity) error {
+func (s Store) DeleteEntity(ctx context.Context, f user.FilterEntity) ([]user.Entity, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	b := strings.Builder{}
@@ -287,9 +287,23 @@ func (s Store) DeleteEntity(ctx context.Context, f user.FilterEntity) error {
 	clause, args := filterEntity(f).where(1)
 	b.WriteString(clause)
 
-	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
-		return postgres.Error(err, "entity", filterEntity(f).index())
+	b.WriteString(` RETURNING id, name, description, avatar_url, created_at, updated_at`)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, postgres.Error(err, "entity", filterEntity(f).index())
 	}
 
-	return err
+	var entities []user.Entity
+
+	for rows.Next() {
+		var e sqlEntity
+		if err := rows.Scan(&e.ID, &e.Name, &e.Description, &e.AvatarURL, &e.CreatedAt, &e.UpdatedAt); err != nil {
+			return nil, postgres.Error(err, "entity", filterEntity(f).index())
+		}
+
+		entities = append(entities, e.entity())
+	}
+
+	return entities, nil
 }

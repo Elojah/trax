@@ -3,7 +3,12 @@ import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { Entity } from '@internal/user/entity'
-import { CreateEntityReq, ListEntityReq, UpdateEntityReq } from '@internal/user/dto/entity'
+import {
+  CreateEntityReq,
+  DeleteEntityReq,
+  ListEntityReq,
+  UpdateEntityReq
+} from '@internal/user/dto/entity'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { parse, ulid } from '@/utils/ulid'
@@ -43,6 +48,19 @@ export const useEntityStore = defineStore('entity', () => {
       const resp = await api.updateEntity(req, { meta: { token: token.value } })
 
       entities.value?.set(ulid(resp.response.iD), resp.response)
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
+
+  const deleteEntity = async (req: DeleteEntityReq) => {
+    try {
+      const resp = await api.deleteEntity(req, { meta: { token: token.value } })
+
+      entities.value?.delete(ulid(resp.response.Entity.iD))
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -105,6 +123,7 @@ export const useEntityStore = defineStore('entity', () => {
     createEntity,
     listEntity,
     updateEntity,
+    deleteEntity,
     populateEntity
   }
 })
