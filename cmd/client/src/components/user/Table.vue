@@ -208,7 +208,7 @@ const delete_ = () => {
 		<v-data-table-server class="main-color-background rounded-0" :headers="headers" fixed-footer min-height="50vh"
 			max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="views"
 			:items-length="Number(total)" :loading="loading" :search="search" item-value="name" item-key="iD"
-			@update:options="list" v-model="selectedUsers" @click:row="select" return-object item-selectable
+			@update:options="list" v-model="selected" @click:row="select" return-object item-selectable
 			select-strategy="single">
 			<template v-slot:item="{ item, isSelected, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
@@ -237,16 +237,8 @@ const delete_ = () => {
 	</v-sheet>
 </template>
 <style scoped>
-.active-bg {
-	background-color: #950c75 !important;
-}
-
 .main-color-background {
 	background-color: #263238;
-}
-
-.transparent-background {
-	background-color: transparent;
 }
 
 .row-odd {

@@ -58,14 +58,14 @@ const initials = computed(() => (user?.value?.firstName.at(0)?.toUpperCase() ?? 
 				</v-avatar>
 				<v-text-field class="justify-center text-h6" density="compact" v-model="user.lastName"
 					:rules="nameRules" :variant="!lastNameEdit ? 'plain' : 'underlined'" :readonly="!lastNameEdit">
-					<template v-slot:append-inner>
+					<template v-slot:prepend-inner>
 						<v-icon color="primary" size="large" @click="updateLastName"
 							:icon="!lastNameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
 					</template>
 				</v-text-field>
 				<v-text-field class="justify-center text-h6" density="compact" v-model="user.firstName"
 					:rules="nameRules" :variant="!firstNameEdit ? 'plain' : 'underlined'" :readonly="!firstNameEdit">
-					<template v-slot:append-inner>
+					<template v-slot:prepend-inner>
 						<v-icon color="primary" size="large" @click="updateFirstName"
 							:icon="!firstNameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
 					</template>

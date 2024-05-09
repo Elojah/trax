@@ -27,9 +27,6 @@ TODO:
 
 - Add Create & Update on everything
 
-  - review CSS post splitting
-  - Move components into view when possible
-
   - Create Role
   - Create (add at least 1 role) User
   - Display + Update Role w permission

@@ -80,9 +80,9 @@ const views = computed(() => {
 	return viewIDs.value.map((roleID: string) => { return roles.value?.get(roleID) });
 });
 
-const select = (_: any, row: any) => {
-	selected.value = [];
-	row.toggleSelect({ value: row.item, selectable: true });
+const expand = (_: any, row: any) => {
+	row.toggleExpand({ value: row.item });
+	// row.toggleSelect({ value: row.item, selectable: true });
 };
 
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
@@ -121,6 +121,28 @@ const create = async () => {
 	await authStore.refreshToken();
 	await list()
 };
+
+const nameEdit = ref(false);
+
+const updateName = async function () {
+	if (nameEdit.value) {
+		// await store.update(UpdateEntityReq.create({
+		// 	iD: e.value?.iD,
+		// 	name: { value: e.value?.name },
+		// }));
+	}
+
+	nameEdit.value = !nameEdit.value
+};
+
+
+const updatePermissions = async function () {
+	// await store.update(UpdateEntityReq.create({
+	// 	iD: e.value?.iD,
+	// 	name: { value: e.value?.name },
+	// }));
+};
+
 
 const dialogDelete = ref(false);
 const closeDelete = () => {
@@ -191,14 +213,14 @@ const delete_ = () => {
 		<v-data-table-server class="main-color-background rounded-0" :headers="headers" fixed-footer min-height="50vh"
 			max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="views"
 			:items-length="Number(total)" :loading="loading" :search="search" item-value="name" item-key="iD"
-			@update:options="list" v-model="selected" @click:row="select" return-object item-selectable
+			@update:options="list" v-model="selected" @click:row="expand" return-object item-selectable
 			select-strategy="single">
-			<template v-slot:item="{ item, isSelected, index, props: itemProps }">
+			<template v-slot:item="{ item, isExpanded, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
 						:key="ulid(item.iD)" :class="{
 							'row-hovered': isHovering,
-							'row-selected': isSelected({ value: item, selectable: true }),
+							'row-selected': isExpanded({ value: item }),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}">
@@ -212,21 +234,144 @@ const delete_ = () => {
 					</tr>
 				</v-hover>
 			</template>
+			<template v-slot:expanded-row="{ columns, item, props: itemProps }">
+				<tr>
+					<td :colspan="columns.length">
+						<v-card outlined class="main-color-background">
+							<v-text-field v-model="item.name" :variant="!nameEdit ? 'plain' : 'underlined'"
+								:readonly="!nameEdit">
+								<template v-slot:prepend-inner>
+									<v-icon color="primary" size="large" @click="updateName"
+										:icon="!nameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
+								</template>
+							</v-text-field>
+							<v-table>
+								<thead>
+									<tr>
+										<th>
+										</th>
+										<th class="text-left">
+											Read
+										</th>
+										<th class="text-left">
+											Create
+										</th>
+										<th class="text-left">
+											Update
+										</th>
+										<th class="text-left">
+											Delete
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											R_asset
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											entity
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											operation
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											role
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											user
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+										<td>
+											<v-checkbox></v-checkbox>
+										</td>
+									</tr>
+								</tbody>
+							</v-table>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="primary" variant="text" @click="updatePermissions">
+									Edit
+								</v-btn>
+								<v-btn color="error" variant="text" @click="delete_">
+									Delete
+								</v-btn>
+							</v-card-actions>
+						</v-card>
+					</td>
+				</tr>
+			</template>
 		</v-data-table-server>
 		<v-col cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
 	</v-sheet>
 </template>
 <style scoped>
-.active-bg {
-	background-color: #950c75 !important;
-}
-
 .main-color-background {
 	background-color: #263238;
-}
-
-.transparent-background {
-	background-color: transparent;
 }
 
 .row-odd {

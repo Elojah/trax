@@ -74,28 +74,28 @@ const updateDescription = async function () {
 			</v-avatar>
 			<v-text-field class="justify-center text-h3" v-model="e.name" :variant="!name ? 'plain' : 'underlined'"
 				:readonly="!name">
-				<template v-slot:append-inner>
+				<template v-slot:prepend-inner>
 					<v-icon color="primary" size="large" @click="updateName"
 						:icon="!name ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
 				</template>
 			</v-text-field>
 			<!-- eslint-disable vue/no-v-html vue/no-v-text-v-html-on-component -->
 			<v-textarea v-if="description" class="p-6 m-6" variant="solo" v-model="e.description" :readonly="false">
-				<template v-slot:append-inner>
+				<template v-slot:prepend-inner>
 					<v-icon color="primary" size="large" @click="updateDescription"
 						:icon="!description ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
 				</template>
 			</v-textarea>
 			<v-text-field v-if="!description" class="p-6 m-6 font-italic" variant="solo" no-resize :readonly="true">
 				Edit description
-				<template v-slot:append-inner>
+				<template v-slot:prepend-inner>
 					<v-icon color="primary" size="large" @click="updateDescription"
 						:icon="!description ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
 				</template>
 			</v-text-field>
 			<div class="px-4" v-if="!description" v-html="mdDescription"></div>
 			<!--eslint-enable-->
-			<v-card-actions class="d-flex justify-center">
+			<v-card-actions>
 				<v-divider></v-divider>
 				<v-dialog v-model="dialogDelete" max-width="800px">
 					<template v-slot:activator="{ props }">
@@ -123,3 +123,8 @@ const updateDescription = async function () {
 		</v-card>
 	</v-sheet>
 </template>
+<style scoped>
+.main-color-background {
+	background-color: #263238;
+}
+</style>

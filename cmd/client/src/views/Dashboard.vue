@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import Dashboard from '@/components/Dashboard.vue';
 </script>
 
 <template>
   <v-main class="bg">
     <v-container>
-      <Dashboard />
+      <div>
+		<h1>Dashboard</h1>
+		<p>WIP</p>
+	</div>
     </v-container>
   </v-main>
 </template>

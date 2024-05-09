@@ -13,7 +13,7 @@ const redirect = function (name: string) {
 </script>
 
 <template>
-	<v-navigation-drawer v-if="authStore.user">
+	<v-navigation-drawer v-if="authStore.user" expand-on-hover rail>
 		<v-list nav>
 			<v-list-item prepend-icon="mdi-domain" title="Entities" value="entities" @click="redirect('entity')"
 				active-class="active-bg">
