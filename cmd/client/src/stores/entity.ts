@@ -15,8 +15,9 @@ import { parse, ulid } from '@/utils/ulid'
 
 export const useEntityStore = defineStore('entity', () => {
   const entities = ref<Map<string, Entity>>(new Map())
-
   const total = ref<bigint>(BigInt(0))
+
+  const selected = ref<Entity[]>([])
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -26,7 +27,7 @@ export const useEntityStore = defineStore('entity', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const createEntity = async function (name: string, avatarURL: string, description: string) {
+  const create = async function (name: string, avatarURL: string, description: string) {
     try {
       const req = CreateEntityReq.create({
         name: name,
@@ -43,7 +44,7 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const updateEntity = async (req: UpdateEntityReq) => {
+  const update = async (req: UpdateEntityReq) => {
     try {
       const resp = await api.updateEntity(req, { meta: { token: token.value } })
 
@@ -56,11 +57,11 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const deleteEntity = async (req: DeleteEntityReq) => {
+  const delete_ = async (req: DeleteEntityReq) => {
     try {
       const resp = await api.deleteEntity(req, { meta: { token: token.value } })
 
-      entities.value?.delete(ulid(resp.response.Entity.iD))
+      entities.value?.delete(ulid(resp.response.entity.iD))
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -69,7 +70,7 @@ export const useEntityStore = defineStore('entity', () => {
     }
   }
 
-  const listEntity = async function (req: ListEntityReq): Promise<string[]> {
+  const list = async function (req: ListEntityReq): Promise<string[]> {
     try {
       const resp = await api.listEntity(req, { meta: { token: token.value } })
 
@@ -91,7 +92,7 @@ export const useEntityStore = defineStore('entity', () => {
     return []
   }
 
-  const populateEntity = async function (ids: string[]) {
+  const populate = async function (ids: string[]) {
     const newIDs = ids.reduce((acc: Uint8Array[], id: string) => {
       if (entities.value?.has(id)) {
         return acc
@@ -104,7 +105,7 @@ export const useEntityStore = defineStore('entity', () => {
       return
     }
 
-    await listEntity(
+    await list(
       ListEntityReq.create({
         iDs: newIDs,
         paginate: {
@@ -120,10 +121,11 @@ export const useEntityStore = defineStore('entity', () => {
   return {
     entities,
     total,
-    createEntity,
-    listEntity,
-    updateEntity,
-    deleteEntity,
-    populateEntity
+    selected,
+    create,
+    list,
+    update,
+    delete_,
+    populate
   }
 })

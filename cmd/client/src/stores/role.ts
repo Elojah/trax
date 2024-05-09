@@ -12,6 +12,8 @@ export const useRoleStore = defineStore('role', () => {
   const roles = ref<Map<string, Role>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
+  const selected = ref<Role[]>([])
+
   const api = new APIClient(
     new GrpcWebFetchTransport({
       baseUrl: config.api_url
@@ -20,7 +22,7 @@ export const useRoleStore = defineStore('role', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const createRole = async function (name: string) {
+  const create = async function (name: string) {
     try {
       const req = CreateRoleReq.create({
         name: name
@@ -36,7 +38,7 @@ export const useRoleStore = defineStore('role', () => {
   }
 
   // Return roles ids and entity ids
-  const listRole = async function (req: ListRoleReq): Promise<[string[], string[]]> {
+  const list = async function (req: ListRoleReq): Promise<[string[], string[]]> {
     try {
       const resp = await api.listRole(req, { meta: { token: token.value } })
 
@@ -68,7 +70,8 @@ export const useRoleStore = defineStore('role', () => {
   return {
     roles,
     total,
-    createRole,
-    listRole
+    selected,
+    create,
+    list
   }
 })

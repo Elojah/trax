@@ -51,6 +51,8 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 			Fields:  []string{"user_ids", "user_entity_ids", "entity_ids"},
 		}
 
+		logger.Error().Err(err).Msg("invalid argument")
+
 		return &dto.ListRoleResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
@@ -72,6 +74,8 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 
 		return transaction.Commit, nil
 	}); err != nil {
+		logger.Error().Err(err).Msg("failed transaction")
+
 		return &dto.ListRoleResp{}, err
 	}
 

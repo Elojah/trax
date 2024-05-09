@@ -13,6 +13,8 @@ export const useUserStore = defineStore('user', () => {
   const users = ref<Map<string, U>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
+  const selected = ref<U[]>([])
+
   const api = new APIClient(
     new GrpcWebFetchTransport({
       baseUrl: config.api_url
@@ -21,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const inviteUser = async function (name: string) {
+  const invite = async function (name: string) {
     // try {
     //   const req = CreateUserReq.create({
     //     name: name
@@ -36,7 +38,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // Return users ids and entity ids
-  const listUser = async function (req: ListUserReq): Promise<string[]> {
+  const list = async function (req: ListUserReq): Promise<string[]> {
     try {
       const resp = await api.listUser(req, { meta: { token: token.value } })
 
@@ -61,7 +63,8 @@ export const useUserStore = defineStore('user', () => {
   return {
     users,
     total,
-    inviteUser,
-    listUser
+    selected,
+    invite,
+    list
   }
 })

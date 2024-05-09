@@ -10,7 +10,7 @@ let zoom = 3;
 		<v-col cols="12 pa-0 ma-0">
 			<l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
 				<l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
-					name="OpenStreetMap"></l-tile-layer>
+					name="MAP"></l-tile-layer>
 			</l-map>
 		</v-col>
 	</v-row>

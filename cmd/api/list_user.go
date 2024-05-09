@@ -45,6 +45,8 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 			Fields:  []string{"user_entity_ids", "entity_ids"},
 		}
 
+		logger.Error().Err(err).Msg("invalid argument")
+
 		return &dto.ListUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
@@ -70,6 +72,8 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 
 		return transaction.Commit, nil
 	}); err != nil {
+		logger.Error().Err(err).Msg("failed transaction")
+
 		return &dto.ListUserResp{}, err
 	}
 

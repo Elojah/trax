@@ -41,6 +41,8 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 	} else {
 		err := gerrors.ErrMissingAtLeast{AtLeast: 1, Fields: []string{"user_all", "ids"}}
 
+		logger.Error().Err(err).Msg("invalid argument")
+
 		return &dto.ListEntityResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
@@ -61,6 +63,8 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 
 		return transaction.Commit, nil
 	}); err != nil {
+		logger.Error().Err(err).Msg("failed transaction")
+
 		return &dto.ListEntityResp{}, err
 	}
 
