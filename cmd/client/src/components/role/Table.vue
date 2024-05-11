@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';
 import { ListRoleReq } from '@internal/user/dto/role';
+import RoleDetails from '@components/roles/Details.vue';
 
 // #MARK:Common
 // ______________________________________________________
@@ -234,137 +235,7 @@ const delete_ = () => {
 					</tr>
 				</v-hover>
 			</template>
-			<template v-slot:expanded-row="{ columns, item, props: itemProps }">
-				<tr>
-					<td :colspan="columns.length">
-						<v-card outlined class="main-color-background">
-							<v-text-field v-model="item.name" :variant="!nameEdit ? 'plain' : 'underlined'"
-								:readonly="!nameEdit">
-								<template v-slot:prepend-inner>
-									<v-icon color="primary" size="large" @click="updateName"
-										:icon="!nameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
-								</template>
-							</v-text-field>
-							<v-table>
-								<thead>
-									<tr>
-										<th>
-										</th>
-										<th class="text-left">
-											Read
-										</th>
-										<th class="text-left">
-											Create
-										</th>
-										<th class="text-left">
-											Update
-										</th>
-										<th class="text-left">
-											Delete
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>
-											R_asset
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											entity
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											operation
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											role
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											user
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-										<td>
-											<v-checkbox></v-checkbox>
-										</td>
-									</tr>
-								</tbody>
-							</v-table>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="primary" variant="text" @click="updatePermissions">
-									Edit
-								</v-btn>
-								<v-btn color="error" variant="text" @click="delete_">
-									Delete
-								</v-btn>
-							</v-card-actions>
-						</v-card>
-					</td>
-				</tr>
-			</template>
+			<RoleDetails></RoleDetails>
 		</v-data-table-server>
 		<v-col cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
 	</v-sheet>

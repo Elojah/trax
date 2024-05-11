@@ -1,4 +1,4 @@
-package main
+package entity
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*user.Entity, error) {
+func (h *HandlerEntity) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*user.Entity, error) {
 	logger := log.With().Str("method", "create_entity").Logger()
 
 	if req == nil {
@@ -22,7 +22,7 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.user.Auth(ctx, "access")
+	claims, err := h.User.Auth(ctx, "access")
 	if err != nil {
 		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -42,8 +42,8 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 		return &user.Entity{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		if err = h.user.InsertEntity(ctx, e); err != nil {
+	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		if err = h.User.InsertEntity(ctx, e); err != nil {
 			logger.Error().Err(err).Msg("failed to insert entity")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
@@ -57,19 +57,19 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 			UpdatedAt: now,
 			CreatedAt: now,
 		}
-		if err := h.user.InsertRole(ctx, role); err != nil {
+		if err := h.User.InsertRole(ctx, role); err != nil {
 			logger.Error().Err(err).Msg("failed to insert role")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		if err := h.user.InsertPermissions(ctx, user.AllPermissions(role.ID)); err != nil {
+		if err := h.User.InsertPermissions(ctx, user.AllPermissions(role.ID)); err != nil {
 			logger.Error().Err(err).Msg("failed to insert permissions")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		if err := h.user.InsertRoleUser(ctx, user.RoleUser{
+		if err := h.User.InsertRoleUser(ctx, user.RoleUser{
 			RoleID:    role.ID,
 			UserID:    claims.UserID,
 			CreatedAt: now,

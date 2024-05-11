@@ -1,7 +1,13 @@
 package main
 
-import "github.com/elojah/trax/internal/user"
+import (
+	"github.com/elojah/trax/cmd/api/entity"
+	"github.com/elojah/trax/cmd/api/role"
+	"github.com/elojah/trax/cmd/api/user"
+)
 
 type handler struct {
-	user user.Agg
+	entity.HandlerEntity
+	role.HandlerRole
+	user.HandlerUser
 }

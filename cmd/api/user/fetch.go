@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U, error) {
+func (h *HandlerUser) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U, error) {
 	logger := log.With().Str("method", "fetch_user").Logger()
 
 	if req == nil {
@@ -22,7 +22,7 @@ func (h *handler) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.user.Auth(ctx, "access")
+	claims, err := h.User.Auth(ctx, "access")
 	if err != nil {
 		return &user.U{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -45,10 +45,10 @@ func (h *handler) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U
 
 	var u user.U
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
-		u, err = h.user.Fetch(ctx, user.Filter{
+		u, err = h.User.Fetch(ctx, user.Filter{
 			ID: id,
 		})
 		if err != nil {

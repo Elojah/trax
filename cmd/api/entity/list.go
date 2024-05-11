@@ -1,4 +1,4 @@
-package main
+package entity
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.ListEntityResp, error) {
+func (h *HandlerEntity) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.ListEntityResp, error) {
 	logger := log.With().Str("method", "list_entity").Logger()
 
 	if req == nil {
@@ -21,7 +21,7 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.user.Auth(ctx, "access")
+	claims, err := h.User.Auth(ctx, "access")
 	if err != nil {
 		return &dto.ListEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -49,8 +49,8 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 	var entities []user.Entity
 	var total uint64
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		entities, total, err = h.user.ListEntity(ctx, user.FilterEntity{
+	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		entities, total, err = h.User.ListEntity(ctx, user.FilterEntity{
 			IDs:      ids,
 			Paginate: req.Paginate,
 			Search:   req.Search,
