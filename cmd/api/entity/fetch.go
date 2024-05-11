@@ -1,4 +1,4 @@
-package main
+package entity
 
 import (
 	"context"
@@ -13,14 +13,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) FetchEntity(ctx context.Context, req *dto.FetchEntityReq) (*user.Entity, error) {
+func (h *HandlerEntity) FetchEntity(ctx context.Context, req *dto.FetchEntityReq) (*user.Entity, error) {
 	logger := log.With().Str("method", "fetch_entity").Logger()
 
 	if req == nil {
 		return &user.Entity{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
-	claims, err := h.user.Auth(ctx, "access")
+	claims, err := h.User.Auth(ctx, "access")
 	if err != nil {
 		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -37,10 +37,10 @@ func (h *handler) FetchEntity(ctx context.Context, req *dto.FetchEntityReq) (*us
 
 	var entity user.Entity
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
-		entity, err = h.user.FetchEntity(ctx, user.FilterEntity{
+		entity, err = h.User.FetchEntity(ctx, user.FilterEntity{
 			ID: req.ID,
 		})
 		if err != nil {

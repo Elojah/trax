@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.ListUserResp, error) {
+func (h *HandlerUser) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.ListUserResp, error) {
 	logger := log.With().Str("method", "list_user").Logger()
 
 	if req == nil {
@@ -21,7 +21,7 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.user.Auth(ctx, "access")
+	claims, err := h.User.Auth(ctx, "access")
 	if err != nil {
 		return &dto.ListUserResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -57,8 +57,8 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 	var users []user.U
 	var total uint64
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		users, total, err = h.user.ListByEntity(ctx, user.Filter{
+	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		users, total, err = h.User.ListByEntity(ctx, user.Filter{
 			IDs:       ids,
 			EntityIDs: entityIDs,
 			Paginate:  req.Paginate,

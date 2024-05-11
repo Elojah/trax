@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) UpdateUser(ctx context.Context, req *dto.UpdateUserReq) (*user.U, error) {
+func (h *HandlerUser) UpdateUser(ctx context.Context, req *dto.UpdateUserReq) (*user.U, error) {
 	logger := log.With().Str("method", "update_user").Logger()
 
 	if req == nil {
@@ -22,16 +22,16 @@ func (h *handler) UpdateUser(ctx context.Context, req *dto.UpdateUserReq) (*user
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.user.Auth(ctx, "access")
+	claims, err := h.User.Auth(ctx, "access")
 	if err != nil {
 		return &user.U{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	var u user.U
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		now := time.Now().Unix()
-		us, err := h.user.Update(ctx, user.Filter{
+		us, err := h.User.Update(ctx, user.Filter{
 			ID: claims.UserID,
 		}, user.Patch{
 			FirstName: pbtypes.GetString(req.Firstname),

@@ -8,14 +8,18 @@ import (
 	"os"
 	"time"
 
+	userapi "github.com/elojah/trax/cmd/api/user"
 	useragg "github.com/elojah/trax/internal/user/agg"
 	userpostgres "github.com/elojah/trax/internal/user/postgres"
 
-	// userredis "github.com/elojah/trax/internal/user/redis"
+	entityapi "github.com/elojah/trax/cmd/api/entity"
+	roleapi "github.com/elojah/trax/cmd/api/role"
 
-	apigrpc "github.com/elojah/trax/cmd/api/grpc"
 	cookieagg "github.com/elojah/trax/pkg/cookie/agg"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
+
+	apigrpc "github.com/elojah/trax/cmd/api/grpc"
+
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	"github.com/elojah/trax/pkg/grpcweb"
 	ghttp "github.com/elojah/trax/pkg/http"
@@ -23,6 +27,7 @@ import (
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
+
 	"github.com/rs/zerolog/log"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/reflection"
@@ -118,9 +123,20 @@ func run(prog string, filename string) {
 		return
 	}
 
-	// init handler
+	// init handlers
+	userH := userapi.HandlerUser{
+		User: userAgg,
+	}
+	entityH := entityapi.HandlerEntity{
+		User: userAgg,
+	}
+	roleH := roleapi.HandlerRole{
+		User: userAgg,
+	}
 	h := handler{
-		user: userAgg,
+		HandlerUser:   userH,
+		HandlerEntity: entityH,
+		HandlerRole:   roleH,
 	}
 
 	// init grpc ONLY server

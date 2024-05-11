@@ -1,4 +1,4 @@
-package main
+package role
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.ListRoleResp, error) {
+func (h *HandlerRole) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.ListRoleResp, error) {
 	logger := log.With().Str("method", "list_role").Logger()
 
 	if req == nil {
@@ -21,7 +21,7 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.user.Auth(ctx, "access")
+	claims, err := h.User.Auth(ctx, "access")
 	if err != nil {
 		return &dto.ListRoleResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -59,8 +59,8 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 	var roles []user.Role
 	var total uint64
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		roles, total, err = h.user.ListRole(ctx, user.FilterRole{
+	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		roles, total, err = h.User.ListRole(ctx, user.FilterRole{
 			IDs:       ids,
 			EntityIDs: entityIDs,
 			Paginate:  req.Paginate,
