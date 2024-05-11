@@ -29,5 +29,8 @@ bin/
 # Temporary vite config
 cmd/client/vite.config.ts.timestamp-*
 
+# Postgres data
+docker/postgres/_data
+
 # IDE
 .vscode
