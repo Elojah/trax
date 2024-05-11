@@ -1,4 +1,4 @@
-package entity
+package main
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *HandlerEntity) DeleteEntity(ctx context.Context, req *dto.DeleteEntityReq) (*dto.DeleteEntityResp, error) {
+func (h *handler) DeleteEntity(ctx context.Context, req *dto.DeleteEntityReq) (*dto.DeleteEntityResp, error) {
 	logger := log.With().Str("method", "delete_entity").Logger()
 
 	if req == nil {
@@ -20,7 +20,7 @@ func (h *HandlerEntity) DeleteEntity(ctx context.Context, req *dto.DeleteEntityR
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.User.Auth(ctx, "access")
+	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &dto.DeleteEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -37,8 +37,8 @@ func (h *HandlerEntity) DeleteEntity(ctx context.Context, req *dto.DeleteEntityR
 
 	var e user.Entity
 
-	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		entities, err := h.User.DeleteEntity(ctx, user.FilterEntity{
+	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		entities, err := h.user.DeleteEntity(ctx, user.FilterEntity{
 			ID: req.ID,
 		})
 		if err != nil {

@@ -41,14 +41,4 @@ service API {
     // Roles
     rpc CreateRole(dto.CreateRoleReq) returns (user.Role);
     rpc ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
-    // TODO:
-    // rpc UpdateRole(dto.UpdateRoleReq) returns (user.Role);
-    // rpc DeleteRole(dto.DeleteRoleReq) returns (dto.DeleteRoleResp);
-    // Roles
-
-    rpc CreatePermission(dto.CreatePermissionReq) returns (user.Permission);
-    rpc ListPermission(dto.ListPermissionReq) returns (dto.ListPermissionResp);
-    // TODO:
-    // rpc UpdatePermission(dto.UpdatePermissionReq) returns (user.Permission);
-    // rpc DeletePermission(dto.DeletePermissionReq) returns (dto.DeletePermissionResp);
 }

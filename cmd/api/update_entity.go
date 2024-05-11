@@ -1,4 +1,4 @@
-package entity
+package main
 
 import (
 	"context"
@@ -14,14 +14,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *HandlerEntity) UpdateEntity(ctx context.Context, req *dto.UpdateEntityReq) (*user.Entity, error) {
+func (h *handler) UpdateEntity(ctx context.Context, req *dto.UpdateEntityReq) (*user.Entity, error) {
 	logger := log.With().Str("method", "update_entity").Logger()
 
 	if req == nil {
 		return &user.Entity{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
-	claims, err := h.User.Auth(ctx, "access")
+	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -32,9 +32,9 @@ func (h *HandlerEntity) UpdateEntity(ctx context.Context, req *dto.UpdateEntityR
 
 	var e user.Entity
 
-	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		now := time.Now().Unix()
-		es, err := h.User.UpdateEntity(ctx, user.FilterEntity{
+		es, err := h.user.UpdateEntity(ctx, user.FilterEntity{
 			ID: req.ID,
 		}, user.PatchEntity{
 			Name:        pbtypes.GetString(req.Name),

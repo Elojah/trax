@@ -1,4 +1,4 @@
-package role
+package main
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *HandlerRole) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user.Role, error) {
+func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user.Role, error) {
 	logger := log.With().Str("method", "create_role").Logger()
 
 	if req == nil {
@@ -22,7 +22,7 @@ func (h *HandlerRole) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*
 	}
 
 	// #MARK:Authenticate
-	claims, err := h.User.Auth(ctx, "access")
+	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
 		return &user.Role{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
@@ -38,8 +38,8 @@ func (h *HandlerRole) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*
 		UpdatedAt: now,
 	}
 
-	if err := h.User.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		if err = h.User.InsertRole(ctx, e); err != nil {
+	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		if err = h.user.InsertRole(ctx, e); err != nil {
 			logger.Error().Err(err).Msg("failed to insert role")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
