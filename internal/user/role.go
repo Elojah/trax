@@ -95,3 +95,15 @@ func AllPermissions(roleID ulid.ID) []Permission {
 
 	return perms
 }
+
+type Permissions []Permission
+
+func (ps Permissions) ByRole() map[string][]Permission {
+	perms := make(map[string][]Permission)
+
+	for _, p := range ps {
+		perms[p.RoleID.String()] = append(perms[p.RoleID.String()], p)
+	}
+
+	return perms
+}

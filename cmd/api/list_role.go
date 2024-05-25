@@ -29,13 +29,13 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 	var entityIDs []ulid.ID
 	var ids []ulid.ID
 
-	if req.UserIDs {
+	if req.Own {
 		ids = claims.RoleIDs()
 	} else if len(req.IDs) > 0 {
 		ids = req.IDs
 	}
 
-	if req.UserEntityIDs {
+	if req.OwnEntity {
 		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_role, Command: user.C_read})
 	} else if len(req.EntityIDs) > 0 {
 		if err := claims.Require(user.NewRequirements(req.EntityIDs, user.R_role, user.C_read)...); err != nil {
@@ -45,7 +45,7 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		}
 
 		entityIDs = req.EntityIDs
-	} else if !req.UserIDs {
+	} else if !req.Own {
 		err := gerrors.ErrMissingAtLeast{
 			AtLeast: 1,
 			Fields:  []string{"user_ids", "user_entity_ids", "entity_ids"},
@@ -56,11 +56,11 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		return &dto.ListRoleResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
-	var roles []user.Role
+	var rolePermissions []dto.RolePermission
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		roles, total, err = h.user.ListRole(ctx, user.FilterRole{
+		roles, totalRole, err := h.user.ListRole(ctx, user.FilterRole{
 			IDs:       ids,
 			EntityIDs: entityIDs,
 			Paginate:  req.Paginate,
@@ -72,6 +72,32 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
+		// Populate roles with their permissions
+		permissions, err := h.user.ListPermission(ctx, user.FilterPermission{
+			RoleIDs: ids,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to list permission")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		permissionsByRole := user.Permissions(permissions).ByRole()
+
+		for _, r := range roles {
+			ps, ok := permissionsByRole[r.ID.String()]
+			if !ok {
+				ps = nil
+			}
+
+			rolePermissions = append(rolePermissions, dto.RolePermission{
+				Role:        r,
+				Permissions: ps,
+			})
+		}
+
+		total = totalRole
+
 		return transaction.Commit, nil
 	}); err != nil {
 		logger.Error().Err(err).Msg("failed transaction")
@@ -82,7 +108,7 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 	logger.Info().Msg("success")
 
 	return &dto.ListRoleResp{
-		Roles: roles,
+		Roles: rolePermissions,
 		Total: total,
 	}, nil
 }

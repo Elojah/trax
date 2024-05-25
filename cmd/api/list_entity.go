@@ -28,7 +28,7 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 
 	var ids []ulid.ID
 
-	if req.UserIDs {
+	if req.Own {
 		ids = claims.EntityIDs()
 	} else if req.IDs != nil {
 		if err := claims.Require(user.NewRequirements(req.IDs, user.R_entity, user.C_read)...); err != nil {

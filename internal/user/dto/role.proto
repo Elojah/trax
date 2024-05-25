@@ -24,15 +24,20 @@ message ListRoleReq {
 	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
 	string Search                     = 2;
 
-	bool UserIDs                      = 3;
-	bool UserEntityIDs                = 4;
+	bool Own                          = 3;
+	bool OwnEntity                    = 4;
 
 	repeated bytes IDs                = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	repeated bytes EntityIDs          = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
+message RolePermission {
+	user.Role Role 	                       = 1 [(gogoproto.nullable) = false];
+	repeated user.Permission Permissions   = 2 [(gogoproto.nullable) = false];
+}
+
 message ListRoleResp {
-	repeated user.Role Roles          = 1 [(gogoproto.nullable) = false];
+	repeated RolePermission Roles     = 1 [(gogoproto.nullable) = false];
 	uint64 Total                      = 2;
 }
 

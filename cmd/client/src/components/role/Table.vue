@@ -219,16 +219,16 @@ const delete_ = () => {
 			<template v-slot:item="{ item, isExpanded, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
-						:key="ulid(item.iD)" :class="{
+						:key="ulid(item.role?.iD)" :class="{
 							'row-hovered': isHovering,
 							'row-selected': isExpanded({ value: item }),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}">
 						<td>
-							<span class="text-h6">{{ item.name }}</span>
+							<span class="text-h6">{{ item.role?.name }}</span>
 						</td>
-						<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
+						<td class="text-caption text-right">{{ new Date(Number(item.role?.createdAt) *
 							1000).toLocaleDateString('en-GB')
 							}}
 						</td>

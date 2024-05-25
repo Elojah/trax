@@ -2,17 +2,16 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { Role } from '@internal/user/role'
-import { CreateRoleReq, ListRoleReq } from '@internal/user/dto/role'
+import { CreateRoleReq, ListRoleReq, RolePermission } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
 
 export const useRoleStore = defineStore('role', () => {
-  const roles = ref<Map<string, Role>>(new Map())
+  const roles = ref<Map<string, RolePermission>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
-  const selected = ref<Role[]>([])
+  const selected = ref<RolePermission[]>([])
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -42,8 +41,8 @@ export const useRoleStore = defineStore('role', () => {
     try {
       const resp = await api.listRole(req, { meta: { token: token.value } })
 
-      resp.response.roles?.forEach((role: Role) => {
-        roles.value?.set(ulid(role.iD), role)
+      resp.response.roles?.forEach((role: RolePermission) => {
+        roles.value?.set(ulid(role.role?.iD), role)
       })
 
       if (req?.iDs.length === 0) {
@@ -51,9 +50,9 @@ export const useRoleStore = defineStore('role', () => {
       }
 
       return resp.response.roles.reduce(
-        (acc: string[][], role: Role) => {
-          acc[0].push(ulid(role.iD))
-          acc[1].push(ulid(role.entityID))
+        (acc: string[][], role: RolePermission) => {
+          acc[0].push(ulid(role.role?.iD))
+          acc[1].push(ulid(role.role?.entityID))
           return acc
         },
         [[], []]

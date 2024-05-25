@@ -1,7 +1,11 @@
 const encoding = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 
-function ulid(id: Uint8Array): string {
+function ulid(id: Uint8Array | undefined): string {
   let result = ''
+
+  if (!id) {
+    return ''
+  }
 
   result += encoding[(id[0] & 224) >> 5]
   result += encoding[id[0] & 31]

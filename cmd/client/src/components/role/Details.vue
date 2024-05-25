@@ -11,12 +11,6 @@ Fetch all permissions of role
 	<tr>
 		<td :colspan="columns.length">
 			<v-card outlined class="main-color-background">
-				<v-text-field v-model="item.name" :variant="!nameEdit ? 'plain' : 'underlined'" :readonly="!nameEdit">
-					<template v-slot:prepend-inner>
-						<v-icon color="primary" size="large" @click="updateName"
-							:icon="!nameEdit ? 'mdi-pencil-circle-outline' : 'mdi-arrow-right-bold-circle-outline'"></v-icon>
-					</template>
-				</v-text-field>
 				<v-table>
 					<thead>
 						<tr>
