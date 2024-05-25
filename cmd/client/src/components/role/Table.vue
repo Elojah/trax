@@ -81,8 +81,9 @@ const views = computed(() => {
 	return viewIDs.value.map((roleID: string) => { return roles.value?.get(roleID) });
 });
 
-const expand = (_: any, row: any) => {
-	row.toggleExpand({ value: row.item });
+const expand = (_: any, item: any) => {
+	selected.value = [item?.internalItem?.value];
+	item.toggleExpand({ value: item.item });
 	// row.toggleSelect({ value: row.item, selectable: true });
 };
 
@@ -216,12 +217,12 @@ const delete_ = () => {
 			:items-length="Number(total)" :loading="loading" :search="search" item-value="name" item-key="iD"
 			@update:options="list" v-model="selected" @click:row="expand" return-object item-selectable
 			select-strategy="single">
-			<template v-slot:item="{ item, isExpanded, index, props: itemProps }">
+			<template v-slot:item="{ item, internalItem, isExpanded, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
 						:key="ulid(item.role?.iD)" :class="{
 							'row-hovered': isHovering,
-							'row-expanded': isExpanded(item),
+							'row-expanded': isExpanded(internalItem),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}">
@@ -235,7 +236,7 @@ const delete_ = () => {
 					</tr>
 				</v-hover>
 			</template>
-			<template v-slot:expanded-row="{ columns, item, props: itemProps }">
+			<template v-slot:expanded-row="{ columns }">
 				<RoleDetails :colspan="columns.length"></RoleDetails>
 			</template>
 		</v-data-table-server>
@@ -265,7 +266,7 @@ const delete_ = () => {
 	background-color: rgba(0, 229, 255, 0.3);
 }
 
-.row-selected {
+.row-expanded {
 	background-color: rgba(149, 12, 117, 0.6) !important;
 }
 
