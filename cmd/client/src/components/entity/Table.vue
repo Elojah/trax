@@ -5,7 +5,7 @@ import type { VForm } from 'vuetify/components/VForm';
 import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
-import {  ListEntityReq } from '@internal/user/dto/entity';
+import { ListEntityReq } from '@internal/user/dto/entity';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -73,7 +73,7 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 
 	const { page, itemsPerPage, sortBy } = options;
 	const newIDs = await store.list(ListEntityReq.create({
-		userIDs: true,
+		own: true,
 		search: search.value,
 		paginate: {
 			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
@@ -167,14 +167,14 @@ const create = async () => {
 				</v-sheet>
 			</v-dialog>
 		</v-col>
-		<v-text-field class="main-color-background" v-model="search" label="Search"
-			prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
+		<v-text-field class="main-color-background" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
+			variant="outlined" hide-details single-line>
 		</v-text-field>
 		<v-data-table-server class="main-color-background table-spacing rounded-0" :headers="headers" fixed-footer
 			min-height="50vh" max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions"
-			:items="views" :items-length="Number(total)" :loading="loading" :search="search"
-			item-value="name" item-key="iD" @update:options="list" v-model="selected"
-			@click:row="select" return-object item-selectable select-strategy="single">
+			:items="views" :items-length="Number(total)" :loading="loading" :search="search" item-value="name"
+			item-key="iD" @update:options="list" v-model="selected" @click:row="select" return-object item-selectable
+			select-strategy="single">
 			<template v-slot:item="{ item, isSelected, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"

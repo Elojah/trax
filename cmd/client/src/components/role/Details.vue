@@ -1,4 +1,8 @@
 <script setup lang="ts">
+const props = defineProps<{
+	colspan: number;
+}>();
+
 /*
 Fetch all commands
 Fetch all resources
@@ -7,9 +11,9 @@ Fetch all resources
 Fetch all permissions of role
  */
 </script>
-<template v-slot:expanded-row="{ columns, item, props: itemProps }">
+<template>
 	<tr>
-		<td :colspan="columns.length">
+		<td :colspan="props.colspan">
 			<v-card outlined class="main-color-background">
 				<v-table>
 					<thead>
@@ -120,10 +124,10 @@ Fetch all permissions of role
 				</v-table>
 				<v-card-actions>
 					<v-spacer></v-spacer>
-					<v-btn color="primary" variant="text" @click="updatePermissions">
+					<v-btn color="primary" variant="text" @click="null">
 						Edit
 					</v-btn>
-					<v-btn color="error" variant="text" @click="delete_">
+					<v-btn color="error" variant="text" @click="null">
 						Delete
 					</v-btn>
 				</v-card-actions>

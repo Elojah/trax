@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';
 import { ListRoleReq } from '@internal/user/dto/role';
-import RoleDetails from '@components/roles/Details.vue';
+import RoleDetails from '@/components/role/Details.vue';
 
 // #MARK:Common
 // ______________________________________________________
@@ -221,7 +221,7 @@ const delete_ = () => {
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
 						:key="ulid(item.role?.iD)" :class="{
 							'row-hovered': isHovering,
-							'row-selected': isExpanded({ value: item }),
+							'row-expanded': isExpanded(item),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}">
@@ -235,7 +235,9 @@ const delete_ = () => {
 					</tr>
 				</v-hover>
 			</template>
-			<RoleDetails></RoleDetails>
+			<template v-slot:expanded-row="{ columns, item, props: itemProps }">
+				<RoleDetails :colspan="columns.length"></RoleDetails>
+			</template>
 		</v-data-table-server>
 		<v-col cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
 	</v-sheet>
