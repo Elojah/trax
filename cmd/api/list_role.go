@@ -74,7 +74,7 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 
 		// Populate roles with their permissions
 		permissions, err := h.user.ListPermission(ctx, user.FilterPermission{
-			RoleIDs: ids,
+			RoleIDs: user.Roles(roles).IDs(),
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list permission")

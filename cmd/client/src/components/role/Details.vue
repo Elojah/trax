@@ -1,21 +1,38 @@
 <script setup lang="ts">
+import type { Permission, } from '@internal/user/role';
+import { Command, Resource } from '@internal/user/role';
+
 const props = defineProps<{
 	colspan: number;
+	permissions: Permission[] | undefined;
 }>();
 
-/*
-Fetch all commands
-Fetch all resources
--> Display table
+const permissionMap = ((perms: Permission[] | undefined) => {
+	if (!perms) {
+		return new Map<number, Map<number, boolean>>();
+	}
 
-Fetch all permissions of role
- */
+	const map = new Map<number, Map<number, boolean>>();
+	perms?.forEach((perm) => {
+		const resource = perm.resource;
+		const command = perm.command;
+
+		if (!map.has(resource)) {
+			map.set(resource, new Map<number, boolean>());
+		}
+
+		map.get(resource)?.set(command, true);
+	});
+	return map;
+})(props.permissions);
+
+
 </script>
 <template>
 	<tr>
 		<td :colspan="props.colspan">
 			<v-card outlined class="main-color-background">
-				<v-table>
+				<v-table density="compact">
 					<thead>
 						<tr>
 							<th>
@@ -40,16 +57,20 @@ Fetch all permissions of role
 								asset
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="info"
+									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_read)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="success"
+									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_create)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="warning"
+									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_update)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="error"
+									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_delete)"></v-checkbox>
 							</td>
 						</tr>
 						<tr>
@@ -57,16 +78,20 @@ Fetch all permissions of role
 								entity
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="info"
+									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_read)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="success"
+									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_create)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="warning"
+									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_update)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="error"
+									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_delete)"></v-checkbox>
 							</td>
 						</tr>
 						<tr>
@@ -74,16 +99,20 @@ Fetch all permissions of role
 								operation
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="info"
+									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_read)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="success"
+									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_create)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="warning"
+									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_update)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="error"
+									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_delete)"></v-checkbox>
 							</td>
 						</tr>
 						<tr>
@@ -91,16 +120,20 @@ Fetch all permissions of role
 								role
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="info"
+									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_read)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="success"
+									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_create)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="warning"
+									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_update)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="error"
+									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_delete)"></v-checkbox>
 							</td>
 						</tr>
 						<tr>
@@ -108,16 +141,20 @@ Fetch all permissions of role
 								user
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="info"
+									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_read)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="success"
+									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_create)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="warning"
+									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_update)"></v-checkbox>
 							</td>
 							<td>
-								<v-checkbox></v-checkbox>
+								<v-checkbox color="error"
+									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_delete)"></v-checkbox>
 							</td>
 						</tr>
 					</tbody>

@@ -73,8 +73,6 @@ const headers: ReadonlyHeaders = [
 	},
 ];
 
-const selectedRole = computed(() => selected.value.at(0));
-
 const viewIDs = ref<string[]>([])
 
 const views = computed(() => {
@@ -82,9 +80,7 @@ const views = computed(() => {
 });
 
 const expand = (_: any, item: any) => {
-	selected.value = [item?.internalItem?.value];
 	item.toggleExpand({ value: item.item });
-	// row.toggleSelect({ value: row.item, selectable: true });
 };
 
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
@@ -236,8 +232,8 @@ const delete_ = () => {
 					</tr>
 				</v-hover>
 			</template>
-			<template v-slot:expanded-row="{ columns }">
-				<RoleDetails :colspan="columns.length"></RoleDetails>
+			<template v-slot:expanded-row="{ columns, item }">
+				<RoleDetails :colspan="columns.length" :permissions="item?.permissions"></RoleDetails>
 			</template>
 		</v-data-table-server>
 		<v-col cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>

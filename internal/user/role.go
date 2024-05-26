@@ -76,6 +76,18 @@ type StoreRoleUser interface {
 	ListClaims(context.Context, ulid.ID) (ClaimAuth, error)
 }
 
+type Roles []Role
+
+func (rs Roles) IDs() []ulid.ID {
+	ids := make([]ulid.ID, 0, len(rs))
+
+	for _, r := range rs {
+		ids = append(ids, r.ID)
+	}
+
+	return ids
+}
+
 func AllPermissions(roleID ulid.ID) []Permission {
 	var perms []Permission
 
