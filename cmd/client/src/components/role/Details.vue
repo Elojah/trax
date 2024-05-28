@@ -1,30 +1,27 @@
 <script setup lang="ts">
 import type { Permission, } from '@internal/user/role';
 import { Command, Resource } from '@internal/user/role';
+import { ref } from 'vue';
 
 const props = defineProps<{
 	colspan: number;
 	permissions: Permission[] | undefined;
 }>();
 
-const permissionMap = ((perms: Permission[] | undefined) => {
+const ps = ref<string[]>(((perms: Permission[] | undefined) => {
 	if (!perms) {
-		return new Map<number, Map<number, boolean>>();
+		return [];
 	}
 
-	const map = new Map<number, Map<number, boolean>>();
+	const result: string[] = [];
 	perms?.forEach((perm) => {
 		const resource = perm.resource;
 		const command = perm.command;
-
-		if (!map.has(resource)) {
-			map.set(resource, new Map<number, boolean>());
-		}
-
-		map.get(resource)?.set(command, true);
+		result.push(`${resource.toString()}_${command.toString()}`);
 	});
-	return map;
-})(props.permissions);
+
+	return result;
+})(props.permissions));
 
 
 </script>
@@ -57,20 +54,20 @@ const permissionMap = ((perms: Permission[] | undefined) => {
 								asset
 							</td>
 							<td>
-								<v-checkbox color="info"
-									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_read)"></v-checkbox>
+								<v-checkbox-btn color="info" v-model="ps"
+									:value="`${Resource.R_asset.toString()}_${Command.C_read.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="success"
-									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_create)"></v-checkbox>
+								<v-checkbox-btn color="success" v-model="ps"
+									:value="`${Resource.R_asset.toString()}_${Command.C_create.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="warning"
-									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_update)"></v-checkbox>
+								<v-checkbox-btn color="warning" v-model="ps"
+									:value="`${Resource.R_asset.toString()}_${Command.C_update.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="error"
-									:v-model="permissionMap.get(Resource.R_asset)?.get(Command.C_delete)"></v-checkbox>
+								<v-checkbox-btn color="error" v-model="ps"
+									:value="`${Resource.R_asset.toString()}_${Command.C_delete.toString()}`"></v-checkbox-btn>
 							</td>
 						</tr>
 						<tr>
@@ -78,20 +75,20 @@ const permissionMap = ((perms: Permission[] | undefined) => {
 								entity
 							</td>
 							<td>
-								<v-checkbox color="info"
-									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_read)"></v-checkbox>
+								<v-checkbox-btn color="info" v-model="ps"
+									:value="`${Resource.R_entity.toString()}_${Command.C_read.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="success"
-									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_create)"></v-checkbox>
+								<v-checkbox-btn color="success" v-model="ps"
+									:value="`${Resource.R_entity.toString()}_${Command.C_create.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="warning"
-									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_update)"></v-checkbox>
+								<v-checkbox-btn color="warning" v-model="ps"
+									:value="`${Resource.R_entity.toString()}_${Command.C_update.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="error"
-									:v-model="permissionMap.get(Resource.R_entity)?.get(Command.C_delete)"></v-checkbox>
+								<v-checkbox-btn color="error" v-model="ps"
+									:value="`${Resource.R_entity.toString()}_${Command.C_delete.toString()}`"></v-checkbox-btn>
 							</td>
 						</tr>
 						<tr>
@@ -99,20 +96,20 @@ const permissionMap = ((perms: Permission[] | undefined) => {
 								operation
 							</td>
 							<td>
-								<v-checkbox color="info"
-									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_read)"></v-checkbox>
+								<v-checkbox-btn color="info" v-model="ps"
+									:value="`${Resource.R_operation.toString()}_${Command.C_read.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="success"
-									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_create)"></v-checkbox>
+								<v-checkbox-btn color="success" v-model="ps"
+									:value="`${Resource.R_operation.toString()}_${Command.C_create.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="warning"
-									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_update)"></v-checkbox>
+								<v-checkbox-btn color="warning" v-model="ps"
+									:value="`${Resource.R_operation.toString()}_${Command.C_update.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="error"
-									:v-model="permissionMap.get(Resource.R_operation)?.get(Command.C_delete)"></v-checkbox>
+								<v-checkbox-btn color="error" v-model="ps"
+									:value="`${Resource.R_operation.toString()}_${Command.C_delete.toString()}`"></v-checkbox-btn>
 							</td>
 						</tr>
 						<tr>
@@ -120,20 +117,20 @@ const permissionMap = ((perms: Permission[] | undefined) => {
 								role
 							</td>
 							<td>
-								<v-checkbox color="info"
-									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_read)"></v-checkbox>
+								<v-checkbox-btn color="info" v-model="ps"
+									:value="`${Resource.R_role.toString()}_${Command.C_read.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="success"
-									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_create)"></v-checkbox>
+								<v-checkbox-btn color="success" v-model="ps"
+									:value="`${Resource.R_role.toString()}_${Command.C_create.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="warning"
-									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_update)"></v-checkbox>
+								<v-checkbox-btn color="warning" v-model="ps"
+									:value="`${Resource.R_role.toString()}_${Command.C_update.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="error"
-									:v-model="permissionMap.get(Resource.R_role)?.get(Command.C_delete)"></v-checkbox>
+								<v-checkbox-btn color="error" v-model="ps"
+									:value="`${Resource.R_role.toString()}_${Command.C_delete.toString()}`"></v-checkbox-btn>
 							</td>
 						</tr>
 						<tr>
@@ -141,20 +138,20 @@ const permissionMap = ((perms: Permission[] | undefined) => {
 								user
 							</td>
 							<td>
-								<v-checkbox color="info"
-									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_read)"></v-checkbox>
+								<v-checkbox-btn color="info" v-model="ps"
+									:value="`${Resource.R_user.toString()}_${Command.C_read.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="success"
-									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_create)"></v-checkbox>
+								<v-checkbox-btn color="success" v-model="ps"
+									:value="`${Resource.R_user.toString()}_${Command.C_create.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="warning"
-									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_update)"></v-checkbox>
+								<v-checkbox-btn color="warning" v-model="ps"
+									:value="`${Resource.R_user.toString()}_${Command.C_update.toString()}`"></v-checkbox-btn>
 							</td>
 							<td>
-								<v-checkbox color="error"
-									:v-model="permissionMap.get(Resource.R_user)?.get(Command.C_delete)"></v-checkbox>
+								<v-checkbox-btn color="error" v-model="ps"
+									:value="`${Resource.R_user.toString()}_${Command.C_delete.toString()}`"></v-checkbox-btn>
 							</td>
 						</tr>
 					</tbody>

@@ -259,11 +259,11 @@ const delete_ = () => {
 }
 
 .row-even:not(.row-hovered) {
-	background-color: rgba(0, 229, 255, 0.3);
+	background-color: rgba(0, 96, 100, 0.3);
 }
 
 .row-expanded {
-	background-color: rgba(149, 12, 117, 0.6) !important;
+	background-color: rgba(0, 191, 165, 0.4) !important;
 }
 
 .cursor-pointer {

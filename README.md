@@ -27,14 +27,15 @@ TODO:
 
 - Add Create & Update on everything
 
-  - Create Role
-  - Create (add at least 1 role) User
   - Display + Update Role w permission
-  - Display + Update User w roles
+    - Update Role (edit & reset)
+  - Create Role
   - Delete Role
+  - Create (add at least 1 role) User
+  - Display + Update User w roles
   - Delete (remove \* roles) User
 
-  - Change `selected` value into stores into map <'string', Ref<[]>>
+  - !!! Show edit/delete only for users with permissions
 
 - Clean UI (table, cards, etc.)
 
