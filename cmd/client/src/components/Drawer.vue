@@ -59,6 +59,6 @@ const redirect = function (name: string) {
 
 <style scoped>
 .active-bg {
-	background-color: #950c75;
+	background-color: rgba(0, 145, 234, 0.5) !important;
 }
 </style>

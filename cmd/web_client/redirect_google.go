@@ -64,15 +64,7 @@ func (h handler) redirectGoogle(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: false,
 	})
 
-	// Set access token
-	http.SetCookie(w, &http.Cookie{
-		Name:     "access",
-		Value:    jwt.AccessToken,
-		Path:     "/",
-		Secure:   true,
-		HttpOnly: false,
-		Domain:   ".legacyfactory.com",
-	})
+	// ignore access token
 
 	// Set refresh token
 	http.SetCookie(w, &http.Cookie{
@@ -83,6 +75,7 @@ func (h handler) redirectGoogle(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		SameSite: http.SameSiteDefaultMode,
 		Domain:   ".legacyfactory.com",
+		MaxAge:   24 * 60 * 60,
 	})
 
 	w.WriteHeader(http.StatusOK)

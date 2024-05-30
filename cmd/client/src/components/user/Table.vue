@@ -155,7 +155,7 @@ const delete_ = () => {
 
 <template>
 	<v-sheet v-if="selectedEntity" class="px-1 rounded-xl" outlined color="primary">
-		<v-col class="d-flex justify-end align-center rounded-t-xl main-color-background" cols="12">
+		<v-col class="d-flex justify-end align-center rounded-t-xl table-color-background" cols="12">
 			<v-dialog v-model="dialogInvite" max-width="800px">
 				<template v-slot:activator="{ props }">
 					<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
@@ -202,14 +202,13 @@ const delete_ = () => {
 				</v-sheet>
 			</v-dialog>
 		</v-col>
-		<v-text-field class="main-color-background" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
+		<v-text-field class="table-color-background" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
 			variant="outlined" hide-details single-line>
 		</v-text-field>
-		<v-data-table-server class="main-color-background rounded-0" :headers="headers" fixed-footer min-height="50vh"
-			max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="views"
-			:items-length="Number(total)" :loading="loading" :search="search" item-value="name" item-key="iD"
-			@update:options="list" v-model="selected" @click:row="select" return-object item-selectable
-			select-strategy="single">
+		<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
+			items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
+			:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list"
+			v-model="selected" @click:row="select" return-object item-selectable select-strategy="single">
 			<template v-slot:item="{ item, isSelected, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
@@ -233,34 +232,35 @@ const delete_ = () => {
 				</v-hover>
 			</template>
 		</v-data-table-server>
-		<v-col cols="12" class="p-8 main-color-background rounded-b-xl"></v-col>
+		<v-col cols="12" class="p-8 table-color-background rounded-b-xl"></v-col>
 	</v-sheet>
 </template>
 <style scoped>
-.main-color-background {
-	background-color: #263238;
+.table-color-background {
+	background-color: #212121;
 }
 
 .row-odd {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(55, 71, 79, 0.3);
+	background-color: rgba(66, 66, 66, 0.3);
+	background-color: #424242;
 }
 
 .row-odd:not(.row-hovered) {
-	background-color: rgba(33, 33, 33, 0.3);
+	background-color: #212121;
 }
 
 .row-even {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(55, 71, 79, 0.3);
+	background-color: rgba(66, 66, 66, 0.3);
 }
 
 .row-even:not(.row-hovered) {
-	background-color: rgba(0, 96, 100, 0.3);
+	background-color: #263238;
 }
 
 .row-selected {
-	background-color: rgba(0, 191, 165, 0.4) !important;
+	background-color: rgba(0, 145, 234, 0.5) !important;
 }
 
 .cursor-pointer {

@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const signupURL = new URL('signup', config.web_client_url).href
   const signinURL = new URL('signin', config.web_client_url).href
+  const signoutURL = new URL('signout', config.web_client_url).href
   const signinGoogleURL = new URL('signin_google', config.web_client_url).href
   const refreshTokenURL = new URL('refresh_token', config.web_client_url).href
 
@@ -111,8 +112,17 @@ export const useAuthStore = defineStore('auth', () => {
   const signout = async () => {
     token.value = ''
     user.value = null
+
     removeCookie('g_state')
-    removeCookie('refresh', { path: '', domain: '.legacyfactory.com' })
+
+    const resp = await fetch(signoutURL, {
+      method: 'GET'
+    })
+
+    if (resp.status !== 200) {
+      logger.error('failed to sign out')
+    }
+
   }
 
   return {

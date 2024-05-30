@@ -51,8 +51,9 @@ func (h handler) signin(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteDefaultMode,
+		SameSite: http.SameSiteStrictMode,
 		Domain:   ".legacyfactory.com",
+		MaxAge:   24 * 60 * 60,
 	})
 
 	w.Write([]byte(jwt.AccessToken))
