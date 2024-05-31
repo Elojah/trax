@@ -27,18 +27,19 @@ service API {
     rpc Ping(pbtypes.Empty) returns (pbtypes.Empty);
 
     // User
+    rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp);
     rpc FetchUser(dto.FetchUserReq) returns (user.U);
     rpc UpdateUser(dto.UpdateUserReq) returns (user.U);
-    rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp);
 
     // Entity
-    rpc CreateEntity(dto.CreateEntityReq) returns (user.Entity);
     rpc ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
     rpc FetchEntity(dto.FetchEntityReq) returns (user.Entity);
+    rpc CreateEntity(dto.CreateEntityReq) returns (user.Entity);
     rpc UpdateEntity(dto.UpdateEntityReq) returns (user.Entity);
     rpc DeleteEntity(dto.DeleteEntityReq) returns (dto.DeleteEntityResp);
 
     // Roles
-    rpc CreateRole(dto.CreateRoleReq) returns (user.Role);
     rpc ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
+    rpc CreateRole(dto.CreateRoleReq) returns (user.Role);
+    rpc UpdateRole(dto.UpdateRoleReq) returns (user.Role);
 }

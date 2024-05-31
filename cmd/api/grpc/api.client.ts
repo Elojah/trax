@@ -4,23 +4,24 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
-import type { ListRoleResp } from "../../../internal/user/dto/role";
-import type { ListRoleReq } from "../../../internal/user/dto/role";
+import type { UpdateRoleReq } from "../../../internal/user/dto/role";
 import type { Role } from "../../../internal/user/role";
 import type { CreateRoleReq } from "../../../internal/user/dto/role";
+import type { ListRoleResp } from "../../../internal/user/dto/role";
+import type { ListRoleReq } from "../../../internal/user/dto/role";
 import type { DeleteEntityResp } from "../../../internal/user/dto/entity";
 import type { DeleteEntityReq } from "../../../internal/user/dto/entity";
 import type { UpdateEntityReq } from "../../../internal/user/dto/entity";
+import type { CreateEntityReq } from "../../../internal/user/dto/entity";
+import type { Entity } from "../../../internal/user/entity";
 import type { FetchEntityReq } from "../../../internal/user/dto/entity";
 import type { ListEntityResp } from "../../../internal/user/dto/entity";
 import type { ListEntityReq } from "../../../internal/user/dto/entity";
-import type { Entity } from "../../../internal/user/entity";
-import type { CreateEntityReq } from "../../../internal/user/dto/entity";
-import type { ListUserResp } from "../../../internal/user/dto/user";
-import type { ListUserReq } from "../../../internal/user/dto/user";
 import type { UpdateUserReq } from "../../../internal/user/dto/user";
 import type { U } from "../../../internal/user/user";
 import type { FetchUserReq } from "../../../internal/user/dto/user";
+import type { ListUserResp } from "../../../internal/user/dto/user";
+import type { ListUserReq } from "../../../internal/user/dto/user";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
 import type { Empty } from "../../../pkg/pbtypes/empty";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
@@ -38,6 +39,10 @@ export interface IAPIClient {
     /**
      * User
      *
+     * @generated from protobuf rpc: ListUser(dto.ListUserReq) returns (dto.ListUserResp);
+     */
+    listUser(input: ListUserReq, options?: RpcOptions): UnaryCall<ListUserReq, ListUserResp>;
+    /**
      * @generated from protobuf rpc: FetchUser(dto.FetchUserReq) returns (user.U);
      */
     fetchUser(input: FetchUserReq, options?: RpcOptions): UnaryCall<FetchUserReq, U>;
@@ -46,16 +51,8 @@ export interface IAPIClient {
      */
     updateUser(input: UpdateUserReq, options?: RpcOptions): UnaryCall<UpdateUserReq, U>;
     /**
-     * @generated from protobuf rpc: ListUser(dto.ListUserReq) returns (dto.ListUserResp);
-     */
-    listUser(input: ListUserReq, options?: RpcOptions): UnaryCall<ListUserReq, ListUserResp>;
-    /**
      * Entity
      *
-     * @generated from protobuf rpc: CreateEntity(dto.CreateEntityReq) returns (user.Entity);
-     */
-    createEntity(input: CreateEntityReq, options?: RpcOptions): UnaryCall<CreateEntityReq, Entity>;
-    /**
      * @generated from protobuf rpc: ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
      */
     listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp>;
@@ -63,6 +60,10 @@ export interface IAPIClient {
      * @generated from protobuf rpc: FetchEntity(dto.FetchEntityReq) returns (user.Entity);
      */
     fetchEntity(input: FetchEntityReq, options?: RpcOptions): UnaryCall<FetchEntityReq, Entity>;
+    /**
+     * @generated from protobuf rpc: CreateEntity(dto.CreateEntityReq) returns (user.Entity);
+     */
+    createEntity(input: CreateEntityReq, options?: RpcOptions): UnaryCall<CreateEntityReq, Entity>;
     /**
      * @generated from protobuf rpc: UpdateEntity(dto.UpdateEntityReq) returns (user.Entity);
      */
@@ -74,13 +75,17 @@ export interface IAPIClient {
     /**
      * Roles
      *
+     * @generated from protobuf rpc: ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
+     */
+    listRole(input: ListRoleReq, options?: RpcOptions): UnaryCall<ListRoleReq, ListRoleResp>;
+    /**
      * @generated from protobuf rpc: CreateRole(dto.CreateRoleReq) returns (user.Role);
      */
     createRole(input: CreateRoleReq, options?: RpcOptions): UnaryCall<CreateRoleReq, Role>;
     /**
-     * @generated from protobuf rpc: ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
+     * @generated from protobuf rpc: UpdateRole(dto.UpdateRoleReq) returns (user.Role);
      */
-    listRole(input: ListRoleReq, options?: RpcOptions): UnaryCall<ListRoleReq, ListRoleResp>;
+    updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, Role>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -103,48 +108,48 @@ export class APIClient implements IAPIClient, ServiceInfo {
     /**
      * User
      *
+     * @generated from protobuf rpc: ListUser(dto.ListUserReq) returns (dto.ListUserResp);
+     */
+    listUser(input: ListUserReq, options?: RpcOptions): UnaryCall<ListUserReq, ListUserResp> {
+        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        return stackIntercept<ListUserReq, ListUserResp>("unary", this._transport, method, opt, input);
+    }
+    /**
      * @generated from protobuf rpc: FetchUser(dto.FetchUserReq) returns (user.U);
      */
     fetchUser(input: FetchUserReq, options?: RpcOptions): UnaryCall<FetchUserReq, U> {
-        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        const method = this.methods[2], opt = this._transport.mergeOptions(options);
         return stackIntercept<FetchUserReq, U>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: UpdateUser(dto.UpdateUserReq) returns (user.U);
      */
     updateUser(input: UpdateUserReq, options?: RpcOptions): UnaryCall<UpdateUserReq, U> {
-        const method = this.methods[2], opt = this._transport.mergeOptions(options);
-        return stackIntercept<UpdateUserReq, U>("unary", this._transport, method, opt, input);
-    }
-    /**
-     * @generated from protobuf rpc: ListUser(dto.ListUserReq) returns (dto.ListUserResp);
-     */
-    listUser(input: ListUserReq, options?: RpcOptions): UnaryCall<ListUserReq, ListUserResp> {
         const method = this.methods[3], opt = this._transport.mergeOptions(options);
-        return stackIntercept<ListUserReq, ListUserResp>("unary", this._transport, method, opt, input);
+        return stackIntercept<UpdateUserReq, U>("unary", this._transport, method, opt, input);
     }
     /**
      * Entity
      *
-     * @generated from protobuf rpc: CreateEntity(dto.CreateEntityReq) returns (user.Entity);
-     */
-    createEntity(input: CreateEntityReq, options?: RpcOptions): UnaryCall<CreateEntityReq, Entity> {
-        const method = this.methods[4], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreateEntityReq, Entity>("unary", this._transport, method, opt, input);
-    }
-    /**
      * @generated from protobuf rpc: ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
      */
     listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp> {
-        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept<ListEntityReq, ListEntityResp>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: FetchEntity(dto.FetchEntityReq) returns (user.Entity);
      */
     fetchEntity(input: FetchEntityReq, options?: RpcOptions): UnaryCall<FetchEntityReq, Entity> {
-        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        const method = this.methods[5], opt = this._transport.mergeOptions(options);
         return stackIntercept<FetchEntityReq, Entity>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: CreateEntity(dto.CreateEntityReq) returns (user.Entity);
+     */
+    createEntity(input: CreateEntityReq, options?: RpcOptions): UnaryCall<CreateEntityReq, Entity> {
+        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        return stackIntercept<CreateEntityReq, Entity>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: UpdateEntity(dto.UpdateEntityReq) returns (user.Entity);
@@ -163,17 +168,24 @@ export class APIClient implements IAPIClient, ServiceInfo {
     /**
      * Roles
      *
-     * @generated from protobuf rpc: CreateRole(dto.CreateRoleReq) returns (user.Role);
-     */
-    createRole(input: CreateRoleReq, options?: RpcOptions): UnaryCall<CreateRoleReq, Role> {
-        const method = this.methods[9], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreateRoleReq, Role>("unary", this._transport, method, opt, input);
-    }
-    /**
      * @generated from protobuf rpc: ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
      */
     listRole(input: ListRoleReq, options?: RpcOptions): UnaryCall<ListRoleReq, ListRoleResp> {
-        const method = this.methods[10], opt = this._transport.mergeOptions(options);
+        const method = this.methods[9], opt = this._transport.mergeOptions(options);
         return stackIntercept<ListRoleReq, ListRoleResp>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: CreateRole(dto.CreateRoleReq) returns (user.Role);
+     */
+    createRole(input: CreateRoleReq, options?: RpcOptions): UnaryCall<CreateRoleReq, Role> {
+        const method = this.methods[10], opt = this._transport.mergeOptions(options);
+        return stackIntercept<CreateRoleReq, Role>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: UpdateRole(dto.UpdateRoleReq) returns (user.Role);
+     */
+    updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, Role> {
+        const method = this.methods[11], opt = this._transport.mergeOptions(options);
+        return stackIntercept<UpdateRoleReq, Role>("unary", this._transport, method, opt, input);
     }
 }

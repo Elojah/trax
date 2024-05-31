@@ -6,6 +6,7 @@ import { CreateRoleReq, ListRoleReq, RolePermission } from '@internal/user/dto/r
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
+import type { Permission } from '@internal/user/role'
 
 export const useRoleStore = defineStore('role', () => {
   const roles = ref<Map<string, RolePermission>>(new Map())
@@ -21,10 +22,12 @@ export const useRoleStore = defineStore('role', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const create = async function (name: string) {
+  const create = async function (entityID: Uint8Array, name: string, permissions: Permission[]) {
     try {
       const req = CreateRoleReq.create({
-        name: name
+        entityID: entityID,
+        name: name,
+        permissions: permissions
       })
 
       return await api.createRole(req, { meta: { token: token.value } })

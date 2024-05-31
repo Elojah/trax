@@ -16,8 +16,20 @@ import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 import "github.com/elojah/trax/pkg/paginate/paginate.proto";
 import "github.com/elojah/trax/internal/user/role.proto";
 
+message RolePermission {
+	user.Role Role 	                       = 1 [(gogoproto.nullable) = false];
+	repeated user.Permission Permissions   = 2 [(gogoproto.nullable) = false];
+}
+
 message CreateRoleReq {
-	string Name                       = 1;
+	bytes EntityID                         = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	string Name                            = 2;
+	repeated user.Permission Permissions   = 3 [(gogoproto.nullable) = false];
+}
+
+message UpdateRoleReq {
+	bytes RoleID                           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated user.Permission Permissions   = 2 [(gogoproto.nullable) = false];
 }
 
 message ListRoleReq {
@@ -29,11 +41,6 @@ message ListRoleReq {
 
 	repeated bytes IDs                = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	repeated bytes EntityIDs          = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-}
-
-message RolePermission {
-	user.Role Role 	                       = 1 [(gogoproto.nullable) = false];
-	repeated user.Permission Permissions   = 2 [(gogoproto.nullable) = false];
 }
 
 message ListRoleResp {

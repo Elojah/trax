@@ -96,4 +96,6 @@ function parse(v: string): Uint8Array {
   return result
 }
 
-export { ulid, parse };
+const zero = new Uint8Array(16)
+
+export { ulid, parse, zero };

@@ -38,36 +38,36 @@ func init() {
 }
 
 var fileDescriptor_e44be87dd4a64048 = []byte{
-	// 449 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0xbd, 0x8e, 0x13, 0x31,
-	0x10, 0xc7, 0xd7, 0x22, 0xe2, 0x63, 0x88, 0x10, 0xf1, 0x41, 0x93, 0x62, 0x4a, 0x10, 0x12, 0xac,
-	0x21, 0xa7, 0xab, 0xa8, 0xf8, 0x38, 0x04, 0x12, 0xc5, 0xe9, 0xa4, 0x3c, 0xc0, 0x26, 0x19, 0x6d,
-	0x16, 0x36, 0xb1, 0xb1, 0x7d, 0x12, 0xd7, 0xf1, 0x08, 0xbc, 0x01, 0x2d, 0x8f, 0x40, 0x79, 0xe5,
-	0x95, 0x29, 0xaf, 0x64, 0x9d, 0x86, 0xf2, 0x4a, 0x4a, 0x64, 0xaf, 0x2f, 0x9b, 0x0f, 0x82, 0x42,
-	0x13, 0x79, 0xfe, 0xf9, 0xfd, 0xec, 0x99, 0xd1, 0xc2, 0x93, 0xbc, 0xb0, 0xe3, 0x93, 0x41, 0x3a,
-	0x94, 0x13, 0x41, 0xa5, 0xfc, 0x90, 0x8d, 0x85, 0xd5, 0xd9, 0x67, 0x31, 0x9c, 0x8c, 0x44, 0xa6,
-	0x0a, 0x91, 0x6b, 0x35, 0xf4, 0x87, 0x54, 0x69, 0x69, 0x25, 0x6f, 0xf9, 0xba, 0x2b, 0xb6, 0x48,
-	0xea, 0x63, 0x2e, 0x72, 0x99, 0xcb, 0xc0, 0x86, 0x53, 0xad, 0x75, 0xd3, 0x7f, 0x08, 0x6a, 0x60,
-	0x4f, 0x15, 0x19, 0x41, 0x13, 0x65, 0x4f, 0x23, 0xff, 0x6c, 0x0b, 0x5f, 0x4c, 0x2d, 0xe9, 0x69,
-	0x56, 0x8a, 0x13, 0x43, 0x5a, 0xd0, 0xd4, 0x16, 0x0b, 0x45, 0xec, 0xa4, 0x68, 0x59, 0xd2, 0x7f,
-	0x09, 0xfe, 0x27, 0x0a, 0x07, 0x3b, 0x09, 0x23, 0x2b, 0x57, 0x1b, 0xdb, 0xdf, 0x59, 0x5b, 0x6a,
-	0x6e, 0x77, 0xa9, 0x69, 0xb0, 0xf7, 0xad, 0x05, 0xd7, 0x5e, 0x1c, 0xbd, 0xe3, 0x0f, 0xa0, 0x75,
-	0x54, 0x4c, 0x73, 0x7e, 0x27, 0x8d, 0xbb, 0x4d, 0x0f, 0xfd, 0x6e, 0xbb, 0x6b, 0x35, 0x7f, 0x08,
-	0xb7, 0xde, 0x90, 0x1d, 0x8e, 0xfb, 0x86, 0x34, 0xef, 0xa4, 0x23, 0x2b, 0xd3, 0x45, 0x7d, 0x4c,
-	0x9f, 0xba, 0x37, 0xd2, 0x70, 0x79, 0x9f, 0x3f, 0x02, 0xe8, 0xab, 0x51, 0x66, 0x29, 0x90, 0x3c,
-	0x90, 0x4d, 0xb0, 0x82, 0x0a, 0xb8, 0xf9, 0xbe, 0x30, 0x36, 0x80, 0x77, 0x03, 0x78, 0x55, 0x7a,
-	0xac, 0xb3, 0x96, 0x18, 0xc5, 0x7b, 0xd0, 0x7e, 0xa5, 0x29, 0xb3, 0x74, 0x18, 0x96, 0xc6, 0xef,
-	0x05, 0x64, 0x39, 0xf2, 0x62, 0xbb, 0xbe, 0x3f, 0x32, 0x07, 0x00, 0xfe, 0x8e, 0x58, 0xf1, 0xc5,
-	0xa5, 0x0d, 0xbf, 0xb7, 0x91, 0x19, 0xc5, 0x9f, 0xc2, 0xed, 0x30, 0x5f, 0xf4, 0xf6, 0x9a, 0x89,
-	0xb7, 0x3d, 0xd4, 0x83, 0x76, 0x3d, 0xe7, 0x4a, 0x73, 0xcb, 0xd1, 0xa6, 0xf3, 0x1c, 0xda, 0xaf,
-	0xa9, 0xa4, 0x35, 0x67, 0x39, 0xf2, 0xce, 0xfd, 0xbf, 0xa4, 0x46, 0xf1, 0xc7, 0x00, 0xf5, 0xe8,
-	0xc7, 0xb2, 0xa4, 0x38, 0x59, 0x13, 0x78, 0x11, 0xea, 0xc7, 0xc2, 0xff, 0x71, 0xd9, 0xe1, 0xdc,
-	0x2c, 0xfb, 0x8a, 0xec, 0xac, 0x25, 0x46, 0xbd, 0x7c, 0x7b, 0x5e, 0x61, 0x32, 0xab, 0x30, 0xb9,
-	0xa8, 0x30, 0xb9, 0xac, 0x90, 0xfd, 0xae, 0x90, 0x7d, 0x71, 0xc8, 0xbe, 0x3b, 0x64, 0x3f, 0x1c,
-	0xb2, 0x33, 0x87, 0xec, 0xdc, 0x21, 0x9b, 0x39, 0x64, 0x3f, 0x1d, 0xb2, 0x5f, 0x0e, 0x93, 0x4b,
-	0x87, 0xec, 0xeb, 0x1c, 0x93, 0xb3, 0x39, 0xb2, 0xd9, 0x1c, 0x93, 0x8b, 0x39, 0x26, 0x83, 0xeb,
-	0xe1, 0x93, 0xdb, 0xff, 0x13, 0x00, 0x00, 0xff, 0xff, 0x94, 0xb3, 0x49, 0xd9, 0x40, 0x04, 0x00,
-	0x00,
+	// 454 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0xbb, 0x6e, 0x14, 0x31,
+	0x18, 0x85, 0xc7, 0x62, 0xc5, 0xc5, 0xac, 0x10, 0x38, 0xd0, 0x6c, 0xf1, 0x97, 0x20, 0xa4, 0x60,
+	0x43, 0xa2, 0x54, 0x54, 0x5c, 0x82, 0x40, 0xa2, 0x88, 0x22, 0xed, 0x03, 0xcc, 0xee, 0xfe, 0x9a,
+	0x1d, 0x98, 0x5d, 0x1b, 0xdb, 0x91, 0x48, 0xc7, 0x23, 0xf0, 0x18, 0x3c, 0x02, 0x65, 0xca, 0x34,
+	0x48, 0x5b, 0xa6, 0x64, 0xbc, 0x0d, 0x65, 0x4a, 0x4a, 0x64, 0xcf, 0x4c, 0xe6, 0x92, 0x2c, 0x9a,
+	0x34, 0x23, 0x9f, 0xe3, 0xf3, 0xc9, 0xc7, 0xfe, 0x87, 0x3e, 0x4b, 0x52, 0x3b, 0x3f, 0x9a, 0xf0,
+	0xa9, 0x5c, 0x08, 0xcc, 0xe4, 0xa7, 0x78, 0x2e, 0xac, 0x8e, 0xbf, 0x8a, 0xe9, 0x62, 0x26, 0x62,
+	0x95, 0x8a, 0x44, 0xab, 0xa9, 0x5f, 0x70, 0xa5, 0xa5, 0x95, 0x6c, 0xe0, 0xf5, 0x48, 0x6c, 0x80,
+	0xd4, 0xe7, 0x44, 0x24, 0x32, 0x91, 0x21, 0x1b, 0x56, 0x05, 0x36, 0xe2, 0xff, 0x01, 0xd4, 0xc4,
+	0x1e, 0x2b, 0x34, 0x02, 0x17, 0xca, 0x1e, 0x97, 0xf9, 0x17, 0x1b, 0xf2, 0xe9, 0xd2, 0xa2, 0x5e,
+	0xc6, 0x99, 0x38, 0x32, 0xa8, 0x05, 0x2e, 0x6d, 0x7a, 0x81, 0x88, 0x5e, 0x88, 0x96, 0x19, 0x5e,
+	0x0b, 0xf0, 0x9f, 0x12, 0xd8, 0xeb, 0x05, 0xcc, 0xac, 0x6c, 0x17, 0xdb, 0xed, 0x8d, 0x35, 0xca,
+	0xf5, 0x87, 0xea, 0x82, 0x3b, 0xbf, 0x06, 0xf4, 0xc6, 0xab, 0x83, 0x0f, 0xec, 0x31, 0x1d, 0x1c,
+	0xa4, 0xcb, 0x84, 0xdd, 0xe3, 0xe5, 0xdb, 0xf2, 0x7d, 0xff, 0xb6, 0xa3, 0x8e, 0x66, 0x82, 0xde,
+	0xfe, 0x98, 0x1a, 0x3b, 0x36, 0xa8, 0xd9, 0x7d, 0x3e, 0xb3, 0x92, 0x57, 0xf2, 0x10, 0xbf, 0x8c,
+	0x1e, 0x74, 0x1c, 0xa3, 0xd8, 0x13, 0x7a, 0xe7, 0x1d, 0xda, 0xe9, 0x3c, 0x10, 0xc5, 0xfe, 0x85,
+	0xf6, 0xc8, 0x2d, 0x1e, 0xda, 0x8c, 0xd9, 0x53, 0x4a, 0xc7, 0x6a, 0x16, 0x5b, 0x0c, 0x49, 0x16,
+	0x92, 0xb5, 0xd1, 0x8a, 0xee, 0x51, 0xea, 0xcf, 0xd8, 0x0f, 0x4f, 0x56, 0x46, 0x6b, 0xc3, 0x47,
+	0xb7, 0x2e, 0x79, 0x46, 0xb1, 0xe7, 0xf4, 0x6e, 0x38, 0xba, 0xe4, 0xb6, 0xea, 0x32, 0x35, 0x38,
+	0x2c, 0xce, 0x28, 0x23, 0x3b, 0x74, 0xf8, 0x46, 0x63, 0x6c, 0xb1, 0xd4, 0x0f, 0x03, 0xd2, 0xb4,
+	0xae, 0x64, 0x8a, 0xda, 0x2d, 0xa6, 0x69, 0x5d, 0x66, 0x5e, 0xd2, 0xe1, 0x5b, 0xcc, 0xb0, 0xc3,
+	0x34, 0x2d, 0xcf, 0x3c, 0xba, 0xc2, 0x35, 0xaa, 0x1a, 0xc9, 0xa1, 0xcc, 0xb0, 0x31, 0x12, 0x2f,
+	0xdb, 0x23, 0x29, 0x1c, 0xa3, 0xd8, 0x36, 0xa5, 0xc5, 0x15, 0x02, 0xc2, 0x1a, 0x77, 0xaa, 0x20,
+	0x5a, 0xb4, 0x0b, 0xfb, 0xdb, 0xd5, 0x5c, 0x1a, 0xe9, 0xda, 0xe8, 0xa4, 0x5f, 0xbf, 0x3f, 0xcd,
+	0x21, 0x5a, 0xe5, 0x10, 0x9d, 0xe5, 0x10, 0x9d, 0xe7, 0x40, 0xfe, 0xe6, 0x40, 0xbe, 0x39, 0x20,
+	0x3f, 0x1c, 0x90, 0x9f, 0x0e, 0xc8, 0x89, 0x03, 0x72, 0xea, 0x80, 0xac, 0x1c, 0x90, 0xdf, 0x0e,
+	0xc8, 0x1f, 0x07, 0xd1, 0xb9, 0x03, 0xf2, 0x7d, 0x0d, 0xd1, 0xc9, 0x1a, 0xc8, 0x6a, 0x0d, 0xd1,
+	0xd9, 0x1a, 0xa2, 0xc9, 0xcd, 0xf0, 0x83, 0xee, 0xfe, 0x0b, 0x00, 0x00, 0xff, 0xff, 0x59, 0x16,
+	0xd4, 0x55, 0x6e, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -85,18 +85,19 @@ type APIClient interface {
 	// Ping
 	Ping(ctx context.Context, in *pbtypes.Empty, opts ...grpc.CallOption) (*pbtypes.Empty, error)
 	// User
+	ListUser(ctx context.Context, in *dto.ListUserReq, opts ...grpc.CallOption) (*dto.ListUserResp, error)
 	FetchUser(ctx context.Context, in *dto.FetchUserReq, opts ...grpc.CallOption) (*user.U, error)
 	UpdateUser(ctx context.Context, in *dto.UpdateUserReq, opts ...grpc.CallOption) (*user.U, error)
-	ListUser(ctx context.Context, in *dto.ListUserReq, opts ...grpc.CallOption) (*dto.ListUserResp, error)
 	// Entity
-	CreateEntity(ctx context.Context, in *dto.CreateEntityReq, opts ...grpc.CallOption) (*user.Entity, error)
 	ListEntity(ctx context.Context, in *dto.ListEntityReq, opts ...grpc.CallOption) (*dto.ListEntityResp, error)
 	FetchEntity(ctx context.Context, in *dto.FetchEntityReq, opts ...grpc.CallOption) (*user.Entity, error)
+	CreateEntity(ctx context.Context, in *dto.CreateEntityReq, opts ...grpc.CallOption) (*user.Entity, error)
 	UpdateEntity(ctx context.Context, in *dto.UpdateEntityReq, opts ...grpc.CallOption) (*user.Entity, error)
 	DeleteEntity(ctx context.Context, in *dto.DeleteEntityReq, opts ...grpc.CallOption) (*dto.DeleteEntityResp, error)
 	// Roles
-	CreateRole(ctx context.Context, in *dto.CreateRoleReq, opts ...grpc.CallOption) (*user.Role, error)
 	ListRole(ctx context.Context, in *dto.ListRoleReq, opts ...grpc.CallOption) (*dto.ListRoleResp, error)
+	CreateRole(ctx context.Context, in *dto.CreateRoleReq, opts ...grpc.CallOption) (*user.Role, error)
+	UpdateRole(ctx context.Context, in *dto.UpdateRoleReq, opts ...grpc.CallOption) (*user.Role, error)
 }
 
 type aPIClient struct {
@@ -110,6 +111,15 @@ func NewAPIClient(cc *grpc.ClientConn) APIClient {
 func (c *aPIClient) Ping(ctx context.Context, in *pbtypes.Empty, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 	out := new(pbtypes.Empty)
 	err := c.cc.Invoke(ctx, "/grpc.API/Ping", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPIClient) ListUser(ctx context.Context, in *dto.ListUserReq, opts ...grpc.CallOption) (*dto.ListUserResp, error) {
+	out := new(dto.ListUserResp)
+	err := c.cc.Invoke(ctx, "/grpc.API/ListUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,24 +144,6 @@ func (c *aPIClient) UpdateUser(ctx context.Context, in *dto.UpdateUserReq, opts 
 	return out, nil
 }
 
-func (c *aPIClient) ListUser(ctx context.Context, in *dto.ListUserReq, opts ...grpc.CallOption) (*dto.ListUserResp, error) {
-	out := new(dto.ListUserResp)
-	err := c.cc.Invoke(ctx, "/grpc.API/ListUser", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *aPIClient) CreateEntity(ctx context.Context, in *dto.CreateEntityReq, opts ...grpc.CallOption) (*user.Entity, error) {
-	out := new(user.Entity)
-	err := c.cc.Invoke(ctx, "/grpc.API/CreateEntity", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *aPIClient) ListEntity(ctx context.Context, in *dto.ListEntityReq, opts ...grpc.CallOption) (*dto.ListEntityResp, error) {
 	out := new(dto.ListEntityResp)
 	err := c.cc.Invoke(ctx, "/grpc.API/ListEntity", in, out, opts...)
@@ -164,6 +156,15 @@ func (c *aPIClient) ListEntity(ctx context.Context, in *dto.ListEntityReq, opts 
 func (c *aPIClient) FetchEntity(ctx context.Context, in *dto.FetchEntityReq, opts ...grpc.CallOption) (*user.Entity, error) {
 	out := new(user.Entity)
 	err := c.cc.Invoke(ctx, "/grpc.API/FetchEntity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPIClient) CreateEntity(ctx context.Context, in *dto.CreateEntityReq, opts ...grpc.CallOption) (*user.Entity, error) {
+	out := new(user.Entity)
+	err := c.cc.Invoke(ctx, "/grpc.API/CreateEntity", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -188,6 +189,15 @@ func (c *aPIClient) DeleteEntity(ctx context.Context, in *dto.DeleteEntityReq, o
 	return out, nil
 }
 
+func (c *aPIClient) ListRole(ctx context.Context, in *dto.ListRoleReq, opts ...grpc.CallOption) (*dto.ListRoleResp, error) {
+	out := new(dto.ListRoleResp)
+	err := c.cc.Invoke(ctx, "/grpc.API/ListRole", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *aPIClient) CreateRole(ctx context.Context, in *dto.CreateRoleReq, opts ...grpc.CallOption) (*user.Role, error) {
 	out := new(user.Role)
 	err := c.cc.Invoke(ctx, "/grpc.API/CreateRole", in, out, opts...)
@@ -197,9 +207,9 @@ func (c *aPIClient) CreateRole(ctx context.Context, in *dto.CreateRoleReq, opts 
 	return out, nil
 }
 
-func (c *aPIClient) ListRole(ctx context.Context, in *dto.ListRoleReq, opts ...grpc.CallOption) (*dto.ListRoleResp, error) {
-	out := new(dto.ListRoleResp)
-	err := c.cc.Invoke(ctx, "/grpc.API/ListRole", in, out, opts...)
+func (c *aPIClient) UpdateRole(ctx context.Context, in *dto.UpdateRoleReq, opts ...grpc.CallOption) (*user.Role, error) {
+	out := new(user.Role)
+	err := c.cc.Invoke(ctx, "/grpc.API/UpdateRole", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -211,18 +221,19 @@ type APIServer interface {
 	// Ping
 	Ping(context.Context, *pbtypes.Empty) (*pbtypes.Empty, error)
 	// User
+	ListUser(context.Context, *dto.ListUserReq) (*dto.ListUserResp, error)
 	FetchUser(context.Context, *dto.FetchUserReq) (*user.U, error)
 	UpdateUser(context.Context, *dto.UpdateUserReq) (*user.U, error)
-	ListUser(context.Context, *dto.ListUserReq) (*dto.ListUserResp, error)
 	// Entity
-	CreateEntity(context.Context, *dto.CreateEntityReq) (*user.Entity, error)
 	ListEntity(context.Context, *dto.ListEntityReq) (*dto.ListEntityResp, error)
 	FetchEntity(context.Context, *dto.FetchEntityReq) (*user.Entity, error)
+	CreateEntity(context.Context, *dto.CreateEntityReq) (*user.Entity, error)
 	UpdateEntity(context.Context, *dto.UpdateEntityReq) (*user.Entity, error)
 	DeleteEntity(context.Context, *dto.DeleteEntityReq) (*dto.DeleteEntityResp, error)
 	// Roles
-	CreateRole(context.Context, *dto.CreateRoleReq) (*user.Role, error)
 	ListRole(context.Context, *dto.ListRoleReq) (*dto.ListRoleResp, error)
+	CreateRole(context.Context, *dto.CreateRoleReq) (*user.Role, error)
+	UpdateRole(context.Context, *dto.UpdateRoleReq) (*user.Role, error)
 }
 
 // UnimplementedAPIServer can be embedded to have forward compatible implementations.
@@ -232,17 +243,14 @@ type UnimplementedAPIServer struct {
 func (*UnimplementedAPIServer) Ping(ctx context.Context, req *pbtypes.Empty) (*pbtypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
+func (*UnimplementedAPIServer) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.ListUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUser not implemented")
+}
 func (*UnimplementedAPIServer) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FetchUser not implemented")
 }
 func (*UnimplementedAPIServer) UpdateUser(ctx context.Context, req *dto.UpdateUserReq) (*user.U, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
-}
-func (*UnimplementedAPIServer) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.ListUserResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListUser not implemented")
-}
-func (*UnimplementedAPIServer) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*user.Entity, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateEntity not implemented")
 }
 func (*UnimplementedAPIServer) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.ListEntityResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListEntity not implemented")
@@ -250,17 +258,23 @@ func (*UnimplementedAPIServer) ListEntity(ctx context.Context, req *dto.ListEnti
 func (*UnimplementedAPIServer) FetchEntity(ctx context.Context, req *dto.FetchEntityReq) (*user.Entity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FetchEntity not implemented")
 }
+func (*UnimplementedAPIServer) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*user.Entity, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateEntity not implemented")
+}
 func (*UnimplementedAPIServer) UpdateEntity(ctx context.Context, req *dto.UpdateEntityReq) (*user.Entity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateEntity not implemented")
 }
 func (*UnimplementedAPIServer) DeleteEntity(ctx context.Context, req *dto.DeleteEntityReq) (*dto.DeleteEntityResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEntity not implemented")
 }
+func (*UnimplementedAPIServer) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.ListRoleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRole not implemented")
+}
 func (*UnimplementedAPIServer) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user.Role, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRole not implemented")
 }
-func (*UnimplementedAPIServer) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.ListRoleResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListRole not implemented")
+func (*UnimplementedAPIServer) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*user.Role, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRole not implemented")
 }
 
 func RegisterAPIServer(s *grpc.Server, srv APIServer) {
@@ -281,6 +295,24 @@ func _API_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(APIServer).Ping(ctx, req.(*pbtypes.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _API_ListUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(dto.ListUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APIServer).ListUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.API/ListUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APIServer).ListUser(ctx, req.(*dto.ListUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -321,42 +353,6 @@ func _API_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _API_ListUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(dto.ListUserReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(APIServer).ListUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/grpc.API/ListUser",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(APIServer).ListUser(ctx, req.(*dto.ListUserReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _API_CreateEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(dto.CreateEntityReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(APIServer).CreateEntity(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/grpc.API/CreateEntity",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(APIServer).CreateEntity(ctx, req.(*dto.CreateEntityReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _API_ListEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(dto.ListEntityReq)
 	if err := dec(in); err != nil {
@@ -389,6 +385,24 @@ func _API_FetchEntity_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(APIServer).FetchEntity(ctx, req.(*dto.FetchEntityReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _API_CreateEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(dto.CreateEntityReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APIServer).CreateEntity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.API/CreateEntity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APIServer).CreateEntity(ctx, req.(*dto.CreateEntityReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -429,24 +443,6 @@ func _API_DeleteEntity_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _API_CreateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(dto.CreateRoleReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(APIServer).CreateRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/grpc.API/CreateRole",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(APIServer).CreateRole(ctx, req.(*dto.CreateRoleReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _API_ListRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(dto.ListRoleReq)
 	if err := dec(in); err != nil {
@@ -465,6 +461,42 @@ func _API_ListRole_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _API_CreateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(dto.CreateRoleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APIServer).CreateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.API/CreateRole",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APIServer).CreateRole(ctx, req.(*dto.CreateRoleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _API_UpdateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(dto.UpdateRoleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APIServer).UpdateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.API/UpdateRole",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APIServer).UpdateRole(ctx, req.(*dto.UpdateRoleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _API_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "grpc.API",
 	HandlerType: (*APIServer)(nil),
@@ -472,6 +504,10 @@ var _API_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _API_Ping_Handler,
+		},
+		{
+			MethodName: "ListUser",
+			Handler:    _API_ListUser_Handler,
 		},
 		{
 			MethodName: "FetchUser",
@@ -482,20 +518,16 @@ var _API_serviceDesc = grpc.ServiceDesc{
 			Handler:    _API_UpdateUser_Handler,
 		},
 		{
-			MethodName: "ListUser",
-			Handler:    _API_ListUser_Handler,
-		},
-		{
-			MethodName: "CreateEntity",
-			Handler:    _API_CreateEntity_Handler,
-		},
-		{
 			MethodName: "ListEntity",
 			Handler:    _API_ListEntity_Handler,
 		},
 		{
 			MethodName: "FetchEntity",
 			Handler:    _API_FetchEntity_Handler,
+		},
+		{
+			MethodName: "CreateEntity",
+			Handler:    _API_CreateEntity_Handler,
 		},
 		{
 			MethodName: "UpdateEntity",
@@ -506,12 +538,16 @@ var _API_serviceDesc = grpc.ServiceDesc{
 			Handler:    _API_DeleteEntity_Handler,
 		},
 		{
+			MethodName: "ListRole",
+			Handler:    _API_ListRole_Handler,
+		},
+		{
 			MethodName: "CreateRole",
 			Handler:    _API_CreateRole_Handler,
 		},
 		{
-			MethodName: "ListRole",
-			Handler:    _API_ListRole_Handler,
+			MethodName: "UpdateRole",
+			Handler:    _API_UpdateRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

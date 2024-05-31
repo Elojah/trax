@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/elojah/trax/internal/user"
@@ -15,8 +14,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user.Role, error) {
-	logger := log.With().Str("method", "create_role").Logger()
+func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*user.Role, error) {
+	logger := log.With().Str("method", "update_role").Logger()
 
 	if req == nil {
 		return &user.Role{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
@@ -28,14 +27,14 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user
 		return &user.Role{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_role, Command: user.C_create}); err != nil {
+	if err := claims.Require(user.Requirement{EntityID: req.RoleID, Resource: user.R_role, Command: user.C_create}); err != nil {
 		return &user.Role{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 
 	// check permissions
 	// current user need to have all assigned permissions to create a role
 	for _, perm := range req.Permissions {
-		if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
+		if err := claims.Require(user.Requirement{EntityID: req.RoleID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			return &user.Role{}, status.New(codes.InvalidArgument, err.Error()).Err()
 		}
 	}
@@ -43,8 +42,7 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user
 	now := time.Now().Unix()
 	role := user.Role{
 		ID:        ulid.NewID(),
-		EntityID:  req.EntityID,
-		Name:      req.Name,
+		Name:      "",
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -59,8 +57,6 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user
 			UpdatedAt: now,
 		})
 	}
-
-	fmt.Println(permissions)
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		if err = h.user.InsertRole(ctx, role); err != nil {

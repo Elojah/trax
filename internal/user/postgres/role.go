@@ -15,9 +15,9 @@ import (
 
 var (
 	sortRole = map[string]string{
-		"name":       "e.name",
-		"created_at": "e.created_at",
-		"updated_at": "e.updated_at",
+		"name":       "r.name",
+		"created_at": "r.created_at",
+		"updated_at": "r.updated_at",
 	}
 )
 

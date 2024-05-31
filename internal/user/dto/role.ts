@@ -10,17 +10,51 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Paginate } from "../../../pkg/paginate/paginate";
 import { Permission } from "../role";
 import { Role } from "../role";
-import { Paginate } from "../../../pkg/paginate/paginate";
+/**
+ * @generated from protobuf message dto.RolePermission
+ */
+export interface RolePermission {
+    /**
+     * @generated from protobuf field: user.Role Role = 1 [json_name = "Role"];
+     */
+    role?: Role;
+    /**
+     * @generated from protobuf field: repeated user.Permission Permissions = 2 [json_name = "Permissions"];
+     */
+    permissions: Permission[];
+}
 /**
  * @generated from protobuf message dto.CreateRoleReq
  */
 export interface CreateRoleReq {
     /**
-     * @generated from protobuf field: string Name = 1 [json_name = "Name"];
+     * @generated from protobuf field: bytes EntityID = 1 [json_name = "EntityID"];
+     */
+    entityID: Uint8Array;
+    /**
+     * @generated from protobuf field: string Name = 2 [json_name = "Name"];
      */
     name: string;
+    /**
+     * @generated from protobuf field: repeated user.Permission Permissions = 3 [json_name = "Permissions"];
+     */
+    permissions: Permission[];
+}
+/**
+ * @generated from protobuf message dto.UpdateRoleReq
+ */
+export interface UpdateRoleReq {
+    /**
+     * @generated from protobuf field: bytes RoleID = 1 [json_name = "RoleID"];
+     */
+    roleID: Uint8Array;
+    /**
+     * @generated from protobuf field: repeated user.Permission Permissions = 2 [json_name = "Permissions"];
+     */
+    permissions: Permission[];
 }
 /**
  * @generated from protobuf message dto.ListRoleReq
@@ -52,19 +86,6 @@ export interface ListRoleReq {
     entityIDs: Uint8Array[];
 }
 /**
- * @generated from protobuf message dto.RolePermission
- */
-export interface RolePermission {
-    /**
-     * @generated from protobuf field: user.Role Role = 1 [json_name = "Role"];
-     */
-    role?: Role;
-    /**
-     * @generated from protobuf field: repeated user.Permission Permissions = 2 [json_name = "Permissions"];
-     */
-    permissions: Permission[];
-}
-/**
  * @generated from protobuf message dto.ListRoleResp
  */
 export interface ListRoleResp {
@@ -78,15 +99,73 @@ export interface ListRoleResp {
     total: bigint;
 }
 // @generated message type with reflection information, may provide speed optimized methods
+class RolePermission$Type extends MessageType<RolePermission> {
+    constructor() {
+        super("dto.RolePermission", [
+            { no: 1, name: "Role", kind: "message", jsonName: "Role", T: () => Role, options: { "gogoproto.nullable": false } },
+            { no: 2, name: "Permissions", kind: "message", jsonName: "Permissions", repeat: 1 /*RepeatType.PACKED*/, T: () => Permission, options: { "gogoproto.nullable": false } }
+        ]);
+    }
+    create(value?: PartialMessage<RolePermission>): RolePermission {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.permissions = [];
+        if (value !== undefined)
+            reflectionMergePartial<RolePermission>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RolePermission): RolePermission {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* user.Role Role = 1 [json_name = "Role"];*/ 1:
+                    message.role = Role.internalBinaryRead(reader, reader.uint32(), options, message.role);
+                    break;
+                case /* repeated user.Permission Permissions = 2 [json_name = "Permissions"];*/ 2:
+                    message.permissions.push(Permission.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: RolePermission, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* user.Role Role = 1 [json_name = "Role"]; */
+        if (message.role)
+            Role.internalBinaryWrite(message.role, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated user.Permission Permissions = 2 [json_name = "Permissions"]; */
+        for (let i = 0; i < message.permissions.length; i++)
+            Permission.internalBinaryWrite(message.permissions[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.RolePermission
+ */
+export const RolePermission = new RolePermission$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class CreateRoleReq$Type extends MessageType<CreateRoleReq> {
     constructor() {
         super("dto.CreateRoleReq", [
-            { no: 1, name: "Name", kind: "scalar", jsonName: "Name", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 2, name: "Name", kind: "scalar", jsonName: "Name", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "Permissions", kind: "message", jsonName: "Permissions", repeat: 1 /*RepeatType.PACKED*/, T: () => Permission, options: { "gogoproto.nullable": false } }
         ]);
     }
     create(value?: PartialMessage<CreateRoleReq>): CreateRoleReq {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.entityID = new Uint8Array(0);
         message.name = "";
+        message.permissions = [];
         if (value !== undefined)
             reflectionMergePartial<CreateRoleReq>(this, message, value);
         return message;
@@ -96,8 +175,14 @@ class CreateRoleReq$Type extends MessageType<CreateRoleReq> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string Name = 1 [json_name = "Name"];*/ 1:
+                case /* bytes EntityID = 1 [json_name = "EntityID"];*/ 1:
+                    message.entityID = reader.bytes();
+                    break;
+                case /* string Name = 2 [json_name = "Name"];*/ 2:
                     message.name = reader.string();
+                    break;
+                case /* repeated user.Permission Permissions = 3 [json_name = "Permissions"];*/ 3:
+                    message.permissions.push(Permission.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -111,9 +196,15 @@ class CreateRoleReq$Type extends MessageType<CreateRoleReq> {
         return message;
     }
     internalBinaryWrite(message: CreateRoleReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string Name = 1 [json_name = "Name"]; */
+        /* bytes EntityID = 1 [json_name = "EntityID"]; */
+        if (message.entityID.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.entityID);
+        /* string Name = 2 [json_name = "Name"]; */
         if (message.name !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.name);
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* repeated user.Permission Permissions = 3 [json_name = "Permissions"]; */
+        for (let i = 0; i < message.permissions.length; i++)
+            Permission.internalBinaryWrite(message.permissions[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -124,6 +215,61 @@ class CreateRoleReq$Type extends MessageType<CreateRoleReq> {
  * @generated MessageType for protobuf message dto.CreateRoleReq
  */
 export const CreateRoleReq = new CreateRoleReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class UpdateRoleReq$Type extends MessageType<UpdateRoleReq> {
+    constructor() {
+        super("dto.UpdateRoleReq", [
+            { no: 1, name: "RoleID", kind: "scalar", jsonName: "RoleID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 2, name: "Permissions", kind: "message", jsonName: "Permissions", repeat: 1 /*RepeatType.PACKED*/, T: () => Permission, options: { "gogoproto.nullable": false } }
+        ]);
+    }
+    create(value?: PartialMessage<UpdateRoleReq>): UpdateRoleReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.roleID = new Uint8Array(0);
+        message.permissions = [];
+        if (value !== undefined)
+            reflectionMergePartial<UpdateRoleReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UpdateRoleReq): UpdateRoleReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes RoleID = 1 [json_name = "RoleID"];*/ 1:
+                    message.roleID = reader.bytes();
+                    break;
+                case /* repeated user.Permission Permissions = 2 [json_name = "Permissions"];*/ 2:
+                    message.permissions.push(Permission.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: UpdateRoleReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes RoleID = 1 [json_name = "RoleID"]; */
+        if (message.roleID.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.roleID);
+        /* repeated user.Permission Permissions = 2 [json_name = "Permissions"]; */
+        for (let i = 0; i < message.permissions.length; i++)
+            Permission.internalBinaryWrite(message.permissions[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.UpdateRoleReq
+ */
+export const UpdateRoleReq = new UpdateRoleReq$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ListRoleReq$Type extends MessageType<ListRoleReq> {
     constructor() {
@@ -210,60 +356,6 @@ class ListRoleReq$Type extends MessageType<ListRoleReq> {
  * @generated MessageType for protobuf message dto.ListRoleReq
  */
 export const ListRoleReq = new ListRoleReq$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class RolePermission$Type extends MessageType<RolePermission> {
-    constructor() {
-        super("dto.RolePermission", [
-            { no: 1, name: "Role", kind: "message", jsonName: "Role", T: () => Role, options: { "gogoproto.nullable": false } },
-            { no: 2, name: "Permissions", kind: "message", jsonName: "Permissions", repeat: 1 /*RepeatType.PACKED*/, T: () => Permission, options: { "gogoproto.nullable": false } }
-        ]);
-    }
-    create(value?: PartialMessage<RolePermission>): RolePermission {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.permissions = [];
-        if (value !== undefined)
-            reflectionMergePartial<RolePermission>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RolePermission): RolePermission {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* user.Role Role = 1 [json_name = "Role"];*/ 1:
-                    message.role = Role.internalBinaryRead(reader, reader.uint32(), options, message.role);
-                    break;
-                case /* repeated user.Permission Permissions = 2 [json_name = "Permissions"];*/ 2:
-                    message.permissions.push(Permission.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: RolePermission, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* user.Role Role = 1 [json_name = "Role"]; */
-        if (message.role)
-            Role.internalBinaryWrite(message.role, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated user.Permission Permissions = 2 [json_name = "Permissions"]; */
-        for (let i = 0; i < message.permissions.length; i++)
-            Permission.internalBinaryWrite(message.permissions[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message dto.RolePermission
- */
-export const RolePermission = new RolePermission$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ListRoleResp$Type extends MessageType<ListRoleResp> {
     constructor() {

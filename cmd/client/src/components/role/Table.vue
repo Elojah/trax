@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
-import { computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
@@ -8,6 +8,7 @@ import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';
 import { ListRoleReq } from '@internal/user/dto/role';
 import RoleDetails from '@/components/role/Details.vue';
+import PermissionTable from '@/components/permission/Table.vue';
 
 // #MARK:Common
 // ______________________________________________________
@@ -102,6 +103,13 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 	loading.value = false;
 };
 
+// refresh list when selected entity changes
+watch(selectedEntity, async () => {
+	if (selectedEntity.value) {
+		await list();
+	}
+});
+
 const name = ref('');
 
 // #MARK:Role dialogs
@@ -111,10 +119,15 @@ const closeCreateRole = () => {
 	name.value = '';
 };
 
+const permissions = ref();
+
 const create = async () => {
-	await store.create(name.value);
+	const values = permissions.value?.values.map(permissions.value.unhash);
+
+	await store.create(selectedEntity?.value?.iD!, name.value, values);
 	dialogCreate.value = false;
 	name.value = '';
+	permissions.value.clear();
 
 	await authStore.refreshToken();
 	await list()
@@ -177,17 +190,12 @@ const delete_ = () => {
 							<v-card-text>
 								<v-container>
 									<v-row>
-										<v-col cols="6">
+										<v-col cols="12">
 											<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
-										</v-col>
-										<v-col cols="6">
-											<v-text-field label="Avatar URL"></v-text-field>
 										</v-col>
 									</v-row>
 									<v-row>
-										<v-col cols="12">
-											<v-textarea label="Description"></v-textarea>
-										</v-col>
+										<PermissionTable :permissions="[]" ref="permissions"></PermissionTable>
 									</v-row>
 								</v-container>
 							</v-card-text>
@@ -211,7 +219,7 @@ const delete_ = () => {
 		<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 			items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 			:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list"
-			v-model="selected" @click:row="expand" return-object item-selectable select-strategy="single">
+			v-model="selected" @click:row="expand" return-object>
 			<template v-slot:item="{ item, internalItem, isExpanded, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
