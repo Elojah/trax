@@ -7,10 +7,13 @@ import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { removeCookie } from 'typescript-cookie'
 import { FetchUserReq, UpdateUserReq } from '@internal/user/dto/user'
 import { ref } from 'vue'
+import { ClaimAuth } from '@internal/user/claims'
+import { Empty } from '@pkg/pbtypes/empty'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string>('')
   const user = ref<U | null>(null)
+  const claims = ref<ClaimAuth | null>(null)
 
   const signupURL = new URL('signup', config.web_client_url).href
   const signinURL = new URL('signin', config.web_client_url).href
@@ -71,6 +74,27 @@ export const useAuthStore = defineStore('auth', () => {
 
       const resp = await api.fetchUser(req, { meta: { token: token.value } })
       user.value = resp.response
+
+      await refreshClaims()
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
+
+  const refreshClaims = async () => {
+    if (!token.value) {
+      refreshToken()
+    }
+
+    try {
+      const req = Empty.create({})
+
+      const resp = await api.fetchClaims(req, { meta: { token: token.value } })
+
+      claims.value = resp.response
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -128,6 +152,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token,
     user,
+    claims,
     signup,
     signin,
     signout,

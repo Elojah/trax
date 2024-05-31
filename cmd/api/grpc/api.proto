@@ -17,6 +17,7 @@ import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
 
 import "github.com/elojah/trax/internal/user/entity.proto";
 import "github.com/elojah/trax/internal/user/user.proto";
+import "github.com/elojah/trax/internal/user/claims.proto";
 import "github.com/elojah/trax/internal/user/dto/entity.proto";
 import "github.com/elojah/trax/internal/user/dto/role.proto";
 import "github.com/elojah/trax/internal/user/dto/user.proto";
@@ -29,6 +30,9 @@ service API {
     rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp);
     rpc FetchUser(dto.FetchUserReq) returns (user.U);
     rpc UpdateUser(dto.UpdateUserReq) returns (user.U);
+
+    // Claims
+    rpc FetchClaims(pbtypes.Empty) returns (user.ClaimAuth);
 
     // Entity
     rpc ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);

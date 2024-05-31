@@ -14,6 +14,7 @@ import { Entity } from "../../../internal/user/entity";
 import { FetchEntityReq } from "../../../internal/user/dto/entity";
 import { ListEntityResp } from "../../../internal/user/dto/entity";
 import { ListEntityReq } from "../../../internal/user/dto/entity";
+import { ClaimAuth } from "../../../internal/user/claims";
 import { UpdateUserReq } from "../../../internal/user/dto/user";
 import { U } from "../../../internal/user/user";
 import { FetchUserReq } from "../../../internal/user/dto/user";
@@ -29,6 +30,7 @@ export const API = new ServiceType("grpc.API", [
     { name: "ListUser", options: {}, I: ListUserReq, O: ListUserResp },
     { name: "FetchUser", options: {}, I: FetchUserReq, O: U },
     { name: "UpdateUser", options: {}, I: UpdateUserReq, O: U },
+    { name: "FetchClaims", options: {}, I: Empty, O: ClaimAuth },
     { name: "ListEntity", options: {}, I: ListEntityReq, O: ListEntityResp },
     { name: "FetchEntity", options: {}, I: FetchEntityReq, O: Entity },
     { name: "CreateEntity", options: {}, I: CreateEntityReq, O: Entity },

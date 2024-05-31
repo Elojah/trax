@@ -38,8 +38,6 @@ func (h *handler) FetchUser(ctx context.Context, req *dto.FetchUserReq) (*user.U
 			return &user.U{}, status.New(codes.PermissionDenied, err.Error()).Err()
 		}
 
-		// TODO: Check if user has at least one role in this entity
-
 		id = req.ID
 	}
 
