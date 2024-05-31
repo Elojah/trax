@@ -174,7 +174,7 @@ const create = async () => {
 			items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 			:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list"
 			v-model="selected" @click:row="select" return-object item-selectable select-strategy="single">
-			<template v-slot:item="{ item, isSelected, index, props: itemProps }">
+			<template v-slot:item="{ item, columns, isSelected, index, props: itemProps }">
 				<v-hover v-slot="{ isHovering, props: hoverProps }">
 					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
 						:key="ulid(item.iD)" :class="{
@@ -183,18 +183,19 @@ const create = async () => {
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}">
-						<td>
-							<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
-								<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
-								<span v-else class=" mx-auto text-center text-h5">
-									{{ item?.name?.at(0)?.toUpperCase() }}
-								</span>
-							</v-avatar>
-							<span class="text-h6">{{ item.name }}</span>
-						</td>
-						<td class="text-caption text-right">{{ new Date(Number(item.createdAt) *
-							1000).toLocaleDateString('en-GB')
-							}}
+						<td :colspan="columns.length">
+							<v-card class="px-6 py-6 justify-center rounded-xl main-color-background" variant="flat">
+								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
+									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
+									<span v-else class=" mx-auto text-center text-h5">
+										{{ item?.name?.at(0)?.toUpperCase() }}
+									</span>
+								</v-avatar>
+								<v-title>
+									<span class="text-h6">{{ item.name }}</span>
+								</v-title>
+								{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
+							</v-card>
 						</td>
 					</tr>
 				</v-hover>
