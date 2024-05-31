@@ -45,6 +45,7 @@ const tableEntities = ref();
 							</v-btn>
 						</v-btn-toggle>
 					</v-col>
+					<v-divider></v-divider>
 					<!-- Info -->
 					<EntityDetails v-if="view === 0" :onDelete="() => { tableEntities?.value?.list() }"></EntityDetails>
 					<!-- Roles -->

@@ -125,6 +125,37 @@ func (f filterRole) index() string {
 	return strings.Join(cols, " - ")
 }
 
+type patchRole user.PatchRole
+
+func (e patchRole) set() (string, []any, int) {
+	var cols []string
+	var args []any
+	n := 1
+
+	if e.Name != nil {
+		cols = append(cols, fmt.Sprintf(`name = $%d`, n))
+		args = append(args, *e.Name)
+		n++
+	}
+
+	if e.UpdatedAt != nil {
+		cols = append(cols, fmt.Sprintf(`updated_at = $%d`, n))
+		args = append(args, time.Unix(*e.UpdatedAt, 0))
+		n++
+	}
+
+	b := strings.Builder{}
+	b.WriteString(" SET ")
+
+	if len(cols) == 0 {
+		b.WriteString("id = id")
+	} else {
+		b.WriteString(strings.Join(cols, " , "))
+	}
+
+	return b.String(), args, n
+}
+
 func (s Store) InsertRole(ctx context.Context, role user.Role) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
@@ -143,6 +174,44 @@ func (s Store) InsertRole(ctx context.Context, role user.Role) error {
 	}
 
 	return nil
+}
+
+func (s Store) UpdateRole(ctx context.Context, f user.FilterRole, p user.PatchRole) ([]user.Role, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`UPDATE "user"."role" r `)
+
+	cols, args, n := patchRole(p).set()
+	b.WriteString(cols)
+
+	clause, wargs := filterRole(f).where(n)
+	b.WriteString(clause)
+
+	args = append(args, wargs...)
+
+	b.WriteString(` RETURNING id, entity_id, name, created_at, updated_at`)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, postgres.Error(err, "entity", filterRole(f).index())
+	}
+
+	var roles []user.Role
+
+	for rows.Next() {
+		var r sqlRole
+		if err := rows.Scan(&r.ID, &r.EntityID, &r.Name, &r.CreatedAt, &r.UpdatedAt); err != nil {
+			return nil, postgres.Error(err, "role", filterRole(f).index())
+		}
+
+		roles = append(roles, r.role())
+	}
+
+	return roles, nil
 }
 
 func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, error) {

@@ -107,6 +107,8 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 watch(selectedEntity, async () => {
 	if (selectedEntity.value) {
 		await list();
+	} else {
+		viewIDs.value = [];
 	}
 });
 
@@ -146,15 +148,6 @@ const updateName = async function () {
 	nameEdit.value = !nameEdit.value
 };
 
-
-const updatePermissions = async function () {
-	// await store.update(UpdateEntityReq.create({
-	// 	iD: e.value?.iD,
-	// 	name: { value: e.value?.name },
-	// }));
-};
-
-
 const dialogDelete = ref(false);
 const closeDelete = () => {
 	dialogDelete.value = false;
@@ -169,82 +162,83 @@ const delete_ = () => {
 };
 </script>
 
-<template>
-	<v-sheet v-if="selectedEntity" class="px-1 rounded-xl" outlined color="primary">
-		<v-col class="d-flex justify-end align-center rounded-t-xl table-color-background" cols="12">
-			<v-dialog v-model="dialogCreate" max-width="800px">
-				<template v-slot:activator="{ props }">
-					<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
-						New
-						<template v-slot:prepend>
-							<v-icon color="primary"></v-icon>
-						</template>
-					</v-btn>
-				</template>
-				<v-sheet class="px-1 rounded-xl" outlined color="primary">
-					<v-card class="px-6 py-6 rounded-xl" variant="elevated">
-						<v-form ref="form" v-model="valid" lazy-validation>
-							<v-card-title>
-								<span class="text-h6">New role</span>
-							</v-card-title>
-							<v-card-text>
-								<v-container>
-									<v-row>
-										<v-col cols="12">
-											<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
-										</v-col>
-									</v-row>
-									<v-row>
-										<PermissionTable :permissions="[]" ref="permissions"></PermissionTable>
-									</v-row>
-								</v-container>
-							</v-card-text>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn variant="text" @click="closeCreateRole">
-									Cancel
-								</v-btn>
-								<v-btn color="primary" variant="text" @click="create">
-									Create
-								</v-btn>
-							</v-card-actions>
-						</v-form>
-					</v-card>
-				</v-sheet>
-			</v-dialog>
-		</v-col>
-		<v-text-field class="table-color-background" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
-			variant="outlined" hide-details single-line>
-		</v-text-field>
-		<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
-			items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
-			:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list"
-			v-model="selected" @click:row="expand" return-object>
-			<template v-slot:item="{ item, internalItem, isExpanded, index, props: itemProps }">
-				<v-hover v-slot="{ isHovering, props: hoverProps }">
-					<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" class="cursor-pointer py-8"
-						:key="ulid(item.role?.iD)" :class="{
+<template v-if="selectedEntity">
+	<v-col class="d-flex justify-end align-center rounded-t table-color-background" cols="12">
+		<v-dialog v-model="dialogCreate" max-width="800px">
+			<template v-slot:activator="{ props }">
+				<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+					New
+					<template v-slot:prepend>
+						<v-icon color="primary"></v-icon>
+					</template>
+				</v-btn>
+			</template>
+			<v-sheet class="px-1 rounded-xl" outlined color="primary">
+				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+					<v-form ref="form" v-model="valid" lazy-validation>
+						<v-card-title>
+							<span class="text-h6">New role</span>
+						</v-card-title>
+						<v-card-text>
+							<v-container>
+								<v-row>
+									<v-col cols="12">
+										<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
+									</v-col>
+								</v-row>
+								<v-row>
+									<PermissionTable :permissions="[]" ref="permissions"></PermissionTable>
+								</v-row>
+							</v-container>
+						</v-card-text>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn variant="text" @click="closeCreateRole">
+								Cancel
+							</v-btn>
+							<v-btn color="primary" variant="text" @click="create">
+								Create
+							</v-btn>
+						</v-card-actions>
+					</v-form>
+				</v-card>
+			</v-sheet>
+		</v-dialog>
+	</v-col>
+	<v-text-field class="table-color-background px-1" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
+		variant="outlined" hide-details single-line>
+	</v-text-field>
+	<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
+		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
+		:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list" v-model="selected"
+		@click:row="expand" return-object>
+		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
+			<v-hover v-slot="{ isHovering, props: hoverProps }">
+				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">
+					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
+						<v-card class="justify-center" variant="flat" :class="{
 							'row-hovered': isHovering,
 							'row-expanded': isExpanded(internalItem),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
-						}">
-						<td>
-							<span class="text-h6">{{ item.role?.name }}</span>
-						</td>
-						<td class="text-caption text-right">{{ new Date(Number(item.role?.createdAt) *
-							1000).toLocaleDateString('en-GB')
-							}}
-						</td>
-					</tr>
-				</v-hover>
-			</template>
-			<template v-slot:expanded-row="{ columns, item }">
-				<RoleDetails :colspan="columns.length" :permissions="item?.permissions"></RoleDetails>
-			</template>
-		</v-data-table-server>
-		<v-col cols="12" class="p-8 table-color-background rounded-b-xl"></v-col>
-	</v-sheet>
+						}" :title="item.role?.name" :subtitle="Number(item.permissions.length) + ' permission(s)'">
+							<v-card-actions>
+								<v-divider></v-divider>
+								<p class="font-italic font-weight-light">
+									{{ new Date(Number(item.role?.createdAt) * 1000).toLocaleDateString('en-GB') }}
+								</p>
+							</v-card-actions>
+						</v-card>
+					</td>
+				</tr>
+			</v-hover>
+		</template>
+		<template v-slot:expanded-row="{ columns, item }">
+			<RoleDetails :colspan="columns.length" :permissions="item?.permissions" :roleID="item?.role?.iD">
+			</RoleDetails>
+		</template>
+	</v-data-table-server>
+	<v-col cols="12" class="p-8 table-color-background rounded-b"></v-col>
 </template>
 <style scoped>
 .table-color-background {

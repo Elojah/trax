@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { CreateRoleReq, ListRoleReq, RolePermission } from '@internal/user/dto/role'
+import { CreateRoleReq, ListRoleReq, RolePermission, UpdateRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
@@ -31,6 +31,19 @@ export const useRoleStore = defineStore('role', () => {
       })
 
       return await api.createRole(req, { meta: { token: token.value } })
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
+
+  const update = async (req: UpdateRoleReq) => {
+    try {
+      const resp = await api.updateRole(req, { meta: { token: token.value } })
+
+      roles.value?.set(ulid(resp.response.iD), resp.response)
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -74,6 +87,7 @@ export const useRoleStore = defineStore('role', () => {
     total,
     selected,
     create,
+    update,
     list
   }
 })

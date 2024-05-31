@@ -5,7 +5,7 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
 import type { UpdateRoleReq } from "../../../internal/user/dto/role";
-import type { Role } from "../../../internal/user/role";
+import type { RolePermission } from "../../../internal/user/dto/role";
 import type { CreateRoleReq } from "../../../internal/user/dto/role";
 import type { ListRoleResp } from "../../../internal/user/dto/role";
 import type { ListRoleReq } from "../../../internal/user/dto/role";
@@ -79,13 +79,13 @@ export interface IAPIClient {
      */
     listRole(input: ListRoleReq, options?: RpcOptions): UnaryCall<ListRoleReq, ListRoleResp>;
     /**
-     * @generated from protobuf rpc: CreateRole(dto.CreateRoleReq) returns (user.Role);
+     * @generated from protobuf rpc: CreateRole(dto.CreateRoleReq) returns (dto.RolePermission);
      */
-    createRole(input: CreateRoleReq, options?: RpcOptions): UnaryCall<CreateRoleReq, Role>;
+    createRole(input: CreateRoleReq, options?: RpcOptions): UnaryCall<CreateRoleReq, RolePermission>;
     /**
-     * @generated from protobuf rpc: UpdateRole(dto.UpdateRoleReq) returns (user.Role);
+     * @generated from protobuf rpc: UpdateRole(dto.UpdateRoleReq) returns (dto.RolePermission);
      */
-    updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, Role>;
+    updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, RolePermission>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -175,17 +175,17 @@ export class APIClient implements IAPIClient, ServiceInfo {
         return stackIntercept<ListRoleReq, ListRoleResp>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: CreateRole(dto.CreateRoleReq) returns (user.Role);
+     * @generated from protobuf rpc: CreateRole(dto.CreateRoleReq) returns (dto.RolePermission);
      */
-    createRole(input: CreateRoleReq, options?: RpcOptions): UnaryCall<CreateRoleReq, Role> {
+    createRole(input: CreateRoleReq, options?: RpcOptions): UnaryCall<CreateRoleReq, RolePermission> {
         const method = this.methods[10], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreateRoleReq, Role>("unary", this._transport, method, opt, input);
+        return stackIntercept<CreateRoleReq, RolePermission>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: UpdateRole(dto.UpdateRoleReq) returns (user.Role);
+     * @generated from protobuf rpc: UpdateRole(dto.UpdateRoleReq) returns (dto.RolePermission);
      */
-    updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, Role> {
+    updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, RolePermission> {
         const method = this.methods[11], opt = this._transport.mergeOptions(options);
-        return stackIntercept<UpdateRoleReq, Role>("unary", this._transport, method, opt, input);
+        return stackIntercept<UpdateRoleReq, RolePermission>("unary", this._transport, method, opt, input);
     }
 }

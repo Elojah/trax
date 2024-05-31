@@ -36,6 +36,7 @@ TODO:
   - Delete (remove \* roles) User
 
   - !!! Show edit/delete only for users with permissions
+  - Add pop up for every success/fail actions
 
 - Clean UI (table, cards, etc.)
 

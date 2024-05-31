@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Permission } from '@internal/user/role';
+import { Permission } from '@internal/user/role';
 import { Command, Resource } from '@internal/user/role';
 import { ref } from 'vue';
 
@@ -14,13 +14,13 @@ const hash = (resource: Resource, command: Command): string => {
 const unhash = (value: string): Permission => {
 	const [resource, command] = value.split('_');
 
-	return {
+	return Permission.create({
 		resource: Number(resource) as Resource,
 		command: Number(command) as Command,
-	} as Permission;
+	});
 }
 
-const values = ref<string[]>(((perms: Permission[] | undefined) => {
+const init = (perms: Permission[] | undefined) => {
 	if (!perms) {
 		return [];
 	}
@@ -33,16 +33,22 @@ const values = ref<string[]>(((perms: Permission[] | undefined) => {
 	});
 
 	return result;
-})(props.permissions));
+}
 
+const values = ref<string[]>(init(props.permissions));
 
 const clear = () => {
 	values.value = [];
 }
 
+const reset = () => {
+	values.value = init(props.permissions);
+}
+
 defineExpose({
 	values,
 	clear,
+	reset,
 	unhash,
 });
 

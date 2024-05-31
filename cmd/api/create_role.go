@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/elojah/trax/internal/user"
@@ -15,28 +14,32 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user.Role, error) {
+func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.RolePermission, error) {
 	logger := log.With().Str("method", "create_role").Logger()
 
 	if req == nil {
-		return &user.Role{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &dto.RolePermission{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &user.Role{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &dto.RolePermission{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_role, Command: user.C_create}); err != nil {
-		return &user.Role{}, status.New(codes.PermissionDenied, err.Error()).Err()
+		logger.Error().Err(err).Msg("permission denied")
+
+		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 
 	// check permissions
 	// current user need to have all assigned permissions to create a role
 	for _, perm := range req.Permissions {
 		if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
-			return &user.Role{}, status.New(codes.InvalidArgument, err.Error()).Err()
+			logger.Error().Err(err).Msg("permission denied")
+
+			return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()
 		}
 	}
 
@@ -60,8 +63,6 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user
 		})
 	}
 
-	fmt.Println(permissions)
-
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		if err = h.user.InsertRole(ctx, role); err != nil {
 			logger.Error().Err(err).Msg("failed to insert role")
@@ -77,13 +78,13 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*user
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &user.Role{}, err
+		return &dto.RolePermission{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &user.Role{
-		ID:   role.ID,
-		Name: role.Name,
+	return &dto.RolePermission{
+		Role:        role,
+		Permissions: permissions,
 	}, nil
 }

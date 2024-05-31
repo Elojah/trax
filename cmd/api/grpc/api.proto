@@ -16,7 +16,6 @@ import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
 
 import "github.com/elojah/trax/internal/user/entity.proto";
-import "github.com/elojah/trax/internal/user/role.proto";
 import "github.com/elojah/trax/internal/user/user.proto";
 import "github.com/elojah/trax/internal/user/dto/entity.proto";
 import "github.com/elojah/trax/internal/user/dto/role.proto";
@@ -40,6 +39,6 @@ service API {
 
     // Roles
     rpc ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
-    rpc CreateRole(dto.CreateRoleReq) returns (user.Role);
-    rpc UpdateRole(dto.UpdateRoleReq) returns (user.Role);
+    rpc CreateRole(dto.CreateRoleReq) returns (dto.RolePermission);
+    rpc UpdateRole(dto.UpdateRoleReq) returns (dto.RolePermission);
 }

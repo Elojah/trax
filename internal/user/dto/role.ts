@@ -48,9 +48,9 @@ export interface CreateRoleReq {
  */
 export interface UpdateRoleReq {
     /**
-     * @generated from protobuf field: bytes RoleID = 1 [json_name = "RoleID"];
+     * @generated from protobuf field: bytes ID = 1 [json_name = "ID"];
      */
-    roleID: Uint8Array;
+    iD: Uint8Array;
     /**
      * @generated from protobuf field: repeated user.Permission Permissions = 2 [json_name = "Permissions"];
      */
@@ -219,13 +219,13 @@ export const CreateRoleReq = new CreateRoleReq$Type();
 class UpdateRoleReq$Type extends MessageType<UpdateRoleReq> {
     constructor() {
         super("dto.UpdateRoleReq", [
-            { no: 1, name: "RoleID", kind: "scalar", jsonName: "RoleID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 2, name: "Permissions", kind: "message", jsonName: "Permissions", repeat: 1 /*RepeatType.PACKED*/, T: () => Permission, options: { "gogoproto.nullable": false } }
         ]);
     }
     create(value?: PartialMessage<UpdateRoleReq>): UpdateRoleReq {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.roleID = new Uint8Array(0);
+        message.iD = new Uint8Array(0);
         message.permissions = [];
         if (value !== undefined)
             reflectionMergePartial<UpdateRoleReq>(this, message, value);
@@ -236,8 +236,8 @@ class UpdateRoleReq$Type extends MessageType<UpdateRoleReq> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bytes RoleID = 1 [json_name = "RoleID"];*/ 1:
-                    message.roleID = reader.bytes();
+                case /* bytes ID = 1 [json_name = "ID"];*/ 1:
+                    message.iD = reader.bytes();
                     break;
                 case /* repeated user.Permission Permissions = 2 [json_name = "Permissions"];*/ 2:
                     message.permissions.push(Permission.internalBinaryRead(reader, reader.uint32(), options));
@@ -254,9 +254,9 @@ class UpdateRoleReq$Type extends MessageType<UpdateRoleReq> {
         return message;
     }
     internalBinaryWrite(message: UpdateRoleReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bytes RoleID = 1 [json_name = "RoleID"]; */
-        if (message.roleID.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.roleID);
+        /* bytes ID = 1 [json_name = "ID"]; */
+        if (message.iD.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
         /* repeated user.Permission Permissions = 2 [json_name = "Permissions"]; */
         for (let i = 0; i < message.permissions.length; i++)
             Permission.internalBinaryWrite(message.permissions[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();

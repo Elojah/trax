@@ -28,7 +28,7 @@ message CreateRoleReq {
 }
 
 message UpdateRoleReq {
-	bytes RoleID                           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	repeated user.Permission Permissions   = 2 [(gogoproto.nullable) = false];
 }
 

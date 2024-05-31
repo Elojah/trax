@@ -2,7 +2,7 @@
 // @generated from protobuf file "github.com/elojah/trax/cmd/api/grpc/api.proto" (package "grpc", syntax proto3)
 // tslint:disable
 import { UpdateRoleReq } from "../../../internal/user/dto/role";
-import { Role } from "../../../internal/user/role";
+import { RolePermission } from "../../../internal/user/dto/role";
 import { CreateRoleReq } from "../../../internal/user/dto/role";
 import { ListRoleResp } from "../../../internal/user/dto/role";
 import { ListRoleReq } from "../../../internal/user/dto/role";
@@ -35,6 +35,6 @@ export const API = new ServiceType("grpc.API", [
     { name: "UpdateEntity", options: {}, I: UpdateEntityReq, O: Entity },
     { name: "DeleteEntity", options: {}, I: DeleteEntityReq, O: DeleteEntityResp },
     { name: "ListRole", options: {}, I: ListRoleReq, O: ListRoleResp },
-    { name: "CreateRole", options: {}, I: CreateRoleReq, O: Role },
-    { name: "UpdateRole", options: {}, I: UpdateRoleReq, O: Role }
+    { name: "CreateRole", options: {}, I: CreateRoleReq, O: RolePermission },
+    { name: "UpdateRole", options: {}, I: UpdateRoleReq, O: RolePermission }
 ]);

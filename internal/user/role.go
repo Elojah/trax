@@ -36,8 +36,14 @@ type FilterRole struct {
 	Search string
 }
 
+type PatchRole struct {
+	Name      *string
+	UpdatedAt *int64
+}
+
 type StoreRole interface {
 	InsertRole(context.Context, Role) error
+	UpdateRole(context.Context, FilterRole, PatchRole) ([]Role, error)
 	FetchRole(context.Context, FilterRole) (Role, error)
 	ListRole(context.Context, FilterRole) ([]Role, uint64, error)
 	DeleteRole(context.Context, FilterRole) error
