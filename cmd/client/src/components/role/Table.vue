@@ -56,7 +56,7 @@ const {
 	total: total,
 } = toRefs(store);
 
-const loading = ref(true);
+const loading = ref(false);
 const search = ref('');
 
 const headers: ReadonlyHeaders = [
@@ -85,10 +85,16 @@ const expand = (_: any, item: any) => {
 };
 
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
+	if (!selectedEntity.value) {
+		viewIDs.value = [];
+
+		return
+	}
+
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
 	const [newRoleIDs] = await store.list(ListRoleReq.create({
-		entityIDs: selectedEntity.value ? [selectedEntity.value.iD!] : [],
+		entityIDs: [selectedEntity.value.iD],
 		search: search.value,
 		paginate: {
 			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
@@ -105,11 +111,7 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 
 // refresh list when selected entity changes
 watch(selectedEntity, async () => {
-	if (selectedEntity.value) {
-		await list();
-	} else {
-		viewIDs.value = [];
-	}
+	await list();
 });
 
 const name = ref('');
@@ -162,7 +164,7 @@ const delete_ = () => {
 };
 </script>
 
-<template v-if="selectedEntity">
+<template>
 	<v-col class="d-flex justify-end align-center rounded-t table-color-background" cols="12">
 		<v-dialog v-model="dialogCreate" max-width="800px">
 			<template v-slot:activator="{ props }">
@@ -234,7 +236,7 @@ const delete_ = () => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<RoleDetails :colspan="columns.length" :permissions="item?.permissions" :roleID="item?.role?.iD">
+			<RoleDetails :colspan="columns.length" :item="item">
 			</RoleDetails>
 		</template>
 	</v-data-table-server>

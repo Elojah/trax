@@ -11,6 +11,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Paginate } from "../../../pkg/paginate/paginate";
+import { String$ } from "../../../pkg/pbtypes/string";
 import { Permission } from "../role";
 import { Role } from "../role";
 /**
@@ -52,7 +53,11 @@ export interface UpdateRoleReq {
      */
     iD: Uint8Array;
     /**
-     * @generated from protobuf field: repeated user.Permission Permissions = 2 [json_name = "Permissions"];
+     * @generated from protobuf field: pbtypes.String Name = 2 [json_name = "Name"];
+     */
+    name?: String$;
+    /**
+     * @generated from protobuf field: repeated user.Permission Permissions = 3 [json_name = "Permissions"];
      */
     permissions: Permission[];
 }
@@ -220,7 +225,8 @@ class UpdateRoleReq$Type extends MessageType<UpdateRoleReq> {
     constructor() {
         super("dto.UpdateRoleReq", [
             { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 2, name: "Permissions", kind: "message", jsonName: "Permissions", repeat: 1 /*RepeatType.PACKED*/, T: () => Permission, options: { "gogoproto.nullable": false } }
+            { no: 2, name: "Name", kind: "message", jsonName: "Name", T: () => String$ },
+            { no: 3, name: "Permissions", kind: "message", jsonName: "Permissions", repeat: 1 /*RepeatType.PACKED*/, T: () => Permission, options: { "gogoproto.nullable": false } }
         ]);
     }
     create(value?: PartialMessage<UpdateRoleReq>): UpdateRoleReq {
@@ -239,7 +245,10 @@ class UpdateRoleReq$Type extends MessageType<UpdateRoleReq> {
                 case /* bytes ID = 1 [json_name = "ID"];*/ 1:
                     message.iD = reader.bytes();
                     break;
-                case /* repeated user.Permission Permissions = 2 [json_name = "Permissions"];*/ 2:
+                case /* pbtypes.String Name = 2 [json_name = "Name"];*/ 2:
+                    message.name = String$.internalBinaryRead(reader, reader.uint32(), options, message.name);
+                    break;
+                case /* repeated user.Permission Permissions = 3 [json_name = "Permissions"];*/ 3:
                     message.permissions.push(Permission.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -257,9 +266,12 @@ class UpdateRoleReq$Type extends MessageType<UpdateRoleReq> {
         /* bytes ID = 1 [json_name = "ID"]; */
         if (message.iD.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
-        /* repeated user.Permission Permissions = 2 [json_name = "Permissions"]; */
+        /* pbtypes.String Name = 2 [json_name = "Name"]; */
+        if (message.name)
+            String$.internalBinaryWrite(message.name, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* repeated user.Permission Permissions = 3 [json_name = "Permissions"]; */
         for (let i = 0; i < message.permissions.length; i++)
-            Permission.internalBinaryWrite(message.permissions[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            Permission.internalBinaryWrite(message.permissions[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

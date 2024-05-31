@@ -39,7 +39,7 @@ const name = ref('');
 const avatarURL = ref('');
 const description = ref('');
 
-const loading = ref(true);
+const loading = ref(false);
 const search = ref('');
 
 const headers: ReadonlyHeaders = [

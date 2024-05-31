@@ -14,6 +14,7 @@ option (gogoproto.goproto_registration) = true;
 import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 
 import "github.com/elojah/trax/pkg/paginate/paginate.proto";
+import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 import "github.com/elojah/trax/internal/user/role.proto";
 
 message RolePermission {
@@ -29,7 +30,8 @@ message CreateRoleReq {
 
 message UpdateRoleReq {
 	bytes ID                               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated user.Permission Permissions   = 2 [(gogoproto.nullable) = false];
+	pbtypes.String Name                    = 2;
+	repeated user.Permission Permissions   = 3 [(gogoproto.nullable) = false];
 }
 
 message ListRoleReq {

@@ -7,8 +7,7 @@ import { UpdateRoleReq } from '@internal/user/dto/role';
 
 const props = defineProps<{
 	colspan: number;
-	permissions: Permission[] | undefined;
-	roleID: Uint8Array | undefined
+	item: RolePermission | undefined,
 }>();
 
 const store = useRoleStore();
@@ -23,7 +22,7 @@ const edit = async () => {
 	const values = ps.value?.values.map(ps.value.unhash);
 
 	const req = UpdateRoleReq.create({
-		iD: props.roleID,
+		iD: props.item.role?.iD,
 		permissions: values,
 	});
 
@@ -34,9 +33,9 @@ const edit = async () => {
 <template>
 	<tr>
 		<td :colspan="props.colspan">
-			<v-card outlined>
-				<PermissionTable :permissions="props.permissions" ref="ps"></PermissionTable>
-				<v-card-actions>
+			<v-card outlined class="mb-4">
+				<PermissionTable :permissions="props.item?.permissions" ref="ps"></PermissionTable>
+				<v-card-actions v-if="props.item.role?.name !== 'admin'">
 					<v-spacer></v-spacer>
 					<v-btn color="primary" variant="text" @click="edit">
 						Edit

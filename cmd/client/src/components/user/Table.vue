@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
 import { Entity } from '@internal/user/entity';
-import { computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
@@ -56,7 +56,7 @@ const {
 	total: total,
 } = toRefs(store);
 
-const loading = ref(true);
+const loading = ref(false);
 const search = ref('');
 
 const headers: ReadonlyHeaders = [
@@ -80,10 +80,6 @@ const headers: ReadonlyHeaders = [
 	},
 ];
 
-type UserEntity = U & { entity: Entity | undefined };
-
-const selectedUser = computed(() => selected.value.at(0));
-
 const viewIDs = ref<string[]>([])
 
 const views = computed(() => {
@@ -91,7 +87,6 @@ const views = computed(() => {
 		const user = users.value?.get(userID);
 		return {
 			...user,
-			// entity: entities.value?.get(ulid(user?.entityID!)),
 		}
 	});
 });
@@ -102,10 +97,16 @@ const select = (_: any, row: any) => {
 };
 
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
+	if (!selectedEntity.value) {
+		viewIDs.value = [];
+
+		return
+	}
+
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
 	const newUserIDs = await store.list(ListUserReq.create({
-		entityIDs: selectedEntity.value ? [selectedEntity.value.iD!] : [],
+		entityIDs: [selectedEntity.value.iD],
 		search: search.value,
 		paginate: {
 			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
@@ -119,6 +120,11 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 
 	loading.value = false;
 };
+
+// refresh list when selected entity changes
+watch(selectedEntity, async () => {
+	await list();
+});
 
 const name = ref('');
 
@@ -153,7 +159,7 @@ const delete_ = () => {
 
 </script>
 
-<template v-if="selectedEntity">
+<template>
 	<v-col class="d-flex justify-end align-center rounded-t table-color-background" cols="12">
 		<v-dialog v-model="dialogInvite" max-width="800px">
 			<template v-slot:activator="{ props }">

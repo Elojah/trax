@@ -66,3 +66,31 @@ type ErrUnauthorizedRole struct {
 func (e ErrUnauthorizedRole) Error() string {
 	return fmt.Sprintf("unauthorized roles: %s", strings.Join(e.Roles, ", "))
 }
+
+type ErrEmptyPermissions struct{}
+
+func (e ErrEmptyPermissions) Error() string {
+	return fmt.Sprintf("missing permissions")
+}
+
+type ErrUnknownResource struct {
+	Resource string
+}
+
+func (e ErrUnknownResource) Error() string {
+	return fmt.Sprintf("unknown resource: %s", e.Resource)
+}
+
+type ErrUnknownCommand struct {
+	Command string
+}
+
+func (e ErrUnknownCommand) Error() string {
+	return fmt.Sprintf("unknown command: %s", e.Command)
+}
+
+type ErrForbiddenAdminRole struct{}
+
+func (e ErrForbiddenAdminRole) Error() string {
+	return fmt.Sprintf("admin role cannot be updated")
+}

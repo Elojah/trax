@@ -32,6 +32,14 @@ func (h *handler) UpdateEntity(ctx context.Context, req *dto.UpdateEntityReq) (*
 
 	var e user.Entity
 
+	// #MARK:Check request
+	if req.Name != nil {
+		e.Name = req.Name.Value
+		if err := e.Check(); err != nil {
+			return &user.Entity{}, status.New(codes.InvalidArgument, err.Error()).Err()
+		}
+	}
+
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		now := time.Now().Unix()
 		es, err := h.user.UpdateEntity(ctx, user.FilterEntity{

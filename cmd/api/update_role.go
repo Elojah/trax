@@ -8,6 +8,7 @@ import (
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
+	"github.com/elojah/trax/pkg/pbtypes"
 	"github.com/elojah/trax/pkg/transaction"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
@@ -28,6 +29,14 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 	}
 
 	var r user.Role
+
+	// #MARK:Check request
+	if req.Name != nil {
+		r.Name = req.Name.Value
+		if err := r.Check(); err != nil {
+			return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()
+		}
+	}
 
 	// Fetch entity from role
 	if err := h.user.Tx(ctx, transaction.Read, func(ctx context.Context) (transaction.Operation, error) {
@@ -50,6 +59,14 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 		return transaction.Commit, nil
 	}); err != nil {
 		return &dto.RolePermission{}, err
+	}
+
+	if r.Name == "admin" {
+		err := user.ErrForbiddenAdminRole{}
+		logger.Error().Err(err).Msg("permission denied on admin role")
+
+		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
+
 	}
 
 	if err := claims.Require(user.Requirement{EntityID: r.EntityID, Resource: user.R_role, Command: user.C_update}); err != nil {
@@ -81,24 +98,33 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 		})
 	}
 
-	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		if err = h.user.DeletePermission(ctx, user.FilterPermission{
-			RoleID: r.ID,
-		}); err != nil {
-			logger.Error().Err(err).Msg("failed to delete permissions")
-
-			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+	if len(permissions) > 0 {
+		if err := user.Permissions(permissions).Check(); err != nil {
+			return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()
 		}
+	}
 
-		if err = h.user.InsertPermissions(ctx, permissions); err != nil {
-			logger.Error().Err(err).Msg("failed to insert role permissions")
+	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		if len(permissions) > 0 {
+			if err = h.user.DeletePermission(ctx, user.FilterPermission{
+				RoleID: r.ID,
+			}); err != nil {
+				logger.Error().Err(err).Msg("failed to delete permissions")
 
-			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+			}
+
+			if err = h.user.InsertPermissions(ctx, permissions); err != nil {
+				logger.Error().Err(err).Msg("failed to insert role permissions")
+
+				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+			}
 		}
 
 		roles, err := h.user.UpdateRole(ctx, user.FilterRole{
 			ID: req.ID,
 		}, user.PatchRole{
+			Name:      pbtypes.GetString(req.Name),
 			UpdatedAt: &now,
 		})
 		if err != nil {
@@ -109,6 +135,11 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 
 		if len(roles) > 0 {
 			r = roles[0]
+		} else {
+			err := gerrors.ErrNotFound{Resource: "role", Index: req.ID.String()}
+			logger.Error().Err(err).Msg("failed to update role")
+
+			return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
 		}
 
 		return transaction.Commit, nil

@@ -52,6 +52,11 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.
 		UpdatedAt: now,
 	}
 
+	// #MARK:Check request
+	if err := role.Check(); err != nil {
+		return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()
+	}
+
 	permissions := make([]user.Permission, 0, len(req.Permissions))
 	for _, perm := range req.Permissions {
 		permissions = append(permissions, user.Permission{
@@ -61,6 +66,10 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.
 			CreatedAt: now,
 			UpdatedAt: now,
 		})
+	}
+
+	if err := user.Permissions(permissions).Check(); err != nil {
+		return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {

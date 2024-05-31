@@ -82,6 +82,19 @@ type StoreRoleUser interface {
 	ListClaims(context.Context, ulid.ID) (ClaimAuth, error)
 }
 
+func (r Role) Check() error {
+	if r.Name == "" {
+		return ErrEmptyName{}
+	} else if len(r.Name) > 255 {
+		return ErrInvalidNameLength{
+			Name:   r.Name,
+			Length: 255,
+		}
+	}
+
+	return nil
+}
+
 type Roles []Role
 
 func (rs Roles) IDs() []ulid.ID {
@@ -115,6 +128,24 @@ func AllPermissions(roleID ulid.ID) []Permission {
 }
 
 type Permissions []Permission
+
+func (ps Permissions) Check() error {
+	if len(ps) == 0 {
+		return ErrEmptyPermissions{}
+	}
+
+	for _, p := range ps {
+		if _, ok := Resources[p.Resource]; !ok {
+			return ErrUnknownResource{Resource: p.Resource.String()}
+		}
+
+		if _, ok := Commands[p.Command]; !ok {
+			return ErrUnknownCommand{Command: p.Command.String()}
+		}
+	}
+
+	return nil
+}
 
 func (ps Permissions) ByRole() map[string][]Permission {
 	perms := make(map[string][]Permission)
