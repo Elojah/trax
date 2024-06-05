@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { Permission, } from '@internal/user/role';
 import PermissionTable from '@/components/permission/Table.vue';
 import { ref } from 'vue';
 import { useRoleStore } from '@/stores/role';
-import { UpdateRoleReq } from '@internal/user/dto/role';
+import { RolePermission, UpdateRoleReq } from '@internal/user/dto/role';
 
 const props = defineProps<{
 	colspan: number;
@@ -22,20 +21,22 @@ const edit = async () => {
 	const values = ps.value?.values.map(ps.value.unhash);
 
 	const req = UpdateRoleReq.create({
-		iD: props.item.role?.iD,
+		iD: props.item?.role?.iD,
 		permissions: values,
 	});
 
 	await store.update(req);
 }
+
+const admin = props.item?.role?.name === 'admin'
 </script>
 
 <template>
 	<tr>
 		<td :colspan="props.colspan">
 			<v-card outlined class="mb-4">
-				<PermissionTable :permissions="props.item?.permissions" ref="ps"></PermissionTable>
-				<v-card-actions v-if="props.item.role?.name !== 'admin'">
+				<PermissionTable :permissions="props.item?.permissions" ref="ps" :disabled="admin"></PermissionTable>
+				<v-card-actions v-if="!admin">
 					<v-spacer></v-spacer>
 					<v-btn color="primary" variant="text" @click="edit">
 						Edit

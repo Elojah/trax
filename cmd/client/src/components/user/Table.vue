@@ -1,27 +1,21 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
-import { Entity } from '@internal/user/entity';
 import { computed, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
-import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useUserStore } from '@/stores/user';
-import type { U } from '@internal/user/user';
 import { ListUserReq } from '@internal/user/dto/user';
+import RoleTable from '@/components/user/RoleTable.vue';
+import type { ReadonlyHeaders } from '@/utils/headers';
 
-// #MARK:Common
-// ______________________________________________________
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
-
 
 const nameRules = [
 	(v: string) => !!v || 'Required',
 	(v: string) => (v && v.length >= 1) || 'Min 1 character',
 ];
-
-type ReadonlyHeaders = VDataTable['$props']['headers']
 
 const pageOptions = [
 	{
@@ -52,7 +46,6 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useUserStore();
 const {
 	users: users,
-	selected: selected,
 	total: total,
 } = toRefs(store);
 
@@ -91,9 +84,10 @@ const views = computed(() => {
 	});
 });
 
-const select = (_: any, row: any) => {
-	selected.value = [];
-	row.toggleSelect({ value: row.item, selectable: true });
+const expand = (_: any, item: any) => {
+	console.log("pre", item.isExpanded(item))
+	item.toggleExpand(item);
+	console.log("post", item.isExpanded(item))
 };
 
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
@@ -212,28 +206,32 @@ const delete_ = () => {
 	</v-text-field>
 	<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
-		:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list" v-model="selected"
-		@click:row="select" return-object item-selectable select-strategy="single">
-		<template v-slot:item="{ item, columns, isSelected, index, props: itemProps }">
+		:loading="loading" :search="search" item-value="user.iD" @update:options="list" @click:row="expand"
+		return-object>
+		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
-				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD!)">
+				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.user?.iD)">
 					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
 						<v-card class="justify-center" variant="flat" :class="{
 							'row-hovered': isHovering,
-							'row-selected': isSelected({ value: item, selectable: true }),
+							'row-expanded': isExpanded(internalItem),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
-						}" :title="item.email" :subtitle="item.lastName + ' ' + item.firstName">
+						}" :title="item.user?.email" :subtitle="item.user?.lastName + ' ' + item.user?.firstName">
 							<v-card-actions>
 								<v-divider></v-divider>
 								<p class="font-italic font-weight-light">
-									{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
+									{{ new Date(Number(item.user?.createdAt) * 1000).toLocaleDateString('en-GB') }}
 								</p>
 							</v-card-actions>
 						</v-card>
 					</td>
 				</tr>
 			</v-hover>
+		</template>
+		<template v-slot:expanded-row="{ columns, item }">
+			<RoleTable :colspan="columns.length" :item="{ user: item.user, roles: item.roles ?? [] }">
+			</RoleTable>
 		</template>
 	</v-data-table-server>
 	<v-col cols="12" class="p-8 table-color-background rounded-b"></v-col>
@@ -245,7 +243,7 @@ const delete_ = () => {
 
 .row-odd {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.3);
+	background-color: rgba(66, 66, 66, 0.5);
 	background-color: #424242;
 }
 
@@ -255,14 +253,14 @@ const delete_ = () => {
 
 .row-even {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.3);
+	background-color: rgba(66, 66, 66, 0.5);
 }
 
 .row-even:not(.row-hovered) {
 	background-color: #263238;
 }
 
-.row-selected {
+.row-expanded {
 	background-color: rgba(0, 145, 234, 0.5) !important;
 }
 

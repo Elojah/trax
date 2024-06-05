@@ -8,13 +8,13 @@ import { computed, ref, toRefs } from 'vue';
 
 const props = defineProps<{
 	permissions: Permission[] | undefined;
+	disabled: boolean;
 }>();
 
 const authStore = useAuthStore();
 const {
 	claims: claims,
 } = toRefs(authStore);
-
 
 const entityStore = useEntityStore();
 const {
@@ -95,22 +95,22 @@ defineExpose({
 				</td>
 				<td>
 					<v-checkbox-btn color="info" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_read]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_read]] === undefined"
 						:value="hash(Resource.R_asset, Command.C_read)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="success" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_create]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_create]] === undefined"
 						:value="hash(Resource.R_asset, Command.C_create)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="warning" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_update]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_update]] === undefined"
 						:value="hash(Resource.R_asset, Command.C_update)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="error" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_delete]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_asset]]?.commands[Command[Command.C_delete]] === undefined"
 						:value="hash(Resource.R_asset, Command.C_delete)"></v-checkbox-btn>
 				</td>
 			</tr>
@@ -120,22 +120,22 @@ defineExpose({
 				</td>
 				<td>
 					<v-checkbox-btn color="info" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_read]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_read]] === undefined"
 						:value="hash(Resource.R_entity, Command.C_read)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="success" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_create]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_create]] === undefined"
 						:value="hash(Resource.R_entity, Command.C_create)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="warning" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_update]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_update]] === undefined"
 						:value="hash(Resource.R_entity, Command.C_update)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="error" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_delete]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_entity]]?.commands[Command[Command.C_delete]] === undefined"
 						:value="hash(Resource.R_entity, Command.C_delete)"></v-checkbox-btn>
 				</td>
 			</tr>
@@ -145,22 +145,22 @@ defineExpose({
 				</td>
 				<td>
 					<v-checkbox-btn color="info" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_read]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_read]] === undefined"
 						:value="hash(Resource.R_operation, Command.C_read)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="success" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_create]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_create]] === undefined"
 						:value="hash(Resource.R_operation, Command.C_create)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="warning" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_update]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_update]] === undefined"
 						:value="hash(Resource.R_operation, Command.C_update)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="error" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_delete]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_operation]]?.commands[Command[Command.C_delete]] === undefined"
 						:value="hash(Resource.R_operation, Command.C_delete)"></v-checkbox-btn>
 				</td>
 			</tr>
@@ -170,22 +170,22 @@ defineExpose({
 				</td>
 				<td>
 					<v-checkbox-btn color="info" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_read]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_read]] === undefined"
 						:value="hash(Resource.R_role, Command.C_read)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="success" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_create]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_create]] === undefined"
 						:value="hash(Resource.R_role, Command.C_create)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="warning" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_update]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_update]] === undefined"
 						:value="hash(Resource.R_role, Command.C_update)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="error" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_delete]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_role]]?.commands[Command[Command.C_delete]] === undefined"
 						:value="hash(Resource.R_role, Command.C_delete)"></v-checkbox-btn>
 				</td>
 			</tr>
@@ -195,22 +195,22 @@ defineExpose({
 				</td>
 				<td>
 					<v-checkbox-btn color="info" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_read]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_read]] === undefined"
 						:value="hash(Resource.R_user, Command.C_read)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="success" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_create]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_create]] === undefined"
 						:value="hash(Resource.R_user, Command.C_create)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="warning" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_update]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_update]] === undefined"
 						:value="hash(Resource.R_user, Command.C_update)"></v-checkbox-btn>
 				</td>
 				<td>
 					<v-checkbox-btn color="error" v-model="values"
-						:disabled="claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_delete]] === undefined"
+						:disabled="props.disabled || claims?.entities[selectedEntityID]?.resources[Resource[Resource.R_user]]?.commands[Command[Command.C_delete]] === undefined"
 						:value="hash(Resource.R_user, Command.C_delete)"></v-checkbox-btn>
 				</td>
 			</tr>

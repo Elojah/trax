@@ -2,15 +2,13 @@
 import { useEntityStore } from '@/stores/entity';
 import { computed, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
-import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { ListEntityReq } from '@internal/user/dto/entity';
+import type { ReadonlyHeaders } from '@/utils/headers';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
-
-type ReadonlyHeaders = VDataTable['$props']['headers']
 
 const pageOptions = [
 	{
@@ -176,7 +174,7 @@ const short = (description: string): string => {
 	</v-text-field>
 	<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
-		:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list" v-model="selected"
+		:loading="loading" :search="search" item-value="iD" @update:options="list" v-model="selected"
 		@click:row="select" return-object item-selectable select-strategy="single">
 		<template v-slot:item="{ item, columns, isSelected, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
@@ -217,7 +215,7 @@ const short = (description: string): string => {
 
 .row-odd {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.3);
+	background-color: rgba(66, 66, 66, 0.5);
 	background-color: #424242;
 }
 
@@ -227,7 +225,7 @@ const short = (description: string): string => {
 
 .row-even {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.3);
+	background-color: rgba(66, 66, 66, 0.5);
 }
 
 .row-even:not(.row-hovered) {

@@ -2,13 +2,13 @@
 import { useEntityStore } from '@/stores/entity';
 import { computed, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
-import type { VDataTable } from 'vuetify/components/VDataTable';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';
 import { ListRoleReq } from '@internal/user/dto/role';
 import RoleDetails from '@/components/role/Details.vue';
 import PermissionTable from '@/components/permission/Table.vue';
+import type { ReadonlyHeaders } from '@/utils/headers';
 
 // #MARK:Common
 // ______________________________________________________
@@ -20,8 +20,6 @@ const nameRules = [
 	(v: string) => !!v || 'Required',
 	(v: string) => (v && v.length >= 1) || 'Min 1 character',
 ];
-
-type ReadonlyHeaders = VDataTable['$props']['headers']
 
 const pageOptions = [
 	{
@@ -52,7 +50,6 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useRoleStore();
 const {
 	roles: roles,
-	selected: selected,
 	total: total,
 } = toRefs(store);
 
@@ -189,7 +186,8 @@ const delete_ = () => {
 									</v-col>
 								</v-row>
 								<v-row>
-									<PermissionTable :permissions="[]" ref="permissions"></PermissionTable>
+									<PermissionTable :permissions="[]" ref="permissions" :disabled="false">
+									</PermissionTable>
 								</v-row>
 							</v-container>
 						</v-card-text>
@@ -212,8 +210,8 @@ const delete_ = () => {
 	</v-text-field>
 	<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
-		:loading="loading" :search="search" item-value="name" item-key="iD" @update:options="list" v-model="selected"
-		@click:row="expand" return-object>
+		:loading="loading" :search="search" item-value="role.iD" @update:options="list" @click:row="expand"
+		return-object>
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">
@@ -249,7 +247,7 @@ const delete_ = () => {
 
 .row-odd {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.3);
+	background-color: rgba(66, 66, 66, 0.5);
 	background-color: #424242;
 }
 
@@ -259,7 +257,7 @@ const delete_ = () => {
 
 .row-even {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.3);
+	background-color: rgba(66, 66, 66, 0.5);
 }
 
 .row-even:not(.row-hovered) {

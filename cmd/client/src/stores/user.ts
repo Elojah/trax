@@ -2,18 +2,16 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { U } from '@internal/user/user'
-import { Paginate } from '@pkg/paginate/paginate'
-import { ListUserReq } from '@internal/user/dto/user'
+import { ListUserReq, UserRoles } from '@internal/user/dto/user'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
 
 export const useUserStore = defineStore('user', () => {
-  const users = ref<Map<string, U>>(new Map())
+  const users = ref<Map<string, UserRoles>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
-  const selected = ref<U[]>([])
+  const selected = ref<UserRoles[]>([])
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -42,15 +40,15 @@ export const useUserStore = defineStore('user', () => {
     try {
       const resp = await api.listUser(req, { meta: { token: token.value } })
 
-      resp.response.users?.forEach((user: U) => {
-        users.value?.set(ulid(user.iD), user)
+      resp.response.users?.forEach((user: UserRoles) => {
+        users.value?.set(ulid(user.user?.iD), user)
       })
 
       if (req?.iDs.length === 0) {
         total.value = resp.response.total
       }
 
-      return resp.response.users.map((user: U) => ulid(user.iD))
+      return resp.response.users.map((user: UserRoles) => ulid(user.user?.iD))
     } catch (err: any) {
       switch (err.code) {
         default:

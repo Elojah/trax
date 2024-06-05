@@ -25,11 +25,8 @@ $ make client && ./bin/trax_web_client config/web_client/local.json
 
 TODO:
 
-- Add Create & Update on everything
+- Add Create & Update & delete on everything
 
-  - Display + Update Role w permission
-    - Update Role (edit & reset)
-  - Create Role
   - Delete Role
   - Create (add at least 1 role) User
   - Display + Update User w roles
@@ -38,7 +35,9 @@ TODO:
   - !!! Show edit/delete only for users with permissions
   - Add pop up for every success/fail actions
 
-- Clean UI (table, cards, etc.)
+- ~ Clean UI (table, cards, etc.)
+
+- Find a way to have expire map for pinia stores
 
 ```
 - Stocks

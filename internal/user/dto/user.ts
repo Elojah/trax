@@ -10,6 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Role } from "../role";
 import { U } from "../user";
 import { Paginate } from "../../../pkg/paginate/paginate";
 import { String$ } from "../../../pkg/pbtypes/string";
@@ -107,9 +108,9 @@ export interface ListUserReq {
      */
     search: string;
     /**
-     * @generated from protobuf field: bool UserEntityIDs = 3 [json_name = "UserEntityIDs"];
+     * @generated from protobuf field: bool OwnEntity = 3 [json_name = "OwnEntity"];
      */
-    userEntityIDs: boolean;
+    ownEntity: boolean;
     /**
      * @generated from protobuf field: repeated bytes IDs = 4 [json_name = "IDs"];
      */
@@ -120,13 +121,26 @@ export interface ListUserReq {
     entityIDs: Uint8Array[];
 }
 /**
+ * @generated from protobuf message dto.UserRoles
+ */
+export interface UserRoles {
+    /**
+     * @generated from protobuf field: user.U User = 1 [json_name = "User"];
+     */
+    user?: U;
+    /**
+     * @generated from protobuf field: repeated user.Role Roles = 2 [json_name = "Roles"];
+     */
+    roles: Role[];
+}
+/**
  * @generated from protobuf message dto.ListUserResp
  */
 export interface ListUserResp {
     /**
-     * @generated from protobuf field: repeated user.U Users = 1 [json_name = "Users"];
+     * @generated from protobuf field: repeated dto.UserRoles Users = 1 [json_name = "Users"];
      */
-    users: U[];
+    users: UserRoles[];
     /**
      * @generated from protobuf field: uint64 Total = 2 [json_name = "Total"];
      */
@@ -442,7 +456,7 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
         super("dto.ListUserReq", [
             { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
             { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "UserEntityIDs", kind: "scalar", jsonName: "UserEntityIDs", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "OwnEntity", kind: "scalar", jsonName: "OwnEntity", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 5, name: "EntityIDs", kind: "scalar", jsonName: "EntityIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
@@ -450,7 +464,7 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
     create(value?: PartialMessage<ListUserReq>): ListUserReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.search = "";
-        message.userEntityIDs = false;
+        message.ownEntity = false;
         message.iDs = [];
         message.entityIDs = [];
         if (value !== undefined)
@@ -468,8 +482,8 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
                 case /* string Search = 2 [json_name = "Search"];*/ 2:
                     message.search = reader.string();
                     break;
-                case /* bool UserEntityIDs = 3 [json_name = "UserEntityIDs"];*/ 3:
-                    message.userEntityIDs = reader.bool();
+                case /* bool OwnEntity = 3 [json_name = "OwnEntity"];*/ 3:
+                    message.ownEntity = reader.bool();
                     break;
                 case /* repeated bytes IDs = 4 [json_name = "IDs"];*/ 4:
                     message.iDs.push(reader.bytes());
@@ -495,9 +509,9 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
         /* string Search = 2 [json_name = "Search"]; */
         if (message.search !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.search);
-        /* bool UserEntityIDs = 3 [json_name = "UserEntityIDs"]; */
-        if (message.userEntityIDs !== false)
-            writer.tag(3, WireType.Varint).bool(message.userEntityIDs);
+        /* bool OwnEntity = 3 [json_name = "OwnEntity"]; */
+        if (message.ownEntity !== false)
+            writer.tag(3, WireType.Varint).bool(message.ownEntity);
         /* repeated bytes IDs = 4 [json_name = "IDs"]; */
         for (let i = 0; i < message.iDs.length; i++)
             writer.tag(4, WireType.LengthDelimited).bytes(message.iDs[i]);
@@ -515,10 +529,64 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
  */
 export const ListUserReq = new ListUserReq$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class UserRoles$Type extends MessageType<UserRoles> {
+    constructor() {
+        super("dto.UserRoles", [
+            { no: 1, name: "User", kind: "message", jsonName: "User", T: () => U, options: { "gogoproto.nullable": false } },
+            { no: 2, name: "Roles", kind: "message", jsonName: "Roles", repeat: 1 /*RepeatType.PACKED*/, T: () => Role, options: { "gogoproto.nullable": false } }
+        ]);
+    }
+    create(value?: PartialMessage<UserRoles>): UserRoles {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.roles = [];
+        if (value !== undefined)
+            reflectionMergePartial<UserRoles>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UserRoles): UserRoles {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* user.U User = 1 [json_name = "User"];*/ 1:
+                    message.user = U.internalBinaryRead(reader, reader.uint32(), options, message.user);
+                    break;
+                case /* repeated user.Role Roles = 2 [json_name = "Roles"];*/ 2:
+                    message.roles.push(Role.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: UserRoles, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* user.U User = 1 [json_name = "User"]; */
+        if (message.user)
+            U.internalBinaryWrite(message.user, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated user.Role Roles = 2 [json_name = "Roles"]; */
+        for (let i = 0; i < message.roles.length; i++)
+            Role.internalBinaryWrite(message.roles[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.UserRoles
+ */
+export const UserRoles = new UserRoles$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class ListUserResp$Type extends MessageType<ListUserResp> {
     constructor() {
         super("dto.ListUserResp", [
-            { no: 1, name: "Users", kind: "message", jsonName: "Users", repeat: 1 /*RepeatType.PACKED*/, T: () => U, options: { "gogoproto.nullable": false } },
+            { no: 1, name: "Users", kind: "message", jsonName: "Users", repeat: 1 /*RepeatType.PACKED*/, T: () => UserRoles, options: { "gogoproto.nullable": false } },
             { no: 2, name: "Total", kind: "scalar", jsonName: "Total", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
@@ -535,8 +603,8 @@ class ListUserResp$Type extends MessageType<ListUserResp> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated user.U Users = 1 [json_name = "Users"];*/ 1:
-                    message.users.push(U.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated dto.UserRoles Users = 1 [json_name = "Users"];*/ 1:
+                    message.users.push(UserRoles.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* uint64 Total = 2 [json_name = "Total"];*/ 2:
                     message.total = reader.uint64().toBigInt();
@@ -553,9 +621,9 @@ class ListUserResp$Type extends MessageType<ListUserResp> {
         return message;
     }
     internalBinaryWrite(message: ListUserResp, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated user.U Users = 1 [json_name = "Users"]; */
+        /* repeated dto.UserRoles Users = 1 [json_name = "Users"]; */
         for (let i = 0; i < message.users.length; i++)
-            U.internalBinaryWrite(message.users[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            UserRoles.internalBinaryWrite(message.users[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* uint64 Total = 2 [json_name = "Total"]; */
         if (message.total !== 0n)
             writer.tag(2, WireType.Varint).uint64(message.total);
