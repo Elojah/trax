@@ -17,6 +17,7 @@ import (
 
 var (
 	sortUser = map[string]string{
+		"email":      "u.email",
 		"name":       "u.last_name",
 		"created_at": "u.created_at",
 		"updated_at": "u.updated_at",

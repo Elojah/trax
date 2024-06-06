@@ -63,7 +63,7 @@ const headers: ReadonlyHeaders = [
 		title: 'Name',
 		key: 'name',
 		align: 'start',
-		sortable: false,
+		sortable: true,
 	},
 	{
 		title: 'Created',
@@ -76,18 +76,11 @@ const headers: ReadonlyHeaders = [
 const viewIDs = ref<string[]>([])
 
 const views = computed(() => {
-	return viewIDs.value.map((userID: string) => {
-		const user = users.value?.get(userID);
-		return {
-			...user,
-		}
-	});
+	return viewIDs.value.map((userID: string) => { return users.value?.get(userID); });
 });
 
 const expand = (_: any, item: any) => {
-	console.log("pre", item.isExpanded(item))
-	item.toggleExpand(item);
-	console.log("post", item.isExpanded(item))
+	item.toggleExpand({ value: item.item });
 };
 
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
@@ -230,7 +223,7 @@ const delete_ = () => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<RoleTable :colspan="columns.length" :item="{ user: item.user, roles: item.roles ?? [] }">
+			<RoleTable :colspan="columns.length" :item="item">
 			</RoleTable>
 		</template>
 	</v-data-table-server>
