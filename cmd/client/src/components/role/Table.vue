@@ -10,11 +10,14 @@ import RoleDetails from '@/components/role/Details.vue';
 import PermissionTable from '@/components/permission/Table.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 
+const props = defineProps<{
+	selection: boolean;
+}>();
+
 // #MARK:Common
 // ______________________________________________________
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
-
 
 const nameRules = [
 	(v: string) => !!v || 'Required',
@@ -208,7 +211,7 @@ const delete_ = () => {
 	<v-text-field class="table-color-background px-1" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
 		variant="outlined" hide-details single-line>
 	</v-text-field>
-	<v-data-table-server class="rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
+	<v-data-table-server class="px-4 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="role.iD" @update:options="list" @click:row="expand"
 		return-object>
@@ -223,6 +226,13 @@ const delete_ = () => {
 							'row-odd': index % 2 !== 0,
 						}" :title="item.role?.name" :subtitle="Number(item.permissions.length) + ' permission(s)'">
 							<v-card-actions>
+								<v-btn v-if="props.selection" variant="tonal" prepend-icon="mdi-plus-box"
+									color="primary" v-bind="props" v-on:click.stop.prevent="() => { console.log('x') }">
+									Add role
+									<template v-slot:prepend>
+										<v-icon color="primary"></v-icon>
+									</template>
+								</v-btn>
 								<v-divider></v-divider>
 								<p class="font-italic font-weight-light">
 									{{ new Date(Number(item.role?.createdAt) * 1000).toLocaleDateString('en-GB') }}

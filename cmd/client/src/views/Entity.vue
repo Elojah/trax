@@ -49,7 +49,7 @@ const tableEntities = ref();
 					<!-- Info -->
 					<EntityDetails v-if="view === 0" :onDelete="() => { tableEntities?.value?.list() }"></EntityDetails>
 					<!-- Roles -->
-					<RoleTable v-if="view === 1"></RoleTable>
+					<RoleTable v-if="view === 1" :selection="false"></RoleTable>
 					<!-- User -->
 					<UserTable v-if="view === 2"></UserTable>
 					<v-divider></v-divider>

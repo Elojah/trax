@@ -5,11 +5,17 @@ import { ulid } from '@/utils/ulid';
 import { computed, ref, toRefs } from 'vue';
 import type { UserRoles } from '@internal/user/dto/user';
 import type { ReadonlyHeaders } from '@/utils/headers';
+import type { VForm } from 'vuetify/components';
+import RoleTable from '@/components/role/Table.vue';
+import { useRoleStore } from '@/stores/role';
 
 const props = defineProps<{
 	item: UserRoles | undefined;
 	colspan: number;
 }>();
+
+const form = ref<VForm | null>(null);
+const valid = ref(null as boolean | null)
 
 const authStore = useAuthStore();
 const {
@@ -33,7 +39,7 @@ const headers: ReadonlyHeaders = [
 	{
 		title: 'Created',
 		key: 'created_at',
-		align: 'start',
+		align: 'end',
 		sortable: true,
 	},
 	{
@@ -43,6 +49,23 @@ const headers: ReadonlyHeaders = [
 		sortable: false,
 	},
 ];
+
+const store = useRoleStore();
+const {
+	selected: selected,
+} = toRefs(store);
+
+
+const dialogAddRole = ref(false);
+
+const closeAddRole = () => {
+	dialogAddRole.value = false;
+};
+
+const addRole = async () => {
+	console.log(selected)
+};
+
 
 </script>
 <template>
@@ -57,34 +80,60 @@ const headers: ReadonlyHeaders = [
 			</p>
 		</td>
 		<td class="px-1 py-1">
-			<p class="font-italic font-weight-light">
-				{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
-			</p>
+			<div class="d-flex flex-row-reverse">
+				<p class="font-italic font-weight-light">
+					{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
+				</p>
+			</div>
 		</td>
 		<td class="px-1 py-1">
-			<v-col class="d-flex justify-end">
+			<div class="d-flex flex-row-reverse">
 				<v-btn variant="tonal" prepend-icon="mdi-trash-can" color="error" v-bind="props">
 					Delete
 					<template v-slot:prepend>
 						<v-icon color="error"></v-icon>
 					</template>
 				</v-btn>
-			</v-col>
+			</div>
 		</td>
 	</tr>
 </template>
-<template v-slot:bottom="{ columns }">
-	<tr>
-		<td :colspan="columns.length">
-			<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
-				New
-				<template v-slot:prepend>
-					<v-icon color="primary"></v-icon>
-				</template>
-			</v-btn>
-		</td>
-	</tr>
+<template v-slot:bottom>
+	<div class="d-flex justify-center px-1 py-1">
+		<v-dialog v-model="dialogAddRole" max-width="800px">
+			<template v-slot:activator="{ props }">
+				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+					Add roles
+					<template v-slot:prepend>
+						<v-icon color="primary"></v-icon>
+					</template>
+				</v-btn>
+			</template>
+			<v-sheet class="px-1 rounded-xl" outlined color="primary">
+				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+					<v-form ref="form" v-model="valid" lazy-validation>
+						<v-card-title>
+							<span class="text-h6">Add roles to user {{ props.item?.user?.email }}</span>
+						</v-card-title>
+						<v-card-text>
+							<RoleTable :selection="true"></RoleTable>
+						</v-card-text>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn variant="text" @click="closeAddRole">
+								Cancel
+							</v-btn>
+							<v-btn color="primary" variant="text" @click="addRole">
+								Add
+							</v-btn>
+						</v-card-actions>
+					</v-form>
+				</v-card>
+			</v-sheet>
+		</v-dialog>
+	</div>
 </template>
+<template v-slot:top></template>
 </v-data-table>
 </td>
 </tr>
