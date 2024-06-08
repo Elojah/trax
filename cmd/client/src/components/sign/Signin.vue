@@ -76,7 +76,7 @@ const signInGoogleError = async function (error: any) {
 </script>
 
 <template>
-  <v-card class="px-6 py-6 rounded-xl" variant="elevated">
+  <v-card class="px-6 py-6 rounded-lg" variant="elevated">
     <v-card-item class="justify-center mb-2" prepend-icon="mdi-login">
       <v-card-title>
         SIGNIN

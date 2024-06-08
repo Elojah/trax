@@ -10,9 +10,10 @@ import RoleDetails from '@/components/role/Details.vue';
 import PermissionTable from '@/components/permission/Table.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import { useUserStore } from '@/stores/user';
+import type { Role } from '@internal/user/role';
 
 const props = defineProps<{
-	addRole: ((role: RolePermission) => void) | undefined;
+	userID: Uint8Array | undefined;
 }>();
 
 // #MARK:Common
@@ -41,6 +42,9 @@ const pageOptions = [
 ]
 
 const authStore = useAuthStore();
+
+// to add role
+const userStore = useUserStore();
 
 const entityStore = useEntityStore();
 const {
@@ -164,10 +168,27 @@ const confirmDelete = () => {
 const delete_ = () => {
 };
 
+// Optional add role to user id
+const userRoles = ref<Map<string, boolean> | undefined>((() => {
+	return userStore.users.get(ulid(props.userID))?.roles?.reduce((acc: Map<string, boolean>, role: Role) => {
+		acc.set(ulid(role?.iD), true);
+
+		return acc;
+	}, new Map<string, boolean>())
+})())
+
+const addRole = async (role: RolePermission) => {
+	if (props.userID) {
+		await userStore.addRole(props.userID, role.role?.iD!);
+		userRoles.value?.set(ulid(role.role?.iD), true);
+	}
+};
+
+
 </script>
 
 <template>
-	<v-col class="d-flex justify-end align-center rounded-t-xl table-color-background" cols="12">
+	<v-col class="d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
 		<v-dialog v-model="dialogCreate" max-width="800px">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
@@ -177,8 +198,8 @@ const delete_ = () => {
 					</template>
 				</v-btn>
 			</template>
-			<v-sheet class="px-1 rounded-xl" outlined color="primary">
-				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+			<v-sheet class="px-1 rounded-lg" outlined color="primary">
+				<v-card class="px-6 py-6 rounded-lg" variant="elevated">
 					<v-form ref="form" v-model="valid" lazy-validation>
 						<v-card-title>
 							<span class="text-h6">New role</span>
@@ -233,11 +254,20 @@ const delete_ = () => {
 								<v-icon v-else icon="mdi-plus" size="x-large" color="primary"> </v-icon>
 							</template>
 							<v-card-actions>
-								<v-btn v-if="props.addRole" variant="tonal" prepend-icon="mdi-plus-box" color="primary"
-									v-bind="props" v-on:click.stop.prevent="() => { props.addRole!(item) }">
+								<v-btn v-if="props.userID && !userRoles?.has(ulid(item.role?.iD))" variant="tonal"
+									prepend-icon="mdi-plus-box" color="primary" v-bind="props"
+									v-on:click.stop.prevent="async () => { await addRole(item) }">
 									Add role
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>
+									</template>
+								</v-btn>
+								<v-btn v-else-if="props.userID && userRoles?.has(ulid(item.role?.iD))" variant="tonal"
+									disabled prepend-icon="mdi-check-bold" color="primary" v-bind="props"
+									v-on:click.stop.prevent="async () => { }">
+									Role added
+									<template v-slot:prepend>
+										<v-icon color="secondary"></v-icon>
 									</template>
 								</v-btn>
 								<v-divider></v-divider>
@@ -255,7 +285,7 @@ const delete_ = () => {
 			</RoleDetails>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="p-8 table-color-background rounded-b-xl"></v-col>
+	<v-col cols="12" class="p-8 table-color-background rounded-b-lg"></v-col>
 </template>
 <style scoped>
 .table-color-background {

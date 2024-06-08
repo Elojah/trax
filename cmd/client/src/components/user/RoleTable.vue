@@ -2,7 +2,7 @@
 import { useAuthStore } from '@/stores/auth';
 import { useEntityStore } from '@/stores/entity';
 import { ulid } from '@/utils/ulid';
-import { computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import type { UserRoles } from '@internal/user/dto/user';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import type { VForm } from 'vuetify/components';
@@ -16,8 +16,6 @@ const props = defineProps<{
 	colspan: number;
 }>();
 
-const form = ref<VForm | null>(null);
-const valid = ref(null as boolean | null)
 const refresh = ref(false);
 
 const authStore = useAuthStore();
@@ -32,7 +30,10 @@ const {
 const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 
 const userStore = useUserStore();
-const user = computed(() => { refresh.value; return userStore.users.get(ulid(props.userID)) });
+
+const user = userStore.users.get(ulid(props.userID))?.user;
+
+const roles = computed(() => { refresh.value; return userStore.users.get(ulid(props.userID))?.roles; });
 
 const headers: ReadonlyHeaders = [
 	{
@@ -63,22 +64,19 @@ const {
 
 const dialogAddRole = ref(false);
 
+watch(() => dialogAddRole, async () => {
+	refresh.value = !refresh.value;
+});
+
 const closeAddRole = () => {
 	dialogAddRole.value = false;
-};
-
-const addRole = (role: RolePermission) => {
-	if (props.userID) {
-		userStore.addRole(props.userID, role.role?.iD!);
-		refresh.value = !refresh.value;
-	}
 };
 
 </script>
 <template>
 	<tr>
 		<td :colspan="props.colspan">
-			<v-data-table density="compact" :headers="headers" :items="user?.roles" class="">
+			<v-data-table density="compact" :headers="headers" :items="roles" class="">
 				<template v-slot:item="{ item }">
 	<tr v-if="item" :key="item.name">
 		<td class="px-1 py-1">
@@ -116,25 +114,20 @@ const addRole = (role: RolePermission) => {
 					</template>
 				</v-btn>
 			</template>
-			<v-sheet class="px-1 rounded-xl" outlined color="primary">
-				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
-					<v-form ref="form" v-model="valid" lazy-validation>
-						<v-card-title>
-							<span class="text-h6">Add roles to {{ user?.user?.email }}</span>
-						</v-card-title>
-						<v-card-text>
-							<RoleTable :add-role="addRole"></RoleTable>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn variant="text" @click="closeAddRole">
-								Cancel
-							</v-btn>
-							<v-btn color="primary" variant="text" @click="addRole">
-								Add
-							</v-btn>
-						</v-card-actions>
-					</v-form>
+			<v-sheet class="px-1 rounded-lg" outlined color="primary">
+				<v-card class="px-6 py-6 rounded-lg" variant="elevated">
+					<v-card-title>
+						<span class="text-h6">Add roles to {{ user?.email }}</span>
+					</v-card-title>
+					<v-card-text>
+						<RoleTable :user-i-d="props.userID"></RoleTable>
+					</v-card-text>
+					<v-card-actions>
+						<v-spacer></v-spacer>
+						<v-btn variant="text">
+							close
+						</v-btn>
+					</v-card-actions>
 				</v-card>
 			</v-sheet>
 		</v-dialog>

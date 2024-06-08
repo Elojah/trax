@@ -64,7 +64,7 @@ const updateDescription = async function () {
 
 <template>
 	<!-- Info -->
-	<v-card v-if="e" class="px-6 py-6 justify-center rounded-xl" variant="flat">
+	<v-card v-if="e" class="px-6 py-6 justify-center rounded-lg" variant="flat">
 		<v-avatar class="mb-4 justify-center" size="96" :color="!e.avatarURL ? 'primary' : ''">
 			<img v-if="e.avatarURL" :src="e.avatarURL" alt="Avatar">
 			<span v-else-if="!e.avatarURL" class=" mx-auto text-center text-h5">
@@ -105,8 +105,8 @@ const updateDescription = async function () {
 						</template>
 					</v-btn>
 				</template>
-				<v-sheet class="px-1 rounded-xl" outlined color="error">
-					<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+				<v-sheet class="px-1 rounded-lg" outlined color="error">
+					<v-card class="px-6 py-6 rounded-lg" variant="elevated">
 						<v-card-title class="text-h5">Are you sure you want to delete this entity
 							?</v-card-title>
 						<v-card-actions>

@@ -122,7 +122,7 @@ const short = (description: string): string => {
 </script>
 
 <template>
-	<v-col class="d-flex justify-end align-center rounded-t-xl table-color-background" cols="12">
+	<v-col class="d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
 		<v-dialog v-model="dialogCreate" max-width="800px">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
@@ -132,8 +132,8 @@ const short = (description: string): string => {
 					</template>
 				</v-btn>
 			</template>
-			<v-sheet class="px-1 rounded-xl" outlined color="primary">
-				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
+			<v-sheet class="px-1 rounded-lg" outlined color="primary">
+				<v-card class="px-6 py-6 rounded-lg" variant="elevated">
 					<v-form ref="form" v-model="valid" lazy-validation>
 						<v-card-title>
 							<span class="text-h6">New entity</span>
@@ -209,7 +209,7 @@ const short = (description: string): string => {
 			</v-hover>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="table-color-background p-8 rounded-b-xl"></v-col>
+	<v-col cols="12" class="table-color-background p-8 rounded-b-lg"></v-col>
 </template>
 <style scoped>
 .table-color-background {
