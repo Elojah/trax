@@ -6,6 +6,7 @@ import { ListUserReq, UserRoles } from '@internal/user/dto/user'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
+import { CreateRoleUserReq } from '@internal/user/dto/role'
 
 export const useUserStore = defineStore('user', () => {
   const users = ref<Map<string, UserRoles>>(new Map())
@@ -21,19 +22,7 @@ export const useUserStore = defineStore('user', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const invite = async function (name: string) {
-    // try {
-    //   const req = CreateUserReq.create({
-    //     name: name
-    //   })
-    //   return await api.createUser(req, { meta: { token: token.value } })
-    // } catch (err: any) {
-    //   switch (err.code) {
-    //     default:
-    //       logger.error(err)
-    //   }
-    // }
-  }
+  const invite = async function (name: string) { throw new Error('not implemented') }
 
   // Return users ids and entity ids
   const list = async function (req: ListUserReq): Promise<string[]> {
@@ -58,11 +47,29 @@ export const useUserStore = defineStore('user', () => {
     return []
   }
 
+  const addRole = async function (userID: Uint8Array, roleID: Uint8Array) {
+    try {
+      const req = CreateRoleUserReq.create({
+        userID: userID,
+        roleID: roleID
+      })
+
+      const resp = await api.createRoleUser(req, { meta: { token: token.value } })
+      users.value.set(resp.response.user?.iD, resp.response)
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
+
   return {
     users,
     total,
     selected,
     invite,
-    list
+    list,
+    addRole
   }
 })

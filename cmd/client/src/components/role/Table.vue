@@ -5,13 +5,14 @@ import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';
-import { ListRoleReq } from '@internal/user/dto/role';
+import { ListRoleReq, RolePermission } from '@internal/user/dto/role';
 import RoleDetails from '@/components/role/Details.vue';
 import PermissionTable from '@/components/permission/Table.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
-	selection: boolean;
+	addRole: ((role: RolePermission) => void) | undefined;
 }>();
 
 // #MARK:Common
@@ -162,10 +163,11 @@ const confirmDelete = () => {
 
 const delete_ = () => {
 };
+
 </script>
 
 <template>
-	<v-col class="d-flex justify-end align-center rounded-t table-color-background" cols="12">
+	<v-col class="d-flex justify-end align-center rounded-t-xl table-color-background" cols="12">
 		<v-dialog v-model="dialogCreate" max-width="800px">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
@@ -225,9 +227,14 @@ const delete_ = () => {
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}" :title="item.role?.name" :subtitle="Number(item.permissions.length) + ' permission(s)'">
+							<template v-slot:append>
+								<v-icon v-if="isExpanded(internalItem)" icon="mdi-minus" size="x-large" color="primary">
+								</v-icon>
+								<v-icon v-else icon="mdi-plus" size="x-large" color="primary"> </v-icon>
+							</template>
 							<v-card-actions>
-								<v-btn v-if="props.selection" variant="tonal" prepend-icon="mdi-plus-box"
-									color="primary" v-bind="props" v-on:click.stop.prevent="() => { console.log('x') }">
+								<v-btn v-if="props.addRole" variant="tonal" prepend-icon="mdi-plus-box" color="primary"
+									v-bind="props" v-on:click.stop.prevent="() => { props.addRole!(item) }">
 									Add role
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>
@@ -248,7 +255,7 @@ const delete_ = () => {
 			</RoleDetails>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="p-8 table-color-background rounded-b"></v-col>
+	<v-col cols="12" class="p-8 table-color-background rounded-b-xl"></v-col>
 </template>
 <style scoped>
 .table-color-background {

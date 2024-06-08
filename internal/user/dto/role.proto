@@ -50,3 +50,7 @@ message ListRoleResp {
 	uint64 Total                      = 2;
 }
 
+message CreateRoleUserReq {
+	bytes RoleID                           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes UserID                           = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}

@@ -16,7 +16,9 @@ const tableEntities = ref();
 		<v-container fluid>
 			<v-row>
 				<v-col cols="4">
-					<EntityTable ref="tableEntities"></EntityTable>
+					<v-sheet class="px-1 rounded-xl" outlined color="primary">
+						<EntityTable ref="tableEntities"></EntityTable>
+					</v-sheet>
 				</v-col>
 				<v-divider vertical></v-divider>
 				<v-col class="mx-auto" cols="6">
@@ -47,11 +49,18 @@ const tableEntities = ref();
 					</v-col>
 					<v-divider></v-divider>
 					<!-- Info -->
-					<EntityDetails v-if="view === 0" :onDelete="() => { tableEntities?.value?.list() }"></EntityDetails>
+					<v-sheet v-if="view === 0" class="px-1 rounded-xl" outlined color="primary">
+						<EntityDetails :onDelete="() => { tableEntities?.value?.list() }">
+						</EntityDetails>
+					</v-sheet>
 					<!-- Roles -->
-					<RoleTable v-if="view === 1" :selection="false"></RoleTable>
+					<v-sheet v-if="view === 1" class="px-1 rounded-xl" outlined color="primary">
+						<RoleTable :user-i-d="undefined"></RoleTable>
+					</v-sheet>
 					<!-- User -->
-					<UserTable v-if="view === 2"></UserTable>
+					<v-sheet v-if="view === 2" class="px-1 rounded-xl" outlined color="primary">
+						<UserTable></UserTable>
+					</v-sheet>
 					<v-divider></v-divider>
 				</v-col>
 			</v-row>

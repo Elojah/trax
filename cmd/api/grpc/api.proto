@@ -45,4 +45,7 @@ service API {
     rpc ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);
     rpc CreateRole(dto.CreateRoleReq) returns (dto.RolePermission);
     rpc UpdateRole(dto.UpdateRoleReq) returns (dto.RolePermission);
+
+    // Roles user
+    rpc CreateRoleUser(dto.CreateRoleUserReq) returns (dto.UserRoles);
 }

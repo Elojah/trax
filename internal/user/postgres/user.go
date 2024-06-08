@@ -307,7 +307,7 @@ func (s Store) ListByEntity(ctx context.Context, f user.Filter) ([]user.U, uint6
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
+	b.WriteString(`SELECT DISTINCT ON (u.id) u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
 	if f.Paginate != nil {
 		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
 	} else {

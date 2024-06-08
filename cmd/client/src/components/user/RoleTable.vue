@@ -8,14 +8,17 @@ import type { ReadonlyHeaders } from '@/utils/headers';
 import type { VForm } from 'vuetify/components';
 import RoleTable from '@/components/role/Table.vue';
 import { useRoleStore } from '@/stores/role';
+import { useUserStore } from '@/stores/user';
+import type { RolePermission } from '@internal/user/dto/role';
 
 const props = defineProps<{
-	item: UserRoles | undefined;
+	userID: Uint8Array | undefined;
 	colspan: number;
 }>();
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
+const refresh = ref(false);
 
 const authStore = useAuthStore();
 const {
@@ -28,6 +31,8 @@ const {
 } = toRefs(entityStore);
 const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 
+const userStore = useUserStore();
+const user = computed(() => { refresh.value; return userStore.users.get(ulid(props.userID)) });
 
 const headers: ReadonlyHeaders = [
 	{
@@ -62,16 +67,18 @@ const closeAddRole = () => {
 	dialogAddRole.value = false;
 };
 
-const addRole = async () => {
-	console.log(selected)
+const addRole = (role: RolePermission) => {
+	if (props.userID) {
+		userStore.addRole(props.userID, role.role?.iD!);
+		refresh.value = !refresh.value;
+	}
 };
-
 
 </script>
 <template>
 	<tr>
 		<td :colspan="props.colspan">
-			<v-data-table density="compact" :headers="headers" :items="props?.item?.roles" class="">
+			<v-data-table density="compact" :headers="headers" :items="user?.roles" class="">
 				<template v-slot:item="{ item }">
 	<tr v-if="item" :key="item.name">
 		<td class="px-1 py-1">
@@ -89,7 +96,7 @@ const addRole = async () => {
 		<td class="px-1 py-1">
 			<div class="d-flex flex-row-reverse">
 				<v-btn variant="tonal" prepend-icon="mdi-trash-can" color="error" v-bind="props">
-					Delete
+					Remove
 					<template v-slot:prepend>
 						<v-icon color="error"></v-icon>
 					</template>
@@ -99,7 +106,7 @@ const addRole = async () => {
 	</tr>
 </template>
 <template v-slot:bottom>
-	<div class="d-flex justify-center px-1 py-1">
+	<div class="d-flex justify-center px-1 py-6">
 		<v-dialog v-model="dialogAddRole" max-width="800px">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
@@ -113,10 +120,10 @@ const addRole = async () => {
 				<v-card class="px-6 py-6 rounded-xl" variant="elevated">
 					<v-form ref="form" v-model="valid" lazy-validation>
 						<v-card-title>
-							<span class="text-h6">Add roles to user {{ props.item?.user?.email }}</span>
+							<span class="text-h6">Add roles to {{ user?.user?.email }}</span>
 						</v-card-title>
 						<v-card-text>
-							<RoleTable :selection="true"></RoleTable>
+							<RoleTable :add-role="addRole"></RoleTable>
 						</v-card-text>
 						<v-card-actions>
 							<v-spacer></v-spacer>

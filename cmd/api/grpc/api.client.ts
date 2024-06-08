@@ -4,6 +4,8 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
+import type { UserRoles } from "../../../internal/user/dto/user";
+import type { CreateRoleUserReq } from "../../../internal/user/dto/role";
 import type { UpdateRoleReq } from "../../../internal/user/dto/role";
 import type { RolePermission } from "../../../internal/user/dto/role";
 import type { CreateRoleReq } from "../../../internal/user/dto/role";
@@ -93,6 +95,12 @@ export interface IAPIClient {
      * @generated from protobuf rpc: UpdateRole(dto.UpdateRoleReq) returns (dto.RolePermission);
      */
     updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, RolePermission>;
+    /**
+     * Roles user
+     *
+     * @generated from protobuf rpc: CreateRoleUser(dto.CreateRoleUserReq) returns (dto.UserRoles);
+     */
+    createRoleUser(input: CreateRoleUserReq, options?: RpcOptions): UnaryCall<CreateRoleUserReq, UserRoles>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -203,5 +211,14 @@ export class APIClient implements IAPIClient, ServiceInfo {
     updateRole(input: UpdateRoleReq, options?: RpcOptions): UnaryCall<UpdateRoleReq, RolePermission> {
         const method = this.methods[12], opt = this._transport.mergeOptions(options);
         return stackIntercept<UpdateRoleReq, RolePermission>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * Roles user
+     *
+     * @generated from protobuf rpc: CreateRoleUser(dto.CreateRoleUserReq) returns (dto.UserRoles);
+     */
+    createRoleUser(input: CreateRoleUserReq, options?: RpcOptions): UnaryCall<CreateRoleUserReq, UserRoles> {
+        const method = this.methods[13], opt = this._transport.mergeOptions(options);
+        return stackIntercept<CreateRoleUserReq, UserRoles>("unary", this._transport, method, opt, input);
     }
 }

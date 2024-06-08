@@ -103,6 +103,19 @@ export interface ListRoleResp {
      */
     total: bigint;
 }
+/**
+ * @generated from protobuf message dto.CreateRoleUserReq
+ */
+export interface CreateRoleUserReq {
+    /**
+     * @generated from protobuf field: bytes RoleID = 1 [json_name = "RoleID"];
+     */
+    roleID: Uint8Array;
+    /**
+     * @generated from protobuf field: bytes UserID = 2 [json_name = "UserID"];
+     */
+    userID: Uint8Array;
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class RolePermission$Type extends MessageType<RolePermission> {
     constructor() {
@@ -423,3 +436,58 @@ class ListRoleResp$Type extends MessageType<ListRoleResp> {
  * @generated MessageType for protobuf message dto.ListRoleResp
  */
 export const ListRoleResp = new ListRoleResp$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CreateRoleUserReq$Type extends MessageType<CreateRoleUserReq> {
+    constructor() {
+        super("dto.CreateRoleUserReq", [
+            { no: 1, name: "RoleID", kind: "scalar", jsonName: "RoleID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 2, name: "UserID", kind: "scalar", jsonName: "UserID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<CreateRoleUserReq>): CreateRoleUserReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.roleID = new Uint8Array(0);
+        message.userID = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<CreateRoleUserReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateRoleUserReq): CreateRoleUserReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes RoleID = 1 [json_name = "RoleID"];*/ 1:
+                    message.roleID = reader.bytes();
+                    break;
+                case /* bytes UserID = 2 [json_name = "UserID"];*/ 2:
+                    message.userID = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CreateRoleUserReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes RoleID = 1 [json_name = "RoleID"]; */
+        if (message.roleID.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.roleID);
+        /* bytes UserID = 2 [json_name = "UserID"]; */
+        if (message.userID.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.userID);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.CreateRoleUserReq
+ */
+export const CreateRoleUserReq = new CreateRoleUserReq$Type();
