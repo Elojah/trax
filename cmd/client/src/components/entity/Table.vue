@@ -157,7 +157,7 @@ const short = (description: string): string => {
 						</v-card-text>
 						<v-card-actions>
 							<v-spacer></v-spacer>
-							<v-btn variant="text" @click="closeCreate">
+							<v-btn color="error" variant="text" @click="closeCreate">
 								Cancel
 							</v-btn>
 							<v-btn color="primary" variant="text" @click="create">
@@ -172,7 +172,7 @@ const short = (description: string): string => {
 	<v-text-field class="table-color-background px-1" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
 		variant="outlined" hide-details single-line>
 	</v-text-field>
-	<v-data-table-server class="px-4 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
+	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="iD" @update:options="list" v-model="selected"
 		@click:row="select" return-object item-selectable select-strategy="single">

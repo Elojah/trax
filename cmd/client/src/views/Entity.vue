@@ -15,13 +15,12 @@ const tableEntities = ref();
 	<v-main class="bg">
 		<v-container fluid>
 			<v-row>
-				<v-col cols="4">
+				<v-col cols="5">
 					<v-sheet class="px-1 rounded-lg" outlined color="primary">
 						<EntityTable ref="tableEntities"></EntityTable>
 					</v-sheet>
 				</v-col>
-				<v-divider vertical></v-divider>
-				<v-col class="mx-auto" cols="6">
+				<v-col class="mx-auto" cols="7">
 					<v-col class="d-flex justify-center" cols="12">
 						<v-btn-toggle v-model="view">
 							<v-btn class="main-color-background" size="large" variant="outlined"

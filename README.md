@@ -32,8 +32,8 @@ TODO:
   - Display + Update User w roles
   - Delete (remove \* roles) User
 
-  - !!! Show edit/delete only for users with permissions
-  - Add pop up for every success/fail actions
+  - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
+  - !!! Add pop up for every success/fail actions -> Manage API fails and success everywhere
 
 - ~ Clean UI (table, cards, etc.)
 

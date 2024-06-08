@@ -55,7 +55,7 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.createRoleUser(req, { meta: { token: token.value } })
-      users.value.set(resp.response.user?.iD, resp.response)
+      users.value.set(ulid(resp.response.user?.iD), resp.response)
     } catch (err: any) {
       switch (err.code) {
         default:

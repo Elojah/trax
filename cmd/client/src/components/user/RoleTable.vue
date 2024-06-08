@@ -2,21 +2,18 @@
 import { useAuthStore } from '@/stores/auth';
 import { useEntityStore } from '@/stores/entity';
 import { ulid } from '@/utils/ulid';
-import { computed, ref, toRefs, watch } from 'vue';
-import type { UserRoles } from '@internal/user/dto/user';
+import { computed, ref, toRefs } from 'vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
-import type { VForm } from 'vuetify/components';
 import RoleTable from '@/components/role/Table.vue';
 import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
-import type { RolePermission } from '@internal/user/dto/role';
+import { U } from '@internal/user/user';
+import type { Role } from '@internal/user/role';
 
 const props = defineProps<{
 	userID: Uint8Array | undefined;
 	colspan: number;
 }>();
-
-const refresh = ref(false);
 
 const authStore = useAuthStore();
 const {
@@ -31,9 +28,13 @@ const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 
 const userStore = useUserStore();
 
-const user = userStore.users.get(ulid(props.userID))?.user;
+// const user = computed(() => { return userStore.users.get(ulid(props.userID))?.user })
+// const roles = computed(() => { return userStore.users.get(ulid(props.userID))?.roles })
 
-const roles = computed(() => { refresh.value; return userStore.users.get(ulid(props.userID))?.roles; });
+const user: U = U.create();
+const roles: Role[] = [];
+
+// const name = user.value?.firstName + ' ' + user.value?.lastName
 
 const headers: ReadonlyHeaders = [
 	{
@@ -63,10 +64,6 @@ const {
 
 
 const dialogAddRole = ref(false);
-
-watch(() => dialogAddRole, async () => {
-	refresh.value = !refresh.value;
-});
 
 const closeAddRole = () => {
 	dialogAddRole.value = false;
@@ -105,7 +102,7 @@ const closeAddRole = () => {
 </template>
 <template v-slot:bottom>
 	<div class="d-flex justify-center px-1 py-6">
-		<v-dialog v-model="dialogAddRole" max-width="800px">
+		<v-dialog persistent v-model="dialogAddRole" max-width="1200px" @click:outside="closeAddRole">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
 					Add roles
@@ -124,8 +121,8 @@ const closeAddRole = () => {
 					</v-card-text>
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn variant="text">
-							close
+						<v-btn color="error" variant="text" @click="closeAddRole">
+							Close
 						</v-btn>
 					</v-card-actions>
 				</v-card>

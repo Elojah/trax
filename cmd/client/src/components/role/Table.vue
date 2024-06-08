@@ -169,18 +169,17 @@ const delete_ = () => {
 };
 
 // Optional add role to user id
-const userRoles = ref<Map<string, boolean> | undefined>((() => {
+const userRoles = computed(() => {
 	return userStore.users.get(ulid(props.userID))?.roles?.reduce((acc: Map<string, boolean>, role: Role) => {
 		acc.set(ulid(role?.iD), true);
 
 		return acc;
 	}, new Map<string, boolean>())
-})())
+});
 
 const addRole = async (role: RolePermission) => {
 	if (props.userID) {
 		await userStore.addRole(props.userID, role.role?.iD!);
-		userRoles.value?.set(ulid(role.role?.iD), true);
 	}
 };
 
@@ -219,7 +218,7 @@ const addRole = async (role: RolePermission) => {
 						</v-card-text>
 						<v-card-actions>
 							<v-spacer></v-spacer>
-							<v-btn variant="text" @click="closeCreateRole">
+							<v-btn color="error" variant="text" @click="closeCreateRole">
 								Cancel
 							</v-btn>
 							<v-btn color="primary" variant="text" @click="create">
@@ -234,7 +233,7 @@ const addRole = async (role: RolePermission) => {
 	<v-text-field class="table-color-background px-1" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
 		variant="outlined" hide-details single-line>
 	</v-text-field>
-	<v-data-table-server class="px-4 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
+	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="role.iD" @update:options="list" @click:row="expand"
 		return-object>
@@ -263,9 +262,9 @@ const addRole = async (role: RolePermission) => {
 									</template>
 								</v-btn>
 								<v-btn v-else-if="props.userID && userRoles?.has(ulid(item.role?.iD))" variant="tonal"
-									disabled prepend-icon="mdi-check-bold" color="primary" v-bind="props"
+									disabled prepend-icon="mdi-check-bold" color="secondary" v-bind="props"
 									v-on:click.stop.prevent="async () => { }">
-									Role added
+									Added
 									<template v-slot:prepend>
 										<v-icon color="secondary"></v-icon>
 									</template>
