@@ -195,7 +195,7 @@ const short = (description: string): string => {
 								</v-avatar>
 							</template>
 							<template v-slot:append v-if="isSelected({ value: item, selectable: true })">
-								<v-icon icon="mdi-arrow-right-circle-outline" size="x-large" color="primary"> </v-icon>
+								<v-icon icon="mdi-chevron-right" size="x-large" color="primary"> </v-icon>
 							</template>
 							<v-card-actions>
 								<v-divider></v-divider>

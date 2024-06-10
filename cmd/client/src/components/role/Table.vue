@@ -45,6 +45,9 @@ const authStore = useAuthStore();
 
 // to add role
 const userStore = useUserStore();
+const {
+	selected: selectedUsers,
+} = toRefs(userStore);
 
 const entityStore = useEntityStore();
 const {
@@ -170,19 +173,22 @@ const delete_ = () => {
 
 // Optional add role to user id
 const userRoles = computed(() => {
-	return userStore.users.get(ulid(props.userID))?.roles?.reduce((acc: Map<string, boolean>, role: Role) => {
+	return selectedUsers.value.at(0)?.roles?.reduce((acc: Map<string, boolean>, role: Role) => {
 		acc.set(ulid(role?.iD), true);
 
 		return acc;
 	}, new Map<string, boolean>())
 });
 
+const addRoleLoading = ref(false);
+
 const addRole = async (role: RolePermission) => {
 	if (props.userID) {
+		addRoleLoading.value = true;
 		await userStore.addRole(props.userID, role.role?.iD!);
+		addRoleLoading.value = false;
 	}
 };
-
 
 </script>
 
@@ -254,8 +260,8 @@ const addRole = async (role: RolePermission) => {
 							</template>
 							<v-card-actions>
 								<v-btn v-if="props.userID && !userRoles?.has(ulid(item.role?.iD))" variant="tonal"
-									prepend-icon="mdi-plus-box" color="primary" v-bind="props"
-									v-on:click.stop.prevent="async () => { await addRole(item) }">
+									:loading="addRoleLoading" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
+									v-on:click.stop.prevent="addRole(item)">
 									Add role
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>

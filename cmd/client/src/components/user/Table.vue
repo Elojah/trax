@@ -46,6 +46,7 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useUserStore();
 const {
 	users: users,
+	expanded: expanded,
 	total: total,
 } = toRefs(store);
 
@@ -200,7 +201,7 @@ const delete_ = () => {
 	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="user.iD" @update:options="list" @click:row="expand"
-		return-object>
+		v-model:expanded="expanded" return-object>
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.user?.iD)">

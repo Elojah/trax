@@ -2,13 +2,11 @@
 import { useAuthStore } from '@/stores/auth';
 import { useEntityStore } from '@/stores/entity';
 import { ulid } from '@/utils/ulid';
-import { computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
 import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
-import { U } from '@internal/user/user';
-import type { Role } from '@internal/user/role';
 
 const props = defineProps<{
 	userID: Uint8Array | undefined;
@@ -27,14 +25,18 @@ const {
 const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 
 const userStore = useUserStore();
+const {
+	users: users,
+	selected: selectedUsers,
+	deleteRole: deleteRole,
+	sync: sync,
+	select: select,
+} = toRefs(userStore);
 
-// const user = computed(() => { return userStore.users.get(ulid(props.userID))?.user })
-// const roles = computed(() => { return userStore.users.get(ulid(props.userID))?.roles })
+const user = computed(() => { return users.value.get(ulid(props.userID))?.user })
+const roles = computed(() => { return users.value.get(ulid(props.userID))?.roles })
 
-const user: U = U.create();
-const roles: Role[] = [];
-
-// const name = user.value?.firstName + ' ' + user.value?.lastName
+const name = `${user.value?.lastName} ${user.value?.firstName}`;
 
 const headers: ReadonlyHeaders = [
 	{
@@ -57,17 +59,23 @@ const headers: ReadonlyHeaders = [
 	},
 ];
 
-const store = useRoleStore();
-const {
-	selected: selected,
-} = toRefs(store);
-
+const deleteUserRole = async (roleID: Uint8Array) => {
+	await deleteRole.value(props.userID!, roleID);
+};
 
 const dialogAddRole = ref(false);
 
 const closeAddRole = () => {
 	dialogAddRole.value = false;
 };
+
+watch(dialogAddRole, (v) => {
+	if (!v) {
+		sync.value();
+	} else {
+		select.value(props.userID!);
+	}
+});
 
 </script>
 <template>
@@ -90,7 +98,8 @@ const closeAddRole = () => {
 		</td>
 		<td class="px-1 py-1">
 			<div class="d-flex flex-row-reverse">
-				<v-btn variant="tonal" prepend-icon="mdi-trash-can" color="error" v-bind="props">
+				<v-btn variant="tonal" prepend-icon="mdi-trash-can" color="error" v-bind="props"
+					@click="deleteUserRole(item.iD)">
 					Remove
 					<template v-slot:prepend>
 						<v-icon color="error"></v-icon>
@@ -102,7 +111,7 @@ const closeAddRole = () => {
 </template>
 <template v-slot:bottom>
 	<div class="d-flex justify-center px-1 py-6">
-		<v-dialog persistent v-model="dialogAddRole" max-width="1200px" @click:outside="closeAddRole">
+		<v-dialog v-model="dialogAddRole" max-width="1200px">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
 					Add roles
@@ -114,7 +123,7 @@ const closeAddRole = () => {
 			<v-sheet class="px-1 rounded-lg" outlined color="primary">
 				<v-card class="px-6 py-6 rounded-lg" variant="elevated">
 					<v-card-title>
-						<span class="text-h6">Add roles to {{ user?.email }}</span>
+						<span class="text-h6">Add roles to {{ name }}</span>
 					</v-card-title>
 					<v-card-text>
 						<RoleTable :user-i-d="props.userID"></RoleTable>

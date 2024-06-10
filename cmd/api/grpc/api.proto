@@ -48,4 +48,5 @@ service API {
 
     // Roles user
     rpc CreateRoleUser(dto.CreateRoleUserReq) returns (dto.UserRoles);
+    rpc DeleteRoleUser(dto.DeleteRoleUserReq) returns (dto.UserRoles);
 }

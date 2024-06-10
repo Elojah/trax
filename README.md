@@ -27,10 +27,11 @@ TODO:
 
 - Add Create & Update & delete on everything
 
+  - Delete (remove \* roles) User
+    - Fix expanded user table to re expand after modification
+    - Fix response of delete_user_role
   - Delete Role
   - Create (add at least 1 role) User
-  - Display + Update User w roles
-  - Delete (remove \* roles) User
 
   - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
   - !!! Add pop up for every success/fail actions -> Manage API fails and success everywhere

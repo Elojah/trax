@@ -6,13 +6,14 @@ import { ListUserReq, UserRoles } from '@internal/user/dto/user'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
-import { CreateRoleUserReq } from '@internal/user/dto/role'
+import { CreateRoleUserReq, DeleteRoleUserReq } from '@internal/user/dto/role'
 
 export const useUserStore = defineStore('user', () => {
   const users = ref<Map<string, UserRoles>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
   const selected = ref<UserRoles[]>([])
+  const expanded = ref<string[]>([])
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -47,6 +48,7 @@ export const useUserStore = defineStore('user', () => {
     return []
   }
 
+  // Add role refresh cache in selected user only
   const addRole = async function (userID: Uint8Array, roleID: Uint8Array) {
     try {
       const req = CreateRoleUserReq.create({
@@ -55,6 +57,25 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.createRoleUser(req, { meta: { token: token.value } })
+      if (selected.value) {
+        selected.value = [resp.response]
+      }
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
+
+  const deleteRole = async function (userID: Uint8Array, roleID: Uint8Array) {
+    try {
+      const req = DeleteRoleUserReq.create({
+        userID: userID,
+        roleID: roleID
+      })
+
+      const resp = await api.deleteRoleUser(req, { meta: { token: token.value } })
       users.value.set(ulid(resp.response.user?.iD), resp.response)
     } catch (err: any) {
       switch (err.code) {
@@ -64,12 +85,32 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  const select = (userID: Uint8Array) => {
+    const user = users.value.get(ulid(userID))
+    if (!user) {
+      return
+    }
+
+    selected.value = [user]
+  }
+
+  // Sync refreshes users with selected
+  const sync = async function () {
+    selected.value.forEach((s) => {
+      users.value.set(ulid(s.user?.iD), s)
+    })
+  }
+
   return {
     users,
     total,
+    expanded,
     selected,
     invite,
     list,
-    addRole
+    addRole,
+    deleteRole,
+    sync,
+    select
   }
 })
