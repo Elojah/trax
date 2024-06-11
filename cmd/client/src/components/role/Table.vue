@@ -46,7 +46,7 @@ const authStore = useAuthStore();
 // to add role
 const userStore = useUserStore();
 const {
-	selected: selectedUsers,
+	roles: rolesUser,
 } = toRefs(userStore);
 
 const entityStore = useEntityStore();
@@ -173,7 +173,7 @@ const delete_ = () => {
 
 // Optional add role to user id
 const userRoles = computed(() => {
-	return selectedUsers.value.at(0)?.roles?.reduce((acc: Map<string, boolean>, role: Role) => {
+	return rolesUser.value.get(ulid(props.userID))?.roles?.reduce((acc: Map<string, boolean>, role: Role) => {
 		acc.set(ulid(role?.iD), true);
 
 		return acc;

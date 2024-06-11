@@ -7,13 +7,13 @@ import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
 import { CreateRoleUserReq, DeleteRoleUserReq } from '@internal/user/dto/role'
+import type { U } from '@internal/user/user'
 
 export const useUserStore = defineStore('user', () => {
-  const users = ref<Map<string, UserRoles>>(new Map())
+  const users = ref<Map<string, U>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
-  const selected = ref<UserRoles[]>([])
-  const expanded = ref<string[]>([])
+  const roles = ref<Map<string, UserRoles>>(new Map())
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -31,7 +31,8 @@ export const useUserStore = defineStore('user', () => {
       const resp = await api.listUser(req, { meta: { token: token.value } })
 
       resp.response.users?.forEach((user: UserRoles) => {
-        users.value?.set(ulid(user.user?.iD), user)
+        roles.value?.set(ulid(user.user?.iD), user)
+        users.value?.set(ulid(user.user?.iD), user.user!)
       })
 
       if (req?.iDs.length === 0) {
@@ -57,9 +58,7 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.createRoleUser(req, { meta: { token: token.value } })
-      if (selected.value) {
-        selected.value = [resp.response]
-      }
+      roles.value.set(ulid(resp.response.user?.iD), resp.response)
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -76,7 +75,7 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.deleteRoleUser(req, { meta: { token: token.value } })
-      users.value.set(ulid(resp.response.user?.iD), resp.response)
+      roles.value.set(ulid(resp.response.user?.iD), resp.response)
     } catch (err: any) {
       switch (err.code) {
         default:
@@ -85,32 +84,14 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  const select = (userID: Uint8Array) => {
-    const user = users.value.get(ulid(userID))
-    if (!user) {
-      return
-    }
-
-    selected.value = [user]
-  }
-
-  // Sync refreshes users with selected
-  const sync = async function () {
-    selected.value.forEach((s) => {
-      users.value.set(ulid(s.user?.iD), s)
-    })
-  }
 
   return {
     users,
     total,
-    expanded,
-    selected,
+    roles,
     invite,
     list,
     addRole,
     deleteRole,
-    sync,
-    select
   }
 })

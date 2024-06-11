@@ -27,9 +27,6 @@ TODO:
 
 - Add Create & Update & delete on everything
 
-  - Delete (remove \* roles) User
-    - Fix expanded user table to re expand after modification
-    - Fix response of delete_user_role
   - Delete Role
   - Create (add at least 1 role) User
 

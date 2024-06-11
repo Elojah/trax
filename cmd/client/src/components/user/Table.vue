@@ -46,7 +46,6 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useUserStore();
 const {
 	users: users,
-	expanded: expanded,
 	total: total,
 } = toRefs(store);
 
@@ -201,17 +200,17 @@ const delete_ = () => {
 	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="user.iD" @update:options="list" @click:row="expand"
-		v-model:expanded="expanded" return-object>
+		return-object>
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
-				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.user?.iD)">
+				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
 					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
 						<v-card class="justify-center" variant="flat" :class="{
 							'row-hovered': isHovering,
 							'row-expanded': isExpanded(internalItem),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
-						}" :title="item.user?.email" :subtitle="item.user?.lastName + ' ' + item.user?.firstName">
+						}" :title="item.email" :subtitle="item.lastName + ' ' + item.firstName">
 							<template v-slot:append>
 								<v-icon v-if="isExpanded(internalItem)" icon="mdi-minus" size="x-large" color="primary">
 								</v-icon>
@@ -220,7 +219,7 @@ const delete_ = () => {
 							<v-card-actions>
 								<v-divider></v-divider>
 								<p class="font-italic font-weight-light">
-									{{ new Date(Number(item.user?.createdAt) * 1000).toLocaleDateString('en-GB') }}
+									{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
 								</p>
 							</v-card-actions>
 						</v-card>
@@ -229,7 +228,7 @@ const delete_ = () => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<RoleTable :colspan="columns.length" :user-i-d="item?.user?.iD">
+			<RoleTable v-if="item" :colspan="columns.length" :user-i-d="item.iD">
 			</RoleTable>
 		</template>
 	</v-data-table-server>

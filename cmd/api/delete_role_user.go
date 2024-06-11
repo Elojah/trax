@@ -106,7 +106,7 @@ func (h *handler) DeleteRoleUser(ctx context.Context, req *dto.DeleteRoleUserReq
 		index := -1
 		found := func() bool {
 			for i, r := range roles {
-				if r.ID.Compare(req.RoleID) != 0 {
+				if r.ID.Compare(req.RoleID) == 0 {
 					index = i
 					return true
 				}
@@ -157,6 +157,6 @@ func (h *handler) DeleteRoleUser(ctx context.Context, req *dto.DeleteRoleUserReq
 
 	return &dto.UserRoles{
 		User:  u,
-		Roles: append(roles, role),
+		Roles: roles,
 	}, nil
 }

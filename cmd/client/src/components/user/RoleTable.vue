@@ -26,17 +26,13 @@ const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 
 const userStore = useUserStore();
 const {
-	users: users,
-	selected: selectedUsers,
+	roles: roles,
 	deleteRole: deleteRole,
-	sync: sync,
-	select: select,
 } = toRefs(userStore);
 
-const user = computed(() => { return users.value.get(ulid(props.userID))?.user })
-const roles = computed(() => { return users.value.get(ulid(props.userID))?.roles })
+const user = computed(() => { return roles.value.get(ulid(props.userID)) })
 
-const name = `${user.value?.lastName} ${user.value?.firstName}`;
+const name = `${user.value?.user?.lastName} ${user.value?.user?.firstName}`;
 
 const headers: ReadonlyHeaders = [
 	{
@@ -69,19 +65,11 @@ const closeAddRole = () => {
 	dialogAddRole.value = false;
 };
 
-watch(dialogAddRole, (v) => {
-	if (!v) {
-		sync.value();
-	} else {
-		select.value(props.userID!);
-	}
-});
-
 </script>
 <template>
-	<tr>
+	<tr v-if="user">
 		<td :colspan="props.colspan">
-			<v-data-table density="compact" :headers="headers" :items="roles" class="">
+			<v-data-table density="compact" :headers="headers" :items="user.roles" class="">
 				<template v-slot:item="{ item }">
 	<tr v-if="item" :key="item.name">
 		<td class="px-1 py-1">
