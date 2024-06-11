@@ -66,7 +66,6 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 		logger.Error().Err(err).Msg("permission denied on admin role")
 
 		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
-
 	}
 
 	if err := claims.Require(user.Requirement{EntityID: r.EntityID, Resource: user.R_role, Command: user.C_update}); err != nil {

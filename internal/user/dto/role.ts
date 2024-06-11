@@ -129,6 +129,15 @@ export interface DeleteRoleUserReq {
      */
     userID: Uint8Array;
 }
+/**
+ * @generated from protobuf message dto.DeleteRoleReq
+ */
+export interface DeleteRoleReq {
+    /**
+     * @generated from protobuf field: bytes ID = 1 [json_name = "ID"];
+     */
+    iD: Uint8Array;
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class RolePermission$Type extends MessageType<RolePermission> {
     constructor() {
@@ -559,3 +568,50 @@ class DeleteRoleUserReq$Type extends MessageType<DeleteRoleUserReq> {
  * @generated MessageType for protobuf message dto.DeleteRoleUserReq
  */
 export const DeleteRoleUserReq = new DeleteRoleUserReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DeleteRoleReq$Type extends MessageType<DeleteRoleReq> {
+    constructor() {
+        super("dto.DeleteRoleReq", [
+            { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<DeleteRoleReq>): DeleteRoleReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.iD = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<DeleteRoleReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteRoleReq): DeleteRoleReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes ID = 1 [json_name = "ID"];*/ 1:
+                    message.iD = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DeleteRoleReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes ID = 1 [json_name = "ID"]; */
+        if (message.iD.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.DeleteRoleReq
+ */
+export const DeleteRoleReq = new DeleteRoleReq$Type();

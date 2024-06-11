@@ -27,7 +27,6 @@ const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 const userStore = useUserStore();
 const {
 	roles: roles,
-	deleteRole: deleteRole,
 } = toRefs(userStore);
 
 const user = computed(() => { return roles.value.get(ulid(props.userID)) })
@@ -56,7 +55,7 @@ const headers: ReadonlyHeaders = [
 ];
 
 const deleteUserRole = async (roleID: Uint8Array) => {
-	await deleteRole.value(props.userID!, roleID);
+	await userStore.deleteRole(props.userID!, roleID);
 };
 
 const dialogAddRole = ref(false);

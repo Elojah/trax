@@ -59,3 +59,7 @@ message DeleteRoleUserReq {
 	bytes RoleID                           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	bytes UserID                           = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
+
+message DeleteRoleReq {
+	bytes ID                               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}

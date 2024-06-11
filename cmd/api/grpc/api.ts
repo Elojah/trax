@@ -4,6 +4,7 @@
 import { DeleteRoleUserReq } from "../../../internal/user/dto/role";
 import { UserRoles } from "../../../internal/user/dto/user";
 import { CreateRoleUserReq } from "../../../internal/user/dto/role";
+import { DeleteRoleReq } from "../../../internal/user/dto/role";
 import { UpdateRoleReq } from "../../../internal/user/dto/role";
 import { RolePermission } from "../../../internal/user/dto/role";
 import { CreateRoleReq } from "../../../internal/user/dto/role";
@@ -42,6 +43,7 @@ export const API = new ServiceType("grpc.API", [
     { name: "ListRole", options: {}, I: ListRoleReq, O: ListRoleResp },
     { name: "CreateRole", options: {}, I: CreateRoleReq, O: RolePermission },
     { name: "UpdateRole", options: {}, I: UpdateRoleReq, O: RolePermission },
+    { name: "DeleteRole", options: {}, I: DeleteRoleReq, O: RolePermission },
     { name: "CreateRoleUser", options: {}, I: CreateRoleUserReq, O: UserRoles },
     { name: "DeleteRoleUser", options: {}, I: DeleteRoleUserReq, O: UserRoles }
 ]);

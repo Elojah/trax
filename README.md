@@ -27,8 +27,7 @@ TODO:
 
 - Add Create & Update & delete on everything
 
-  - Delete Role
-  - Create (add at least 1 role) User
+  - Create/Invite (add at least 1 role) User
 
   - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
   - !!! Add pop up for every success/fail actions -> Manage API fails and success everywhere
