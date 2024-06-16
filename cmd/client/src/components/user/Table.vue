@@ -6,8 +6,9 @@ import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useUserStore } from '@/stores/user';
 import { ListUserReq } from '@internal/user/dto/user';
-import RoleTable from '@/components/user/RoleTable.vue';
+import UserRoleTable from '@/components/user/RoleTable.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
+import RoleTable from '@/components/role/Table.vue';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -144,55 +145,45 @@ const confirmDelete = () => {
 const delete_ = () => {
 };
 
+
+const dialogAddUser = ref(false);
+
+const closeAddUser = () => {
+	dialogAddUser.value = false;
+};
+
 </script>
 
 <template>
 	<v-col class="d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
-		<v-dialog v-model="dialogInvite" max-width="800px">
-			<template v-slot:activator="{ props }">
-				<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
-					New
-					<template v-slot:prepend>
-						<v-icon color="primary"></v-icon>
-					</template>
-				</v-btn>
-			</template>
-			<v-sheet class="px-1 rounded-lg" outlined color="primary">
-				<v-card class="px-6 py-6 rounded-lg" variant="elevated">
-					<v-form ref="form" v-model="valid" lazy-validation>
+		<div class="d-flex justify-center px-1 py-6">
+			<v-dialog v-model="dialogAddUser" max-width="1200px">
+				<template v-slot:activator="{ props }">
+					<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+						New
+						<template v-slot:prepend>
+							<v-icon color="primary"></v-icon>
+						</template>
+					</v-btn>
+				</template>
+				<v-sheet class="px-1 rounded-lg" outlined color="primary">
+					<v-card class="px-6 py-6 rounded-lg" variant="elevated">
 						<v-card-title>
-							<span class="text-h6">Invite user</span>
+							<span class="text-h6">Invite new user</span>
 						</v-card-title>
 						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="6">
-										<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
-									</v-col>
-									<v-col cols="6">
-										<v-text-field label="Avatar URL"></v-text-field>
-									</v-col>
-								</v-row>
-								<v-row>
-									<v-col cols="12">
-										<v-textarea label="Description"></v-textarea>
-									</v-col>
-								</v-row>
-							</v-container>
+							<RoleTable :select="true"></RoleTable>
 						</v-card-text>
 						<v-card-actions>
 							<v-spacer></v-spacer>
-							<v-btn color="error" variant="text" @click="closeInvite">
-								Cancel
-							</v-btn>
-							<v-btn color="primary" variant="text" @click="invite">
-								Invite
+							<v-btn color="error" variant="text" @click="closeAddUser">
+								Close
 							</v-btn>
 						</v-card-actions>
-					</v-form>
-				</v-card>
-			</v-sheet>
-		</v-dialog>
+					</v-card>
+				</v-sheet>
+			</v-dialog>
+		</div>
 	</v-col>
 	<v-text-field class="table-color-background px-1" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
 		variant="outlined" hide-details single-line>
@@ -228,8 +219,8 @@ const delete_ = () => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<RoleTable v-if="item" :colspan="columns.length" :user-i-d="item.iD">
-			</RoleTable>
+			<UserRoleTable v-if="item" :colspan="columns.length" :user-i-d="item.iD">
+			</UserRoleTable>
 		</template>
 	</v-data-table-server>
 	<v-col cols="12" class="p-8 table-color-background rounded-b-lg"></v-col>

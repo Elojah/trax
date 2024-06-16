@@ -12,9 +12,13 @@ import type { ReadonlyHeaders } from '@/utils/headers';
 import { useUserStore } from '@/stores/user';
 import type { Role } from '@internal/user/role';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	userID: Uint8Array | undefined;
-}>();
+	select: boolean;
+}>(), {
+	select: false,
+	userID: undefined,
+});
 
 // #MARK:Common
 // ______________________________________________________
@@ -61,6 +65,7 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useRoleStore();
 const {
 	roles: roles,
+	selected: selected,
 	total: total,
 } = toRefs(store);
 
@@ -242,7 +247,7 @@ const addRole = async (role: RolePermission) => {
 	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="role.iD" @update:options="list" @click:row="expand"
-		return-object>
+		return-object :show-select="props.select" :v-model="selected">
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">

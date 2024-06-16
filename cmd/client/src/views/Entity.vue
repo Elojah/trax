@@ -54,7 +54,7 @@ const tableEntities = ref();
 					</v-sheet>
 					<!-- Roles -->
 					<v-sheet v-if="view === 1" class="px-1 rounded-lg" outlined color="primary">
-						<RoleTable :user-i-d="undefined"></RoleTable>
+						<RoleTable></RoleTable>
 					</v-sheet>
 					<!-- User -->
 					<v-sheet v-if="view === 2" class="px-1 rounded-lg" outlined color="primary">

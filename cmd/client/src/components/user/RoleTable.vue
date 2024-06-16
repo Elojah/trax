@@ -5,7 +5,6 @@ import { ulid } from '@/utils/ulid';
 import { computed, ref, toRefs, watch } from 'vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
-import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
