@@ -8,6 +8,8 @@ import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
 import { CreateRoleUserReq, DeleteRoleUserReq } from '@internal/user/dto/role'
 import type { U } from '@internal/user/user'
+import User from '@/views/User.vue'
+import type { Role } from '@internal/user/role'
 
 export const useUserStore = defineStore('user', () => {
   const users = ref<Map<string, U>>(new Map())
@@ -84,6 +86,39 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // Add role modifies local cache only, no API call
+  const addRoleDry = async function (userID: Uint8Array, role: Role) {
+    try {
+      const ur = roles.value.get(ulid(userID))
+
+      if (!ur) {
+        roles.value.set(ulid(userID), UserRoles.create({
+          user: { iD: userID },
+          roles: [role]
+        }))
+      } else {
+        ur.roles.push(role)
+        roles.value.set(ulid(userID), ur)
+      }
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
+
+  // Reset roles for user, no API call
+  const resetRoleDry = async function (userID: Uint8Array) {
+    try {
+      roles.value.delete(ulid(userID))
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
 
   return {
     users,
@@ -93,5 +128,7 @@ export const useUserStore = defineStore('user', () => {
     list,
     addRole,
     deleteRole,
+    addRoleDry,
+    resetRoleDry,
   }
 })

@@ -3,12 +3,13 @@ import { useEntityStore } from '@/stores/entity';
 import { computed, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
-import { ulid } from '@/utils/ulid';
+import { ulid, zero } from '@/utils/ulid';
 import { useUserStore } from '@/stores/user';
 import { ListUserReq } from '@internal/user/dto/user';
 import UserRoleTable from '@/components/user/RoleTable.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
+import type { RolePermission } from '@internal/user/dto/role';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -47,7 +48,9 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useUserStore();
 const {
 	users: users,
+	roles: roles,
 	total: total,
+	resetRoleDry: resetRoleDry,
 } = toRefs(store);
 
 const loading = ref(false);
@@ -146,11 +149,27 @@ const delete_ = () => {
 };
 
 
+// New user
 const dialogAddUser = ref(false);
 
 const closeAddUser = () => {
 	dialogAddUser.value = false;
 };
+
+// reset roles for new user
+// await resetRoleDry.value(zero);
+
+const addRoleNewUser = async (role: RolePermission) => {
+	await store.addRoleDry(zero, role.role!);
+};
+
+const email = ref(null as string | null)
+const emailRules = [
+	(v: string) => !!v || "Required",
+	(v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
+]
+
+const addedRoles = computed(() => roles.value.get(ulid(zero))?.roles);
 
 </script>
 
@@ -172,7 +191,20 @@ const closeAddUser = () => {
 							<span class="text-h6">Invite new user</span>
 						</v-card-title>
 						<v-card-text>
-							<RoleTable :select="true"></RoleTable>
+							<v-form ref="form" v-model="valid" lazy-validation>
+								<v-text-field v-model="email" label="Email" :rules="emailRules"
+									prepend-inner-icon="mdi-email" underlined required clearable>
+								</v-text-field>
+								<v-row v-if="addedRoles">
+									<v-col v-for="item in addedRoles" :key="ulid(item.iD)">
+										<v-chip class="ma-2" color="cyan" closable label>
+											<v-icon icon="mdi-account-cog" start></v-icon>
+											{{ item.name }}
+										</v-chip>
+									</v-col>
+								</v-row>
+							</v-form>
+							<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
 						</v-card-text>
 						<v-card-actions>
 							<v-spacer></v-spacer>

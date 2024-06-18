@@ -6,6 +6,7 @@ import { computed, ref, toRefs, watch } from 'vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
 import { useUserStore } from '@/stores/user';
+import type { RolePermission } from '@internal/user/dto/role';
 
 const props = defineProps<{
 	userID: Uint8Array | undefined;
@@ -63,6 +64,16 @@ const closeAddRole = () => {
 	dialogAddRole.value = false;
 };
 
+// Role table properties
+
+const addRoleLoading = ref(false);
+
+const addRole = async (role: RolePermission) => {
+	addRoleLoading.value = true;
+	await userStore.addRole(props?.userID!, role.role?.iD!);
+	addRoleLoading.value = false;
+};
+
 </script>
 <template>
 	<tr v-if="user">
@@ -112,7 +123,7 @@ const closeAddRole = () => {
 						<span class="text-h6">Add roles to {{ name }}</span>
 					</v-card-title>
 					<v-card-text>
-						<RoleTable :user-i-d="props.userID"></RoleTable>
+						<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
 					</v-card-text>
 					<v-card-actions>
 						<v-spacer></v-spacer>

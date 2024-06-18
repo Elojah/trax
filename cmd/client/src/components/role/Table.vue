@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
-import { computed, ref, toRefs, watch } from 'vue';
+import { computed, ref, toRefs, watch, type ComputedRef } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
@@ -14,10 +14,10 @@ import type { Role } from '@internal/user/role';
 
 const props = withDefaults(defineProps<{
 	userID: Uint8Array | undefined;
-	select: boolean;
+	addRole: ((role: RolePermission) => Promise<void>) | undefined;
 }>(), {
-	select: false,
 	userID: undefined,
+	addRole: undefined,
 });
 
 // #MARK:Common
@@ -185,13 +185,13 @@ const userRoles = computed(() => {
 	}, new Map<string, boolean>())
 });
 
-const addRoleLoading = ref(false);
+const loadingAddRole = ref(false);
 
-const addRole = async (role: RolePermission) => {
-	if (props.userID) {
-		addRoleLoading.value = true;
-		await userStore.addRole(props.userID, role.role?.iD!);
-		addRoleLoading.value = false;
+const addRole = async (item: RolePermission) => {
+	if (props.addRole) {
+		loadingAddRole.value = true;
+		await props.addRole(item);
+		loadingAddRole.value = false;
 	}
 };
 
@@ -247,7 +247,7 @@ const addRole = async (role: RolePermission) => {
 	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="role.iD" @update:options="list" @click:row="expand"
-		return-object :show-select="props.select" :v-model="selected">
+		return-object>
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">
@@ -265,7 +265,7 @@ const addRole = async (role: RolePermission) => {
 							</template>
 							<v-card-actions>
 								<v-btn v-if="props.userID && !userRoles?.has(ulid(item.role?.iD))" variant="tonal"
-									:loading="addRoleLoading" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
+									prepend-icon="mdi-plus-box" color="primary" v-bind="props" :loading="loadingAddRole"
 									v-on:click.stop.prevent="addRole(item)">
 									Add role
 									<template v-slot:prepend>
