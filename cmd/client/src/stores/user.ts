@@ -108,6 +108,26 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // Delete role modifies local cache only, no API call
+  const deleteRoleDry = async function (userID: Uint8Array, roleID: Uint8Array) {
+    try {
+      const ur = roles.value.get(ulid(userID))
+      const id = ulid(roleID)
+
+      if (!ur?.roles) {
+        return
+      } else {
+        ur.roles = ur.roles.filter((r) => ulid(r.iD) !== id)
+        roles.value.set(ulid(userID), ur)
+      }
+    } catch (err: any) {
+      switch (err.code) {
+        default:
+          logger.error(err)
+      }
+    }
+  }
+
   // Reset roles for user, no API call
   const resetRoleDry = async function (userID: Uint8Array) {
     try {
@@ -129,6 +149,7 @@ export const useUserStore = defineStore('user', () => {
     addRole,
     deleteRole,
     addRoleDry,
+    deleteRoleDry,
     resetRoleDry,
   }
 })

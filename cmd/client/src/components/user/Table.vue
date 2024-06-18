@@ -171,55 +171,86 @@ const emailRules = [
 
 const addedRoles = computed(() => roles.value.get(ulid(zero))?.roles);
 
+const deleteRole = async (roleID: Uint8Array) => {
+	await store.deleteRoleDry(zero, roleID);
+};
+
+
+const inviteUser = async () => {
+	// await store.inviteUser(email.value!, addedRoles.value!);
+	// dialogAddUser.value = false;
+	// email.value = '';
+};
+
 </script>
 
 <template>
-	<v-col class="d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
-		<div class="d-flex justify-center px-1 py-6">
-			<v-dialog v-model="dialogAddUser" max-width="1200px">
-				<template v-slot:activator="{ props }">
-					<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
-						New
-						<template v-slot:prepend>
-							<v-icon color="primary"></v-icon>
-						</template>
-					</v-btn>
-				</template>
-				<v-sheet class="px-1 rounded-lg" outlined color="primary">
-					<v-card class="px-6 py-6 rounded-lg" variant="elevated">
-						<v-card-title>
-							<span class="text-h6">Invite new user</span>
-						</v-card-title>
-						<v-card-text>
-							<v-form ref="form" v-model="valid" lazy-validation>
-								<v-text-field v-model="email" label="Email" :rules="emailRules"
-									prepend-inner-icon="mdi-email" underlined required clearable>
-								</v-text-field>
-								<v-row v-if="addedRoles">
-									<v-col v-for="item in addedRoles" :key="ulid(item.iD)">
-										<v-chip class="ma-2" color="cyan" closable label>
-											<v-icon icon="mdi-account-cog" start></v-icon>
-											{{ item.name }}
-										</v-chip>
-									</v-col>
-								</v-row>
-							</v-form>
-							<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="error" variant="text" @click="closeAddUser">
-								Close
-							</v-btn>
-						</v-card-actions>
-					</v-card>
-				</v-sheet>
-			</v-dialog>
-		</div>
+	<v-col class="px-6 d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
+		<v-row>
+			<v-col cols="10">
+				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
+					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
+				</v-text-field>
+			</v-col>
+			<v-col cols="2" class="d-flex align-center justify-center">
+				<v-dialog v-model="dialogAddUser" max-width="1200px">
+					<template v-slot:activator="{ props }">
+						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
+							New
+							<template v-slot:prepend>
+								<v-icon color="primary"></v-icon>
+							</template>
+						</v-btn>
+					</template>
+					<v-sheet class="px-1 rounded-lg" outlined color="primary">
+						<v-card class="rounded-lg" variant="elevated">
+							<v-card-title class="d-flex justify-center">
+								<span class="text-h6">Invite user</span>
+							</v-card-title>
+							<v-card-text>
+								<v-form ref="form" v-model="valid" lazy-validation>
+									<v-row class="px-6">
+										<v-col cols="10">
+											<v-text-field v-model="email" label="Email" :rules="emailRules"
+												prepend-inner-icon="mdi-email" underlined required clearable>
+											</v-text-field>
+										</v-col>
+										<v-col cols="2" class="d-flex align-center justify-center">
+											<v-btn size="large" :disabled="!valid || addedRoles?.length === 0"
+												variant="tonal" append-icon="mdi-account-circle"
+												@click="inviteUser">Invite
+												<template v-slot:append>
+													<v-icon color="primary"></v-icon>
+												</template>
+											</v-btn>
+										</v-col>
+									</v-row>
+									<v-row v-if="addedRoles" class="px-6 mb-4">
+										<v-chip-group column>
+											<v-chip v-for="item in addedRoles" :key="ulid(item.iD)" class="ma-2"
+												variant="tonal" closable label color="primary"
+												@click:close="deleteRole(item.iD)">
+												<v-icon icon="mdi-account-cog" start></v-icon>
+												{{ item.name }}
+											</v-chip>
+										</v-chip-group>
+									</v-row>
+								</v-form>
+								<v-divider></v-divider>
+								<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="error" variant="text" @click="closeAddUser">
+									Close
+								</v-btn>
+							</v-card-actions>
+						</v-card>
+					</v-sheet>
+				</v-dialog>
+			</v-col>
+		</v-row>
 	</v-col>
-	<v-text-field class="table-color-background px-1" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
-		variant="outlined" hide-details single-line>
-	</v-text-field>
 	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="user.iD" @update:options="list" @click:row="expand"

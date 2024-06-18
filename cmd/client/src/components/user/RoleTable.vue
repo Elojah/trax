@@ -118,8 +118,8 @@ const addRole = async (role: RolePermission) => {
 				</v-btn>
 			</template>
 			<v-sheet class="px-1 rounded-lg" outlined color="primary">
-				<v-card class="px-6 py-6 rounded-lg" variant="elevated">
-					<v-card-title>
+				<v-card class="rounded-lg" variant="elevated">
+					<v-card-title class="d-flex justify-center">
 						<span class="text-h6">Add roles to {{ name }}</span>
 					</v-card-title>
 					<v-card-text>

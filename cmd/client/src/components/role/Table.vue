@@ -198,52 +198,59 @@ const addRole = async (item: RolePermission) => {
 </script>
 
 <template>
-	<v-col class="d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
-		<v-dialog v-model="dialogCreate" max-width="800px">
-			<template v-slot:activator="{ props }">
-				<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
-					New
-					<template v-slot:prepend>
-						<v-icon color="primary"></v-icon>
+	<v-col class="px-6 d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
+		<v-row>
+			<v-col cols="10">
+				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
+					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
+				</v-text-field>
+			</v-col>
+			<v-col cols="2" class="d-flex align-center justify-center">
+				<v-dialog v-model="dialogCreate" max-width="800px">
+					<template v-slot:activator="{ props }">
+						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
+							New
+							<template v-slot:prepend>
+								<v-icon color="primary"></v-icon>
+							</template>
+						</v-btn>
 					</template>
-				</v-btn>
-			</template>
-			<v-sheet class="px-1 rounded-lg" outlined color="primary">
-				<v-card class="px-6 py-6 rounded-lg" variant="elevated">
-					<v-form ref="form" v-model="valid" lazy-validation>
-						<v-card-title>
-							<span class="text-h6">New role</span>
-						</v-card-title>
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="12">
-										<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
-									</v-col>
-								</v-row>
-								<v-row>
-									<PermissionTable :permissions="[]" ref="permissions" :disabled="false">
-									</PermissionTable>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="error" variant="text" @click="closeCreateRole">
-								Cancel
-							</v-btn>
-							<v-btn color="primary" variant="text" @click="create">
-								Create
-							</v-btn>
-						</v-card-actions>
-					</v-form>
-				</v-card>
-			</v-sheet>
-		</v-dialog>
+					<v-sheet class="px-1 rounded-lg" outlined color="primary">
+						<v-card class="px-6 py-6 rounded-lg" variant="elevated">
+							<v-form ref="form" v-model="valid" lazy-validation>
+								<v-card-title class="d-flex justify-center">
+									<span class="text-h6">Create role</span>
+								</v-card-title>
+								<v-card-text>
+									<v-container>
+										<v-row>
+											<v-col cols="12">
+												<v-text-field v-model="name" :rules="nameRules"
+													label="Name"></v-text-field>
+											</v-col>
+										</v-row>
+										<v-row>
+											<PermissionTable :permissions="[]" ref="permissions" :disabled="false">
+											</PermissionTable>
+										</v-row>
+									</v-container>
+								</v-card-text>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="error" variant="text" @click="closeCreateRole">
+										Cancel
+									</v-btn>
+									<v-btn color="primary" variant="text" @click="create">
+										Create
+									</v-btn>
+								</v-card-actions>
+							</v-form>
+						</v-card>
+					</v-sheet>
+				</v-dialog>
+			</v-col>
+		</v-row>
 	</v-col>
-	<v-text-field class="table-color-background px-1" v-model="search" label="Search" prepend-inner-icon="mdi-magnify"
-		variant="outlined" hide-details single-line>
-	</v-text-field>
 	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="role.iD" @update:options="list" @click:row="expand"
