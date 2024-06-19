@@ -146,6 +146,23 @@ export interface ListUserResp {
      */
     total: bigint;
 }
+/**
+ * @generated from protobuf message dto.InviteUserReq
+ */
+export interface InviteUserReq {
+    /**
+     * @generated from protobuf field: string Email = 1 [json_name = "Email"];
+     */
+    email: string;
+    /**
+     * @generated from protobuf field: bytes EntityID = 2 [json_name = "EntityID"];
+     */
+    entityID: Uint8Array;
+    /**
+     * @generated from protobuf field: repeated bytes RoleIDs = 3 [json_name = "RoleIDs"];
+     */
+    roleIDs: Uint8Array[];
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class SigninResp$Type extends MessageType<SigninResp> {
     constructor() {
@@ -637,3 +654,66 @@ class ListUserResp$Type extends MessageType<ListUserResp> {
  * @generated MessageType for protobuf message dto.ListUserResp
  */
 export const ListUserResp = new ListUserResp$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class InviteUserReq$Type extends MessageType<InviteUserReq> {
+    constructor() {
+        super("dto.InviteUserReq", [
+            { no: 1, name: "Email", kind: "scalar", jsonName: "Email", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 3, name: "RoleIDs", kind: "scalar", jsonName: "RoleIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<InviteUserReq>): InviteUserReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.email = "";
+        message.entityID = new Uint8Array(0);
+        message.roleIDs = [];
+        if (value !== undefined)
+            reflectionMergePartial<InviteUserReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: InviteUserReq): InviteUserReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string Email = 1 [json_name = "Email"];*/ 1:
+                    message.email = reader.string();
+                    break;
+                case /* bytes EntityID = 2 [json_name = "EntityID"];*/ 2:
+                    message.entityID = reader.bytes();
+                    break;
+                case /* repeated bytes RoleIDs = 3 [json_name = "RoleIDs"];*/ 3:
+                    message.roleIDs.push(reader.bytes());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: InviteUserReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string Email = 1 [json_name = "Email"]; */
+        if (message.email !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.email);
+        /* bytes EntityID = 2 [json_name = "EntityID"]; */
+        if (message.entityID.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.entityID);
+        /* repeated bytes RoleIDs = 3 [json_name = "RoleIDs"]; */
+        for (let i = 0; i < message.roleIDs.length; i++)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.roleIDs[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.InviteUserReq
+ */
+export const InviteUserReq = new InviteUserReq$Type();

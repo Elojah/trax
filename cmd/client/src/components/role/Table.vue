@@ -198,14 +198,14 @@ const addRole = async (item: RolePermission) => {
 </script>
 
 <template>
-	<v-col class="px-6 d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
+	<v-col class="px-6 pt-6 rounded-t table-color-background" cols="12">
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>
-			<v-col cols="2" class="d-flex align-center justify-center">
+			<v-col cols="2" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogCreate" max-width="800px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
@@ -215,38 +215,36 @@ const addRole = async (item: RolePermission) => {
 							</template>
 						</v-btn>
 					</template>
-					<v-sheet class="px-1 rounded-lg" outlined color="primary">
-						<v-card class="px-6 py-6 rounded-lg" variant="elevated">
-							<v-form ref="form" v-model="valid" lazy-validation>
-								<v-card-title class="d-flex justify-center">
-									<span class="text-h6">Create role</span>
-								</v-card-title>
-								<v-card-text>
-									<v-container>
-										<v-row>
-											<v-col cols="12">
-												<v-text-field v-model="name" :rules="nameRules"
-													label="Name"></v-text-field>
-											</v-col>
-										</v-row>
-										<v-row>
-											<PermissionTable :permissions="[]" ref="permissions" :disabled="false">
-											</PermissionTable>
-										</v-row>
-									</v-container>
-								</v-card-text>
-								<v-card-actions>
-									<v-spacer></v-spacer>
-									<v-btn color="error" variant="text" @click="closeCreateRole">
-										Cancel
-									</v-btn>
-									<v-btn color="primary" variant="text" @click="create">
-										Create
-									</v-btn>
-								</v-card-actions>
-							</v-form>
-						</v-card>
-					</v-sheet>
+					<v-card class="px-6 py-6 rounded" variant="elevated">
+						<v-form ref="form" v-model="valid" lazy-validation>
+							<v-card-title class="d-flex justify-center">
+								<span class="text-h5">Create role</span>
+							</v-card-title>
+							<v-divider></v-divider>
+							<v-card-text>
+								<v-container>
+									<v-row>
+										<v-col cols="12">
+											<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
+										</v-col>
+									</v-row>
+									<v-row>
+										<PermissionTable :permissions="[]" ref="permissions" :disabled="false">
+										</PermissionTable>
+									</v-row>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="error" variant="text" @click="closeCreateRole">
+									Cancel
+								</v-btn>
+								<v-btn color="primary" variant="text" @click="create">
+									Create
+								</v-btn>
+							</v-card-actions>
+						</v-form>
+					</v-card>
 				</v-dialog>
 			</v-col>
 		</v-row>
@@ -302,7 +300,7 @@ const addRole = async (item: RolePermission) => {
 			</RoleDetails>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="p-8 table-color-background rounded-b-lg"></v-col>
+	<v-col cols="12" class="p-8 table-color-background rounded-b"></v-col>
 </template>
 <style scoped>
 .table-color-background {

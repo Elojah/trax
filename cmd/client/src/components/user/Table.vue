@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
-import { computed, ref, toRefs, watch } from 'vue';
+import { computed, onMounted, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
 import { ulid, zero } from '@/utils/ulid';
@@ -115,6 +115,12 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 // refresh list when selected entity changes
 watch(selectedEntity, async () => {
 	await list();
+	await resetRoleDry.value(zero);
+});
+
+// reset roles for new user
+onMounted(async () => {
+	await resetRoleDry.value(zero);
 });
 
 const name = ref('');
@@ -156,9 +162,6 @@ const closeAddUser = () => {
 	dialogAddUser.value = false;
 };
 
-// reset roles for new user
-// await resetRoleDry.value(zero);
-
 const addRoleNewUser = async (role: RolePermission) => {
 	await store.addRoleDry(zero, role.role!);
 };
@@ -185,14 +188,14 @@ const inviteUser = async () => {
 </script>
 
 <template>
-	<v-col class="px-6 d-flex justify-end align-center rounded-t-lg table-color-background" cols="12">
+	<v-col class="px-6 pt-6 rounded-t table-color-background" cols="12">
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>
-			<v-col cols="2" class="d-flex align-center justify-center">
+			<v-col cols="2" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogAddUser" max-width="1200px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
@@ -202,51 +205,50 @@ const inviteUser = async () => {
 							</template>
 						</v-btn>
 					</template>
-					<v-sheet class="px-1 rounded-lg" outlined color="primary">
-						<v-card class="rounded-lg" variant="elevated">
-							<v-card-title class="d-flex justify-center">
-								<span class="text-h6">Invite user</span>
-							</v-card-title>
-							<v-card-text>
+					<v-card class="rounded" variant="elevated">
+						<v-card-title class="d-flex justify-center">
+							<span class="text-h5">Invite user</span>
+						</v-card-title>
+						<v-divider></v-divider>
+						<v-card-text>
+							<v-container class="px-6">
 								<v-form ref="form" v-model="valid" lazy-validation>
-									<v-row class="px-6">
+									<v-row>
 										<v-col cols="10">
 											<v-text-field v-model="email" label="Email" :rules="emailRules"
 												prepend-inner-icon="mdi-email" underlined required clearable>
 											</v-text-field>
 										</v-col>
-										<v-col cols="2" class="d-flex align-center justify-center">
+										<v-col cols="2" class="d-flex align-center justify-end">
 											<v-btn size="large" :disabled="!valid || addedRoles?.length === 0"
-												variant="tonal" append-icon="mdi-account-circle"
+												variant="tonal" prepend-icon="mdi-account-circle"
 												@click="inviteUser">Invite
-												<template v-slot:append>
+												<template v-slot:prepend>
 													<v-icon color="primary"></v-icon>
 												</template>
 											</v-btn>
 										</v-col>
 									</v-row>
-									<v-row v-if="addedRoles" class="px-6 mb-4">
-										<v-chip-group column>
-											<v-chip v-for="item in addedRoles" :key="ulid(item.iD)" class="ma-2"
-												variant="tonal" closable label color="primary"
-												@click:close="deleteRole(item.iD)">
-												<v-icon icon="mdi-account-cog" start></v-icon>
-												{{ item.name }}
-											</v-chip>
-										</v-chip-group>
+									<v-row v-if="addedRoles">
+										<v-chip v-for="item in addedRoles" :key="ulid(item.iD)" class="ma-2"
+											variant="tonal" closable label color="primary"
+											@click:close="deleteRole(item.iD)">
+											<v-icon icon="mdi-account-cog" start></v-icon>
+											{{ item.name }}
+										</v-chip>
 									</v-row>
 								</v-form>
-								<v-divider></v-divider>
-								<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
-							</v-card-text>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="error" variant="text" @click="closeAddUser">
-									Close
-								</v-btn>
-							</v-card-actions>
-						</v-card>
-					</v-sheet>
+							</v-container>
+							<v-divider></v-divider>
+							<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
+						</v-card-text>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="error" variant="text" @click="closeAddUser">
+								Close
+							</v-btn>
+						</v-card-actions>
+					</v-card>
 				</v-dialog>
 			</v-col>
 		</v-row>
@@ -286,7 +288,7 @@ const inviteUser = async () => {
 			</UserRoleTable>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="p-8 table-color-background rounded-b-lg"></v-col>
+	<v-col cols="12" class="p-8 table-color-background rounded-b"></v-col>
 </template>
 <style scoped>
 .table-color-background {

@@ -47,7 +47,7 @@ const initials = computed(() => (user?.value?.firstName.at(0)?.toUpperCase() ?? 
 </script>
 
 <template>
-	<v-card v-if="user" class="px-6 py-6 rounded-lg" variant="elevated">
+	<v-card v-if="user" class="px-6 py-6 rounded" variant="elevated">
 		<v-card-title class="justify-center mb-2 text-center">
 			<v-form v-if="user" ref="form" v-model="valid" lazy-validation>
 				<v-avatar class="mb-4" size="96" :color="!user.avatarURL ? 'primary' : ''">

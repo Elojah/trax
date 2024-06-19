@@ -7,9 +7,7 @@ import User from '@/components/user/Me.vue';
 		<v-container fluid>
 			<v-row>
 				<v-col class="mx-auto px-12 py-12" cols="12" md="4">
-					<v-sheet class="px-1 rounded-lg" outlined color="primary">
-						<User />
-					</v-sheet>
+					<User />
 				</v-col>
 			</v-row>
 		</v-container>

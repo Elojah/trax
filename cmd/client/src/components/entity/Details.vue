@@ -64,7 +64,7 @@ const updateDescription = async function () {
 
 <template>
 	<!-- Info -->
-	<v-card v-if="e" class="px-6 py-6 justify-center rounded-lg" variant="flat">
+	<v-card v-if="e" class="px-6 py-6 justify-center rounded" variant="flat">
 		<v-avatar class="mb-4 justify-center" size="96" :color="!e.avatarURL ? 'primary' : ''">
 			<img v-if="e.avatarURL" :src="e.avatarURL" alt="Avatar">
 			<span v-else-if="!e.avatarURL" class=" mx-auto text-center text-h5">
@@ -105,18 +105,16 @@ const updateDescription = async function () {
 						</template>
 					</v-btn>
 				</template>
-				<v-sheet class="px-1 rounded-lg" outlined color="error">
-					<v-card class="px-6 py-6 rounded-lg" variant="elevated">
-						<v-card-title class="text-h5">Are you sure you want to delete this entity
-							?</v-card-title>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn variant="text" @click="closeDelete">Cancel</v-btn>
-							<v-btn color="error" variant="text" @click="confirmDelete">OK</v-btn>
-							<v-spacer></v-spacer>
-						</v-card-actions>
-					</v-card>
-				</v-sheet>
+				<v-card class="px-6 py-6 rounded" variant="elevated">
+					<v-card-title class="text-h5">Are you sure you want to delete this entity
+						?</v-card-title>
+					<v-card-actions>
+						<v-spacer></v-spacer>
+						<v-btn variant="text" @click="closeDelete">Cancel</v-btn>
+						<v-btn color="error" variant="text" @click="confirmDelete">OK</v-btn>
+						<v-spacer></v-spacer>
+					</v-card-actions>
+				</v-card>
 			</v-dialog>
 		</v-card-actions>
 	</v-card>
