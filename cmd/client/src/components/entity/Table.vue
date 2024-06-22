@@ -185,7 +185,7 @@ const short = (description: string): string => {
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
 					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
-						<v-card class="justify-center" variant="flat" :class="{
+						<v-card class="justify-center border-primary" :class="{
 							'row-hovered': isHovering,
 							'row-selected': isSelected({ value: item, selectable: true }),
 							'row-even': index % 2 === 0,
@@ -216,22 +216,21 @@ const short = (description: string): string => {
 </template>
 <style scoped>
 .table-color-background {
-	background-color: #212121;
+	background-color: #121212;
 }
 
 .row-odd {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.5);
-	background-color: #424242;
+	background-color: rgba(55, 0, 179, 0.5);
 }
 
 .row-odd:not(.row-hovered) {
-	background-color: #212121;
+	background-color: #121212;
 }
 
 .row-even {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(66, 66, 66, 0.5);
+	background-color: rgba(55, 0, 179, 0.5);
 }
 
 .row-even:not(.row-hovered) {
@@ -239,7 +238,7 @@ const short = (description: string): string => {
 }
 
 .row-selected {
-	background-color: rgba(0, 145, 234, 0.5) !important;
+	background-color: rgba(55, 0, 179, 1) !important;
 }
 
 .cursor-pointer {

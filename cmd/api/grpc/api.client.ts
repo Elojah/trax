@@ -5,7 +5,6 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
 import type { DeleteRoleUserReq } from "../../../internal/user/dto/role";
-import type { UserRoles } from "../../../internal/user/dto/user";
 import type { CreateRoleUserReq } from "../../../internal/user/dto/role";
 import type { DeleteRoleReq } from "../../../internal/user/dto/role";
 import type { UpdateRoleReq } from "../../../internal/user/dto/role";
@@ -22,6 +21,7 @@ import type { FetchEntityReq } from "../../../internal/user/dto/entity";
 import type { ListEntityResp } from "../../../internal/user/dto/entity";
 import type { ListEntityReq } from "../../../internal/user/dto/entity";
 import type { ClaimAuth } from "../../../internal/user/claims";
+import type { UserRoles } from "../../../internal/user/dto/user";
 import type { InviteUserReq } from "../../../internal/user/dto/user";
 import type { UpdateUserReq } from "../../../internal/user/dto/user";
 import type { U } from "../../../internal/user/user";
@@ -57,9 +57,9 @@ export interface IAPIClient {
      */
     updateUser(input: UpdateUserReq, options?: RpcOptions): UnaryCall<UpdateUserReq, U>;
     /**
-     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (user.U);
+     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (dto.UserRoles);
      */
-    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, U>;
+    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, UserRoles>;
     /**
      * Claims
      *
@@ -159,11 +159,11 @@ export class APIClient implements IAPIClient, ServiceInfo {
         return stackIntercept<UpdateUserReq, U>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (user.U);
+     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (dto.UserRoles);
      */
-    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, U> {
+    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, UserRoles> {
         const method = this.methods[4], opt = this._transport.mergeOptions(options);
-        return stackIntercept<InviteUserReq, U>("unary", this._transport, method, opt, input);
+        return stackIntercept<InviteUserReq, UserRoles>("unary", this._transport, method, opt, input);
     }
     /**
      * Claims

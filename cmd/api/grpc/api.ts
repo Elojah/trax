@@ -2,7 +2,6 @@
 // @generated from protobuf file "github.com/elojah/trax/cmd/api/grpc/api.proto" (package "grpc", syntax proto3)
 // tslint:disable
 import { DeleteRoleUserReq } from "../../../internal/user/dto/role";
-import { UserRoles } from "../../../internal/user/dto/user";
 import { CreateRoleUserReq } from "../../../internal/user/dto/role";
 import { DeleteRoleReq } from "../../../internal/user/dto/role";
 import { UpdateRoleReq } from "../../../internal/user/dto/role";
@@ -19,6 +18,7 @@ import { FetchEntityReq } from "../../../internal/user/dto/entity";
 import { ListEntityResp } from "../../../internal/user/dto/entity";
 import { ListEntityReq } from "../../../internal/user/dto/entity";
 import { ClaimAuth } from "../../../internal/user/claims";
+import { UserRoles } from "../../../internal/user/dto/user";
 import { InviteUserReq } from "../../../internal/user/dto/user";
 import { UpdateUserReq } from "../../../internal/user/dto/user";
 import { U } from "../../../internal/user/user";
@@ -35,7 +35,7 @@ export const API = new ServiceType("grpc.API", [
     { name: "ListUser", options: {}, I: ListUserReq, O: ListUserResp },
     { name: "FetchUser", options: {}, I: FetchUserReq, O: U },
     { name: "UpdateUser", options: {}, I: UpdateUserReq, O: U },
-    { name: "InviteUser", options: {}, I: InviteUserReq, O: U },
+    { name: "InviteUser", options: {}, I: InviteUserReq, O: UserRoles },
     { name: "FetchClaims", options: {}, I: Empty, O: ClaimAuth },
     { name: "ListEntity", options: {}, I: ListEntityReq, O: ListEntityResp },
     { name: "FetchEntity", options: {}, I: FetchEntityReq, O: Entity },

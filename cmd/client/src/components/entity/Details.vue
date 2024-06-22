@@ -64,7 +64,7 @@ const updateDescription = async function () {
 
 <template>
 	<!-- Info -->
-	<v-card v-if="e" class="px-6 py-6 justify-center rounded" variant="flat">
+	<v-card v-if="e" class="px-6 py-6 justify-center rounded">
 		<v-avatar class="mb-4 justify-center" size="96" :color="!e.avatarURL ? 'primary' : ''">
 			<img v-if="e.avatarURL" :src="e.avatarURL" alt="Avatar">
 			<span v-else-if="!e.avatarURL" class=" mx-auto text-center text-h5">
