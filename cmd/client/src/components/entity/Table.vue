@@ -177,7 +177,7 @@ const short = (description: string): string => {
 			</v-col>
 		</v-row>
 	</v-col>
-	<v-data-table-server class="px-6 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
+	<v-data-table-server class="px-2 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="iD" @update:options="list" v-model="selected"
 		@click:row="select" return-object item-selectable select-strategy="single">
@@ -216,12 +216,12 @@ const short = (description: string): string => {
 </template>
 <style scoped>
 .table-color-background {
-	background-color: #121212;
+	background-color: #212121;
 }
 
 .row-odd {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(55, 0, 179, 0.5);
+	background-color: #616161;
 }
 
 .row-odd:not(.row-hovered) {
@@ -230,15 +230,15 @@ const short = (description: string): string => {
 
 .row-even {
 	transition: background-color .2s ease-in-out;
-	background-color: rgba(55, 0, 179, 0.5);
+	background-color: #616161;
 }
 
 .row-even:not(.row-hovered) {
-	background-color: #263238;
+	background-color: #424242;
 }
 
 .row-selected {
-	background-color: rgba(55, 0, 179, 1) !important;
+	background-color: #2979FF
 }
 
 .cursor-pointer {
