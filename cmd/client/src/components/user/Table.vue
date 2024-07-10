@@ -188,7 +188,7 @@ const inviteUser = async () => {
 </script>
 
 <template>
-	<v-col class="px-6 pt-6 rounded-t table-color-background" cols="12">
+	<v-col class="px-6 rounded-t table-color-background" cols="12">
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
@@ -310,11 +310,11 @@ const inviteUser = async () => {
 }
 
 .row-even:not(.row-hovered) {
-	background-color: #263238;
+	background-color: #424242;
 }
 
 .row-expanded {
-	background-color: #2979FF
+	background-color: rgb(33, 47, 59) !important;
 }
 
 .cursor-pointer {

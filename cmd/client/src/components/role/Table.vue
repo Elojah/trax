@@ -198,7 +198,7 @@ const addRole = async (item: RolePermission) => {
 </script>
 
 <template>
-	<v-col class="px-6 pt-6 rounded-t table-color-background" cols="12">
+	<v-col class="px-6 rounded-t table-color-background" cols="12">
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
@@ -259,9 +259,10 @@ const addRole = async (item: RolePermission) => {
 					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
 						<v-card class="justify-center" :class="{
 							'row-hovered': isHovering,
-							'row-expanded': isExpanded(internalItem),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
+							'row-expanded': isExpanded(internalItem),
+							'text-primary': isExpanded(internalItem),
 						}" :title="item.role?.name" :subtitle="Number(item.permissions.length) + ' permission(s)'">
 							<template v-slot:append>
 								<v-icon v-if="isExpanded(internalItem)" icon="mdi-minus" size="x-large" color="primary">
@@ -322,11 +323,11 @@ const addRole = async (item: RolePermission) => {
 }
 
 .row-even:not(.row-hovered) {
-	background-color: #263238;
+	background-color: #424242;
 }
 
 .row-expanded {
-	background-color: #2979FF
+	background-color: rgb(33, 47, 59) !important;
 }
 
 .cursor-pointer {

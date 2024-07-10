@@ -13,10 +13,12 @@ const tableEntities = ref();
 
 <template>
 	<v-main class="bg">
-		<v-container fluid>
+		<v-container fluid class="fill-height h-screen py-0">
 			<v-row>
 				<v-col cols="5">
-					<EntityTable ref="tableEntities"></EntityTable>
+					<v-row class="h-screen">
+						<EntityTable ref="tableEntities"></EntityTable>
+					</v-row>
 				</v-col>
 				<v-col class="mx-auto" cols="7">
 					<v-col class="d-flex justify-center" cols="12">

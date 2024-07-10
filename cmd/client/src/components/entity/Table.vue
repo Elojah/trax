@@ -122,7 +122,7 @@ const short = (description: string): string => {
 </script>
 
 <template>
-	<v-col class="px-6 pt-6 rounded-t table-color-background" cols="12">
+	<v-col class="px-6 rounded-t table-color-background flex-shrink-1" cols="12">
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
@@ -177,20 +177,20 @@ const short = (description: string): string => {
 			</v-col>
 		</v-row>
 	</v-col>
-	<v-data-table-server class="px-2 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
-		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
-		:loading="loading" :search="search" item-value="iD" @update:options="list" v-model="selected"
-		@click:row="select" return-object item-selectable select-strategy="single">
+	<v-data-table-server class="px-2 rounded-0 flex-grow-1 overflow-y-auto" :headers="headers" fixed-footer
+		max-height="auto" items-per-page-text="" :items-per-page-options="pageOptions" :items="views"
+		:items-length="Number(total)" :loading="loading" :search="search" item-value="iD" @update:options="list"
+		v-model="selected" @click:row="select" return-object item-selectable select-strategy="single">
 		<template v-slot:item="{ item, columns, isSelected, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
 					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
 						<v-card class="justify-center border-primary" :class="{
 							'row-hovered': isHovering,
-							'row-selected': isSelected({ value: item, selectable: true }),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
-							'border-e-xl': isSelected({ value: item, selectable: true }),
+							'row-selected': isSelected({ value: item, selectable: true }),
+							'text-primary': isSelected({ value: item, selectable: true }),
 						}" :title="item.name" :subtitle="short(item.description)">
 							<template v-slot:prepend>
 								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
@@ -212,7 +212,7 @@ const short = (description: string): string => {
 			</v-hover>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="table-color-background p-8 rounded-b"></v-col>
+	<v-col cols="12" class="table-color-background p-8 rounded-b flex-shrink-1"></v-col>
 </template>
 <style scoped>
 .table-color-background {
@@ -238,7 +238,7 @@ const short = (description: string): string => {
 }
 
 .row-selected {
-	background-color: #2979FF
+	background-color: rgb(33, 47, 59) !important;
 }
 
 .cursor-pointer {
