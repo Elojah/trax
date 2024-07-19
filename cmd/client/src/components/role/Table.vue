@@ -198,7 +198,7 @@ const addRole = async (item: RolePermission) => {
 </script>
 
 <template>
-	<v-col class="px-6 rounded-t table-color-background" cols="12">
+	<v-container>
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
@@ -248,11 +248,11 @@ const addRole = async (item: RolePermission) => {
 				</v-dialog>
 			</v-col>
 		</v-row>
-	</v-col>
-	<v-data-table-server class="px-2 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
-		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
-		:loading="loading" :search="search" item-value="role.iD" @update:options="list" @click:row="expand"
-		return-object>
+	</v-container>
+	<v-data-table-server class="px-2 overflow-y-auto flex-grow-1" :headers="headers" fixed-footer fixed-header
+		max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="views"
+		:items-length="Number(total)" :loading="loading" :search="search" item-value="role.iD" @update:options="list"
+		@click:row="expand" return-object>
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">
@@ -301,7 +301,6 @@ const addRole = async (item: RolePermission) => {
 			</RoleDetails>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="p-8 table-color-background rounded-b"></v-col>
 </template>
 <style scoped>
 .table-color-background {

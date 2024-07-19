@@ -14,14 +14,14 @@ const tableEntities = ref();
 <template>
 	<v-main class="bg">
 		<v-container fluid class="fill-height h-screen py-0">
-			<v-row>
+			<v-row no-gutters>
 				<v-col cols="5">
-					<v-row class="h-screen">
+					<v-sheet class="d-flex flex-column px-4 h-screen fill-height fill-width">
 						<EntityTable ref="tableEntities"></EntityTable>
-					</v-row>
+					</v-sheet>
 				</v-col>
-				<v-col class="mx-auto" cols="7">
-					<v-col class="d-flex justify-center" cols="12">
+				<v-col class="mx-auto d-flex flex-column" cols="7">
+					<v-col class="d-flex justify-center flex-shrink-1" cols="12">
 						<v-btn-toggle v-model="view">
 							<v-btn class="main-color-background" size="large" variant="outlined"
 								append-icon="mdi-domain">
@@ -53,11 +53,11 @@ const tableEntities = ref();
 						</EntityDetails>
 					</v-sheet>
 					<!-- Roles -->
-					<v-sheet v-if="view === 1">
+					<v-sheet v-if="view === 1" class="d-flex flex-column fill-height fill-width flex-grow-1">
 						<RoleTable></RoleTable>
 					</v-sheet>
 					<!-- User -->
-					<v-sheet v-if="view === 2">
+					<v-sheet v-if="view === 2" class="d-flex flex-column fill-height fill-width flex-grow-1">
 						<UserTable></UserTable>
 					</v-sheet>
 					<v-divider></v-divider>

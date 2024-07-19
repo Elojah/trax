@@ -188,7 +188,7 @@ const inviteUser = async () => {
 </script>
 
 <template>
-	<v-col class="px-6 rounded-t table-color-background" cols="12">
+	<v-container>
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
@@ -252,8 +252,8 @@ const inviteUser = async () => {
 				</v-dialog>
 			</v-col>
 		</v-row>
-	</v-col>
-	<v-data-table-server class="px-2 rounded-0" :headers="headers" fixed-footer min-height="50vh" max-height="100vh"
+	</v-container>
+	<v-data-table-server class="px-2 overflow-y-auto flex-grow-1" :headers="headers" fixed-footer fixed-header
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="user.iD" @update:options="list" @click:row="expand"
 		return-object>
@@ -288,7 +288,6 @@ const inviteUser = async () => {
 			</UserRoleTable>
 		</template>
 	</v-data-table-server>
-	<v-col cols="12" class="p-8 table-color-background rounded-b"></v-col>
 </template>
 <style scoped>
 .table-color-background {

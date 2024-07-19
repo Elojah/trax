@@ -123,7 +123,9 @@ const addRole = async (role: RolePermission) => {
 				</v-card-title>
 				<v-divider></v-divider>
 				<v-card-text>
-					<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
+					<v-sheet class="d-flex flex-column px-4 fill-height fill-width">
+						<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
+					</v-sheet>
 				</v-card-text>
 				<v-card-actions>
 					<v-spacer></v-spacer>
