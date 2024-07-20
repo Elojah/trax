@@ -112,7 +112,7 @@ const create = async () => {
 	description.value = '';
 
 	await authStore.refreshToken();
-	await list({ page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] })
+	await list();
 };
 
 const short = (description: string): string => {

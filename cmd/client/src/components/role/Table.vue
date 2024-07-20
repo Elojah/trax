@@ -134,6 +134,7 @@ const dialogCreate = ref(false);
 const closeCreateRole = () => {
 	dialogCreate.value = false;
 	name.value = '';
+	permissions.value.clear();
 };
 
 const permissions = ref();
@@ -147,7 +148,7 @@ const create = async () => {
 	permissions.value.clear();
 
 	await authStore.refreshToken();
-	await list()
+	await list();
 };
 
 const nameEdit = ref(false);
