@@ -125,7 +125,7 @@ const short = (description: string): string => {
 	<v-container>
 		<v-row>
 			<v-col cols="10">
-				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
+				<v-text-field class="table-color-background" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>

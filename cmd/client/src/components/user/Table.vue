@@ -191,7 +191,7 @@ const inviteUser = async () => {
 	<v-container>
 		<v-row>
 			<v-col cols="10">
-				<v-text-field class="table-color-background px-1" v-model="search" label="Search"
+				<v-text-field class="table-color-background" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>
@@ -205,50 +205,40 @@ const inviteUser = async () => {
 							</template>
 						</v-btn>
 					</template>
-					<v-card class="rounded" variant="elevated">
-						<v-card-title class="d-flex justify-center">
-							<span class="text-h5">Invite user</span>
-						</v-card-title>
+					<v-sheet class="d-flex flex-column px-4 fill-height fill-width" height="90vh">
+						<v-container class="px-6">
+							<v-form ref="form" v-model="valid" lazy-validation>
+								<v-row>
+									<v-col cols="10">
+										<v-text-field v-model="email" label="Email" :rules="emailRules"
+											prepend-inner-icon="mdi-email" underlined required clearable>
+										</v-text-field>
+									</v-col>
+									<v-col cols="2" class="d-flex align-center justify-end">
+										<v-btn size="large" :disabled="!valid || addedRoles?.length === 0"
+											variant="tonal" prepend-icon="mdi-account-circle" @click="inviteUser">Invite
+											<template v-slot:prepend>
+												<v-icon color="primary"></v-icon>
+											</template>
+										</v-btn>
+									</v-col>
+								</v-row>
+								<v-row v-if="addedRoles">
+									<v-chip v-for="item in addedRoles" :key="ulid(item.iD)" class="ma-2" variant="tonal"
+										closable label color="primary" @click:close="deleteRole(item.iD)">
+										<v-icon icon="mdi-account-cog" start></v-icon>
+										{{ item.name }}
+									</v-chip>
+								</v-row>
+							</v-form>
+						</v-container>
 						<v-divider></v-divider>
-						<v-card-text>
-							<v-container class="px-6">
-								<v-form ref="form" v-model="valid" lazy-validation>
-									<v-row>
-										<v-col cols="10">
-											<v-text-field v-model="email" label="Email" :rules="emailRules"
-												prepend-inner-icon="mdi-email" underlined required clearable>
-											</v-text-field>
-										</v-col>
-										<v-col cols="2" class="d-flex align-center justify-end">
-											<v-btn size="large" :disabled="!valid || addedRoles?.length === 0"
-												variant="tonal" prepend-icon="mdi-account-circle"
-												@click="inviteUser">Invite
-												<template v-slot:prepend>
-													<v-icon color="primary"></v-icon>
-												</template>
-											</v-btn>
-										</v-col>
-									</v-row>
-									<v-row v-if="addedRoles">
-										<v-chip v-for="item in addedRoles" :key="ulid(item.iD)" class="ma-2"
-											variant="tonal" closable label color="primary"
-											@click:close="deleteRole(item.iD)">
-											<v-icon icon="mdi-account-cog" start></v-icon>
-											{{ item.name }}
-										</v-chip>
-									</v-row>
-								</v-form>
-							</v-container>
-							<v-divider></v-divider>
-							<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="error" variant="text" @click="closeAddUser">
-								Close
-							</v-btn>
-						</v-card-actions>
-					</v-card>
+						<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
+						<v-divider></v-divider>
+						<v-btn color="error" variant="text" @click="closeAddUser">
+							Close
+						</v-btn>
+					</v-sheet>
 				</v-dialog>
 			</v-col>
 		</v-row>

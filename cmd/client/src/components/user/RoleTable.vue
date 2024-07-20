@@ -117,23 +117,13 @@ const addRole = async (role: RolePermission) => {
 					</template>
 				</v-btn>
 			</template>
-			<v-card class="rounded" variant="elevated">
-				<v-card-title class="d-flex justify-center">
-					<span class="text-h5">Add roles to {{ name }}</span>
-				</v-card-title>
+			<v-sheet class="d-flex flex-column px-4 fill-height fill-width" height="90vh">
+				<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
 				<v-divider></v-divider>
-				<v-card-text>
-					<v-sheet class="d-flex flex-column px-4 fill-height fill-width">
-						<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
-					</v-sheet>
-				</v-card-text>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="error" variant="text" @click="closeAddRole">
-						Close
-					</v-btn>
-				</v-card-actions>
-			</v-card>
+				<v-btn color="error" variant="text" @click="closeAddRole">
+					Close
+				</v-btn>
+			</v-sheet>
 		</v-dialog>
 	</div>
 </template>
