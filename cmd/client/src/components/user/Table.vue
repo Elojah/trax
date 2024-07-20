@@ -205,7 +205,7 @@ const inviteUser = async () => {
 							</template>
 						</v-btn>
 					</template>
-					<v-sheet class="d-flex flex-column px-4 fill-height fill-width" height="90vh">
+					<v-sheet class="d-flex flex-column px-4 h-screen fill-height fill-width">
 						<v-container class="px-6">
 							<v-form ref="form" v-model="valid" lazy-validation>
 								<v-row>

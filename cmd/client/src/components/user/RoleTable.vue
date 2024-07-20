@@ -117,7 +117,7 @@ const addRole = async (role: RolePermission) => {
 					</template>
 				</v-btn>
 			</template>
-			<v-sheet class="d-flex flex-column px-4 fill-height fill-width" height="90vh">
+			<v-sheet class="d-flex flex-column px-4 h-screen fill-height fill-width">
 				<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
 				<v-divider></v-divider>
 				<v-btn color="error" variant="text" @click="closeAddRole">
