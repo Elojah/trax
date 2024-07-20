@@ -188,7 +188,7 @@ const inviteUser = async () => {
 </script>
 
 <template>
-	<v-container>
+	<v-container class="px-0">
 		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background" v-model="search" label="Search"
@@ -205,8 +205,8 @@ const inviteUser = async () => {
 							</template>
 						</v-btn>
 					</template>
-					<v-sheet class="d-flex flex-column px-4 h-screen fill-height fill-width">
-						<v-container class="px-6">
+					<v-sheet class="d-flex flex-column pa-4 h-screen fill-height fill-width">
+						<v-container class="px-0">
 							<v-form ref="form" v-model="valid" lazy-validation>
 								<v-row>
 									<v-col cols="10">

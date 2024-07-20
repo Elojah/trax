@@ -122,8 +122,8 @@ const short = (description: string): string => {
 </script>
 
 <template>
-	<v-container class="p-0">
-		<v-row no-gutters>
+	<v-container class="px-0">
+		<v-row>
 			<v-col cols="10">
 				<v-text-field class="table-color-background" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>

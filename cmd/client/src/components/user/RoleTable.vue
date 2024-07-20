@@ -107,7 +107,7 @@ const addRole = async (role: RolePermission) => {
 	</tr>
 </template>
 <template v-slot:bottom>
-	<div class="d-flex justify-center px-1 py-6">
+	<div class="d-flex justify-center">
 		<v-dialog v-model="dialogAddRole" max-width="1200px">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
@@ -117,7 +117,7 @@ const addRole = async (role: RolePermission) => {
 					</template>
 				</v-btn>
 			</template>
-			<v-sheet class="d-flex flex-column px-4 h-screen fill-height fill-width">
+			<v-sheet class="d-flex flex-column pa-4 fill-height fill-width" height="50vh">
 				<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
 				<v-divider></v-divider>
 				<v-btn color="error" variant="text" @click="closeAddRole">
