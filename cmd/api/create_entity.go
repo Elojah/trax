@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/elojah/trax/internal/user"
@@ -44,6 +45,12 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		if err = h.user.InsertEntity(ctx, e); err != nil {
+			if errors.As(err, &gerrors.ErrConflict{}) {
+				logger.Error().Err(err).Msg("failed to insert entity")
+
+				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
+			}
+
 			logger.Error().Err(err).Msg("failed to insert entity")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()

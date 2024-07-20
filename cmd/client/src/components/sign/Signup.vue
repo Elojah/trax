@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
+import { useErrorsStore } from '@/stores/errors';
 import { SignupReq } from '@internal/user/dto/user';
-import { ref } from 'vue';
+import { toRefs, ref } from "vue";
 import type { VForm } from 'vuetify/components/VForm';
 
 const form = ref<VForm | null>(null);
@@ -32,9 +33,12 @@ const lastnameRules = [
 ]
 const passwordMatch = () => password.value === passwordCheck.value || "Password must match";
 
-const snackbarSuccess = ref(false)
-const snackbarConflict = ref(false)
-const snackbarInternal = ref(false)
+const errorsStore = useErrorsStore()
+const {
+  message,
+  success,
+  error,
+} = toRefs(errorsStore)
 
 const signup = async function () {
   const req = SignupReq.create({
@@ -48,14 +52,17 @@ const signup = async function () {
 
   switch (resp.status) {
     case 200: // success
-      snackbarSuccess.value = true
+      message.value = 'Successfully Signup ! You can now signin.'
+      success.value = true
       form?.value?.reset()
       break;
     case 409: // conflict
-      snackbarConflict.value = true
+      message.value = 'Failed to signup, email already exists.'
+      error.value = true
       break;
     case 500: // internal
-      snackbarInternal.value = true
+      message.value = 'Internal error occurred, please retry later.'
+      error.value = true
       break;
   }
 }
@@ -113,24 +120,6 @@ const signup = async function () {
           </v-col>
         </v-row>
       </v-form>
-      <v-snackbar :timeout="2000" v-model="snackbarSuccess" class="mt-6" color="primary">
-        Successfully Signup ! You can now signin.
-        <template v-slot:actions>
-          <v-btn variant="text" @click="snackbarSuccess = false">Close</v-btn>
-        </template>
-      </v-snackbar>
-      <v-snackbar :timeout="2000" v-model="snackbarConflict" class="mt-6" color="error">
-        Failed to signup, email already exists.
-        <template v-slot:actions>
-          <v-btn variant="text" @click="snackbarConflict = false">Close</v-btn>
-        </template>
-      </v-snackbar>
-      <v-snackbar :timeout="2000" v-model="snackbarInternal" class="mt-6" color="error">
-        Internal error occurred, please retry later.
-        <template v-slot:actions>
-          <v-btn variant="text" @click="snackbarInternal = false">Close</v-btn>
-        </template>
-      </v-snackbar>
     </v-card-text>
   </v-card>
 </template>

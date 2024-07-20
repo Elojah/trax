@@ -3,9 +3,11 @@ import { useEntityStore } from '@/stores/entity';
 import { computed, ref, toRefs } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
+import { useErrorsStore } from '@/stores/errors';
 import { ulid } from '@/utils/ulid';
 import { ListEntityReq } from '@internal/user/dto/entity';
 import type { ReadonlyHeaders } from '@/utils/headers';
+import { grpccodes } from '@/utils/errors';
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -32,6 +34,9 @@ const {
 	total: total,
 	selected: selected,
 } = toRefs(store);
+
+const errorsStore = useErrorsStore()
+const { success, message } = toRefs(errorsStore)
 
 const name = ref('');
 const avatarURL = ref('');
@@ -69,19 +74,23 @@ const select = (_: any, row: any) => {
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
 	loading.value = true;
 
-	const { page, itemsPerPage, sortBy } = options;
-	const newIDs = await store.list(ListEntityReq.create({
-		own: true,
-		search: search.value,
-		paginate: {
-			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-			end: BigInt(page * itemsPerPage),
-			sort: sortBy?.at(0)?.key ?? '',
-			order: sortBy?.at(0)?.order === 'asc' ? true : false,
-		}
-	}));
+	try {
+		const { page, itemsPerPage, sortBy } = options;
+		const newIDs = await store.list(ListEntityReq.create({
+			own: true,
+			search: search.value,
+			paginate: {
+				start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+				end: BigInt(page * itemsPerPage),
+				sort: sortBy?.at(0)?.key ?? '',
+				order: sortBy?.at(0)?.order === 'asc' ? true : false,
+			}
+		}));
 
-	viewIDs.value = newIDs;
+		viewIDs.value = newIDs;
+	} catch (e) {
+		errorsStore.showGRPC(e)
+	}
 
 	loading.value = false;
 };
@@ -105,7 +114,19 @@ const closeCreate = () => {
 };
 
 const create = async () => {
-	await store.create(name.value, avatarURL.value, description.value);
+	let ok = true;
+	try {
+		await store.create(name.value, avatarURL.value, description.value);
+	} catch (e) {
+		errorsStore.showGRPC(e)
+		ok = false
+	}
+
+	if (ok) {
+		message.value = 'Entity created successfully';
+		success.value = true;
+	}
+
 	dialogCreate.value = false;
 	name.value = '';
 	avatarURL.value = '';

@@ -31,6 +31,7 @@ TODO:
 
   - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
   - !!! Add pop up for every success/fail actions -> Manage API fails and success everywhere
+    + Error store with only one snackbar with options ?
 
 - ~ Clean UI (table, cards, etc.)
 

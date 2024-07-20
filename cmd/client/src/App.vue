@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Drawer from '@/components/Drawer.vue';
+import Errors from '@/components/Errors.vue';
 
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from './stores/auth';
@@ -20,6 +21,7 @@ onUnmounted(() => clearInterval(timer.value))
   <v-app id="trax">
     <Drawer />
     <RouterView />
+    <Errors />
   </v-app>
 </template>
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/elojah/trax/internal/user"
@@ -74,6 +75,12 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		if err = h.user.InsertRole(ctx, role); err != nil {
+			if errors.As(err, &gerrors.ErrConflict{}) {
+				logger.Error().Err(err).Msg("failed to insert role")
+
+				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
+			}
+
 			logger.Error().Err(err).Msg("failed to insert role")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { toRefs, ref } from "vue";
 import { SigninReq } from '@internal/user/dto/user';
 import { useAuthStore } from '@/stores/auth';
+import { useErrorsStore } from '@/stores/errors';
 import type { VForm } from "vuetify/components/VForm";
 import { type CredentialResponse } from "vue3-google-signin";
 import router from "@/router";
@@ -24,8 +25,13 @@ const passwordRules = [
   (v: string) => (v && v.length >= 8) || "Min 8 characters"
 ]
 
-const snackbarUnauthorized = ref(false)
-const snackbarInternal = ref(false)
+
+const errorsStore = useErrorsStore()
+const {
+  message,
+  success,
+  error,
+} = toRefs(errorsStore)
 
 const signin = async function () {
   const req = SigninReq.create({
@@ -58,11 +64,13 @@ const signInGoogle = async function (credentials: CredentialResponse) {
       router.push({ name: 'dashboard' })
       break;
     case 401: // unauthorized
-      snackbarUnauthorized.value = true
+      message.value = 'Failed to signin, wrong email/password.'
+      error.value = true
       form?.value?.reset()
       break;
     case 500: // internal
-      snackbarInternal.value = true
+      message.value = 'Internal error occurred, please retry later.'
+      error.value = true
       form?.value?.reset()
       break;
   }
@@ -116,18 +124,6 @@ const signInGoogleError = async function (error: any) {
           </v-col>
         </v-row>
       </v-form>
-      <v-snackbar :timeout="2000" v-model="snackbarUnauthorized" class="mt-6" color="error">
-        Failed to signin, wrong email/password.
-        <template v-slot:actions>
-          <v-btn variant="text" @click="snackbarUnauthorized = false">Close</v-btn>
-        </template>
-      </v-snackbar>
-      <v-snackbar :timeout="2000" v-model="snackbarInternal" class="mt-6" color="error">
-        Internal error occurred, please retry later.
-        <template v-slot:actions>
-          <v-btn variant="text" @click="snackbarInternal = false">Close</v-btn>
-        </template>
-      </v-snackbar>
     </v-card-text>
   </v-card>
 </template>

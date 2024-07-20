@@ -37,10 +37,8 @@ export const useEntityStore = defineStore('entity', () => {
 
       return await api.createEntity(req, { meta: { token: token.value } })
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err
     }
   }
 
@@ -50,10 +48,8 @@ export const useEntityStore = defineStore('entity', () => {
 
       entities.value?.set(ulid(resp.response.iD), resp.response)
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err;
     }
   }
 
@@ -63,10 +59,8 @@ export const useEntityStore = defineStore('entity', () => {
 
       entities.value?.delete(ulid(resp.response.entity.iD))
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err;
     }
   }
 
@@ -84,12 +78,9 @@ export const useEntityStore = defineStore('entity', () => {
 
       return resp.response.entities.map((entity: Entity) => ulid(entity.iD))
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err
     }
-    return []
   }
 
   const populate = async function (ids: string[]) {
