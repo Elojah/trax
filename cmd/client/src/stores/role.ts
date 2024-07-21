@@ -32,10 +32,8 @@ export const useRoleStore = defineStore('role', () => {
 
       return await api.createRole(req, { meta: { token: token.value } })
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      console.log(err)
+      throw err
     }
   }
 
@@ -45,10 +43,8 @@ export const useRoleStore = defineStore('role', () => {
 
       roles.value?.set(ulid(resp.response.iD), resp.response)
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      console.log(err)
+      throw err
     }
   }
 
@@ -74,12 +70,9 @@ export const useRoleStore = defineStore('role', () => {
         [[], []]
       )
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      console.log(err)
+      throw err
     }
-    return [[], []]
   }
 
   const delete_ = async (req: DeleteRoleReq) => {
@@ -88,10 +81,8 @@ export const useRoleStore = defineStore('role', () => {
 
       roles.value?.delete(ulid(resp.response.role?.iD))
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      console.log(err)
+      throw err
     }
   }
 

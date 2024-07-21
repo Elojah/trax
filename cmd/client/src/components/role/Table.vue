@@ -10,6 +10,7 @@ import RoleDetails from '@/components/role/Details.vue';
 import PermissionTable from '@/components/permission/Table.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import { useUserStore } from '@/stores/user';
+import { useErrorsStore } from '@/stores/errors';
 import type { Role } from '@internal/user/role';
 
 const props = withDefaults(defineProps<{
@@ -46,6 +47,9 @@ const pageOptions = [
 ]
 
 const authStore = useAuthStore();
+
+const errorsStore = useErrorsStore()
+const { success, message } = toRefs(errorsStore)
 
 // to add role
 const userStore = useUserStore();
@@ -106,18 +110,22 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
-	const [newRoleIDs] = await store.list(ListRoleReq.create({
-		entityIDs: [selectedEntity.value.iD],
-		search: search.value,
-		paginate: {
-			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-			end: BigInt((page * itemsPerPage)),
-			sort: sortBy?.at(0)?.key ?? '',
-			order: sortBy?.at(0)?.order === 'asc' ? true : false,
-		}
-	}));
+	try {
+		const [newRoleIDs] = await store.list(ListRoleReq.create({
+			entityIDs: [selectedEntity.value.iD],
+			search: search.value,
+			paginate: {
+				start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+				end: BigInt((page * itemsPerPage)),
+				sort: sortBy?.at(0)?.key ?? '',
+				order: sortBy?.at(0)?.order === 'asc' ? true : false,
+			}
+		}));
 
-	viewIDs.value = newRoleIDs;
+		viewIDs.value = newRoleIDs;
+	} catch (e) {
+		errorsStore.showGRPC(e)
+	}
 
 	loading.value = false;
 };
@@ -142,7 +150,18 @@ const permissions = ref();
 const create = async () => {
 	const values = permissions.value?.values.map(permissions.value.unhash);
 
-	await store.create(selectedEntity?.value?.iD!, name.value, values);
+	let ok = true;
+	try {
+		await store.create(selectedEntity?.value?.iD!, name.value, values);
+	} catch (e) {
+		errorsStore.showGRPC(e)
+		ok = false;
+	}
+	if (ok) {
+		message.value = `Role ${name.value} created successfully`;
+		success.value = true;
+	}
+
 	dialogCreate.value = false;
 	name.value = '';
 	permissions.value.clear();
@@ -240,7 +259,7 @@ const addRole = async (item: RolePermission) => {
 								<v-btn color="error" variant="text" @click="closeCreateRole">
 									Cancel
 								</v-btn>
-								<v-btn color="primary" variant="text" @click="create">
+								<v-btn color="primary" variant="text" :disabled="!valid" @click="create">
 									Create
 								</v-btn>
 							</v-card-actions>

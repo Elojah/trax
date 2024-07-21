@@ -123,7 +123,7 @@ const create = async () => {
 	}
 
 	if (ok) {
-		message.value = 'Entity created successfully';
+		message.value = `Entity ${name.value} created successfully`;
 		success.value = true;
 	}
 
