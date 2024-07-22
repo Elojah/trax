@@ -251,40 +251,43 @@ const addRole = async (item: RolePermission) => {
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">
 					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
-						<v-card class="justify-center" :class="{
+						<v-card :class="{
 							'row-hovered': isHovering,
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 							'row-expanded': isExpanded(internalItem),
 							'text-primary': isExpanded(internalItem),
 						}" :title="item.role?.name" :subtitle="Number(item.permissions.length) + ' permission(s)'">
-							<template v-slot:append>
-								<v-icon v-if="isExpanded(internalItem)" icon="mdi-minus" size="x-large" color="primary">
+							<template v-slot:prepend>
+								<v-icon v-if="isExpanded(internalItem)" class="mr-4" icon="mdi-minus" size="x-large"
+									color="primary">
 								</v-icon>
-								<v-icon v-else icon="mdi-plus" size="x-large" color="primary"> </v-icon>
+								<v-icon v-else class="mr-4" icon="mdi-plus" size="x-large" color="primary"> </v-icon>
+								<v-divider vertical></v-divider>
 							</template>
-							<v-card-actions>
+							<template v-slot:append>
+								<v-divider vertical v-if="props.userID"></v-divider>
 								<v-btn v-if="props.userID && !userRoles?.has(ulid(item.role?.iD))" variant="tonal"
-									prepend-icon="mdi-plus-box" color="primary" v-bind="props" :loading="loadingAddRole"
-									v-on:click.stop.prevent="addRole(item)">
+									class="mr-4" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
+									:loading="loadingAddRole" v-on:click.stop.prevent="addRole(item)">
 									Add role
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>
 									</template>
 								</v-btn>
 								<v-btn v-else-if="props.userID && userRoles?.has(ulid(item.role?.iD))" variant="tonal"
-									disabled prepend-icon="mdi-check-bold" color="secondary" v-bind="props"
+									class="mr-4" disabled prepend-icon="mdi-check-bold" color="secondary" v-bind="props"
 									v-on:click.stop.prevent="async () => { }">
 									Added
 									<template v-slot:prepend>
 										<v-icon color="secondary"></v-icon>
 									</template>
 								</v-btn>
-								<v-divider></v-divider>
-								<p class="font-italic font-weight-light">
+								<v-divider vertical></v-divider>
+								<p class="ml-4 font-italic font-weight-light">
 									{{ new Date(Number(item.role?.createdAt) * 1000).toLocaleDateString('en-GB') }}
 								</p>
-							</v-card-actions>
+							</template>
 						</v-card>
 					</td>
 				</tr>

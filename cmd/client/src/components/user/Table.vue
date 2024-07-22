@@ -262,17 +262,19 @@ const deleteRole = async (roleID: Uint8Array) => {
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}" :title="item.email" :subtitle="item.lastName + ' ' + item.firstName">
-							<template v-slot:append>
-								<v-icon v-if="isExpanded(internalItem)" icon="mdi-minus" size="x-large" color="primary">
+							<template v-slot:prepend>
+								<v-icon v-if="isExpanded(internalItem)" class="mr-4" icon="mdi-minus" size="x-large"
+									color="primary">
 								</v-icon>
-								<v-icon v-else icon="mdi-plus" size="x-large" color="primary"> </v-icon>
+								<v-icon v-else class="mr-4" icon="mdi-plus" size="x-large" color="primary"> </v-icon>
+								<v-divider vertical></v-divider>
 							</template>
-							<v-card-actions>
-								<v-divider></v-divider>
-								<p class="font-italic font-weight-light">
+							<template v-slot:append>
+								<v-divider vertical></v-divider>
+								<p class="ml-4 font-italic font-weight-light">
 									{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
 								</p>
-							</v-card-actions>
+							</template>
 						</v-card>
 					</td>
 				</tr>

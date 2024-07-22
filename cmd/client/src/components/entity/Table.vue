@@ -206,7 +206,7 @@ const short = (description: string): string => {
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
 					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
-						<v-card class="justify-center border-primary" :class="{
+						<v-card :class="{
 							'row-hovered': isHovering,
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
@@ -220,13 +220,14 @@ const short = (description: string): string => {
 										{{ item?.name?.at(0)?.toUpperCase() }}
 									</span>
 								</v-avatar>
+								<v-divider vertical></v-divider>
 							</template>
-							<v-card-actions>
-								<v-divider></v-divider>
-								<p class="font-italic font-weight-light">
+							<template v-slot:append>
+								<v-divider vertical></v-divider>
+								<p class="ml-4 font-italic font-weight-light">
 									{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
 								</p>
-							</v-card-actions>
+							</template>
 						</v-card>
 					</td>
 				</tr>

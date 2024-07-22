@@ -28,7 +28,6 @@ TODO:
 - Add Create & Update & delete on everything
 
   - Create/Invite (add at least 1 role) User
-
   - Edit role name
   - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
     + Check user table w/ permission
