@@ -245,7 +245,7 @@ const short = (description: string): string => {
 }
 
 .row-odd:not(.row-hovered) {
-	background-color: #121212;
+	background-color: #37474F;
 }
 
 .row-even {
@@ -254,7 +254,7 @@ const short = (description: string): string => {
 }
 
 .row-even:not(.row-hovered) {
-	background-color: #424242;
+	background-color: #263238;
 }
 
 .row-selected {

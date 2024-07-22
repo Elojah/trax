@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
+import { useErrorsStore } from '@/stores/errors';
 import { useEntityStore } from '@/stores/entity';
 import { ulid } from '@/utils/ulid';
 import { computed, ref, toRefs, watch } from 'vue';
@@ -29,6 +30,9 @@ const {
 	roles: roles,
 } = toRefs(userStore);
 
+const errorsStore = useErrorsStore();
+const { success, message } = toRefs(errorsStore);
+
 const user = computed(() => { return roles.value.get(ulid(props.userID)) })
 
 const name = `${user.value?.user?.lastName} ${user.value?.user?.firstName}`;
@@ -55,7 +59,17 @@ const headers: ReadonlyHeaders = [
 ];
 
 const deleteUserRole = async (roleID: Uint8Array) => {
-	await userStore.deleteRole(props.userID!, roleID);
+	let ok = true;
+	try {
+		await userStore.deleteRole(props.userID!, roleID);
+	} catch (e) {
+		errorsStore.showGRPC(e);
+		ok = false;
+	}
+	if (ok) {
+		message.value = `Role deleted successfully`;
+		success.value = true;
+	}
 };
 
 const dialogAddRole = ref(false);
@@ -70,7 +84,17 @@ const addRoleLoading = ref(false);
 
 const addRole = async (role: RolePermission) => {
 	addRoleLoading.value = true;
-	await userStore.addRole(props?.userID!, role.role?.iD!);
+	let ok = true;
+	try {
+		await userStore.addRole(props?.userID!, role.role?.iD!);
+	} catch (e) {
+		errorsStore.showGRPC(e);
+		ok = false;
+	}
+	if (ok) {
+		message.value = `Role added successfully`;
+		success.value = true;
+	}
 	addRoleLoading.value = false;
 };
 
@@ -120,7 +144,7 @@ const addRole = async (role: RolePermission) => {
 			<v-sheet class="d-flex flex-column pa-4 fill-height fill-width" height="50vh">
 				<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
 				<v-divider></v-divider>
-				<v-btn color="error" variant="text" @click="closeAddRole">
+				<v-btn color="error" variant="tonal" @click="closeAddRole">
 					Close
 				</v-btn>
 			</v-sheet>

@@ -3,6 +3,7 @@ import { useEntityStore } from '@/stores/entity';
 import { computed, onMounted, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
+import { useErrorsStore } from '@/stores/errors';
 import { ulid, zero } from '@/utils/ulid';
 import { useUserStore } from '@/stores/user';
 import { ListUserReq } from '@internal/user/dto/user';
@@ -40,6 +41,9 @@ const entityStore = useEntityStore();
 const {
 	selected: selectedEntities,
 } = toRefs(entityStore);
+
+const errorsStore = useErrorsStore();
+const { success, message } = toRefs(errorsStore);
 
 const selectedEntity = computed(() => selectedEntities.value.at(0));
 
@@ -96,18 +100,22 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
-	const newUserIDs = await store.list(ListUserReq.create({
-		entityIDs: [selectedEntity.value.iD],
-		search: search.value,
-		paginate: {
-			start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
-			end: BigInt((page * itemsPerPage)),
-			sort: sortBy?.at(0)?.key ?? '',
-			order: sortBy?.at(0)?.order === 'asc' ? true : false,
-		}
-	}));
+	try {
+		const newUserIDs = await store.list(ListUserReq.create({
+			entityIDs: [selectedEntity.value.iD],
+			search: search.value,
+			paginate: {
+				start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
+				end: BigInt((page * itemsPerPage)),
+				sort: sortBy?.at(0)?.key ?? '',
+				order: sortBy?.at(0)?.order === 'asc' ? true : false,
+			}
+		}));
 
-	viewIDs.value = newUserIDs;
+		viewIDs.value = newUserIDs;
+	} catch (e) {
+		errorsStore.showGRPC(e)
+	}
 
 	loading.value = false;
 };
@@ -133,11 +141,23 @@ const closeInvite = () => {
 };
 
 const invite = async () => {
-	await store.invite(name.value);
-	dialogInvite.value = false;
-	name.value = '';
+	let ok = true;
+	try {
+		await store.invite(email.value, addedRoles);
+	} catch (e) {
+		errorsStore.showGRPC(e)
+		ok = false;
+	}
 
-	await authStore.refreshToken();
+	if (ok) {
+		message.value = `User ${email.value} invited successfully`;
+		success.value = true;
+	}
+
+	dialogInvite.value = false;
+	email.value = '';
+	roles.value.set(ulid(zero), { roles: [] });
+
 	await list()
 };
 
@@ -152,14 +172,6 @@ const confirmDelete = () => {
 };
 
 const delete_ = () => {
-};
-
-
-// New user
-const dialogAddUser = ref(false);
-
-const closeAddUser = () => {
-	dialogAddUser.value = false;
 };
 
 const addRoleNewUser = async (role: RolePermission) => {
@@ -178,13 +190,6 @@ const deleteRole = async (roleID: Uint8Array) => {
 	await store.deleteRoleDry(zero, roleID);
 };
 
-
-const inviteUser = async () => {
-	// await store.inviteUser(email.value!, addedRoles.value!);
-	// dialogAddUser.value = false;
-	// email.value = '';
-};
-
 </script>
 
 <template>
@@ -196,7 +201,7 @@ const inviteUser = async () => {
 				</v-text-field>
 			</v-col>
 			<v-col cols="2" class="d-flex align-center justify-end">
-				<v-dialog v-model="dialogAddUser" max-width="1200px">
+				<v-dialog v-model="dialogInvite" max-width="1200px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
 							New
@@ -216,7 +221,7 @@ const inviteUser = async () => {
 									</v-col>
 									<v-col cols="2" class="d-flex align-center justify-end">
 										<v-btn size="large" :disabled="!valid || addedRoles?.length === 0"
-											variant="tonal" prepend-icon="mdi-account-circle" @click="inviteUser">Invite
+											variant="tonal" prepend-icon="mdi-account-circle" @click="invite">Invite
 											<template v-slot:prepend>
 												<v-icon color="primary"></v-icon>
 											</template>
@@ -235,7 +240,7 @@ const inviteUser = async () => {
 						<v-divider></v-divider>
 						<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
 						<v-divider></v-divider>
-						<v-btn color="error" variant="text" @click="closeAddUser">
+						<v-btn color="error" variant="tonal" @click="closeInvite">
 							Close
 						</v-btn>
 					</v-sheet>
@@ -290,7 +295,7 @@ const inviteUser = async () => {
 }
 
 .row-odd:not(.row-hovered) {
-	background-color: #121212;
+	background-color: #37474F;
 }
 
 .row-even {
@@ -299,7 +304,7 @@ const inviteUser = async () => {
 }
 
 .row-even:not(.row-hovered) {
-	background-color: #424242;
+	background-color: #263238;
 }
 
 .row-expanded {

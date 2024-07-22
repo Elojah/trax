@@ -32,7 +32,7 @@ export const useRoleStore = defineStore('role', () => {
 
       return await api.createRole(req, { meta: { token: token.value } })
     } catch (err: any) {
-      console.log(err)
+      logger.error(err)
       throw err
     }
   }
@@ -43,7 +43,7 @@ export const useRoleStore = defineStore('role', () => {
 
       roles.value?.set(ulid(resp.response.iD), resp.response)
     } catch (err: any) {
-      console.log(err)
+      logger.error(err)
       throw err
     }
   }
@@ -70,7 +70,7 @@ export const useRoleStore = defineStore('role', () => {
         [[], []]
       )
     } catch (err: any) {
-      console.log(err)
+      logger.error(err)
       throw err
     }
   }
@@ -81,7 +81,7 @@ export const useRoleStore = defineStore('role', () => {
 
       roles.value?.delete(ulid(resp.response.role?.iD))
     } catch (err: any) {
-      console.log(err)
+      logger.error(err)
       throw err
     }
   }

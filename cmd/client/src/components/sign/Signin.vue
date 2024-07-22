@@ -6,6 +6,7 @@ import { useErrorsStore } from '@/stores/errors';
 import type { VForm } from "vuetify/components/VForm";
 import { type CredentialResponse } from "vue3-google-signin";
 import router from "@/router";
+import { logger } from "@/config";
 
 const form = ref<VForm | null>(null);
 
@@ -29,7 +30,6 @@ const passwordRules = [
 const errorsStore = useErrorsStore()
 const {
   message,
-  success,
   error,
 } = toRefs(errorsStore)
 
@@ -46,11 +46,13 @@ const signin = async function () {
       router.push({ name: 'dashboard' })
       break;
     case 401: // unauthorized
-      snackbarUnauthorized.value = true
+      message.value = 'Failed to signin, wrong email/password.'
+      error.value = true;
       form?.value?.reset()
       break;
     case 500: // internal
-      snackbarInternal.value = true
+      message.value = 'Internal error occurred, please retry later.'
+      error.value = true;
       form?.value?.reset()
       break;
   }
@@ -77,10 +79,11 @@ const signInGoogle = async function (credentials: CredentialResponse) {
 }
 
 const signInGoogleError = async function (error: any) {
-  console.log(error)
-  snackbarInternal.value = true
+  message.value = `Google returned an error: ${error}`
+  error.value = true
   form?.value?.reset()
 }
+
 </script>
 
 <template>

@@ -69,7 +69,6 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useRoleStore();
 const {
 	roles: roles,
-	selected: selected,
 	total: total,
 } = toRefs(store);
 
@@ -170,31 +169,6 @@ const create = async () => {
 	await list();
 };
 
-const nameEdit = ref(false);
-
-const updateName = async function () {
-	if (nameEdit.value) {
-		// await store.update(UpdateEntityReq.create({
-		// 	iD: e.value?.iD,
-		// 	name: { value: e.value?.name },
-		// }));
-	}
-
-	nameEdit.value = !nameEdit.value
-};
-
-const dialogDelete = ref(false);
-const closeDelete = () => {
-	dialogDelete.value = false;
-};
-
-const confirmDelete = () => {
-	// TODO: delete entity
-	dialogDelete.value = false;
-};
-
-const delete_ = () => {
-};
 
 // Optional add role to user id
 const userRoles = computed(() => {
@@ -333,7 +307,7 @@ const addRole = async (item: RolePermission) => {
 }
 
 .row-odd:not(.row-hovered) {
-	background-color: #121212;
+	background-color: #37474F;
 }
 
 .row-even {
@@ -342,7 +316,7 @@ const addRole = async (item: RolePermission) => {
 }
 
 .row-even:not(.row-hovered) {
-	background-color: #424242;
+	background-color: #263238;
 }
 
 .row-expanded {

@@ -25,7 +25,7 @@ export const useUserStore = defineStore('user', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const invite = async function (name: string) { throw new Error('not implemented') }
+  const invite = async function (name: string, roles: Role[]) { throw new Error('not implemented') }
 
   // Return users ids and entity ids
   const list = async function (req: ListUserReq): Promise<string[]> {
@@ -43,12 +43,9 @@ export const useUserStore = defineStore('user', () => {
 
       return resp.response.users.map((user: UserRoles) => ulid(user.user?.iD))
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err
     }
-    return []
   }
 
   // Add role refresh cache in selected user only
@@ -62,10 +59,8 @@ export const useUserStore = defineStore('user', () => {
       const resp = await api.createRoleUser(req, { meta: { token: token.value } })
       roles.value.set(ulid(resp.response.user?.iD), resp.response)
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err
     }
   }
 
@@ -78,11 +73,15 @@ export const useUserStore = defineStore('user', () => {
 
       const resp = await api.deleteRoleUser(req, { meta: { token: token.value } })
       roles.value.set(ulid(resp.response.user?.iD), resp.response)
-    } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
+
+      // if no roles left, remove user from cache
+      if (roles.value.get(ulid(resp.response.user?.iD))?.roles.length === 0) {
+        roles.value.delete(ulid(resp.response.user?.iD))
+        users.value.delete(ulid(resp.response.user?.iD))
       }
+    } catch (err: any) {
+      logger.error(err)
+      throw err
     }
   }
 
@@ -101,10 +100,8 @@ export const useUserStore = defineStore('user', () => {
         roles.value.set(ulid(userID), ur)
       }
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err
     }
   }
 
@@ -121,10 +118,8 @@ export const useUserStore = defineStore('user', () => {
         roles.value.set(ulid(userID), ur)
       }
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err
     }
   }
 
@@ -133,10 +128,27 @@ export const useUserStore = defineStore('user', () => {
     try {
       roles.value.delete(ulid(userID))
     } catch (err: any) {
-      switch (err.code) {
-        default:
-          logger.error(err)
-      }
+      logger.error(err)
+      throw err
+    }
+  }
+
+  // Delete role deletes role for all users, no API call
+  const deleteRoleGlobal = async function (roleID: Uint8Array) {
+    try {
+      roles.value.forEach((ur) => {
+        const id = ulid(roleID)
+
+        if (!ur.roles) {
+          return
+        } else {
+          ur.roles = ur.roles.filter((r) => ulid(r.iD) !== id)
+          roles.value.set(ulid(ur.user?.iD), ur)
+        }
+      })
+    } catch (err: any) {
+      logger.error(err)
+      throw err
     }
   }
 
@@ -151,5 +163,6 @@ export const useUserStore = defineStore('user', () => {
     addRoleDry,
     deleteRoleDry,
     resetRoleDry,
+    deleteRoleGlobal,
   }
 })

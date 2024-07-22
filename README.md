@@ -29,9 +29,9 @@ TODO:
 
   - Create/Invite (add at least 1 role) User
 
+  - Edit role name
   - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
-  - !!! Add pop up for every success/fail actions -> Manage API fails and success everywhere
-    + Error store with only one snackbar with options ?
+    + Check user table w/ permission
 
 - ~ Clean UI (table, cards, etc.)
 

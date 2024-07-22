@@ -146,7 +146,7 @@ const updateDescription = async function () {
 					<v-card-actions>
 						<v-spacer></v-spacer>
 						<v-btn variant="text" @click="closeDelete">Cancel</v-btn>
-						<v-btn color="error" variant="text" @click="confirmDelete">OK</v-btn>
+						<v-btn color="error" variant="tonal" @click="confirmDelete">OK</v-btn>
 						<v-spacer></v-spacer>
 					</v-card-actions>
 				</v-card>
