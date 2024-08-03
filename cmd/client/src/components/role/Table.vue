@@ -6,11 +6,11 @@ import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';
 import { ListRoleReq, RolePermission } from '@internal/user/dto/role';
-import RoleDetails from '@/components/role/Details.vue';
 import PermissionTable from '@/components/permission/Table.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import { useUserStore } from '@/stores/user';
 import { useErrorsStore } from '@/stores/errors';
+import RoleUserTable from '@/components/role/UserTable.vue';
 import type { Role } from '@internal/user/role';
 
 const props = withDefaults(defineProps<{
@@ -294,8 +294,8 @@ const addRole = async (item: RolePermission) => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<RoleDetails :colspan="columns.length" :item="item">
-			</RoleDetails>
+			<RoleUserTable v-if="item" :colspan="columns.length" :role-i-d="item.role?.iD">
+			</RoleUserTable>
 		</template>
 	</v-data-table-server>
 </template>

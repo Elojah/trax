@@ -65,7 +65,7 @@ const deleteRole = async () => {
 		message.value = `Role ${props.item?.role?.name} deleted successfully`;
 		success.value = true;
 		// async refresh users to remove role
-		userStore.deleteRoleGlobal(props.item?.role?.iD);
+		userStore.deleteRoleGlobal(props.item?.role?.iD!);
 	}
 }
 

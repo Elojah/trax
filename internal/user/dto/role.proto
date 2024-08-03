@@ -16,6 +16,7 @@ import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
 import "github.com/elojah/trax/pkg/paginate/paginate.proto";
 import "github.com/elojah/trax/pkg/pbtypes/string.proto";
 import "github.com/elojah/trax/internal/user/role.proto";
+import "github.com/elojah/trax/internal/user/user.proto";
 
 message RolePermission {
 	user.Role Role 	                       = 1 [(gogoproto.nullable) = false];
@@ -45,8 +46,13 @@ message ListRoleReq {
 	repeated bytes EntityIDs          = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
+message RoleUsers {
+    RolePermission Role               = 1 [(gogoproto.nullable) = false];
+    repeated user.U Users             = 2 [(gogoproto.nullable) = false];
+}
+
 message ListRoleResp {
-	repeated RolePermission Roles     = 1 [(gogoproto.nullable) = false];
+	repeated RoleUsers Roles          = 1 [(gogoproto.nullable) = false];
 	uint64 Total                      = 2;
 }
 

@@ -54,14 +54,13 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 		ids = req.IDs
 	}
 
-	var users []user.U
-	var roles map[string][]user.Role
+	var userRoles []dto.UserRoles
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		users, total, err = h.user.ListByEntity(ctx, user.Filter{
-			IDs:       ids,
+		users, totalUser, err := h.user.ListByEntity(ctx, user.Filter{
 			EntityIDs: entityIDs,
+			IDs:       ids,
 			Paginate:  req.Paginate,
 			Search:    req.Search,
 		})
@@ -71,15 +70,29 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		roles, _, err = h.user.ListRoleByUser(ctx, user.FilterRole{
-			UserIDs:   ids,
+		roles, _, err := h.user.ListRoleByUser(ctx, user.FilterRole{
 			EntityIDs: entityIDs,
+			UserIDs:   ids,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list roles")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
+
+		for _, u := range users {
+			rs, ok := roles[u.ID.String()]
+			if !ok {
+				// should never happen, both queries should never return a user without roles
+				continue
+			}
+			userRoles = append(userRoles, dto.UserRoles{
+				User:  u,
+				Roles: rs,
+			})
+		}
+
+		total = totalUser
 
 		return transaction.Commit, nil
 	}); err != nil {
@@ -88,24 +101,10 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 		return &dto.ListUserResp{}, err
 	}
 
-	resp := &dto.ListUserResp{
-		Users: make([]dto.UserRoles, 0, len(users)),
-		Total: total,
-	}
-
-	for _, u := range users {
-		rs, ok := roles[u.ID.String()]
-		if !ok {
-			// should never happen, both queries should never return a user without roles
-			continue
-		}
-		resp.Users = append(resp.Users, dto.UserRoles{
-			User:  u,
-			Roles: rs,
-		})
-	}
-
 	logger.Info().Msg("success")
 
-	return resp, nil
+	return &dto.ListUserResp{
+		Users: userRoles,
+		Total: total,
+	}, nil
 }

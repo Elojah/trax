@@ -8,14 +8,14 @@ import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
 import { CreateRoleUserReq, DeleteRoleUserReq } from '@internal/user/dto/role'
 import type { U } from '@internal/user/user'
-import User from '@/views/User.vue'
 import type { Role } from '@internal/user/role'
 
 export const useUserStore = defineStore('user', () => {
   const users = ref<Map<string, U>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
-  const roles = ref<Map<string, UserRoles>>(new Map())
+  // roles by user
+  const roles = ref<Map<string, Role[]>>(new Map())
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -33,7 +33,7 @@ export const useUserStore = defineStore('user', () => {
       const resp = await api.listUser(req, { meta: { token: token.value } })
 
       resp.response.users?.forEach((user: UserRoles) => {
-        roles.value?.set(ulid(user.user?.iD), user)
+        roles.value?.set(ulid(user.user?.iD), user.roles)
         users.value?.set(ulid(user.user?.iD), user.user!)
       })
 
@@ -57,7 +57,7 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.createRoleUser(req, { meta: { token: token.value } })
-      roles.value.set(ulid(resp.response.user?.iD), resp.response)
+      roles.value.set(ulid(resp.response.user?.iD), resp.response.roles)
     } catch (err: any) {
       logger.error(err)
       throw err
@@ -72,10 +72,10 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.deleteRoleUser(req, { meta: { token: token.value } })
-      roles.value.set(ulid(resp.response.user?.iD), resp.response)
+      roles.value.set(ulid(resp.response.user?.iD), resp.response.roles)
 
       // if no roles left, remove user from cache
-      if (roles.value.get(ulid(resp.response.user?.iD))?.roles.length === 0) {
+      if (roles.value.get(ulid(resp.response.user?.iD))?.length === 0) {
         roles.value.delete(ulid(resp.response.user?.iD))
         users.value.delete(ulid(resp.response.user?.iD))
       }
@@ -88,16 +88,13 @@ export const useUserStore = defineStore('user', () => {
   // Add role modifies local cache only, no API call
   const addRoleDry = async function (userID: Uint8Array, role: Role) {
     try {
-      const ur = roles.value.get(ulid(userID))
+      const rs = roles.value.get(ulid(userID))
 
-      if (!ur) {
-        roles.value.set(ulid(userID), UserRoles.create({
-          user: { iD: userID },
-          roles: [role]
-        }))
+      if (!rs) {
+        roles.value.set(ulid(userID), [role])
       } else {
-        ur.roles.push(role)
-        roles.value.set(ulid(userID), ur)
+        rs.push(role)
+        roles.value.set(ulid(userID), rs)
       }
     } catch (err: any) {
       logger.error(err)
@@ -108,14 +105,14 @@ export const useUserStore = defineStore('user', () => {
   // Delete role modifies local cache only, no API call
   const deleteRoleDry = async function (userID: Uint8Array, roleID: Uint8Array) {
     try {
-      const ur = roles.value.get(ulid(userID))
+      const rs = roles.value.get(ulid(userID))
       const id = ulid(roleID)
 
-      if (!ur?.roles) {
+      if (!rs) {
         return
       } else {
-        ur.roles = ur.roles.filter((r) => ulid(r.iD) !== id)
-        roles.value.set(ulid(userID), ur)
+        const newRoles = rs.filter((r) => ulid(r.iD) !== id)
+        roles.value.set(ulid(userID), newRoles)
       }
     } catch (err: any) {
       logger.error(err)
@@ -136,14 +133,14 @@ export const useUserStore = defineStore('user', () => {
   // Delete role deletes role for all users, no API call
   const deleteRoleGlobal = async function (roleID: Uint8Array) {
     try {
-      roles.value.forEach((ur) => {
+      roles.value.forEach((rs, userID) => {
         const id = ulid(roleID)
 
-        if (!ur.roles) {
+        if (!rs) {
           return
         } else {
-          ur.roles = ur.roles.filter((r) => ulid(r.iD) !== id)
-          roles.value.set(ulid(ur.user?.iD), ur)
+          const newRoles = rs.filter((r) => ulid(r.iD) !== id)
+          roles.value.set(userID, newRoles)
         }
       })
     } catch (err: any) {

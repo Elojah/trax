@@ -56,7 +56,7 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		return &dto.ListRoleResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
-	var rolePermissions []dto.RolePermission
+	var roleUsers []dto.RoleUsers
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
@@ -68,6 +68,16 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list role")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		users, _, err := h.user.ListByRole(ctx, user.Filter{
+			EntityIDs: entityIDs,
+			RoleIDs:   user.Roles(roles).IDs(),
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to list user")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
@@ -90,9 +100,17 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 				ps = nil
 			}
 
-			rolePermissions = append(rolePermissions, dto.RolePermission{
-				Role:        r,
-				Permissions: ps,
+			us, ok := users[r.ID.String()]
+			if !ok {
+				us = nil
+			}
+
+			roleUsers = append(roleUsers, dto.RoleUsers{
+				Role: dto.RolePermission{
+					Role:        r,
+					Permissions: ps,
+				},
+				Users: us,
 			})
 		}
 
@@ -108,7 +126,7 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 	logger.Info().Msg("success")
 
 	return &dto.ListRoleResp{
-		Roles: rolePermissions,
+		Roles: roleUsers,
 		Total: total,
 	}, nil
 }

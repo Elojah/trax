@@ -3,16 +3,19 @@ import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useEntityStore } from '@/stores/entity';
 import { ulid } from '@/utils/ulid';
-import { computed, ref, toRefs, watch } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
-import RoleTable from '@/components/role/Table.vue';
+import UserTable from '@/components/user/Table.vue';
+import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
-import type { RolePermission } from '@internal/user/dto/role';
+import type { UserPermission } from '@internal/role/dto/user';
 
 const props = defineProps<{
-	userID: Uint8Array | undefined;
+	roleID: Uint8Array | undefined;
 	colspan: number;
 }>();
+
+const userStore = useUserStore();
 
 const authStore = useAuthStore();
 const {
@@ -25,19 +28,19 @@ const {
 } = toRefs(entityStore);
 const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 
-const userStore = useUserStore();
+const roleStore = useRoleStore();
 const {
-	roles: roles,
-} = toRefs(userStore);
+	users: users,
+} = toRefs(roleStore);
 
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 
-const user = computed(() => { return roles.value.get(ulid(props.userID)) })
+const role = computed(() => { return users.value.get(ulid(props.roleID)) })
 
 const headers: ReadonlyHeaders = [
 	{
-		title: 'Role',
+		title: 'User',
 		key: 'name',
 		align: 'start',
 		sortable: true,
@@ -56,10 +59,10 @@ const headers: ReadonlyHeaders = [
 	},
 ];
 
-const deleteUserRole = async (roleID: Uint8Array) => {
+const deleteUserRole = async (userID: Uint8Array) => {
 	let ok = true;
 	try {
-		await userStore.deleteRole(props.userID!, roleID);
+		await roleStore.deleteUser(props.roleID!, userID);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		ok = false;
@@ -70,21 +73,21 @@ const deleteUserRole = async (roleID: Uint8Array) => {
 	}
 };
 
-const dialogAddRole = ref(false);
+const dialogAddUser = ref(false);
 
-const closeAddRole = () => {
-	dialogAddRole.value = false;
+const closeAddUser = () => {
+	dialogAddUser.value = false;
 };
 
-// Role table properties
+// User table properties
 
 const addRoleLoading = ref(false);
 
-const addRole = async (role: RolePermission) => {
+const addUser = async (userID: Uint8Array) => {
 	addRoleLoading.value = true;
 	let ok = true;
 	try {
-		await userStore.addRole(props?.userID!, role.role?.iD!);
+		await roleStore.addUser(props?.roleID!, userID);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		ok = false;
@@ -98,9 +101,9 @@ const addRole = async (role: RolePermission) => {
 
 </script>
 <template>
-	<tr v-if="user">
+	<tr v-if="role">
 		<td :colspan="props.colspan">
-			<v-data-table density="compact" :headers="headers" :items="user.roles" class="">
+			<v-data-table density="compact" :headers="headers" :items="role.users" class="">
 				<template v-slot:item="{ item }">
 	<tr v-if="item" :key="item.name">
 		<td class="px-1 py-1">
@@ -118,7 +121,7 @@ const addRole = async (role: RolePermission) => {
 		<td class="px-1 py-1">
 			<div class="d-flex flex-row-reverse">
 				<v-btn variant="tonal" prepend-icon="mdi-trash-can" color="error" v-bind="props"
-					@click="deleteUserRole(item.iD)">
+					@click="deleteRoleUser(item.iD)">
 					Remove
 					<template v-slot:prepend>
 						<v-icon color="error"></v-icon>
@@ -130,19 +133,19 @@ const addRole = async (role: RolePermission) => {
 </template>
 <template v-slot:bottom>
 	<div class="d-flex justify-center">
-		<v-dialog v-model="dialogAddRole" max-width="1200px">
+		<v-dialog v-model="dialogAddUser" max-width="1200px">
 			<template v-slot:activator="{ props }">
 				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
-					Add roles
+					Add users
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>
 					</template>
 				</v-btn>
 			</template>
 			<v-sheet class="d-flex flex-column pa-4 fill-height fill-width" height="50vh">
-				<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
+				<UserTable :role-i-d="props.roleID" :addUser="addUser"></UserTable>
 				<v-divider></v-divider>
-				<v-btn color="error" variant="tonal" @click="closeAddRole">
+				<v-btn color="error" variant="tonal" @click="closeAddUser">
 					Close
 				</v-btn>
 			</v-sheet>

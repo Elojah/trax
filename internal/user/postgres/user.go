@@ -104,6 +104,13 @@ func (f filter) where(n int) (string, []any) {
 		n += len(f.EntityIDs)
 	}
 
+	// !!! Only available if role r is joined
+	if len(f.RoleIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`r.id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
+		args = append(args, ulid.IDs(f.RoleIDs).Any()...)
+		n += len(f.RoleIDs)
+	}
+
 	if len(f.Search) > 0 {
 		clause = append(clause, fmt.Sprintf(`( u.email ILIKE $%d OR u.first_name ILIKE $%d OR u.last_name ILIKE $%d )`, n, n+1, n+2))
 		args = append(args, "%"+f.Search+"%", "%"+f.Search+"%", "%"+f.Search+"%")
@@ -144,6 +151,16 @@ func (f filter) index() string {
 
 	if f.Search != "" {
 		cols = append(cols, f.Search)
+	}
+
+	if f.EntityIDs != nil {
+		ss := ulid.IDs(f.EntityIDs).String()
+		cols = append(cols, strings.Join(ss, "|"))
+	}
+
+	if f.RoleIDs != nil {
+		ss := ulid.IDs(f.RoleIDs).String()
+		cols = append(cols, strings.Join(ss, "|"))
 	}
 
 	return strings.Join(cols, " - ")
@@ -339,6 +356,52 @@ func (s Store) ListByEntity(ctx context.Context, f user.Filter) ([]user.U, uint6
 		}
 
 		users = append(users, u.user())
+	}
+
+	return users, count, nil
+}
+
+func (s Store) ListByRole(ctx context.Context, f user.Filter) (map[string][]user.U, uint64, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT DISTINCT ON (u.id) u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
+	if f.Paginate != nil {
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
+	} else {
+		b.WriteString(`, 0`)
+	}
+	b.WriteString(`
+	FROM "user"."user" u
+	JOIN "user"."role_user" ru ON u.id = ru.user_id
+	JOIN "user"."role" r ON ru.role_id = r.id
+	`)
+
+	clause, args := filter(f).where(1)
+	b.WriteString(clause)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, 0, postgres.Error(err, "user+role", filter(f).index())
+	}
+
+	users := make(map[string][]user.U)
+
+	var count uint64
+	var row_number int
+
+	for rows.Next() {
+		var u sqlUser
+		var roleID ulid.ID
+
+		if err := rows.Scan(&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt, &roleID, &count, &row_number); err != nil {
+			return nil, 0, postgres.Error(err, "user+role", filter(f).index())
+		}
+
+		users[roleID.String()] = append(users[roleID.String()], u.user())
 	}
 
 	return users, count, nil

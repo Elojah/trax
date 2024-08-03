@@ -2,15 +2,19 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { CreateRoleReq, DeleteRoleReq, ListRoleReq, RolePermission, UpdateRoleReq } from '@internal/user/dto/role'
+import { CreateRoleReq, CreateRoleUserReq, DeleteRoleReq, DeleteRoleUserReq, ListRoleReq, RolePermission, RoleUsers, UpdateRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
 import type { Permission } from '@internal/user/role'
+import type { U } from '@internal/user/user'
 
 export const useRoleStore = defineStore('role', () => {
   const roles = ref<Map<string, RolePermission>>(new Map())
   const total = ref<bigint>(BigInt(0))
+
+  // users by role
+  const users = ref<Map<string, U[]>>(new Map())
 
   const selected = ref<RolePermission[]>([])
 
@@ -53,8 +57,9 @@ export const useRoleStore = defineStore('role', () => {
     try {
       const resp = await api.listRole(req, { meta: { token: token.value } })
 
-      resp.response.roles?.forEach((role: RolePermission) => {
-        roles.value?.set(ulid(role.role?.iD), role)
+      resp.response.roles?.forEach((role: RoleUsers) => {
+        roles.value?.set(ulid(role.role?.role?.iD), role?.role!)
+        users.value?.set(ulid(role.role?.role?.iD), role.users)
       })
 
       if (req?.iDs.length === 0) {
@@ -75,6 +80,44 @@ export const useRoleStore = defineStore('role', () => {
     }
   }
 
+  // Add user refresh cache in selected role only
+  const addUser = async function (roleID: Uint8Array, userID: Uint8Array) {
+    try {
+      const req = CreateRoleUserReq.create({
+        userID: userID,
+        roleID: roleID
+      })
+
+      const resp = await api.createRoleUser(req, { meta: { token: token.value } })
+      users.value.set(ulid(resp.response.role?.iD), resp.response.users)
+    } catch (err: any) {
+      logger.error(err)
+      throw err
+    }
+  }
+
+
+  const deleteUser = async function (roleID: Uint8Array, userID: Uint8Array) {
+    try {
+      const req = DeleteRoleUserReq.create({
+        userID: userID,
+        roleID: roleID
+      })
+
+      const resp = await api.deleteRoleUser(req, { meta: { token: token.value } })
+      users.value.set(ulid(resp.response.role?.iD), resp.response.users)
+
+      // if no users left, remove user from cache
+      if (users.value.get(ulid(resp.response.role?.iD))?.length === 0) {
+        users.value.delete(ulid(resp.response.role?.iD))
+      }
+    } catch (err: any) {
+      logger.error(err)
+      throw err
+    }
+  }
+
+
   const delete_ = async (req: DeleteRoleReq) => {
     try {
       const resp = await api.deleteRole(req, { meta: { token: token.value } })
@@ -93,6 +136,8 @@ export const useRoleStore = defineStore('role', () => {
     create,
     update,
     list,
+    addUser,
+    deleteUser,
     delete_,
   }
 })

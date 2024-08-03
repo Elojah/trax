@@ -35,7 +35,9 @@ type Filter struct {
 	Email    *string
 	GoogleID *string
 
+	// ListByEntity only
 	EntityIDs []ulid.ID
+	RoleIDs   []ulid.ID
 
 	*paginate.Paginate
 	Search string
@@ -57,6 +59,7 @@ type Store interface {
 
 	FetchWithPassword(context.Context, Filter) (U, error)
 	ListByEntity(context.Context, Filter) ([]U, uint64, error)
+	ListByRole(context.Context, Filter) (map[string][]U, uint64, error)
 }
 
 const (
