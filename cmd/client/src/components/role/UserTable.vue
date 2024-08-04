@@ -81,10 +81,10 @@ const closeAddUser = () => {
 
 // User table properties
 
-const addRoleLoading = ref(false);
+const addUserLoading = ref(false);
 
 const addUser = async (userID: Uint8Array) => {
-	addRoleLoading.value = true;
+	addUserLoading.value = true;
 	let ok = true;
 	try {
 		await roleStore.addUser(props?.roleID!, userID);
@@ -96,7 +96,7 @@ const addUser = async (userID: Uint8Array) => {
 		message.value = `Role added successfully to user`;
 		success.value = true;
 	}
-	addRoleLoading.value = false;
+	addUserLoading.value = false;
 };
 
 </script>
@@ -121,7 +121,7 @@ const addUser = async (userID: Uint8Array) => {
 		<td class="px-1 py-1">
 			<div class="d-flex flex-row-reverse">
 				<v-btn variant="tonal" prepend-icon="mdi-trash-can" color="error" v-bind="props"
-					@click="deleteRoleUser(item.iD)">
+					@click="deleteUserRole(item.iD)">
 					Remove
 					<template v-slot:prepend>
 						<v-icon color="error"></v-icon>

@@ -53,7 +53,7 @@ export const useRoleStore = defineStore('role', () => {
   }
 
   // Return roles ids and entity ids
-  const list = async function (req: ListRoleReq): Promise<[string[], string[]]> {
+  const list = async function (req: ListRoleReq): Promise<string[]> {
     try {
       const resp = await api.listRole(req, { meta: { token: token.value } })
 
@@ -66,14 +66,7 @@ export const useRoleStore = defineStore('role', () => {
         total.value = resp.response.total
       }
 
-      return resp.response.roles.reduce(
-        (acc: string[][], role: RolePermission) => {
-          acc[0].push(ulid(role.role?.iD))
-          acc[1].push(ulid(role.role?.entityID))
-          return acc
-        },
-        [[], []]
-      )
+      return resp.response.roles.map((role: RoleUsers) => ulid(role.role?.role?.iD))
     } catch (err: any) {
       logger.error(err)
       throw err
@@ -131,6 +124,7 @@ export const useRoleStore = defineStore('role', () => {
 
   return {
     roles,
+    users,
     total,
     selected,
     create,

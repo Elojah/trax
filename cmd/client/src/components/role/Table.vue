@@ -110,7 +110,7 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 	loading.value = true;
 	const { page, itemsPerPage, sortBy } = options;
 	try {
-		const [newRoleIDs] = await store.list(ListRoleReq.create({
+		const newRoleIDs = await store.list(ListRoleReq.create({
 			entityIDs: [selectedEntity.value.iD],
 			search: search.value,
 			paginate: {
@@ -172,7 +172,7 @@ const create = async () => {
 
 // Optional add role to user id
 const userRoles = computed(() => {
-	return rolesUser.value.get(ulid(props.userID))?.roles?.reduce((acc: Map<string, boolean>, role: Role) => {
+	return rolesUser.value.get(ulid(props.userID))?.reduce((acc: Map<string, boolean>, role: Role) => {
 		acc.set(ulid(role?.iD), true);
 
 		return acc;

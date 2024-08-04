@@ -11,6 +11,16 @@ import UserRoleTable from '@/components/user/RoleTable.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
 import type { RolePermission } from '@internal/user/dto/role';
+import type { U } from '@internal/user/user';
+import { useRoleStore } from '@/stores/role';
+
+const props = withDefaults(defineProps<{
+	roleID: Uint8Array | undefined;
+	addUser: ((u: U) => Promise<void>) | undefined;
+}>(), {
+	roleID: undefined,
+	addUser: undefined,
+});
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
@@ -41,6 +51,11 @@ const entityStore = useEntityStore();
 const {
 	selected: selectedEntities,
 } = toRefs(entityStore);
+
+const roleStore = useRoleStore();
+const {
+	users: usersRole,
+} = toRefs(roleStore);
 
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
@@ -190,6 +205,25 @@ const deleteRole = async (roleID: Uint8Array) => {
 	await store.deleteRoleDry(zero, roleID);
 };
 
+// Optional add role to user id
+const roleUsers = computed(() => {
+	return usersRole.value.get(ulid(props.roleID))?.reduce((acc: Map<string, boolean>, u: U) => {
+		acc.set(ulid(u?.iD), true);
+
+		return acc;
+	}, new Map<string, boolean>())
+});
+
+const loadingAddUser = ref(false);
+
+const addUser = async (item: U) => {
+	if (props.addUser) {
+		loadingAddUser.value = true;
+		await props.addUser(item);
+		loadingAddUser.value = false;
+	}
+};
+
 </script>
 
 <template>
@@ -270,6 +304,27 @@ const deleteRole = async (roleID: Uint8Array) => {
 								<v-divider vertical></v-divider>
 							</template>
 							<template v-slot:append>
+								<v-divider vertical v-if="props.roleID"></v-divider>
+								<v-btn v-if="props.roleID && !roleUsers?.has(ulid(item?.iD))" variant="tonal"
+									class="mr-4" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
+									:loading="loadingAddUser" v-on:click.stop.prevent="addUser(item)">
+									Add user
+									<template v-slot:prepend>
+										<v-icon color="primary"></v-icon>
+									</template>
+								</v-btn>
+								<v-btn v-else-if="props.roleID && roleUsers?.has(ulid(item?.iD))" variant="tonal"
+									class="mr-4" disabled prepend-icon="mdi-check-bold" color="secondary" v-bind="props"
+									v-on:click.stop.prevent="async () => { }">
+									Added
+									<template v-slot:prepend>
+										<v-icon color="secondary"></v-icon>
+									</template>
+								</v-btn>
+								<v-divider vertical></v-divider>
+								<p class="ml-4 font-italic font-weight-light">
+									{{ new Date(Number(item?.createdAt) * 1000).toLocaleDateString('en-GB') }}
+								</p>
 								<v-divider vertical></v-divider>
 								<p class="ml-4 font-italic font-weight-light">
 									{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
