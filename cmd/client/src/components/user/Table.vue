@@ -103,6 +103,9 @@ const views = computed(() => {
 });
 
 const expand = (_: any, item: any) => {
+	if (props.roleID) {
+		return
+	}
 	item.toggleExpand({ value: item.item });
 };
 
@@ -158,7 +161,7 @@ const closeInvite = () => {
 const invite = async () => {
 	let ok = true;
 	try {
-		await store.invite(email.value, addedRoles);
+		// await store.invite(email.value!, addedRoles);
 	} catch (e) {
 		errorsStore.showGRPC(e)
 		ok = false;
@@ -286,6 +289,9 @@ const addUser = async (item: U) => {
 		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
 		:loading="loading" :search="search" item-value="user.iD" @update:options="list" @click:row="expand"
 		return-object>
+		<template v-slot:no-data>
+			<div></div>
+		</template>
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
@@ -297,10 +303,11 @@ const addUser = async (item: U) => {
 							'row-odd': index % 2 !== 0,
 						}" :title="item.email" :subtitle="item.lastName + ' ' + item.firstName">
 							<template v-slot:prepend>
-								<v-icon v-if="isExpanded(internalItem)" class="mr-4" icon="mdi-minus" size="x-large"
-									color="primary">
+								<v-icon v-if="!props.roleID && isExpanded(internalItem)" class="mr-4" icon="mdi-minus"
+									size="x-large" color="primary">
 								</v-icon>
-								<v-icon v-else class="mr-4" icon="mdi-plus" size="x-large" color="primary"> </v-icon>
+								<v-icon v-else-if="!props.roleID" class="mr-4" icon="mdi-plus" size="x-large"
+									color="primary"> </v-icon>
 								<v-divider vertical></v-divider>
 							</template>
 							<template v-slot:append>
@@ -323,10 +330,6 @@ const addUser = async (item: U) => {
 								</v-btn>
 								<v-divider vertical></v-divider>
 								<p class="ml-4 font-italic font-weight-light">
-									{{ new Date(Number(item?.createdAt) * 1000).toLocaleDateString('en-GB') }}
-								</p>
-								<v-divider vertical></v-divider>
-								<p class="ml-4 font-italic font-weight-light">
 									{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
 								</p>
 							</template>
@@ -336,7 +339,7 @@ const addUser = async (item: U) => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<UserRoleTable v-if="item" :colspan="columns.length" :user-i-d="item.iD">
+			<UserRoleTable v-if="item && !props.roleID" :colspan="columns.length" :user-i-d="item.iD">
 			</UserRoleTable>
 		</template>
 	</v-data-table-server>

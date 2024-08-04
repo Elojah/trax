@@ -97,6 +97,9 @@ const views = computed(() => {
 });
 
 const expand = (_: any, item: any) => {
+	if (props.userID) {
+		return
+	}
 	item.toggleExpand({ value: item.item });
 };
 
@@ -247,6 +250,9 @@ const addRole = async (item: RolePermission) => {
 		max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="views"
 		:items-length="Number(total)" :loading="loading" :search="search" item-value="role.iD" @update:options="list"
 		@click:row="expand" return-object>
+		<template v-slot:no-data>
+			<div></div>
+		</template>
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">
@@ -259,10 +265,11 @@ const addRole = async (item: RolePermission) => {
 							'text-primary': isExpanded(internalItem),
 						}" :title="item.role?.name" :subtitle="Number(item.permissions.length) + ' permission(s)'">
 							<template v-slot:prepend>
-								<v-icon v-if="isExpanded(internalItem)" class="mr-4" icon="mdi-minus" size="x-large"
-									color="primary">
+								<v-icon v-if="!props.userID && isExpanded(internalItem)" class="mr-4" icon="mdi-minus"
+									size="x-large" color="primary">
 								</v-icon>
-								<v-icon v-else class="mr-4" icon="mdi-plus" size="x-large" color="primary"> </v-icon>
+								<v-icon v-else-if="!props.userID" class="mr-4" icon="mdi-plus" size="x-large"
+									color="primary"> </v-icon>
 								<v-divider vertical></v-divider>
 							</template>
 							<template v-slot:append>
@@ -294,7 +301,7 @@ const addRole = async (item: RolePermission) => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<RoleUserTable v-if="item" :colspan="columns.length" :role-i-d="item.role?.iD">
+			<RoleUserTable v-if="item && !props.userID" :colspan="columns.length" :role-i-d="item.role?.iD">
 			</RoleUserTable>
 		</template>
 	</v-data-table-server>

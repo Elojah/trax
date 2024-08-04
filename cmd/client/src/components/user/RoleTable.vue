@@ -33,7 +33,7 @@ const {
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 
-const user = computed(() => { return roles.value.get(ulid(props.userID)) })
+const rs = computed(() => { return roles.value.get(ulid(props.userID)) })
 
 const headers: ReadonlyHeaders = [
 	{
@@ -98,11 +98,11 @@ const addRole = async (role: RolePermission) => {
 
 </script>
 <template>
-	<tr v-if="user">
+	<tr v-if="rs">
 		<td :colspan="props.colspan">
-			<v-data-table density="compact" :headers="headers" :items="user.roles" class="">
+			<v-data-table density="compact" :headers="headers" :items="rs" class="">
 				<template v-slot:item="{ item }">
-	<tr v-if="item" :key="item.name">
+	<tr v-if="item" :key="ulid(item.iD)">
 		<td class="px-1 py-1">
 			<p class="font-weight-bold">
 				{{ item.name }}
@@ -132,7 +132,8 @@ const addRole = async (role: RolePermission) => {
 	<div class="d-flex justify-center">
 		<v-dialog v-model="dialogAddRole" max-width="1200px">
 			<template v-slot:activator="{ props }">
-				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+				<v-btn variant="tonal" class="my-4" size="large" prepend-icon="mdi-plus-box" color="primary"
+					v-bind="props">
 					Add roles
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>

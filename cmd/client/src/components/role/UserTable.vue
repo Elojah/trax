@@ -8,7 +8,7 @@ import type { ReadonlyHeaders } from '@/utils/headers';
 import UserTable from '@/components/user/Table.vue';
 import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
-import type { UserPermission } from '@internal/role/dto/user';
+import type { U } from '@internal/user/user';
 
 const props = defineProps<{
 	roleID: Uint8Array | undefined;
@@ -36,7 +36,7 @@ const {
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 
-const role = computed(() => { return users.value.get(ulid(props.roleID)) })
+const us = computed(() => { return users.value.get(ulid(props.roleID)) })
 
 const headers: ReadonlyHeaders = [
 	{
@@ -83,11 +83,11 @@ const closeAddUser = () => {
 
 const addUserLoading = ref(false);
 
-const addUser = async (userID: Uint8Array) => {
+const addUser = async (u: U) => {
 	addUserLoading.value = true;
 	let ok = true;
 	try {
-		await roleStore.addUser(props?.roleID!, userID);
+		await roleStore.addUser(props?.roleID!, u?.iD);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		ok = false;
@@ -101,14 +101,14 @@ const addUser = async (userID: Uint8Array) => {
 
 </script>
 <template>
-	<tr v-if="role">
+	<tr v-if="us">
 		<td :colspan="props.colspan">
-			<v-data-table density="compact" :headers="headers" :items="role.users" class="">
+			<v-data-table density="compact" :headers="headers" :items="us" class="">
 				<template v-slot:item="{ item }">
-	<tr v-if="item" :key="item.name">
+	<tr v-if="item" :key="ulid(item.iD)">
 		<td class="px-1 py-1">
 			<p class="font-weight-bold">
-				{{ item.name }}
+				{{ item.lastName }} {{ item.firstName }}
 			</p>
 		</td>
 		<td class="px-1 py-1">
@@ -135,7 +135,7 @@ const addUser = async (userID: Uint8Array) => {
 	<div class="d-flex justify-center">
 		<v-dialog v-model="dialogAddUser" max-width="1200px">
 			<template v-slot:activator="{ props }">
-				<v-btn variant="tonal" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+				<v-btn variant="tonal" class="my-4" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
 					Add users
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>
