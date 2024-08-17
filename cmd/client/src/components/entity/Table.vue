@@ -145,12 +145,12 @@ const short = (description: string): string => {
 <template>
 	<v-container class="px-0">
 		<v-row>
-			<v-col cols="10">
+			<v-col cols="9">
 				<v-text-field class="table-color-background" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>
-			<v-col cols="2" class="d-flex align-center justify-end">
+			<v-col cols="3" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogCreate" max-width="800px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">

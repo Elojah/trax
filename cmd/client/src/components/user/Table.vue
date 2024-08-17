@@ -16,10 +16,10 @@ import { useRoleStore } from '@/stores/role';
 
 const props = withDefaults(defineProps<{
 	roleID: Uint8Array | undefined;
-	addUser: ((u: U) => Promise<void>) | undefined;
+	roleIDOnly: boolean | undefined;
 }>(), {
 	roleID: undefined,
-	addUser: undefined,
+	roleIDOnly: undefined,
 });
 
 const form = ref<VForm | null>(null);
@@ -174,7 +174,7 @@ const invite = async () => {
 
 	dialogInvite.value = false;
 	email.value = '';
-	roles.value.set(ulid(zero), { roles: [] });
+	roles.value.set(ulid(zero), []);
 
 	await list()
 };
@@ -202,7 +202,7 @@ const emailRules = [
 	(v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
 ]
 
-const addedRoles = computed(() => roles.value.get(ulid(zero))?.roles);
+const addedRoles = computed(() => roles.value.get(ulid(zero)));
 
 const deleteRole = async (roleID: Uint8Array) => {
 	await store.deleteRoleDry(zero, roleID);
@@ -219,13 +219,43 @@ const roleUsers = computed(() => {
 
 const loadingAddUser = ref(false);
 
+
+
 const addUser = async (item: U) => {
-	if (props.addUser) {
+	if (props.roleID) {
 		loadingAddUser.value = true;
-		await props.addUser(item);
+		let ok = true;
+		try {
+			await roleStore.addUser(props.roleID, item.iD);
+		} catch (e) {
+			errorsStore.showGRPC(e);
+			ok = false;
+		}
+		if (ok) {
+			message.value = `Role added successfully to user`;
+			success.value = true;
+		}
 		loadingAddUser.value = false;
 	}
 };
+
+
+const deleteUserRole = async (item: U) => {
+	if (props.roleID) {
+		let ok = true;
+		try {
+			await roleStore.deleteUser(props.roleID!, item.iD);
+		} catch (e) {
+			errorsStore.showGRPC(e);
+			ok = false;
+		}
+		if (ok) {
+			message.value = `Role deleted successfully to user`;
+			success.value = true;
+		}
+	}
+};
+
 
 </script>
 
@@ -312,7 +342,15 @@ const addUser = async (item: U) => {
 							</template>
 							<template v-slot:append>
 								<v-divider vertical v-if="props.roleID"></v-divider>
-								<v-btn v-if="props.roleID && !roleUsers?.has(ulid(item?.iD))" variant="tonal"
+								<v-btn v-if="props.roleID && props.roleIDOnly" variant="tonal"
+									prepend-icon="mdi-trash-can" color="error" v-bind="props"
+									@click="deleteUserRole(item)">
+									Remove
+									<template v-slot:prepend>
+										<v-icon color="error"></v-icon>
+									</template>
+								</v-btn>
+								<v-btn v-else-if="props.roleID && !roleUsers?.has(ulid(item?.iD))" variant="tonal"
 									class="mr-4" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
 									:loading="loadingAddUser" v-on:click.stop.prevent="addUser(item)">
 									Add user

@@ -135,7 +135,8 @@ const addUser = async (u: U) => {
 	<div class="d-flex justify-center">
 		<v-dialog v-model="dialogAddUser" max-width="1200px">
 			<template v-slot:activator="{ props }">
-				<v-btn variant="tonal" class="my-4" size="large" prepend-icon="mdi-plus-box" color="primary" v-bind="props">
+				<v-btn variant="tonal" class="my-4" size="large" prepend-icon="mdi-plus-box" color="primary"
+					v-bind="props">
 					Add users
 					<template v-slot:prepend>
 						<v-icon color="primary"></v-icon>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
-import { computed, ref, toRefs, watch, type ComputedRef } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
@@ -10,8 +10,10 @@ import PermissionTable from '@/components/permission/Table.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import { useUserStore } from '@/stores/user';
 import { useErrorsStore } from '@/stores/errors';
-import RoleUserTable from '@/components/role/UserTable.vue';
 import type { Role } from '@internal/user/role';
+import RoleDetails from '@/components/role/Details.vue';
+import UserTable from '@/components/user/Table.vue';
+import type { U } from '@internal/user/user';
 
 const props = withDefaults(defineProps<{
 	userID: Uint8Array | undefined;
@@ -301,8 +303,29 @@ const addRole = async (item: RolePermission) => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<RoleUserTable v-if="item && !props.userID" :colspan="columns.length" :role-i-d="item.role?.iD">
-			</RoleUserTable>
+			<tr>
+				<td :colspan="columns.length">
+					<v-sheet>
+						<v-row class="my-4">
+							<v-col cols="4">
+								<v-sheet class="fill-height fill-width">
+									<RoleDetails :item="item">
+									</RoleDetails>
+								</v-sheet>
+							</v-col>
+							<v-divider vertical></v-divider>
+							<v-col cols="8">
+								<v-sheet class="fill-height fill-width">
+									<UserTable :role-i-d="item?.role?.iD"
+										:addUser="(u: U) => { return addUser(u, item?.role?.iD!) }"
+										:role-i-d-only="true">
+									</UserTable>
+								</v-sheet>
+							</v-col>
+						</v-row>
+					</v-sheet>
+				</td>
+			</tr>
 		</template>
 	</v-data-table-server>
 </template>

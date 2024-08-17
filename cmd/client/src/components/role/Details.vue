@@ -7,7 +7,6 @@ import { useErrorsStore } from '@/stores/errors';
 import { DeleteRoleReq, RolePermission, UpdateRoleReq } from '@internal/user/dto/role';
 
 const props = defineProps<{
-	colspan: number;
 	item: RolePermission | undefined,
 }>();
 
@@ -68,14 +67,12 @@ const deleteRole = async () => {
 		userStore.deleteRoleGlobal(props.item?.role?.iD!);
 	}
 }
-
 </script>
 
-<!-- TODO: Add edit name -->
 <template>
 	<tr>
-		<td :colspan="props.colspan">
-			<v-card outlined class="mb-4">
+		<td>
+			<v-card flat class="mb-4">
 				<PermissionTable :permissions="props.item?.permissions" ref="ps" :disabled="admin"></PermissionTable>
 				<v-card-actions v-if="!admin">
 					<v-spacer></v-spacer>
