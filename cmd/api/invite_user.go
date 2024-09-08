@@ -13,17 +13,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*dto.UserRoles, error) {
+func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user.U, error) {
 	logger := log.With().Str("method", "invite_user").Logger()
 
 	if req == nil {
-		return &dto.UserRoles{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &user.U{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &dto.UserRoles{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &user.U{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	var roles []user.Role
@@ -60,28 +60,28 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*dto.
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &dto.UserRoles{}, err
+		return &user.U{}, err
 	}
 
 	if len(roles) == 0 {
 		err := gerrors.ErrNotFound{Resource: "role", Index: ""}
 		logger.Error().Err(err).Msg("roles not found")
 
-		return &dto.UserRoles{}, status.New(codes.NotFound, err.Error()).Err()
+		return &user.U{}, status.New(codes.NotFound, err.Error()).Err()
 	}
 
 	// check permissions
 	if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_user, Command: user.C_create}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
-		return &dto.UserRoles{}, status.New(codes.InvalidArgument, err.Error()).Err()
+		return &user.U{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 	// current user need to have all assigned permissions to assign a role
 	for _, perm := range permissions {
 		if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
-			return &dto.UserRoles{}, status.New(codes.InvalidArgument, err.Error()).Err()
+			return &user.U{}, status.New(codes.InvalidArgument, err.Error()).Err()
 		}
 	}
 
@@ -143,12 +143,12 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*dto.
 
 	// 	return transaction.Commit, nil
 	// }); err != nil {
-	// 	return &dto.UserRoles{}, err
+	// 	return &user.U{}, err
 	// }
 
 	logger.Info().Msg("success")
 
-	return &dto.UserRoles{
+	return &user.U{
 		// User:  u,
 		// Roles: append(roles, role),
 	}, nil

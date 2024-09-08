@@ -5,6 +5,7 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { API } from "./api";
 import type { DeleteRoleUserReq } from "../../../internal/user/dto/role";
+import type { RoleUserResp } from "../../../internal/user/dto/role";
 import type { CreateRoleUserReq } from "../../../internal/user/dto/role";
 import type { DeleteRoleReq } from "../../../internal/user/dto/role";
 import type { UpdateRoleReq } from "../../../internal/user/dto/role";
@@ -21,7 +22,6 @@ import type { FetchEntityReq } from "../../../internal/user/dto/entity";
 import type { ListEntityResp } from "../../../internal/user/dto/entity";
 import type { ListEntityReq } from "../../../internal/user/dto/entity";
 import type { ClaimAuth } from "../../../internal/user/claims";
-import type { UserRoles } from "../../../internal/user/dto/user";
 import type { InviteUserReq } from "../../../internal/user/dto/user";
 import type { UpdateUserReq } from "../../../internal/user/dto/user";
 import type { U } from "../../../internal/user/user";
@@ -57,9 +57,9 @@ export interface IAPIClient {
      */
     updateUser(input: UpdateUserReq, options?: RpcOptions): UnaryCall<UpdateUserReq, U>;
     /**
-     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (dto.UserRoles);
+     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (user.U);
      */
-    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, UserRoles>;
+    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, U>;
     /**
      * Claims
      *
@@ -109,13 +109,13 @@ export interface IAPIClient {
     /**
      * Roles user
      *
-     * @generated from protobuf rpc: CreateRoleUser(dto.CreateRoleUserReq) returns (dto.UserRoles);
+     * @generated from protobuf rpc: CreateRoleUser(dto.CreateRoleUserReq) returns (dto.RoleUserResp);
      */
-    createRoleUser(input: CreateRoleUserReq, options?: RpcOptions): UnaryCall<CreateRoleUserReq, UserRoles>;
+    createRoleUser(input: CreateRoleUserReq, options?: RpcOptions): UnaryCall<CreateRoleUserReq, RoleUserResp>;
     /**
-     * @generated from protobuf rpc: DeleteRoleUser(dto.DeleteRoleUserReq) returns (dto.UserRoles);
+     * @generated from protobuf rpc: DeleteRoleUser(dto.DeleteRoleUserReq) returns (dto.RoleUserResp);
      */
-    deleteRoleUser(input: DeleteRoleUserReq, options?: RpcOptions): UnaryCall<DeleteRoleUserReq, UserRoles>;
+    deleteRoleUser(input: DeleteRoleUserReq, options?: RpcOptions): UnaryCall<DeleteRoleUserReq, RoleUserResp>;
 }
 /**
  * @generated from protobuf service grpc.API
@@ -159,11 +159,11 @@ export class APIClient implements IAPIClient, ServiceInfo {
         return stackIntercept<UpdateUserReq, U>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (dto.UserRoles);
+     * @generated from protobuf rpc: InviteUser(dto.InviteUserReq) returns (user.U);
      */
-    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, UserRoles> {
+    inviteUser(input: InviteUserReq, options?: RpcOptions): UnaryCall<InviteUserReq, U> {
         const method = this.methods[4], opt = this._transport.mergeOptions(options);
-        return stackIntercept<InviteUserReq, UserRoles>("unary", this._transport, method, opt, input);
+        return stackIntercept<InviteUserReq, U>("unary", this._transport, method, opt, input);
     }
     /**
      * Claims
@@ -244,17 +244,17 @@ export class APIClient implements IAPIClient, ServiceInfo {
     /**
      * Roles user
      *
-     * @generated from protobuf rpc: CreateRoleUser(dto.CreateRoleUserReq) returns (dto.UserRoles);
+     * @generated from protobuf rpc: CreateRoleUser(dto.CreateRoleUserReq) returns (dto.RoleUserResp);
      */
-    createRoleUser(input: CreateRoleUserReq, options?: RpcOptions): UnaryCall<CreateRoleUserReq, UserRoles> {
+    createRoleUser(input: CreateRoleUserReq, options?: RpcOptions): UnaryCall<CreateRoleUserReq, RoleUserResp> {
         const method = this.methods[15], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreateRoleUserReq, UserRoles>("unary", this._transport, method, opt, input);
+        return stackIntercept<CreateRoleUserReq, RoleUserResp>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: DeleteRoleUser(dto.DeleteRoleUserReq) returns (dto.UserRoles);
+     * @generated from protobuf rpc: DeleteRoleUser(dto.DeleteRoleUserReq) returns (dto.RoleUserResp);
      */
-    deleteRoleUser(input: DeleteRoleUserReq, options?: RpcOptions): UnaryCall<DeleteRoleUserReq, UserRoles> {
+    deleteRoleUser(input: DeleteRoleUserReq, options?: RpcOptions): UnaryCall<DeleteRoleUserReq, RoleUserResp> {
         const method = this.methods[16], opt = this._transport.mergeOptions(options);
-        return stackIntercept<DeleteRoleUserReq, UserRoles>("unary", this._transport, method, opt, input);
+        return stackIntercept<DeleteRoleUserReq, RoleUserResp>("unary", this._transport, method, opt, input);
     }
 }

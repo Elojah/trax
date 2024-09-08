@@ -27,13 +27,13 @@ const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
 
 const userStore = useUserStore();
 const {
-	roles: roles,
+	byRole: byRole,
 } = toRefs(userStore);
 
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 
-const rs = computed(() => { return roles.value.get(ulid(props.userID)) })
+const rs = computed(() => { return byRole.value.get(ulid(props.userID)) })
 
 const headers: ReadonlyHeaders = [
 	{
@@ -76,25 +76,6 @@ const closeAddRole = () => {
 	dialogAddRole.value = false;
 };
 
-// Role table properties
-
-const addRoleLoading = ref(false);
-
-const addRole = async (role: RolePermission) => {
-	addRoleLoading.value = true;
-	let ok = true;
-	try {
-		await userStore.addRole(props?.userID!, role.role?.iD!);
-	} catch (e) {
-		errorsStore.showGRPC(e);
-		ok = false;
-	}
-	if (ok) {
-		message.value = `Role added successfully to user`;
-		success.value = true;
-	}
-	addRoleLoading.value = false;
-};
 
 </script>
 <template>
@@ -105,7 +86,7 @@ const addRole = async (role: RolePermission) => {
 	<tr v-if="item" :key="ulid(item.iD)">
 		<td class="px-1 py-1">
 			<p class="font-weight-bold">
-				{{ item.name }}
+				<!-- {{ item.name }} -->
 			</p>
 		</td>
 		<td class="px-1 py-1">
@@ -141,7 +122,7 @@ const addRole = async (role: RolePermission) => {
 				</v-btn>
 			</template>
 			<v-sheet class="d-flex flex-column pa-4 fill-height fill-width" height="50vh">
-				<RoleTable :user-i-d="props.userID" :addRole="addRole"></RoleTable>
+				<RoleTable :show-action-user-i-d="props.userID"></RoleTable>
 				<v-divider></v-divider>
 				<v-btn color="error" variant="tonal" @click="closeAddRole">
 					Close

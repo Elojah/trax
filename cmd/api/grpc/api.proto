@@ -32,7 +32,7 @@ service API {
     rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp);
     rpc FetchUser(dto.FetchUserReq) returns (user.U);
     rpc UpdateUser(dto.UpdateUserReq) returns (user.U);
-    rpc InviteUser(dto.InviteUserReq) returns (dto.UserRoles);
+    rpc InviteUser(dto.InviteUserReq) returns (user.U);
 
     // Claims
     rpc FetchClaims(pbtypes.Empty) returns (user.ClaimAuth);
@@ -51,6 +51,6 @@ service API {
     rpc DeleteRole(dto.DeleteRoleReq) returns (dto.RolePermission);
 
     // Roles user
-    rpc CreateRoleUser(dto.CreateRoleUserReq) returns (dto.UserRoles);
-    rpc DeleteRoleUser(dto.DeleteRoleUserReq) returns (dto.UserRoles);
+    rpc CreateRoleUser(dto.CreateRoleUserReq) returns (dto.RoleUserResp);
+    rpc DeleteRoleUser(dto.DeleteRoleUserReq) returns (dto.RoleUserResp);
 }
