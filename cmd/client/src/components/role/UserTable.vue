@@ -144,7 +144,7 @@ const addUser = async (u: U) => {
 				</v-btn>
 			</template>
 			<v-sheet class="d-flex flex-column pa-4 fill-height fill-width" height="50vh">
-				<UserTable :role-i-d="props.roleID" :addUser="addUser"></UserTable>
+				<UserTable :showActionRoleID="props.roleID" :addUser="addUser"></UserTable>
 				<v-divider></v-divider>
 				<v-btn color="error" variant="tonal" @click="closeAddUser">
 					Close

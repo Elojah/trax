@@ -86,12 +86,6 @@ func (f filterRole) where(n int) (string, []any) {
 		n++
 	}
 
-	if len(f.UserIDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`ru.user_id IN (%s)`, postgres.Array(n, len(f.UserIDs))))
-		args = append(args, ulid.IDs(f.UserIDs).Any()...)
-		n += len(f.UserIDs)
-	}
-
 	if len(f.Search) > 0 {
 		clause = append(clause, fmt.Sprintf(`r.name ILIKE $%d`, n))
 		args = append(args, "%"+f.Search+"%")
@@ -264,6 +258,10 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 	}
 	b.WriteString(` FROM "user"."role" r `)
 
+	if f.UserID != nil {
+		b.WriteString(` JOIN "user"."role_user" ru ON r.id = ru.role_id `)
+	}
+
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
 
@@ -291,55 +289,6 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 
 		roles = append(roles, r.role())
 
-	}
-
-	return roles, count, nil
-}
-
-func (s Store) ListRoleByUser(ctx context.Context, f user.FilterRole) (map[string][]user.Role, uint64, error) {
-	tx, err := postgres.Tx(ctx)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	b := strings.Builder{}
-	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at, ru.user_id, COUNT(1) OVER() `)
-	if f.Paginate != nil {
-		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortRole))
-	} else {
-		b.WriteString(`, 0`)
-	}
-	b.WriteString(` FROM "user"."role" r `)
-	b.WriteString(` JOIN "user"."role_user" ru ON r.id = ru.role_id `)
-
-	clause, args := filterRole(f).where(1)
-	b.WriteString(clause)
-
-	if f.Paginate != nil {
-		pag := ppostgres.Paginate(*f.Paginate).CTE(b.String())
-		b.Reset()
-		b.WriteString(pag)
-	}
-
-	rows, err := tx.Query(ctx, b.String(), args...)
-	if err != nil {
-		return nil, 0, postgres.Error(err, "role", filterRole(f).index())
-	}
-
-	roles := make(map[string][]user.Role)
-
-	var count uint64
-	var row_number int
-
-	for rows.Next() {
-		var r sqlRole
-		var userID ulid.ID
-
-		if err := rows.Scan(&r.ID, &r.EntityID, &r.Name, &r.CreatedAt, &r.UpdatedAt, &userID, &count, &row_number); err != nil {
-			return nil, 0, postgres.Error(err, "role", filterRole(f).index())
-		}
-
-		roles[userID.String()] = append(roles[userID.String()], r.role())
 	}
 
 	return roles, count, nil

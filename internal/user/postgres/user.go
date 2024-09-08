@@ -105,6 +105,12 @@ func (f filter) where(n int) (string, []any) {
 	}
 
 	// !!! Only available if role r is joined
+	if f.RoleID != nil {
+		clause = append(clause, fmt.Sprintf(`r.id = $%d`, n))
+		args = append(args, f.RoleID)
+		n++
+	}
+
 	if len(f.RoleIDs) > 0 {
 		clause = append(clause, fmt.Sprintf(`r.id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
 		args = append(args, ulid.IDs(f.RoleIDs).Any()...)

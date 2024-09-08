@@ -13,14 +13,13 @@ import { useErrorsStore } from '@/stores/errors';
 import type { Role } from '@internal/user/role';
 import RoleDetails from '@/components/role/Details.vue';
 import UserTable from '@/components/user/Table.vue';
-import type { U } from '@internal/user/user';
 
 const props = withDefaults(defineProps<{
-	userID: Uint8Array | undefined;
-	addRole: ((role: RolePermission) => Promise<void>) | undefined;
+	showActionUserID: Uint8Array | undefined;
+	filterByUserID: Uint8Array | undefined;
 }>(), {
-	userID: undefined,
-	addRole: undefined,
+	showActionUserID: undefined,
+	filterByUserID: undefined,
 });
 
 // #MARK:Common
@@ -53,12 +52,6 @@ const authStore = useAuthStore();
 const errorsStore = useErrorsStore()
 const { success, message } = toRefs(errorsStore)
 
-// to add role
-const userStore = useUserStore();
-const {
-	roles: rolesUser,
-} = toRefs(userStore);
-
 const entityStore = useEntityStore();
 const {
 	selected: selectedEntities,
@@ -72,6 +65,8 @@ const store = useRoleStore();
 const {
 	roles: roles,
 	total: total,
+	// if filterByUser only
+	rolesbyUser: rolesByUser,
 } = toRefs(store);
 
 const loading = ref(false);
@@ -99,7 +94,7 @@ const views = computed(() => {
 });
 
 const expand = (_: any, item: any) => {
-	if (props.userID) {
+	if (props.showActionUserID) {
 		return
 	}
 	item.toggleExpand({ value: item.item });
@@ -117,6 +112,7 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 	try {
 		const newRoleIDs = await store.list(ListRoleReq.create({
 			entityIDs: [selectedEntity.value.iD],
+			userID: props.filterByUserID,
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
@@ -175,22 +171,50 @@ const create = async () => {
 };
 
 
-// Optional add role to user id
+// Optional show action user ID
 const userRoles = computed(() => {
-	return rolesUser.value.get(ulid(props.userID))?.reduce((acc: Map<string, boolean>, role: Role) => {
-		acc.set(ulid(role?.iD), true);
-
-		return acc;
-	}, new Map<string, boolean>())
+	return rolesByUser.value.get(ulid(props.showActionUserID))
 });
 
 const loadingAddRole = ref(false);
 
-const addRole = async (item: RolePermission) => {
-	if (props.addRole) {
+const addRoleToUser = async (item: RolePermission) => {
+	if (props.showActionUserID) {
 		loadingAddRole.value = true;
-		await props.addRole(item);
+		let ok = true;
+		try {
+			await store.addUser(item.role?.iD!, props.showActionUserID);
+		} catch (e) {
+			errorsStore.showGRPC(e);
+			ok = false;
+		}
+		if (ok) {
+			message.value = `Role added successfully to user`;
+			success.value = true;
+		}
+
 		loadingAddRole.value = false;
+	}
+};
+
+const loadingRemoveRole = ref(false);
+
+const removeRoleToUser = async (item: RolePermission) => {
+	if (props.showActionUserID) {
+		loadingRemoveRole.value = true;
+		let ok = true;
+		try {
+			await store.deleteUser(item.role?.iD!, props.showActionUserID);
+		} catch (e) {
+			errorsStore.showGRPC(e);
+			ok = false;
+		}
+		if (ok) {
+			message.value = `Role removed successfully to user`;
+			success.value = true;
+		}
+
+		loadingRemoveRole.value = false;
 	}
 };
 
@@ -267,27 +291,29 @@ const addRole = async (item: RolePermission) => {
 							'text-primary': isExpanded(internalItem),
 						}" :title="item.role?.name" :subtitle="Number(item.permissions.length) + ' permission(s)'">
 							<template v-slot:prepend>
-								<v-icon v-if="!props.userID && isExpanded(internalItem)" class="mr-4" icon="mdi-minus"
-									size="x-large" color="primary">
+								<v-icon v-if="!props.showActionUserID && isExpanded(internalItem)" class="mr-4"
+									icon="mdi-minus" size="x-large" color="primary">
 								</v-icon>
-								<v-icon v-else-if="!props.userID" class="mr-4" icon="mdi-plus" size="x-large"
+								<v-icon v-else-if="!props.showActionUserID" class="mr-4" icon="mdi-plus" size="x-large"
 									color="primary"> </v-icon>
 								<v-divider vertical></v-divider>
 							</template>
 							<template v-slot:append>
-								<v-divider vertical v-if="props.userID"></v-divider>
-								<v-btn v-if="props.userID && !userRoles?.has(ulid(item.role?.iD))" variant="tonal"
-									class="mr-4" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
-									:loading="loadingAddRole" v-on:click.stop.prevent="addRole(item)">
+								<v-divider vertical v-if="props.showActionUserID"></v-divider>
+								<v-btn v-if="props.showActionUserID && !userRoles?.has(ulid(item.role?.iD))"
+									variant="tonal" class="mr-4" prepend-icon="mdi-plus-box" color="primary"
+									v-bind="props" :loading="loadingAddRole"
+									v-on:click.stop.prevent="addRoleToUser(item)">
 									Add role
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>
 									</template>
 								</v-btn>
-								<v-btn v-else-if="props.userID && userRoles?.has(ulid(item.role?.iD))" variant="tonal"
-									class="mr-4" disabled prepend-icon="mdi-check-bold" color="secondary" v-bind="props"
-									v-on:click.stop.prevent="async () => { }">
-									Added
+								<v-btn v-else-if="props.showActionUserID && userRoles?.has(ulid(item.role?.iD))"
+									variant="tonal" class="mr-4" prepend-icon="mdi-trash-can" color="secondary"
+									v-bind="props" :loading="loadingRemoveRole"
+									v-on:click.stop.prevent="removeRoleToUser(item)">
+									Remove role
 									<template v-slot:prepend>
 										<v-icon color="secondary"></v-icon>
 									</template>
@@ -303,7 +329,7 @@ const addRole = async (item: RolePermission) => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<tr>
+			<tr v-if="!props.showActionUserID">
 				<td :colspan="columns.length">
 					<v-sheet>
 						<v-row class="my-4">
@@ -316,9 +342,7 @@ const addRole = async (item: RolePermission) => {
 							<v-divider vertical></v-divider>
 							<v-col cols="8">
 								<v-sheet class="fill-height fill-width">
-									<UserTable :role-i-d="item?.role?.iD"
-										:addUser="(u: U) => { return addUser(u, item?.role?.iD!) }"
-										:role-i-d-only="true">
+									<UserTable :showActionRoleID="item?.role?.iD" :role-i-d-only="true">
 									</UserTable>
 								</v-sheet>
 							</v-col>

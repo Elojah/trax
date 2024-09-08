@@ -37,6 +37,7 @@ type Filter struct {
 
 	// ListByEntity only
 	EntityIDs []ulid.ID
+	RoleID    ulid.ID
 	RoleIDs   []ulid.ID
 
 	*paginate.Paginate

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { ListUserReq, UserRoles } from '@internal/user/dto/user'
+import { ListUserReq } from '@internal/user/dto/user'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid } from '@/utils/ulid'
@@ -14,8 +14,8 @@ export const useUserStore = defineStore('user', () => {
   const users = ref<Map<string, U>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
-  // roles by user
-  const roles = ref<Map<string, Role[]>>(new Map())
+  // users by role
+  const usersByRole = ref<Map<string, Map<string, boolean>>>(new Map())
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -32,23 +32,31 @@ export const useUserStore = defineStore('user', () => {
     try {
       const resp = await api.listUser(req, { meta: { token: token.value } })
 
-      resp.response.users?.forEach((user: UserRoles) => {
-        roles.value?.set(ulid(user.user?.iD), user.roles)
-        users.value?.set(ulid(user.user?.iD), user.user!)
+      resp.response.users?.forEach((user: U) => {
+        users.value?.set(ulid(user?.iD), user)
       })
+
+      const userIDs = resp.response.users.map((user: U) => ulid(user?.iD))
+
+      if (req.roleID) {
+        usersByRole.value.set(ulid(req.roleID), userIDs.reduce((acc: Map<string, boolean>, userID: Uint8Array) => {
+          acc.set(ulid(userID), true);
+
+          return acc;
+        }, new Map<string, boolean>()))
+      }
 
       if (req?.iDs.length === 0) {
         total.value = resp.response.total
       }
 
-      return resp.response.users.map((user: UserRoles) => ulid(user.user?.iD))
+      return userIDs
     } catch (err: any) {
       logger.error(err)
       throw err
     }
   }
 
-  // Add role refresh cache in selected user only
   const addRole = async function (userID: Uint8Array, roleID: Uint8Array) {
     try {
       const req = CreateRoleUserReq.create({
@@ -57,7 +65,10 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.createRoleUser(req, { meta: { token: token.value } })
-      roles.value.set(ulid(resp.response.user?.iD), resp.response.roles)
+
+      const users = usersByRole.value.get(ulid(resp.response.role?.iD)) ?? new Map()
+      users?.set(ulid(resp.response.user?.iD), true)
+      usersByRole.value.set(ulid(resp.response.role?.iD), users)
     } catch (err: any) {
       logger.error(err)
       throw err
@@ -72,94 +83,24 @@ export const useUserStore = defineStore('user', () => {
       })
 
       const resp = await api.deleteRoleUser(req, { meta: { token: token.value } })
-      roles.value.set(ulid(resp.response.user?.iD), resp.response.roles)
 
-      // if no roles left, remove user from cache
-      if (roles.value.get(ulid(resp.response.user?.iD))?.length === 0) {
-        roles.value.delete(ulid(resp.response.user?.iD))
-        users.value.delete(ulid(resp.response.user?.iD))
-      }
+      const users = usersByRole.value.get(ulid(resp.response.role?.iD)) ?? new Map()
+      users?.delete(ulid(resp.response.user?.iD))
+      usersByRole.value.set(ulid(resp.response.role?.iD), users)
     } catch (err: any) {
       logger.error(err)
       throw err
     }
   }
 
-  // Add role modifies local cache only, no API call
-  const addRoleDry = async function (userID: Uint8Array, role: Role) {
-    try {
-      const rs = roles.value.get(ulid(userID))
-
-      if (!rs) {
-        roles.value.set(ulid(userID), [role])
-      } else {
-        rs.push(role)
-        roles.value.set(ulid(userID), rs)
-      }
-    } catch (err: any) {
-      logger.error(err)
-      throw err
-    }
-  }
-
-  // Delete role modifies local cache only, no API call
-  const deleteRoleDry = async function (userID: Uint8Array, roleID: Uint8Array) {
-    try {
-      const rs = roles.value.get(ulid(userID))
-      const id = ulid(roleID)
-
-      if (!rs) {
-        return
-      } else {
-        const newRoles = rs.filter((r) => ulid(r.iD) !== id)
-        roles.value.set(ulid(userID), newRoles)
-      }
-    } catch (err: any) {
-      logger.error(err)
-      throw err
-    }
-  }
-
-  // Reset roles for user, no API call
-  const resetRoleDry = async function (userID: Uint8Array) {
-    try {
-      roles.value.delete(ulid(userID))
-    } catch (err: any) {
-      logger.error(err)
-      throw err
-    }
-  }
-
-  // Delete role deletes role for all users, no API call
-  const deleteRoleGlobal = async function (roleID: Uint8Array) {
-    try {
-      roles.value.forEach((rs, userID) => {
-        const id = ulid(roleID)
-
-        if (!rs) {
-          return
-        } else {
-          const newRoles = rs.filter((r) => ulid(r.iD) !== id)
-          roles.value.set(userID, newRoles)
-        }
-      })
-    } catch (err: any) {
-      logger.error(err)
-      throw err
-    }
-  }
 
   return {
     users,
     total,
-    roles,
+    usersByRole,
     invite,
     list,
     addRole,
     deleteRole,
-    addRoleDry,
-    deleteRoleDry,
-    resetRoleDry,
-    deleteRoleGlobal,
   }
 })

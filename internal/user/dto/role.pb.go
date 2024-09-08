@@ -151,6 +151,7 @@ type ListRoleReq struct {
 	OwnEntity bool                                 `protobuf:"varint,4,opt,name=OwnEntity,proto3" json:"OwnEntity,omitempty"`
 	IDs       []github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,5,rep,name=IDs,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"IDs"`
 	EntityIDs []github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,6,rep,name=EntityIDs,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"EntityIDs"`
+	UserID    github_com_elojah_trax_pkg_ulid.ID   `protobuf:"bytes,7,opt,name=UserID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"UserID"`
 }
 
 func (m *ListRoleReq) Reset()      { *m = ListRoleReq{} }
@@ -185,52 +186,15 @@ func (m *ListRoleReq) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListRoleReq proto.InternalMessageInfo
 
-type RoleUsers struct {
-	Role  RolePermission `protobuf:"bytes,1,opt,name=Role,proto3" json:"Role"`
-	Users []user.U       `protobuf:"bytes,2,rep,name=Users,proto3" json:"Users"`
-}
-
-func (m *RoleUsers) Reset()      { *m = RoleUsers{} }
-func (*RoleUsers) ProtoMessage() {}
-func (*RoleUsers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_345bd77e73122213, []int{4}
-}
-func (m *RoleUsers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RoleUsers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RoleUsers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RoleUsers) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RoleUsers.Merge(m, src)
-}
-func (m *RoleUsers) XXX_Size() int {
-	return m.Size()
-}
-func (m *RoleUsers) XXX_DiscardUnknown() {
-	xxx_messageInfo_RoleUsers.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RoleUsers proto.InternalMessageInfo
-
 type ListRoleResp struct {
-	Roles []RoleUsers `protobuf:"bytes,1,rep,name=Roles,proto3" json:"Roles"`
-	Total uint64      `protobuf:"varint,2,opt,name=Total,proto3" json:"Total,omitempty"`
+	Roles []RolePermission `protobuf:"bytes,1,rep,name=Roles,proto3" json:"Roles"`
+	Total uint64           `protobuf:"varint,2,opt,name=Total,proto3" json:"Total,omitempty"`
 }
 
 func (m *ListRoleResp) Reset()      { *m = ListRoleResp{} }
 func (*ListRoleResp) ProtoMessage() {}
 func (*ListRoleResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_345bd77e73122213, []int{5}
+	return fileDescriptor_345bd77e73122213, []int{4}
 }
 func (m *ListRoleResp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -267,7 +231,7 @@ type CreateRoleUserReq struct {
 func (m *CreateRoleUserReq) Reset()      { *m = CreateRoleUserReq{} }
 func (*CreateRoleUserReq) ProtoMessage() {}
 func (*CreateRoleUserReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_345bd77e73122213, []int{6}
+	return fileDescriptor_345bd77e73122213, []int{5}
 }
 func (m *CreateRoleUserReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -295,6 +259,43 @@ func (m *CreateRoleUserReq) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_CreateRoleUserReq proto.InternalMessageInfo
+
+type RoleUserResp struct {
+	User user.U         `protobuf:"bytes,1,opt,name=User,proto3" json:"User"`
+	Role RolePermission `protobuf:"bytes,2,opt,name=Role,proto3" json:"Role"`
+}
+
+func (m *RoleUserResp) Reset()      { *m = RoleUserResp{} }
+func (*RoleUserResp) ProtoMessage() {}
+func (*RoleUserResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_345bd77e73122213, []int{6}
+}
+func (m *RoleUserResp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RoleUserResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RoleUserResp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RoleUserResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RoleUserResp.Merge(m, src)
+}
+func (m *RoleUserResp) XXX_Size() int {
+	return m.Size()
+}
+func (m *RoleUserResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_RoleUserResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RoleUserResp proto.InternalMessageInfo
 
 type DeleteRoleUserReq struct {
 	RoleID github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,1,opt,name=RoleID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"RoleID"`
@@ -378,12 +379,12 @@ func init() {
 	golang_proto.RegisterType((*UpdateRoleReq)(nil), "dto.UpdateRoleReq")
 	proto.RegisterType((*ListRoleReq)(nil), "dto.ListRoleReq")
 	golang_proto.RegisterType((*ListRoleReq)(nil), "dto.ListRoleReq")
-	proto.RegisterType((*RoleUsers)(nil), "dto.RoleUsers")
-	golang_proto.RegisterType((*RoleUsers)(nil), "dto.RoleUsers")
 	proto.RegisterType((*ListRoleResp)(nil), "dto.ListRoleResp")
 	golang_proto.RegisterType((*ListRoleResp)(nil), "dto.ListRoleResp")
 	proto.RegisterType((*CreateRoleUserReq)(nil), "dto.CreateRoleUserReq")
 	golang_proto.RegisterType((*CreateRoleUserReq)(nil), "dto.CreateRoleUserReq")
+	proto.RegisterType((*RoleUserResp)(nil), "dto.RoleUserResp")
+	golang_proto.RegisterType((*RoleUserResp)(nil), "dto.RoleUserResp")
 	proto.RegisterType((*DeleteRoleUserReq)(nil), "dto.DeleteRoleUserReq")
 	golang_proto.RegisterType((*DeleteRoleUserReq)(nil), "dto.DeleteRoleUserReq")
 	proto.RegisterType((*DeleteRoleReq)(nil), "dto.DeleteRoleReq")
@@ -398,46 +399,47 @@ func init() {
 }
 
 var fileDescriptor_345bd77e73122213 = []byte{
-	// 623 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x94, 0x31, 0x6f, 0xd3, 0x40,
-	0x14, 0xc7, 0x7d, 0x71, 0x12, 0x9a, 0x97, 0xb6, 0x94, 0x03, 0x21, 0xab, 0x42, 0xd7, 0xc8, 0x65,
-	0x88, 0x2a, 0x61, 0x4b, 0x29, 0x03, 0x42, 0x4c, 0xc1, 0xa0, 0x46, 0x20, 0x5a, 0xb9, 0x74, 0x46,
-	0x6e, 0x73, 0x72, 0x0d, 0xae, 0xcf, 0xf8, 0xae, 0x2a, 0xdd, 0xf8, 0x08, 0x48, 0x8c, 0xcc, 0x48,
-	0x88, 0x4f, 0xc0, 0xd8, 0xb1, 0x63, 0xc7, 0x8a, 0xa1, 0x22, 0xce, 0xc2, 0xd8, 0x91, 0x11, 0xdd,
-	0xd9, 0x89, 0x13, 0x24, 0x42, 0xd3, 0x2e, 0x2c, 0xd1, 0xbb, 0xbb, 0xff, 0xef, 0xdd, 0xdf, 0xef,
-	0xbd, 0x0b, 0xac, 0xfa, 0x81, 0xd8, 0xdd, 0xdf, 0xb6, 0x76, 0xd8, 0x9e, 0x4d, 0x43, 0xf6, 0xda,
-	0xdb, 0xb5, 0x45, 0xe2, 0xbd, 0xb3, 0x83, 0x48, 0xd0, 0x24, 0xf2, 0x42, 0x7b, 0x9f, 0xd3, 0xc4,
-	0xee, 0x0a, 0x66, 0x27, 0x2c, 0xa4, 0x56, 0x9c, 0x30, 0xc1, 0xb0, 0xde, 0x15, 0x6c, 0xd1, 0xfe,
-	0x0b, 0x19, 0xbf, 0xf1, 0x6d, 0x9f, 0xf9, 0x4c, 0x49, 0x55, 0x94, 0x51, 0x8b, 0xad, 0x09, 0x40,
-	0xec, 0xf9, 0x41, 0xe4, 0x09, 0x3a, 0x0c, 0x72, 0x66, 0xd2, 0x25, 0xf1, 0xb6, 0x38, 0x8c, 0x29,
-	0xb7, 0xb9, 0x48, 0x82, 0xc8, 0xff, 0x07, 0x30, 0xfe, 0x3d, 0xc5, 0xb7, 0x5c, 0x10, 0x90, 0x3f,
-	0x19, 0x60, 0xc6, 0x30, 0xef, 0xb2, 0x90, 0x6e, 0xd0, 0x64, 0x2f, 0xe0, 0x3c, 0x60, 0x11, 0xbe,
-	0x0b, 0x65, 0xb9, 0x63, 0xa0, 0x06, 0x6a, 0xd6, 0x5b, 0x60, 0x29, 0xb1, 0xdc, 0x69, 0x97, 0x8f,
-	0xcf, 0x96, 0x34, 0x57, 0x9d, 0xe2, 0x07, 0x50, 0x2f, 0x18, 0x6e, 0x94, 0x1a, 0x7a, 0xb3, 0xde,
-	0x5a, 0xc8, 0xc4, 0xc5, 0x41, 0x8e, 0x8c, 0x4a, 0xcd, 0xcf, 0x08, 0xe6, 0x1e, 0x27, 0xd4, 0x13,
-	0x54, 0x26, 0x72, 0xe9, 0x5b, 0xfc, 0x14, 0x66, 0x9e, 0x44, 0x22, 0x10, 0x87, 0x1d, 0x47, 0xdd,
-	0x3a, 0xdb, 0x5e, 0x91, 0xd8, 0xf7, 0xb3, 0x25, 0x73, 0x42, 0xc1, 0xf6, 0xc3, 0xa0, 0x6b, 0x75,
-	0x1c, 0x77, 0xc8, 0x62, 0x0c, 0xe5, 0x17, 0xde, 0x1e, 0x35, 0x4a, 0x0d, 0xd4, 0xac, 0xb9, 0x2a,
-	0xfe, 0xd3, 0xa7, 0x7e, 0x71, 0x9f, 0x5f, 0x11, 0xcc, 0x6d, 0xc5, 0xdd, 0x11, 0x9f, 0x0f, 0xa1,
-	0x74, 0x29, 0x87, 0xa5, 0x8e, 0x83, 0x97, 0x47, 0xbc, 0xd5, 0x5b, 0xd7, 0xad, 0xbc, 0xdd, 0xd6,
-	0xa6, 0x6a, 0xf7, 0x95, 0xcd, 0x7e, 0x2c, 0x41, 0xfd, 0x79, 0xc0, 0xc5, 0xc0, 0xea, 0x7d, 0x98,
-	0xd9, 0xc8, 0x67, 0x2f, 0x6f, 0x24, 0xb6, 0x86, 0xc3, 0x38, 0x38, 0x51, 0x89, 0x90, 0x3b, 0x54,
-	0xe2, 0xdb, 0x50, 0xdd, 0xa4, 0x5e, 0xb2, 0xb3, 0x9b, 0x97, 0x30, 0x5f, 0xe1, 0x05, 0xd0, 0xd7,
-	0x0f, 0x22, 0x43, 0x6f, 0xa0, 0xe6, 0x8c, 0x2b, 0x43, 0x7c, 0x07, 0x6a, 0xeb, 0x07, 0x51, 0x56,
-	0x79, 0xa3, 0xac, 0xf6, 0x8b, 0x0d, 0xfc, 0x08, 0xf4, 0x8e, 0xc3, 0x8d, 0x4a, 0x43, 0x9f, 0xb2,
-	0x52, 0x12, 0xc3, 0x6b, 0x50, 0x1b, 0xb4, 0x94, 0x1b, 0xd5, 0xa9, 0x73, 0x14, 0xb0, 0xf9, 0x0a,
-	0x6a, 0xb2, 0x20, 0x5b, 0x9c, 0x26, 0x1c, 0xdf, 0x1b, 0x9b, 0xeb, 0x9b, 0x56, 0x57, 0x30, 0x6b,
-	0x7c, 0xf4, 0xc7, 0x06, 0x7c, 0x19, 0x2a, 0x8a, 0xcb, 0x47, 0xfb, 0x5a, 0xd6, 0x85, 0xad, 0x5c,
-	0x93, 0x9d, 0x99, 0x1b, 0x30, 0x5b, 0x54, 0x9d, 0xc7, 0x78, 0x05, 0x2a, 0x32, 0xe6, 0x06, 0x52,
-	0xd0, 0xfc, 0xf0, 0x12, 0x25, 0x1f, 0xb0, 0x4a, 0x82, 0x6f, 0x41, 0xe5, 0x25, 0x13, 0x5e, 0xa8,
-	0x6a, 0x5d, 0x76, 0xb3, 0x85, 0xf9, 0x09, 0xc1, 0x8d, 0xe2, 0x75, 0x48, 0x4c, 0xb6, 0xb3, 0x0d,
-	0x55, 0xb9, 0xbc, 0xd4, 0xf4, 0xe5, 0xa4, 0xcc, 0x21, 0xd3, 0x75, 0x1c, 0x75, 0xe1, 0x94, 0x39,
-	0x32, 0x52, 0xb9, 0x73, 0x68, 0x48, 0xff, 0x4f, 0x77, 0xcf, 0x60, 0xae, 0x30, 0x77, 0xc5, 0x07,
-	0xdb, 0x5e, 0x3b, 0xee, 0x11, 0xed, 0xa4, 0x47, 0xb4, 0xd3, 0x1e, 0xd1, 0xce, 0x7b, 0x04, 0xfd,
-	0xea, 0x11, 0xf4, 0x3e, 0x25, 0xe8, 0x4b, 0x4a, 0xd0, 0xb7, 0x94, 0xa0, 0xa3, 0x94, 0xa0, 0xe3,
-	0x94, 0xa0, 0x93, 0x94, 0xa0, 0x1f, 0x29, 0x41, 0x3f, 0x53, 0xa2, 0x9d, 0xa7, 0x04, 0x7d, 0xe8,
-	0x13, 0xed, 0xa8, 0x4f, 0xd0, 0x49, 0x9f, 0x68, 0xa7, 0x7d, 0xa2, 0x6d, 0x57, 0xd5, 0x3f, 0xed,
-	0xea, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x46, 0xe8, 0x0e, 0x9d, 0x06, 0x00, 0x00,
+	// 631 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x54, 0xbf, 0x6f, 0xd3, 0x4e,
+	0x14, 0xf7, 0xc5, 0x6e, 0xda, 0xbe, 0xb4, 0xdf, 0x6f, 0x39, 0x10, 0xb2, 0x2a, 0x74, 0x0d, 0x81,
+	0x21, 0x42, 0xc2, 0x96, 0x52, 0x06, 0x84, 0x98, 0x82, 0x41, 0x8d, 0x40, 0xb4, 0x72, 0xc9, 0x8e,
+	0xdb, 0x9c, 0x5c, 0x83, 0xeb, 0x33, 0xbe, 0xab, 0x4a, 0x37, 0xfe, 0x04, 0x76, 0x66, 0x24, 0xc4,
+	0x5f, 0xc0, 0xd8, 0xb1, 0x63, 0x37, 0x2a, 0x86, 0x8a, 0x38, 0x0b, 0x63, 0x47, 0x46, 0x74, 0xe7,
+	0x4b, 0x9c, 0x22, 0x11, 0xfa, 0x63, 0x61, 0x39, 0xbd, 0x7b, 0xef, 0x7d, 0xee, 0x3e, 0xef, 0x7d,
+	0xde, 0x1d, 0x2c, 0x87, 0x91, 0xd8, 0xda, 0xd9, 0x70, 0x36, 0xd9, 0xb6, 0x4b, 0x63, 0xf6, 0x2a,
+	0xd8, 0x72, 0x45, 0x16, 0xbc, 0x75, 0xa3, 0x44, 0xd0, 0x2c, 0x09, 0x62, 0x77, 0x87, 0xd3, 0xcc,
+	0xed, 0x09, 0xe6, 0x66, 0x2c, 0xa6, 0x4e, 0x9a, 0x31, 0xc1, 0xb0, 0xd9, 0x13, 0x6c, 0xd1, 0xfd,
+	0x03, 0x32, 0x7d, 0x1d, 0xba, 0x21, 0x0b, 0x99, 0x4a, 0x55, 0x56, 0x81, 0x5a, 0x6c, 0x4d, 0x00,
+	0xa4, 0x41, 0x18, 0x25, 0x81, 0xa0, 0x23, 0x43, 0x63, 0x26, 0x5d, 0x92, 0x6e, 0x88, 0xbd, 0x94,
+	0x72, 0x97, 0x8b, 0x2c, 0x4a, 0xc2, 0xbf, 0x00, 0x4e, 0xd7, 0x53, 0xd6, 0x72, 0x46, 0x80, 0x5c,
+	0x0a, 0x40, 0x23, 0x85, 0xff, 0x7c, 0x16, 0xd3, 0x35, 0x9a, 0x6d, 0x47, 0x9c, 0x47, 0x2c, 0xc1,
+	0xb7, 0xc1, 0x92, 0x1e, 0x1b, 0xd5, 0x51, 0xb3, 0xd6, 0x02, 0x47, 0x25, 0x4b, 0x4f, 0xdb, 0x3a,
+	0x38, 0x5e, 0x32, 0x7c, 0x15, 0xc5, 0xf7, 0xa1, 0x56, 0x62, 0xb8, 0x5d, 0xa9, 0x9b, 0xcd, 0x5a,
+	0x6b, 0xa1, 0x48, 0x2e, 0x03, 0x1a, 0x32, 0x9e, 0xda, 0xf8, 0x88, 0x60, 0xfe, 0x51, 0x46, 0x03,
+	0x41, 0xe5, 0x41, 0x3e, 0x7d, 0x83, 0x9f, 0xc0, 0xcc, 0xe3, 0x44, 0x44, 0x62, 0xaf, 0xe3, 0xa9,
+	0x5b, 0xe7, 0xda, 0x77, 0x24, 0xec, 0xdb, 0xf1, 0x52, 0x63, 0x42, 0xc3, 0x76, 0xe2, 0xa8, 0xe7,
+	0x74, 0x3c, 0x7f, 0x84, 0xc5, 0x18, 0xac, 0xe7, 0xc1, 0x36, 0xb5, 0x2b, 0x75, 0xd4, 0x9c, 0xf5,
+	0x95, 0xfd, 0x3b, 0x4f, 0xf3, 0xec, 0x3c, 0x3f, 0x23, 0x98, 0xef, 0xa6, 0xbd, 0x31, 0x9e, 0x0f,
+	0xa0, 0x72, 0x21, 0x86, 0x95, 0x8e, 0x87, 0x6f, 0x8d, 0x71, 0xab, 0xb5, 0xfe, 0x77, 0xb4, 0xdc,
+	0xce, 0xba, 0x92, 0xfb, 0xd2, 0x64, 0xbf, 0x56, 0xa0, 0xf6, 0x2c, 0xe2, 0x62, 0x48, 0xf5, 0x1e,
+	0xcc, 0xac, 0xe9, 0xd9, 0xd3, 0x42, 0x62, 0x67, 0x34, 0x8c, 0xc3, 0x88, 0x3a, 0x08, 0xf9, 0xa3,
+	0x4c, 0x7c, 0x1d, 0xaa, 0xeb, 0x34, 0xc8, 0x36, 0xb7, 0x74, 0x0b, 0xf5, 0x0e, 0x2f, 0x80, 0xb9,
+	0xba, 0x9b, 0xd8, 0x66, 0x1d, 0x35, 0x67, 0x7c, 0x69, 0xe2, 0x1b, 0x30, 0xbb, 0xba, 0x9b, 0x14,
+	0x9d, 0xb7, 0x2d, 0xe5, 0x2f, 0x1d, 0xf8, 0x21, 0x98, 0x1d, 0x8f, 0xdb, 0x53, 0x75, 0xf3, 0x9c,
+	0x9d, 0x92, 0x30, 0xbc, 0x02, 0xb3, 0x43, 0x49, 0xb9, 0x5d, 0x3d, 0xf7, 0x19, 0x25, 0x18, 0xb7,
+	0xa1, 0xda, 0xe5, 0x34, 0xeb, 0x78, 0xf6, 0xf4, 0xb9, 0x45, 0xd3, 0xc8, 0x46, 0x17, 0xe6, 0xca,
+	0xc6, 0xf2, 0x14, 0xbb, 0x30, 0x25, 0x6d, 0x6e, 0x23, 0xa5, 0xce, 0x55, 0xa7, 0x27, 0x98, 0x73,
+	0xfa, 0x09, 0x69, 0x81, 0x8a, 0x3c, 0x7c, 0x0d, 0xa6, 0x5e, 0x30, 0x11, 0xc4, 0xaa, 0xa7, 0x96,
+	0x5f, 0x6c, 0x1a, 0x1f, 0x10, 0x5c, 0x29, 0x5f, 0x81, 0xbc, 0x4b, 0xca, 0xd6, 0x86, 0xaa, 0xdc,
+	0x5e, 0x68, 0xca, 0x34, 0x72, 0xac, 0xe8, 0xca, 0x85, 0x8b, 0x7e, 0x09, 0x73, 0x25, 0x2d, 0x9e,
+	0xe2, 0x9b, 0x60, 0x49, 0x5b, 0x8f, 0xd2, 0x74, 0x31, 0x91, 0xdd, 0xe1, 0x87, 0x20, 0x43, 0xf8,
+	0xae, 0xfe, 0x36, 0x8a, 0x01, 0x9f, 0xd0, 0x16, 0x95, 0xa6, 0xea, 0xf7, 0x68, 0x4c, 0xff, 0xcd,
+	0xfa, 0x9f, 0xc2, 0x7c, 0x49, 0xee, 0x92, 0x4f, 0xbf, 0xbd, 0x72, 0xd0, 0x27, 0xc6, 0x61, 0x9f,
+	0x18, 0x47, 0x7d, 0x62, 0x9c, 0xf4, 0x09, 0xfa, 0xd9, 0x27, 0xe8, 0x5d, 0x4e, 0xd0, 0xa7, 0x9c,
+	0xa0, 0x2f, 0x39, 0x41, 0xfb, 0x39, 0x41, 0x07, 0x39, 0x41, 0x87, 0x39, 0x41, 0xdf, 0x73, 0x82,
+	0x7e, 0xe4, 0xc4, 0x38, 0xc9, 0x09, 0x7a, 0x3f, 0x20, 0xc6, 0xfe, 0x80, 0xa0, 0xc3, 0x01, 0x31,
+	0x8e, 0x06, 0xc4, 0xd8, 0xa8, 0xaa, 0x3f, 0x7b, 0xf9, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0x30,
+	0xc4, 0xf1, 0xb3, 0xe7, 0x06, 0x00, 0x00,
 }
 
 func (this *RolePermission) Equal(that interface{}) bool {
@@ -589,37 +591,8 @@ func (this *ListRoleReq) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	return true
-}
-func (this *RoleUsers) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*RoleUsers)
-	if !ok {
-		that2, ok := that.(RoleUsers)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
+	if !this.UserID.Equal(that1.UserID) {
 		return false
-	}
-	if !this.Role.Equal(&that1.Role) {
-		return false
-	}
-	if len(this.Users) != len(that1.Users) {
-		return false
-	}
-	for i := range this.Users {
-		if !this.Users[i].Equal(&that1.Users[i]) {
-			return false
-		}
 	}
 	return true
 }
@@ -678,6 +651,33 @@ func (this *CreateRoleUserReq) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.UserID.Equal(that1.UserID) {
+		return false
+	}
+	return true
+}
+func (this *RoleUserResp) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*RoleUserResp)
+	if !ok {
+		that2, ok := that.(RoleUserResp)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.User.Equal(&that1.User) {
+		return false
+	}
+	if !this.Role.Equal(&that1.Role) {
 		return false
 	}
 	return true
@@ -792,7 +792,7 @@ func (this *ListRoleReq) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 10)
+	s := make([]string, 0, 11)
 	s = append(s, "&dto.ListRoleReq{")
 	if this.Paginate != nil {
 		s = append(s, "Paginate: "+fmt.Sprintf("%#v", this.Paginate)+",\n")
@@ -802,23 +802,7 @@ func (this *ListRoleReq) GoString() string {
 	s = append(s, "OwnEntity: "+fmt.Sprintf("%#v", this.OwnEntity)+",\n")
 	s = append(s, "IDs: "+fmt.Sprintf("%#v", this.IDs)+",\n")
 	s = append(s, "EntityIDs: "+fmt.Sprintf("%#v", this.EntityIDs)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *RoleUsers) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 6)
-	s = append(s, "&dto.RoleUsers{")
-	s = append(s, "Role: "+strings.Replace(this.Role.GoString(), `&`, ``, 1)+",\n")
-	if this.Users != nil {
-		vs := make([]user.U, len(this.Users))
-		for i := range vs {
-			vs[i] = this.Users[i]
-		}
-		s = append(s, "Users: "+fmt.Sprintf("%#v", vs)+",\n")
-	}
+	s = append(s, "UserID: "+fmt.Sprintf("%#v", this.UserID)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -829,7 +813,7 @@ func (this *ListRoleResp) GoString() string {
 	s := make([]string, 0, 6)
 	s = append(s, "&dto.ListRoleResp{")
 	if this.Roles != nil {
-		vs := make([]RoleUsers, len(this.Roles))
+		vs := make([]RolePermission, len(this.Roles))
 		for i := range vs {
 			vs[i] = this.Roles[i]
 		}
@@ -847,6 +831,17 @@ func (this *CreateRoleUserReq) GoString() string {
 	s = append(s, "&dto.CreateRoleUserReq{")
 	s = append(s, "RoleID: "+fmt.Sprintf("%#v", this.RoleID)+",\n")
 	s = append(s, "UserID: "+fmt.Sprintf("%#v", this.UserID)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *RoleUserResp) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&dto.RoleUserResp{")
+	s = append(s, "User: "+strings.Replace(this.User.GoString(), `&`, ``, 1)+",\n")
+	s = append(s, "Role: "+strings.Replace(this.Role.GoString(), `&`, ``, 1)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -1059,6 +1054,16 @@ func (m *ListRoleReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	{
+		size := m.UserID.Size()
+		i -= size
+		if _, err := m.UserID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintRole(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
 	if len(m.EntityIDs) > 0 {
 		for iNdEx := len(m.EntityIDs) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -1126,53 +1131,6 @@ func (m *ListRoleReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xa
 	}
-	return len(dAtA) - i, nil
-}
-
-func (m *RoleUsers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *RoleUsers) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *RoleUsers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Users) > 0 {
-		for iNdEx := len(m.Users) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Users[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintRole(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	{
-		size, err := m.Role.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintRole(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1254,6 +1212,49 @@ func (m *CreateRoleUserReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		if _, err := m.RoleID.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
+		i = encodeVarintRole(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *RoleUserResp) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RoleUserResp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RoleUserResp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Role.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintRole(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.User.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
 		i = encodeVarintRole(dAtA, i, uint64(size))
 	}
 	i--
@@ -1423,23 +1424,8 @@ func NewPopulatedListRoleReq(r randyRole, easy bool) *ListRoleReq {
 		v13 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
 		this.EntityIDs[i] = *v13
 	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedRoleUsers(r randyRole, easy bool) *RoleUsers {
-	this := &RoleUsers{}
-	v14 := NewPopulatedRolePermission(r, easy)
-	this.Role = *v14
-	if r.Intn(5) != 0 {
-		v15 := r.Intn(5)
-		this.Users = make([]user.U, v15)
-		for i := 0; i < v15; i++ {
-			v16 := user.NewPopulatedU(r, easy)
-			this.Users[i] = *v16
-		}
-	}
+	v14 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.UserID = *v14
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1448,11 +1434,11 @@ func NewPopulatedRoleUsers(r randyRole, easy bool) *RoleUsers {
 func NewPopulatedListRoleResp(r randyRole, easy bool) *ListRoleResp {
 	this := &ListRoleResp{}
 	if r.Intn(5) != 0 {
-		v17 := r.Intn(5)
-		this.Roles = make([]RoleUsers, v17)
-		for i := 0; i < v17; i++ {
-			v18 := NewPopulatedRoleUsers(r, easy)
-			this.Roles[i] = *v18
+		v15 := r.Intn(5)
+		this.Roles = make([]RolePermission, v15)
+		for i := 0; i < v15; i++ {
+			v16 := NewPopulatedRolePermission(r, easy)
+			this.Roles[i] = *v16
 		}
 	}
 	this.Total = uint64(uint64(r.Uint32()))
@@ -1463,10 +1449,21 @@ func NewPopulatedListRoleResp(r randyRole, easy bool) *ListRoleResp {
 
 func NewPopulatedCreateRoleUserReq(r randyRole, easy bool) *CreateRoleUserReq {
 	this := &CreateRoleUserReq{}
-	v19 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.RoleID = *v19
-	v20 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.UserID = *v20
+	v17 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.RoleID = *v17
+	v18 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.UserID = *v18
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedRoleUserResp(r randyRole, easy bool) *RoleUserResp {
+	this := &RoleUserResp{}
+	v19 := user.NewPopulatedU(r, easy)
+	this.User = *v19
+	v20 := NewPopulatedRolePermission(r, easy)
+	this.Role = *v20
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1655,23 +1652,8 @@ func (m *ListRoleReq) Size() (n int) {
 			n += 1 + l + sovRole(uint64(l))
 		}
 	}
-	return n
-}
-
-func (m *RoleUsers) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.Role.Size()
+	l = m.UserID.Size()
 	n += 1 + l + sovRole(uint64(l))
-	if len(m.Users) > 0 {
-		for _, e := range m.Users {
-			l = e.Size()
-			n += 1 + l + sovRole(uint64(l))
-		}
-	}
 	return n
 }
 
@@ -1702,6 +1684,19 @@ func (m *CreateRoleUserReq) Size() (n int) {
 	l = m.RoleID.Size()
 	n += 1 + l + sovRole(uint64(l))
 	l = m.UserID.Size()
+	n += 1 + l + sovRole(uint64(l))
+	return n
+}
+
+func (m *RoleUserResp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.User.Size()
+	n += 1 + l + sovRole(uint64(l))
+	l = m.Role.Size()
 	n += 1 + l + sovRole(uint64(l))
 	return n
 }
@@ -1797,22 +1792,7 @@ func (this *ListRoleReq) String() string {
 		`OwnEntity:` + fmt.Sprintf("%v", this.OwnEntity) + `,`,
 		`IDs:` + fmt.Sprintf("%v", this.IDs) + `,`,
 		`EntityIDs:` + fmt.Sprintf("%v", this.EntityIDs) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *RoleUsers) String() string {
-	if this == nil {
-		return "nil"
-	}
-	repeatedStringForUsers := "[]U{"
-	for _, f := range this.Users {
-		repeatedStringForUsers += fmt.Sprintf("%v", f) + ","
-	}
-	repeatedStringForUsers += "}"
-	s := strings.Join([]string{`&RoleUsers{`,
-		`Role:` + strings.Replace(strings.Replace(this.Role.String(), "RolePermission", "RolePermission", 1), `&`, ``, 1) + `,`,
-		`Users:` + repeatedStringForUsers + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1821,9 +1801,9 @@ func (this *ListRoleResp) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForRoles := "[]RoleUsers{"
+	repeatedStringForRoles := "[]RolePermission{"
 	for _, f := range this.Roles {
-		repeatedStringForRoles += strings.Replace(strings.Replace(f.String(), "RoleUsers", "RoleUsers", 1), `&`, ``, 1) + ","
+		repeatedStringForRoles += strings.Replace(strings.Replace(f.String(), "RolePermission", "RolePermission", 1), `&`, ``, 1) + ","
 	}
 	repeatedStringForRoles += "}"
 	s := strings.Join([]string{`&ListRoleResp{`,
@@ -1840,6 +1820,17 @@ func (this *CreateRoleUserReq) String() string {
 	s := strings.Join([]string{`&CreateRoleUserReq{`,
 		`RoleID:` + fmt.Sprintf("%v", this.RoleID) + `,`,
 		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RoleUserResp) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RoleUserResp{`,
+		`User:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.User), "U", "user.U", 1), `&`, ``, 1) + `,`,
+		`Role:` + strings.Replace(strings.Replace(this.Role.String(), "RolePermission", "RolePermission", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2508,64 +2499,11 @@ func (m *ListRoleReq) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRole(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRole
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRole
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *RoleUsers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRole
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: RoleUsers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RoleUsers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
+		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Role", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
 			}
-			var msglen int
+			var byteLen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowRole
@@ -2575,56 +2513,22 @@ func (m *RoleUsers) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				byteLen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			if byteLen < 0 {
 				return ErrInvalidLengthRole
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + byteLen
 			if postIndex < 0 {
 				return ErrInvalidLengthRole
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.Role.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Users", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRole
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRole
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRole
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Users = append(m.Users, user.U{})
-			if err := m.Users[len(m.Users)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.UserID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2710,7 +2614,7 @@ func (m *ListRoleResp) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Roles = append(m.Roles, RoleUsers{})
+			m.Roles = append(m.Roles, RolePermission{})
 			if err := m.Roles[len(m.Roles)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2850,6 +2754,125 @@ func (m *CreateRoleUserReq) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.UserID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRole(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthRole
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthRole
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RoleUserResp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRole
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RoleUserResp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RoleUserResp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRole
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRole
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthRole
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.User.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Role", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRole
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRole
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthRole
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Role.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

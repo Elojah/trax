@@ -32,9 +32,7 @@ type FilterRole struct {
 	EntityID  ulid.ID
 	EntityIDs []ulid.ID
 
-	// ListRoleByUser only
-	UserID  ulid.ID
-	UserIDs []ulid.ID
+	UserID ulid.ID
 
 	*paginate.Paginate
 	Search string
@@ -50,7 +48,6 @@ type StoreRole interface {
 	UpdateRole(context.Context, FilterRole, PatchRole) ([]Role, error)
 	FetchRole(context.Context, FilterRole) (Role, error)
 	ListRole(context.Context, FilterRole) ([]Role, uint64, error)
-	ListRoleByUser(context.Context, FilterRole) (map[string][]Role, uint64, error)
 	DeleteRole(context.Context, FilterRole) error
 }
 
