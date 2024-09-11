@@ -2,10 +2,10 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { CreateRoleReq, CreateRoleUserReq, DeleteRoleReq, DeleteRoleUserReq, ListRoleReq, RolePermission, RoleUsers, UpdateRoleReq } from '@internal/user/dto/role'
+import { CreateRoleReq, CreateRoleUserReq, DeleteRoleReq, DeleteRoleUserReq, ListRoleReq, RolePermission, UpdateRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
-import { ulid } from '@/utils/ulid'
+import { ulid, zero } from '@/utils/ulid'
 import type { Permission } from '@internal/user/role'
 
 export const useRoleStore = defineStore('role', () => {
@@ -85,6 +85,15 @@ export const useRoleStore = defineStore('role', () => {
   // Add user to role
   const addUser = async function (roleID: Uint8Array, userID: Uint8Array) {
     try {
+      // zero case exception, dry update local only
+      if (ulid(roleID) === ulid(zero)) {
+        const roles = rolesbyUser.value.get(ulid(userID)) ?? new Map()
+        roles?.set(ulid(zero), true)
+        rolesbyUser.value.set(ulid(roleID), roles)
+
+        return
+      }
+
       const req = CreateRoleUserReq.create({
         userID: userID,
         roleID: roleID
@@ -104,6 +113,15 @@ export const useRoleStore = defineStore('role', () => {
 
   const deleteUser = async function (roleID: Uint8Array, userID: Uint8Array) {
     try {
+      // zero case exception, dry update local only
+      if (ulid(roleID) === ulid(zero)) {
+        const roles = rolesbyUser.value.get(ulid(userID)) ?? new Map()
+        roles?.delete(ulid(zero))
+        rolesbyUser.value.set(ulid(userID), roles)
+
+        return
+      }
+
       const req = DeleteRoleUserReq.create({
         userID: userID,
         roleID: roleID
