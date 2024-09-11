@@ -5,7 +5,7 @@ import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { ListUserReq } from '@internal/user/dto/user'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
-import { ulid } from '@/utils/ulid'
+import { ulid, zero } from '@/utils/ulid'
 import { CreateRoleUserReq, DeleteRoleUserReq } from '@internal/user/dto/role'
 import type { U } from '@internal/user/user'
 import type { Role } from '@internal/user/role'
@@ -59,6 +59,15 @@ export const useUserStore = defineStore('user', () => {
 
   const addRole = async function (userID: Uint8Array, roleID: Uint8Array) {
     try {
+      // zero case exception, dry update local only
+      if (ulid(userID) === ulid(zero)) {
+        const users = usersByRole.value.get(ulid(roleID)) ?? new Map()
+        users?.set(ulid(zero), true)
+        usersByRole.value.set(ulid(roleID), users)
+
+        return
+      }
+
       const req = CreateRoleUserReq.create({
         userID: userID,
         roleID: roleID
@@ -77,6 +86,15 @@ export const useUserStore = defineStore('user', () => {
 
   const deleteRole = async function (userID: Uint8Array, roleID: Uint8Array) {
     try {
+      // zero case exception, dry update local only
+      if (ulid(userID) === ulid(zero)) {
+        const users = usersByRole.value.get(ulid(roleID)) ?? new Map()
+        users?.delete(ulid(zero))
+        usersByRole.value.set(ulid(roleID), users)
+
+        return
+      }
+
       const req = DeleteRoleUserReq.create({
         userID: userID,
         roleID: roleID

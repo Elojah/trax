@@ -8,9 +8,7 @@ import { useRoleStore } from '@/stores/role';
 import { ListRoleReq, RolePermission } from '@internal/user/dto/role';
 import PermissionTable from '@/components/permission/Table.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
-import { useUserStore } from '@/stores/user';
 import { useErrorsStore } from '@/stores/errors';
-import type { Role } from '@internal/user/role';
 import RoleDetails from '@/components/role/Details.vue';
 import UserTable from '@/components/user/Table.vue';
 
@@ -342,7 +340,8 @@ const removeRoleToUser = async (item: RolePermission) => {
 							<v-divider vertical></v-divider>
 							<v-col cols="8">
 								<v-sheet class="fill-height fill-width">
-									<UserTable :showActionRoleID="item?.role?.iD" :role-i-d-only="true">
+									<UserTable :filter-by-role-i-d="item?.role?.iD"
+										:show-action-role-i-d="item?.role?.iD">
 									</UserTable>
 								</v-sheet>
 							</v-col>

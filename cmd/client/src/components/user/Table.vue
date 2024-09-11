@@ -7,12 +7,12 @@ import { useErrorsStore } from '@/stores/errors';
 import { ulid, zero } from '@/utils/ulid';
 import { useUserStore } from '@/stores/user';
 import { ListUserReq } from '@internal/user/dto/user';
-import UserRoleTable from '@/components/user/RoleTable.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
 import type { RolePermission } from '@internal/user/dto/role';
 import type { U } from '@internal/user/user';
 import { useRoleStore } from '@/stores/role';
+import type { Role } from '@internal/user/role';
 
 const props = withDefaults(defineProps<{
 	showActionRoleID: Uint8Array | undefined;
@@ -66,6 +66,12 @@ const {
 	usersByRole: usersByRole,
 	total: total,
 } = toRefs(store);
+
+const roleStore = useRoleStore();
+const {
+	roles: roles,
+	rolesbyUser: rolesByUser,
+} = toRefs(roleStore);
 
 const loading = ref(false);
 const search = ref('');
@@ -188,21 +194,18 @@ const confirmDelete = () => {
 const delete_ = () => {
 };
 
-const addRoleNewUser = async (role: RolePermission) => {
-	// await store.addDry(zero, role.role!);
-};
-
 const email = ref(null as string | null)
 const emailRules = [
 	(v: string) => !!v || "Required",
 	(v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
 ]
 
-// const addedRoles = computed(() => roles.value.get(ulid(zero)));
-
-const deleteRole = async (roleID: Uint8Array) => {
-	// await store.deleteDry(zero, roleID);
-};
+// For invite user
+const addedRoles = computed(() => Array.from(
+	rolesByUser.value.get(ulid(zero))!
+)?.map(
+	([roleID, _]) => roles.value.get(roleID)
+));
 
 // Optional add role to user id
 const roleUsers = computed(() => {
@@ -248,6 +251,20 @@ const deleteUserRole = async (item: U) => {
 	}
 };
 
+const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
+	let ok = true;
+	try {
+		await store.deleteRole(userID, item?.iD);
+	} catch (e) {
+		errorsStore.showGRPC(e);
+		ok = false;
+	}
+	if (ok) {
+		// message.value = `Role deleted successfully to user`;
+		// success.value = true;
+	}
+};
+
 
 </script>
 
@@ -288,16 +305,17 @@ const deleteUserRole = async (item: U) => {
 									</v-col>
 								</v-row>
 								<v-row v-if="addedRoles">
-									<v-chip v-for="item in addedRoles" :key="ulid(item.iD)" class="ma-2" variant="tonal"
-										closable label color="primary" @click:close="deleteRole(item.iD)">
+									<v-chip v-for="item in addedRoles" :key="ulid(item?.role?.iD)" class="ma-2"
+										variant="tonal" closable label color="primary"
+										@click:close="deleteRoleUser(item?.role!, zero)">
 										<v-icon icon="mdi-account-cog" start></v-icon>
-										{{ item.name }}
+										{{ item?.role?.name }}
 									</v-chip>
 								</v-row>
 							</v-form>
 						</v-container>
 						<v-divider></v-divider>
-						<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
+						<RoleTable :show-action-user-i-d="zero"></RoleTable>
 						<v-divider></v-divider>
 						<v-btn color="error" variant="tonal" @click="closeInvite">
 							Close
@@ -369,8 +387,27 @@ const deleteUserRole = async (item: U) => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<UserRoleTable v-if="item && !props.showActionRoleID" :colspan="columns.length" :user-i-d="item.iD">
-			</UserRoleTable>
+			<tr v-if="!props.showActionRoleID">
+				<td :colspan="columns.length">
+					<v-sheet>
+						<v-row class="my-4">
+							<v-col cols="4">
+								<v-sheet class="fill-height fill-width">
+									<UserDetails :item="item">
+									</UserDetails>
+								</v-sheet>
+							</v-col>
+							<v-divider vertical></v-divider>
+							<v-col cols="8">
+								<v-sheet class="fill-height fill-width">
+									<RoleTable :filter-by-user-i-d="item?.iD" :show-action-user-i-d="item?.iD">
+									</RoleTable>
+								</v-sheet>
+							</v-col>
+						</v-row>
+					</v-sheet>
+				</td>
+			</tr>
 		</template>
 	</v-data-table-server>
 </template>
