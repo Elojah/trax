@@ -36,11 +36,11 @@ export const useUserStore = defineStore('user', () => {
         users.value?.set(ulid(user?.iD), user)
       })
 
-      const userIDs = resp.response.users.map((user: U) => ulid(user?.iD))
+      const userIDs: string[] = resp.response.users.map((user: U) => ulid(user?.iD))
 
       if (req.roleID) {
-        usersByRole.value.set(ulid(req.roleID), userIDs.reduce((acc: Map<string, boolean>, userID: Uint8Array) => {
-          acc.set(ulid(userID), true);
+        usersByRole.value.set(ulid(req.roleID), userIDs.reduce((acc: Map<string, boolean>, userID: string) => {
+          acc.set(userID, true);
 
           return acc;
         }, new Map<string, boolean>()))

@@ -369,11 +369,11 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 									</template>
 								</v-btn>
 								<v-btn v-else-if="props.showActionRoleID && roleUsers?.has(ulid(item?.iD))"
-									variant="tonal" class="mr-4" disabled prepend-icon="mdi-trash-can" color="secondary"
+									variant="tonal" class="mr-4" disabled prepend-icon="mdi-trash-can" color="error"
 									v-bind="props" v-on:click.stop.prevent="deleteUserRole(item)">
 									Remove
 									<template v-slot:prepend>
-										<v-icon color="secondary"></v-icon>
+										<v-icon color="error"></v-icon>
 									</template>
 								</v-btn>
 								<v-divider vertical></v-divider>

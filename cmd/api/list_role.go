@@ -65,6 +65,7 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		roles, totalRole, err := h.user.ListRole(ctx, user.FilterRole{
 			IDs:       ids,
 			EntityIDs: entityIDs,
+			UserID:    req.UserID,
 			Paginate:  req.Paginate,
 			Search:    req.Search,
 		})

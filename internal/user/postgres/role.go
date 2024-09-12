@@ -230,6 +230,10 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 	b := strings.Builder{}
 	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at FROM "user"."role" r `)
 
+	if f.UserID != nil {
+		b.WriteString(` JOIN "user"."role_user" ru ON r.id = ru.role_id `)
+	}
+
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
 
