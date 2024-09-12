@@ -63,7 +63,6 @@ const store = useRoleStore();
 const {
 	roles: roles,
 	total: total,
-	// if filterByUser only
 	rolesbyUser: rolesByUser,
 } = toRefs(store);
 
@@ -308,12 +307,12 @@ const removeRoleToUser = async (item: RolePermission) => {
 									</template>
 								</v-btn>
 								<v-btn v-else-if="props.showActionUserID && userRoles?.has(ulid(item.role?.iD))"
-									variant="tonal" class="mr-4" prepend-icon="mdi-trash-can" color="secondary"
+									variant="tonal" class="mr-4" prepend-icon="mdi-trash-can" color="error"
 									v-bind="props" :loading="loadingRemoveRole"
 									v-on:click.stop.prevent="removeRoleToUser(item)">
 									Remove role
 									<template v-slot:prepend>
-										<v-icon color="secondary"></v-icon>
+										<v-icon color="error"></v-icon>
 									</template>
 								</v-btn>
 								<v-divider vertical></v-divider>

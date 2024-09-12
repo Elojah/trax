@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { CreateRoleReq, CreateRoleUserReq, DeleteRoleReq, DeleteRoleUserReq, ListRoleReq, RolePermission, UpdateRoleReq } from '@internal/user/dto/role'
+import { CreateRoleReq, CreateRoleUserReq, DeleteRoleReq, DeleteRoleUserReq, ListRoleReq, ListRoleResp, RolePermission, UpdateRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid, zero } from '@/utils/ulid'
@@ -61,11 +61,11 @@ export const useRoleStore = defineStore('role', () => {
         roles.value?.set(ulid(role.role?.iD), role)
       })
 
-      const roleIDs = resp.response.roles.map((role: RolePermission) => ulid(role.role?.iD))
+      const roleIDs: string[] = resp.response.roles.map((role: RolePermission) => ulid(role.role?.iD))
 
       if (req.userID) {
-        rolesbyUser.value.set(ulid(req.userID), roleIDs.reduce((acc: Map<string, boolean>, roleID: Uint8Array) => {
-          acc.set(ulid(roleID), true);
+        rolesbyUser.value.set(ulid(req.userID), roleIDs.reduce((acc: Map<string, boolean>, roleID: string) => {
+          acc.set(roleID, true);
 
           return acc;
         }, new Map<string, boolean>()))

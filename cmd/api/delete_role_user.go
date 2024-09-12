@@ -85,7 +85,7 @@ func (h *handler) DeleteRoleUser(ctx context.Context, req *dto.DeleteRoleUserReq
 			EntityID: role.EntityID,
 		})
 		if err != nil {
-			if errors.As(err, gerrors.ErrNotFound{}) {
+			if errors.As(err, &gerrors.ErrNotFound{}) {
 				err := gerrors.ErrNotFound{Resource: "role", Index: req.UserID.String()}
 				logger.Error().Err(err).Msg("role not found")
 
