@@ -63,7 +63,7 @@ const store = useRoleStore();
 const {
 	roles: roles,
 	total: total,
-	rolesbyUser: rolesByUser,
+	rolesByUser: rolesByUser,
 } = toRefs(store);
 
 const loading = ref(false);
@@ -279,9 +279,10 @@ const removeRoleToUser = async (item: RolePermission) => {
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.role?.iD)">
-					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
+					<td :colspan="columns.length" class="px-1 py-1">
 						<v-card :class="{
-							'row-hovered': isHovering,
+							'cursor-pointer': !props.showActionUserID,
+							'row-hovered': isHovering && !props.showActionUserID,
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 							'row-expanded': isExpanded(internalItem),

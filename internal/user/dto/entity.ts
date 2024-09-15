@@ -103,15 +103,6 @@ export interface DeleteEntityReq {
      */
     iD: Uint8Array;
 }
-/**
- * @generated from protobuf message dto.DeleteEntityResp
- */
-export interface DeleteEntityResp {
-    /**
-     * @generated from protobuf field: user.Entity Entity = 1 [json_name = "Entity"];
-     */
-    entity?: Entity;
-}
 // @generated message type with reflection information, may provide speed optimized methods
 class CreateEntityReq$Type extends MessageType<CreateEntityReq> {
     constructor() {
@@ -462,49 +453,3 @@ class DeleteEntityReq$Type extends MessageType<DeleteEntityReq> {
  * @generated MessageType for protobuf message dto.DeleteEntityReq
  */
 export const DeleteEntityReq = new DeleteEntityReq$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class DeleteEntityResp$Type extends MessageType<DeleteEntityResp> {
-    constructor() {
-        super("dto.DeleteEntityResp", [
-            { no: 1, name: "Entity", kind: "message", jsonName: "Entity", T: () => Entity, options: { "gogoproto.nullable": false } }
-        ]);
-    }
-    create(value?: PartialMessage<DeleteEntityResp>): DeleteEntityResp {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        if (value !== undefined)
-            reflectionMergePartial<DeleteEntityResp>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteEntityResp): DeleteEntityResp {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* user.Entity Entity = 1 [json_name = "Entity"];*/ 1:
-                    message.entity = Entity.internalBinaryRead(reader, reader.uint32(), options, message.entity);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: DeleteEntityResp, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* user.Entity Entity = 1 [json_name = "Entity"]; */
-        if (message.entity)
-            Entity.internalBinaryWrite(message.entity, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message dto.DeleteEntityResp
- */
-export const DeleteEntityResp = new DeleteEntityResp$Type();

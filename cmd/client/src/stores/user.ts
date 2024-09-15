@@ -2,11 +2,11 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { ListUserReq } from '@internal/user/dto/user'
+import { ListUserReq, ListUserResp } from '@internal/user/dto/user'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { ulid, zero } from '@/utils/ulid'
-import { CreateRoleUserReq, DeleteRoleUserReq } from '@internal/user/dto/role'
+import { CreateRoleUserReq, DeleteRoleUserReq, RoleUserResp } from '@internal/user/dto/role'
 import type { U } from '@internal/user/user'
 import type { Role } from '@internal/user/role'
 
@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', () => {
   // Return users ids and entity ids
   const list = async function (req: ListUserReq): Promise<string[]> {
     try {
-      const resp = await api.listUser(req, { meta: { token: token.value } })
+      const resp: { response: ListUserResp } = await api.listUser(req, { meta: { token: token.value } })
 
       resp.response.users?.forEach((user: U) => {
         users.value?.set(ulid(user?.iD), user)
@@ -38,7 +38,7 @@ export const useUserStore = defineStore('user', () => {
 
       const userIDs: string[] = resp.response.users.map((user: U) => ulid(user?.iD))
 
-      if (req.roleID) {
+      if (req.roleID.length > 0) {
         usersByRole.value.set(ulid(req.roleID), userIDs.reduce((acc: Map<string, boolean>, userID: string) => {
           acc.set(userID, true);
 
@@ -73,11 +73,11 @@ export const useUserStore = defineStore('user', () => {
         roleID: roleID
       })
 
-      const resp = await api.createRoleUser(req, { meta: { token: token.value } })
+      const resp: { response: RoleUserResp } = await api.createRoleUser(req, { meta: { token: token.value } })
 
-      const users = usersByRole.value.get(ulid(resp.response.role?.iD)) ?? new Map()
+      const users = usersByRole.value.get(ulid(resp.response.role?.role?.iD)) ?? new Map()
       users?.set(ulid(resp.response.user?.iD), true)
-      usersByRole.value.set(ulid(resp.response.role?.iD), users)
+      usersByRole.value.set(ulid(resp.response.role?.role?.iD), users)
     } catch (err: any) {
       logger.error(err)
       throw err
@@ -100,11 +100,11 @@ export const useUserStore = defineStore('user', () => {
         roleID: roleID
       })
 
-      const resp = await api.deleteRoleUser(req, { meta: { token: token.value } })
+      const resp: { response: RoleUserResp } = await api.deleteRoleUser(req, { meta: { token: token.value } })
 
-      const users = usersByRole.value.get(ulid(resp.response.role?.iD)) ?? new Map()
+      const users = usersByRole.value.get(ulid(resp.response.role?.role?.iD)) ?? new Map()
       users?.delete(ulid(resp.response.user?.iD))
-      usersByRole.value.set(ulid(resp.response.role?.iD), users)
+      usersByRole.value.set(ulid(resp.response.role?.role?.iD), users)
     } catch (err: any) {
       logger.error(err)
       throw err

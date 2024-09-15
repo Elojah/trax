@@ -10,7 +10,6 @@ import { RolePermission } from "../../../internal/user/dto/role";
 import { CreateRoleReq } from "../../../internal/user/dto/role";
 import { ListRoleResp } from "../../../internal/user/dto/role";
 import { ListRoleReq } from "../../../internal/user/dto/role";
-import { DeleteEntityResp } from "../../../internal/user/dto/entity";
 import { DeleteEntityReq } from "../../../internal/user/dto/entity";
 import { UpdateEntityReq } from "../../../internal/user/dto/entity";
 import { CreateEntityReq } from "../../../internal/user/dto/entity";
@@ -41,7 +40,7 @@ export const API = new ServiceType("grpc.API", [
     { name: "FetchEntity", options: {}, I: FetchEntityReq, O: Entity },
     { name: "CreateEntity", options: {}, I: CreateEntityReq, O: Entity },
     { name: "UpdateEntity", options: {}, I: UpdateEntityReq, O: Entity },
-    { name: "DeleteEntity", options: {}, I: DeleteEntityReq, O: DeleteEntityResp },
+    { name: "DeleteEntity", options: {}, I: DeleteEntityReq, O: Entity },
     { name: "ListRole", options: {}, I: ListRoleReq, O: ListRoleResp },
     { name: "CreateRole", options: {}, I: CreateRoleReq, O: RolePermission },
     { name: "UpdateRole", options: {}, I: UpdateRoleReq, O: RolePermission },
