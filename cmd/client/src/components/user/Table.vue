@@ -70,7 +70,7 @@ const {
 const roleStore = useRoleStore();
 const {
 	roles: roles,
-	rolesbyUser: rolesByUser,
+	rolesByUser: rolesByUser,
 } = toRefs(roleStore);
 
 const loading = ref(false);
@@ -335,9 +335,10 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
-					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
+					<td :colspan="columns.length" class="px-1 py-1">
 						<v-card class="justify-center" :class="{
-							'row-hovered': isHovering,
+							'cursor-pointer': !props.showActionRoleID,
+							'row-hovered': isHovering && !props.showActionRoleID,
 							'row-expanded': isExpanded(internalItem),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,

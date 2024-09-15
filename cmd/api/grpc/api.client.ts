@@ -13,7 +13,6 @@ import type { RolePermission } from "../../../internal/user/dto/role";
 import type { CreateRoleReq } from "../../../internal/user/dto/role";
 import type { ListRoleResp } from "../../../internal/user/dto/role";
 import type { ListRoleReq } from "../../../internal/user/dto/role";
-import type { DeleteEntityResp } from "../../../internal/user/dto/entity";
 import type { DeleteEntityReq } from "../../../internal/user/dto/entity";
 import type { UpdateEntityReq } from "../../../internal/user/dto/entity";
 import type { CreateEntityReq } from "../../../internal/user/dto/entity";
@@ -85,9 +84,9 @@ export interface IAPIClient {
      */
     updateEntity(input: UpdateEntityReq, options?: RpcOptions): UnaryCall<UpdateEntityReq, Entity>;
     /**
-     * @generated from protobuf rpc: DeleteEntity(dto.DeleteEntityReq) returns (dto.DeleteEntityResp);
+     * @generated from protobuf rpc: DeleteEntity(dto.DeleteEntityReq) returns (user.Entity);
      */
-    deleteEntity(input: DeleteEntityReq, options?: RpcOptions): UnaryCall<DeleteEntityReq, DeleteEntityResp>;
+    deleteEntity(input: DeleteEntityReq, options?: RpcOptions): UnaryCall<DeleteEntityReq, Entity>;
     /**
      * Roles
      *
@@ -205,11 +204,11 @@ export class APIClient implements IAPIClient, ServiceInfo {
         return stackIntercept<UpdateEntityReq, Entity>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: DeleteEntity(dto.DeleteEntityReq) returns (dto.DeleteEntityResp);
+     * @generated from protobuf rpc: DeleteEntity(dto.DeleteEntityReq) returns (user.Entity);
      */
-    deleteEntity(input: DeleteEntityReq, options?: RpcOptions): UnaryCall<DeleteEntityReq, DeleteEntityResp> {
+    deleteEntity(input: DeleteEntityReq, options?: RpcOptions): UnaryCall<DeleteEntityReq, Entity> {
         const method = this.methods[10], opt = this._transport.mergeOptions(options);
-        return stackIntercept<DeleteEntityReq, DeleteEntityResp>("unary", this._transport, method, opt, input);
+        return stackIntercept<DeleteEntityReq, Entity>("unary", this._transport, method, opt, input);
     }
     /**
      * Roles
