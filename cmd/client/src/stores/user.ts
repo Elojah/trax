@@ -85,6 +85,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const deleteRole = async function (userID: Uint8Array, roleID: Uint8Array) {
+
     try {
       // zero case exception, dry update local only
       if (ulid(userID) === ulid(zero)) {

@@ -229,7 +229,7 @@ const removeRoleToUser = async (item: RolePermission) => {
 				<v-dialog v-model="dialogCreate" max-width="800px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
-							New
+							{{ props.showActionUserID ? 'Add' : 'New' }}
 							<template v-slot:prepend>
 								<v-icon color="primary"></v-icon>
 							</template>
@@ -302,7 +302,7 @@ const removeRoleToUser = async (item: RolePermission) => {
 									variant="tonal" class="mr-4" prepend-icon="mdi-plus-box" color="primary"
 									v-bind="props" :loading="loadingAddRole"
 									v-on:click.stop.prevent="addRoleToUser(item)">
-									Add role
+									Add
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>
 									</template>
@@ -311,7 +311,7 @@ const removeRoleToUser = async (item: RolePermission) => {
 									variant="tonal" class="mr-4" prepend-icon="mdi-trash-can" color="error"
 									v-bind="props" :loading="loadingRemoveRole"
 									v-on:click.stop.prevent="removeRoleToUser(item)">
-									Remove role
+									Remove
 									<template v-slot:prepend>
 										<v-icon color="error"></v-icon>
 									</template>

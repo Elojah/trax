@@ -15,12 +15,12 @@ const tableEntities = ref();
 	<v-main class="bg">
 		<v-container fluid class="fill-height h-screen py-0">
 			<v-row no-gutters>
-				<v-col cols="3">
+				<v-col cols="4">
 					<v-sheet color="transparent" class="d-flex flex-column pa-4 h-screen fill-height fill-width">
 						<EntityTable ref="tableEntities"></EntityTable>
 					</v-sheet>
 				</v-col>
-				<v-col cols="9">
+				<v-col cols="8">
 					<v-sheet color="transparent" class="d-flex flex-column pa-4 h-screen fill-height fill-width">
 						<v-container class="flex-shrink-1">
 							<v-row>

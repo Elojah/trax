@@ -202,21 +202,17 @@ const emailRules = [
 
 // For invite user
 const addedRoles = computed(() => Array.from(
-	rolesByUser.value.get(ulid(zero))!
-)?.map(
-	([roleID, _]) => roles.value.get(roleID)
-));
+	rolesByUser.value.get(ulid(zero)) ?? new Map())?.map(
+		([roleID, _]) => roles.value.get(roleID)
+	));
 
-// Optional add role to user id
 const roleUsers = computed(() => {
 	return usersByRole.value.get(ulid(props.showActionRoleID))
 });
 
 const loadingAddUser = ref(false);
 
-
-
-const addUser = async (item: U) => {
+const addUserRole = async (item: U) => {
 	if (props.showActionRoleID) {
 		loadingAddUser.value = true;
 		let ok = true;
@@ -234,9 +230,11 @@ const addUser = async (item: U) => {
 	}
 };
 
+const loadingRemoveUser = ref(false);
 
 const deleteUserRole = async (item: U) => {
 	if (props.showActionRoleID) {
+		loadingRemoveUser.value = true;
 		let ok = true;
 		try {
 			await store.deleteRole(item.iD, props.showActionRoleID);
@@ -248,6 +246,7 @@ const deleteUserRole = async (item: U) => {
 			message.value = `Role deleted successfully to user`;
 			success.value = true;
 		}
+		loadingRemoveUser.value = false;
 	}
 };
 
@@ -264,8 +263,6 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 		// success.value = true;
 	}
 };
-
-
 </script>
 
 <template>
@@ -280,7 +277,7 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 				<v-dialog v-model="dialogInvite" max-width="1200px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
-							New
+							{{ props.showActionRoleID ? 'Add' : 'New' }}
 							<template v-slot:prepend>
 								<v-icon color="primary"></v-icon>
 							</template>
@@ -353,25 +350,18 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 							</template>
 							<template v-slot:append>
 								<v-divider vertical v-if="props.showActionRoleID"></v-divider>
-								<v-btn v-if="props.showActionRoleID && props.filterByRoleID" variant="tonal"
-									prepend-icon="mdi-trash-can" color="error" v-bind="props"
-									@click="deleteUserRole(item)">
-									Remove
-									<template v-slot:prepend>
-										<v-icon color="error"></v-icon>
-									</template>
-								</v-btn>
-								<v-btn v-else-if="props.showActionRoleID && !roleUsers?.has(ulid(item?.iD))"
-									variant="tonal" class="mr-4" prepend-icon="mdi-plus-box" color="primary"
-									v-bind="props" :loading="loadingAddUser" v-on:click.stop.prevent="addUser(item)">
-									Add user
+								<v-btn v-if="props.showActionRoleID && !roleUsers?.has(ulid(item?.iD))" variant="tonal"
+									class="mr-4" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
+									:loading="loadingAddUser" v-on:click.stop.prevent="addUserRole(item)">
+									Add
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>
 									</template>
 								</v-btn>
 								<v-btn v-else-if="props.showActionRoleID && roleUsers?.has(ulid(item?.iD))"
-									variant="tonal" class="mr-4" disabled prepend-icon="mdi-trash-can" color="error"
-									v-bind="props" v-on:click.stop.prevent="deleteUserRole(item)">
+									variant="tonal" class="mr-4" prepend-icon="mdi-trash-can" color="error"
+									v-bind="props" :loading="loadingRemoveUser"
+									v-on:click.stop.prevent="deleteUserRole(item)">
 									Remove
 									<template v-slot:prepend>
 										<v-icon color="error"></v-icon>
