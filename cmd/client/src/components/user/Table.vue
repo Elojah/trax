@@ -9,7 +9,6 @@ import { useUserStore } from '@/stores/user';
 import { ListUserReq } from '@internal/user/dto/user';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
-import type { RolePermission } from '@internal/user/dto/role';
 import type { U } from '@internal/user/user';
 import { useRoleStore } from '@/stores/role';
 import type { Role } from '@internal/user/role';
@@ -24,6 +23,8 @@ const props = withDefaults(defineProps<{
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
+
+const createActionText = props.showActionRoleID ? 'Add' : 'New';
 
 const nameRules = [
 	(v: string) => !!v || 'Required',
@@ -263,6 +264,7 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 		// success.value = true;
 	}
 };
+
 </script>
 
 <template>
@@ -276,8 +278,8 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 			<v-col cols="2" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogInvite" max-width="1200px">
 					<template v-slot:activator="{ props }">
-						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
-							{{ props.showActionRoleID ? 'Add' : 'New' }}
+						<v-btn variant="text" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
+							{{ createActionText }}
 							<template v-slot:prepend>
 								<v-icon color="primary"></v-icon>
 							</template>
@@ -312,7 +314,7 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 							</v-form>
 						</v-container>
 						<v-divider></v-divider>
-						<RoleTable :show-action-user-i-d="zero"></RoleTable>
+						<Table :show-action-role-i-d="props.showActionRoleID"></Table>
 						<v-divider></v-divider>
 						<v-btn color="error" variant="tonal" @click="closeInvite">
 							Close

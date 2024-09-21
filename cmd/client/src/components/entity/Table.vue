@@ -153,7 +153,7 @@ const short = (description: string): string => {
 			<v-col cols="3" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogCreate" max-width="800px">
 					<template v-slot:activator="{ props }">
-						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
+						<v-btn variant="text" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
 							New
 							<template v-slot:prepend>
 								<v-icon color="primary"></v-icon>

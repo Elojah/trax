@@ -25,6 +25,8 @@ const props = withDefaults(defineProps<{
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
 
+const createActionText = props.showActionUserID ? 'Add' : 'New';
+
 const nameRules = [
 	(v: string) => !!v || 'Required',
 	(v: string) => (v && v.length >= 1) || 'Min 1 character',
@@ -228,14 +230,14 @@ const removeRoleToUser = async (item: RolePermission) => {
 			<v-col cols="2" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogCreate" max-width="800px">
 					<template v-slot:activator="{ props }">
-						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
-							{{ props.showActionUserID ? 'Add' : 'New' }}
+						<v-btn variant="text" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
+							{{ createActionText }}
 							<template v-slot:prepend>
 								<v-icon color="primary"></v-icon>
 							</template>
 						</v-btn>
 					</template>
-					<v-card class="px-6 py-6 rounded" variant="elevated">
+					<v-card v-if="!props.showActionUserID" class="px-6 py-6 rounded" variant="elevated">
 						<v-form ref="form" v-model="valid" lazy-validation>
 							<v-card-title class="d-flex justify-center">
 								<span class="text-h5">Create role</span>
@@ -265,6 +267,13 @@ const removeRoleToUser = async (item: RolePermission) => {
 							</v-card-actions>
 						</v-form>
 					</v-card>
+					<v-sheet v-else class="d-flex flex-column pa-4 fill-height fill-width" height="50vh">
+						<Table :show-action-user-i-d="props.showActionUserID"></Table>
+						<v-divider></v-divider>
+						<v-btn color="error" variant="tonal" @click="() => { dialogCreate = false }">
+							Close
+						</v-btn>
+					</v-sheet>
 				</v-dialog>
 			</v-col>
 		</v-row>
