@@ -15,9 +15,11 @@ import UserTable from '@/components/user/Table.vue';
 const props = withDefaults(defineProps<{
 	showActionUserID: Uint8Array | undefined;
 	filterByUserID: Uint8Array | undefined;
+	disableNewButton: boolean;
 }>(), {
 	showActionUserID: undefined,
 	filterByUserID: undefined,
+	disableNewButton: false,
 });
 
 // #MARK:Common
@@ -222,12 +224,12 @@ const removeRoleToUser = async (item: RolePermission) => {
 <template>
 	<v-container class="px-0">
 		<v-row>
-			<v-col cols="10">
+			<v-col :cols="!props.disableNewButton ? 10 : 12">
 				<v-text-field class="table-color-background" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>
-			<v-col cols="2" class="d-flex align-center justify-end">
+			<v-col v-if="!props.disableNewButton" cols="2" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogCreate" max-width="800px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="text" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
@@ -268,7 +270,7 @@ const removeRoleToUser = async (item: RolePermission) => {
 						</v-form>
 					</v-card>
 					<v-sheet v-else class="d-flex flex-column pa-4 fill-height fill-width" height="50vh">
-						<Table :show-action-user-i-d="props.showActionUserID"></Table>
+						<Table :show-action-user-i-d="props.showActionUserID" :disable-new-button="true"></Table>
 						<v-divider></v-divider>
 						<v-btn color="error" variant="tonal" @click="() => { dialogCreate = false }">
 							Close
@@ -278,7 +280,7 @@ const removeRoleToUser = async (item: RolePermission) => {
 			</v-col>
 		</v-row>
 	</v-container>
-	<v-data-table-server class="px-2 overflow-y-auto flex-grow-1" :headers="headers" fixed-footer fixed-header
+	<v-data-table-server class="overflow-y-auto flex-grow-1" :headers="headers" fixed-footer fixed-header
 		max-height="100vh" items-per-page-text="" :items-per-page-options="pageOptions" :items="views"
 		:items-length="Number(total)" :loading="loading" :search="search" item-value="role.iD" @update:options="list"
 		@click:row="expand" return-object>

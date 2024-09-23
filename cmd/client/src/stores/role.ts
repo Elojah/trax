@@ -86,7 +86,7 @@ export const useRoleStore = defineStore('role', () => {
   const addUser = async function (roleID: Uint8Array, userID: Uint8Array) {
     try {
       // zero case exception, dry update local only
-      if (ulid(roleID) === ulid(zero)) {
+      if (ulid(userID) === ulid(zero)) {
         const roles = rolesByUser.value.get(ulid(userID)) ?? new Map()
         roles?.set(ulid(zero), true)
         rolesByUser.value.set(ulid(roleID), roles)
@@ -114,7 +114,7 @@ export const useRoleStore = defineStore('role', () => {
   const deleteUser = async function (roleID: Uint8Array, userID: Uint8Array) {
     try {
       // zero case exception, dry update local only
-      if (ulid(roleID) === ulid(zero)) {
+      if (ulid(userID) === ulid(zero)) {
         const roles = rolesByUser.value.get(ulid(userID)) ?? new Map()
         roles?.delete(ulid(zero))
         rolesByUser.value.set(ulid(userID), roles)

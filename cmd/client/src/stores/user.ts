@@ -60,7 +60,7 @@ export const useUserStore = defineStore('user', () => {
   const addRole = async function (userID: Uint8Array, roleID: Uint8Array) {
     try {
       // zero case exception, dry update local only
-      if (ulid(userID) === ulid(zero)) {
+      if (ulid(roleID) === ulid(zero)) {
         const users = usersByRole.value.get(ulid(roleID)) ?? new Map()
         users?.set(ulid(zero), true)
         usersByRole.value.set(ulid(roleID), users)
@@ -88,7 +88,7 @@ export const useUserStore = defineStore('user', () => {
 
     try {
       // zero case exception, dry update local only
-      if (ulid(userID) === ulid(zero)) {
+      if (ulid(roleID) === ulid(zero)) {
         const users = usersByRole.value.get(ulid(roleID)) ?? new Map()
         users?.delete(ulid(zero))
         usersByRole.value.set(ulid(roleID), users)
