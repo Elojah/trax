@@ -94,7 +94,7 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 			EntityID: role.EntityID,
 			Paginate: &paginate.Paginate{
 				Start: 0,
-				End:   0,
+				End:   1,
 			},
 		})
 		if err != nil {

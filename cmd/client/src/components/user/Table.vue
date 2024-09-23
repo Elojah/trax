@@ -16,9 +16,11 @@ import type { Role } from '@internal/user/role';
 const props = withDefaults(defineProps<{
 	showActionRoleID: Uint8Array | undefined;
 	filterByRoleID: Uint8Array | undefined;
+	disableNewButton: boolean;
 }>(), {
 	showActionRoleID: undefined,
 	filterByRoleID: undefined,
+	disableNewButton: false,
 });
 
 const form = ref<VForm | null>(null);
@@ -202,10 +204,18 @@ const emailRules = [
 ]
 
 // For invite user
-const addedRoles = computed(() => Array.from(
-	rolesByUser.value.get(ulid(zero)) ?? new Map())?.map(
-		([roleID, _]) => roles.value.get(roleID)
-	));
+const addedRoles = computed(() => {
+	const result = Array.from(rolesByUser.value.get(ulid(zero)) ?? new Map())
+		?.map(
+			([roleID, _]) => roles.value.get(roleID)
+		);
+
+	if (props.showActionRoleID) {
+		return result?.concat(roles.value.get(ulid(props.showActionRoleID)))
+	}
+
+	return result
+});
 
 const roleUsers = computed(() => {
 	return usersByRole.value.get(ulid(props.showActionRoleID))
@@ -270,12 +280,12 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 <template>
 	<v-container class="px-0">
 		<v-row>
-			<v-col cols="10">
+			<v-col :cols="!props.disableNewButton ? 10 : 12">
 				<v-text-field class="table-color-background" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>
-			<v-col cols="2" class="d-flex align-center justify-end">
+			<v-col v-if="!props.disableNewButton" cols="2" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogInvite" max-width="1200px">
 					<template v-slot:activator="{ props }">
 						<v-btn variant="text" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
@@ -314,7 +324,11 @@ const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
 							</v-form>
 						</v-container>
 						<v-divider></v-divider>
-						<Table :show-action-role-i-d="props.showActionRoleID"></Table>
+						<Table v-if="props.showActionRoleID" :show-action-role-i-d="props.showActionRoleID"
+							:disable-new-button="true">
+						</Table>
+						<RoleTable v-else :show-action-user-i-d="zero" :disable-new-button="true">
+						</RoleTable>
 						<v-divider></v-divider>
 						<v-btn color="error" variant="tonal" @click="closeInvite">
 							Close
