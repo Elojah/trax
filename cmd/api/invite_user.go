@@ -43,7 +43,6 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		// overwrite roles ids with entity filter
 		req.RoleIDs = make([]ulid.ID, 0, len(roles))
 		for _, role := range roles {
 			req.RoleIDs = append(req.RoleIDs, role.ID)
@@ -84,6 +83,8 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 			return &user.U{}, status.New(codes.InvalidArgument, err.Error()).Err()
 		}
 	}
+
+	// TODO: Check if user already exists globally
 
 	// now := time.Now().Unix()
 	// ru := user.RoleUser{
