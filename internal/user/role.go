@@ -18,10 +18,9 @@ var (
 	}
 
 	Commands = map[Command]struct{}{
-		C_read:   {},
-		C_create: {},
-		C_update: {},
-		C_delete: {},
+		C_read:  {},
+		C_edit:  {},
+		C_write: {},
 	}
 )
 

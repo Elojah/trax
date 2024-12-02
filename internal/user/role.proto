@@ -25,9 +25,8 @@ enum Resource {
 
 enum Command {
 	C_read       = 0;
-	C_create     = 1;
-	C_update     = 2;
-	C_delete     = 3;
+	C_edit       = 1;
+	C_write      = 2;
 }
 
 message Role {

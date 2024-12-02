@@ -28,7 +28,7 @@ func (h *handler) DeleteEntity(ctx context.Context, req *dto.DeleteEntityReq) (*
 	if err := claims.Require(user.Requirement{
 		EntityID: req.ID,
 		Resource: user.R_entity,
-		Command:  user.C_delete,
+		Command:  user.C_write,
 	}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 

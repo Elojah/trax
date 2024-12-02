@@ -9,9 +9,8 @@ CREATE TYPE "user"."resource" AS ENUM(
 );
 CREATE TYPE "user"."command" AS ENUM(
 	'C_read',
-	'C_create',
-	'C_update',
-	'C_delete'
+	'C_edit',
+	'C_write'
 );
 CREATE TABLE IF NOT EXISTS "user"."role" (
 	"id" UUID NOT NULL,

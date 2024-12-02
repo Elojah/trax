@@ -26,7 +26,7 @@ func (h *handler) UpdateEntity(ctx context.Context, req *dto.UpdateEntityReq) (*
 		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	if err := claims.Require(user.Requirement{EntityID: req.ID, Resource: user.R_entity, Command: user.C_update}); err != nil {
+	if err := claims.Require(user.Requirement{EntityID: req.ID, Resource: user.R_entity, Command: user.C_edit}); err != nil {
 		return &user.Entity{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 

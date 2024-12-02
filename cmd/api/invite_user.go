@@ -70,7 +70,7 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 	}
 
 	// check permissions
-	if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_user, Command: user.C_create}); err != nil {
+	if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_user, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &user.U{}, status.New(codes.InvalidArgument, err.Error()).Err()
