@@ -5,9 +5,9 @@ package gogoproto
 
 import (
 	fmt "fmt"
+	google "github.com/elojah/trax/pkg/gogoproto/google"
 	proto "github.com/gogo/protobuf/proto"
 	math "math"
-	google "pkg/gogoproto/google"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

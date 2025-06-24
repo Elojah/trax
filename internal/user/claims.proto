@@ -23,7 +23,7 @@ message ClaimResources {
 }
 
 message ClaimEntity {
-	bytes ID                                       = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                                       = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	// Roles key must be a user.Role ID
 	map<string, pbtypes.Empty> Roles               = 2 [(gogoproto.nullable) = false];
 	// Resources key must be a user.Resource

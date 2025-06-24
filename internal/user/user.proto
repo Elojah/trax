@@ -16,7 +16,7 @@ option go_package = "github.com/elojah/trax/internal/user";
 import "pkg/gogoproto/gogo.proto";
 
 message U {
-	bytes ID                   = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                   = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
 	string Email               = 2;
 

@@ -26,13 +26,13 @@ message RolePermission {
 }
 
 message CreateRoleReq {
-	bytes EntityID                         = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes EntityID                         = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	string Name                            = 2;
 	repeated user.Permission Permissions   = 3 [(gogoproto.nullable) = false];
 }
 
 message UpdateRoleReq {
-	bytes ID                               = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	pbtypes.String Name                    = 2;
 	repeated user.Permission Permissions   = 3 [(gogoproto.nullable) = false];
 }
@@ -44,8 +44,8 @@ message ListRoleReq {
 	bool Own                          = 3;
 	bool OwnEntity                    = 4;
 
-	repeated bytes IDs                = 5 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes EntityIDs          = 6 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes IDs                = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes EntityIDs          = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message RoleUsers {
@@ -59,15 +59,15 @@ message ListRoleResp {
 }
 
 message CreateRoleUserReq {
-	bytes RoleID                           = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
-	bytes UserID                           = 2 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes RoleID                           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes UserID                           = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message DeleteRoleUserReq {
-	bytes RoleID                           = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
-	bytes UserID                           = 2 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes RoleID                           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes UserID                           = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message DeleteRoleReq {
-	bytes ID                               = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
