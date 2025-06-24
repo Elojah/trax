@@ -11,16 +11,18 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
-import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+option go_package = "github.com/elojah/trax/cmd/api/grpc";
 
-import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
+import "pkg/gogoproto/gogo.proto";
 
-import "github.com/elojah/trax/internal/user/entity.proto";
-import "github.com/elojah/trax/internal/user/user.proto";
-import "github.com/elojah/trax/internal/user/claims.proto";
-import "github.com/elojah/trax/internal/user/dto/entity.proto";
-import "github.com/elojah/trax/internal/user/dto/role.proto";
-import "github.com/elojah/trax/internal/user/dto/user.proto";
+import "pkg/pbtypes/empty.proto";
+
+import "internal/user/entity.proto";
+import "internal/user/user.proto";
+import "internal/user/claims.proto";
+import "internal/user/dto/entity.proto";
+import "internal/user/dto/role.proto";
+import "internal/user/dto/user.proto";
 
 service API {
     // Ping

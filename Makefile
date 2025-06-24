@@ -4,7 +4,6 @@ VERSION           ?= $(shell echo $(shell cat $(PWD)/.version)-$(shell git descr
 DIR                = $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 GO                 = go
-GOROOT             ?= $(shell go env GOROOT)
 GODOC              = godoc
 GOFMT              = gofmt
 
@@ -19,7 +18,6 @@ V                 = 0
 Q                 = $(if $(filter 1,$V),,@)
 M                 = $(shell printf "\033[0;35m▶\033[0m")
 
-GO_PACKAGE        = github.com/elojah/trax
 ADMIN             = admin
 API               = api
 AUTH              = auth
@@ -34,9 +32,9 @@ GOOSE_DBSTRING    = postgres://username:password@localhost:5432/postgres
 # Static directory name for client
 STATIC            = static
 
-GEN_PARENT_PATH    = $(GOPATH)/src
-GEN_PB_GO          = protoc -I=$(GEN_PARENT_PATH) --gogoslick_out=plugins=grpc:$(GEN_PARENT_PATH)
-GEN_PB_TS          = npx protoc -I=$(GEN_PARENT_PATH) --ts_opt optimize_speed --ts_out $(GEN_PARENT_PATH)
+ROOT               = .
+GEN_PB_GO          = protoc -I=$(ROOT) --gogoslick_out=plugins=grpc,paths=source_relative:$(ROOT)
+GEN_PB_TS          = npx protoc -I=$(ROOT) --ts_opt optimize_speed --ts_out $(ROOT)
 
 .PHONY: all
 all: admin api auth client web_client
@@ -94,27 +92,26 @@ proto-go:    PB_LANG = GO
 proto-ts:    PB_LANG = TS
 proto-go proto-ts: ## Regenerate protobuf files
 	$(info $(M) running protobuf $(PB_LANG)) @
-	$(info $(M) generate utils) @
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/gogoproto/gogo.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/paginate/paginate.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/empty.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/pbtypes/string.proto
 	$(info $(M) generate pkg) @
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/pkg/cookie/keys.proto
+	$Q $(GEN_PB_$(PB_LANG)) pkg/gogoproto/gogo.proto
+	$Q $(GEN_PB_$(PB_LANG)) pkg/paginate/paginate.proto
+	$Q $(GEN_PB_$(PB_LANG)) pkg/pbtypes/empty.proto
+	$Q $(GEN_PB_$(PB_LANG)) pkg/pbtypes/string.proto
+	$Q $(GEN_PB_$(PB_LANG)) pkg/cookie/keys.proto
 	$(info $(M) generate internal) @
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/claims.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/entity.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/role.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/user.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/claims.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/entity.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/role.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/user.proto
 	$(info $(M) generate clients) @
 	$(info $(M) generate dto) @
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/entity.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/role.proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/internal/user/dto/user.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/entity.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/role.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/user.proto
 	$(info $(M) generate services) @
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(ADMIN)/grpc/$(ADMIN).proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(API)/grpc/$(API).proto
-	$Q $(GEN_PB_$(PB_LANG)) $(GO_PACKAGE)/cmd/$(AUTH)/grpc/$(AUTH).proto
+	$Q $(GEN_PB_$(PB_LANG)) cmd/$(ADMIN)/grpc/$(ADMIN).proto
+	$Q $(GEN_PB_$(PB_LANG)) cmd/$(API)/grpc/$(API).proto
+	$Q $(GEN_PB_$(PB_LANG)) cmd/$(AUTH)/grpc/$(AUTH).proto
 
 # Proto
 .PHONY: proto

@@ -7,7 +7,9 @@ option (gogoproto.benchgen_all) = true;
 option (gogoproto.populate_all) = true;
 option (gogoproto.goproto_registration) = true;
 
-import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+option go_package = "github.com/elojah/trax/pkg/cookie";
+
+import "pkg/gogoproto/gogo.proto";
 
 message Keys {
     bytes Hash         = 1;

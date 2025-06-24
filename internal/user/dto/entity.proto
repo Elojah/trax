@@ -11,11 +11,13 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
-import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
-import "github.com/elojah/trax/pkg/pbtypes/string.proto";
+option go_package = "github.com/elojah/trax/internal/user/dto";
 
-import "github.com/elojah/trax/pkg/paginate/paginate.proto";
-import "github.com/elojah/trax/internal/user/entity.proto";
+import "pkg/gogoproto/gogo.proto";
+import "pkg/pbtypes/string.proto";
+
+import "pkg/paginate/paginate.proto";
+import "internal/user/entity.proto";
 
 message CreateEntityReq {
 	string Name                 = 1;
@@ -24,7 +26,7 @@ message CreateEntityReq {
 }
 
 message UpdateEntityReq {
-	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                      = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 
 	pbtypes.String Name           = 2;
     pbtypes.String Description    = 3;
@@ -32,7 +34,7 @@ message UpdateEntityReq {
 }
 
 message FetchEntityReq {
-	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                      = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message ListEntityReq {
@@ -40,7 +42,7 @@ message ListEntityReq {
 	string Search                 = 2;
 
 	bool Own                      = 3;
-	repeated bytes IDs            = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes IDs            = 4 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message ListEntityResp {
@@ -49,7 +51,7 @@ message ListEntityResp {
 }
 
 message DeleteEntityReq {
-	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                      = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message DeleteEntityResp {

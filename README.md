@@ -7,9 +7,18 @@ Local development setup:
 Once:
 
 ```sh
+# Protobuf setup
+$ sudo apt install -y protobuf-compiler
+# Protobuf golang with gogoproto
+$ export PATH=$PATH:$GOPATH/bin
+$ go get github.com/gogo/protobuf/proto
+$ go get github.com/gogo/protobuf/protoc-gen-gogoslick
+$ go get github.com/gogo/protobuf/gogoproto
+# Protobuf TS (install node + npm latest versions with nvm)
+$ sudo npm i -g npx
+$ sudo npm i -g protoc-gen-ts
 $ cd cmd/client && npm install
-$ GO111MODULE=off go get github.com/gogo/protobuf/proto
-$ go install github.com/gogo/protobuf/protoc-gen-gogoslick
+# Host aliases for local development
 $ cat scripts/add_localhost.hosts | sudo tee -a /etc/hosts > /dev/null
 ```
 

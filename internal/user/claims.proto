@@ -11,9 +11,11 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
-import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
+option go_package = "github.com/elojah/trax/internal/user";
 
-import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
+import "pkg/gogoproto/gogo.proto";
+
+import "pkg/pbtypes/empty.proto";
 
 message ClaimResources {
 	// Commands key must be a user.Commands
@@ -21,7 +23,7 @@ message ClaimResources {
 }
 
 message ClaimEntity {
-	bytes ID                                       = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                                       = 1 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 	// Roles key must be a user.Role ID
 	map<string, pbtypes.Empty> Roles               = 2 [(gogoproto.nullable) = false];
 	// Resources key must be a user.Resource

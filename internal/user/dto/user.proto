@@ -11,12 +11,14 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.goproto_enum_prefix_all) = false;
 option (gogoproto.goproto_registration) = true;
 
-import "github.com/elojah/trax/pkg/gogoproto/gogo.proto";
-import "github.com/elojah/trax/pkg/pbtypes/string.proto";
-import "github.com/elojah/trax/pkg/paginate/paginate.proto";
+option go_package = "github.com/elojah/trax/internal/user/dto";
 
-import "github.com/elojah/trax/internal/user/user.proto";
-import "github.com/elojah/trax/internal/user/role.proto";
+import "pkg/gogoproto/gogo.proto";
+import "pkg/pbtypes/string.proto";
+import "pkg/paginate/paginate.proto";
+
+import "internal/user/user.proto";
+import "internal/user/role.proto";
 
 message SigninResp {
     string AccessToken    = 1;
@@ -38,8 +40,8 @@ message SigninReq {
 message FetchUserReq {
     bool Me                     = 1;
 
-	bytes ID                    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	bytes EntityID              = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes ID                    = 2 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes EntityID              = 3 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message UpdateUserReq {
@@ -54,8 +56,8 @@ message ListUserReq {
 
 	bool OwnEntity                    = 3;
 
-    repeated bytes IDs                = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes EntityIDs          = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+    repeated bytes IDs                = 4 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes EntityIDs          = 5 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message UserRoles {
@@ -70,6 +72,6 @@ message ListUserResp {
 
 message InviteUserReq {
     string Email                      = 1;
-    bytes EntityID                    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes RoleIDs            = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+    bytes EntityID                    = 2 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes RoleIDs            = 3 [(gogoproto.customtype) = "pkg/ulid.ID", (gogoproto.nullable) = false];
 }
