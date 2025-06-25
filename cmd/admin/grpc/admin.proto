@@ -13,14 +13,9 @@ option (gogoproto.goproto_registration) = true;
 
 option go_package = "github.com/elojah/trax/cmd/admin/grpc";
 
-<<<<<<< HEAD
 import "pkg/gogoproto/gogo.proto";
 
 import "pkg/pbtypes/empty.proto";
-import "pkg/pbtypes/string.proto";
-=======
-import "github.com/elojah/trax/pkg/pbtypes/empty.proto";
->>>>>>> ea82978 (wip)
 
 service Admin {
 	// #MARK:## TECHNICAL ADMIN ###
