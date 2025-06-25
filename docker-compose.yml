@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - ./docker/postgres/_data:/var/lib/postgresql/data
+    networks:
+      - default
     expose:
       - 5432
     ports:
@@ -21,7 +23,25 @@ services:
     container_name: trax_redis
     volumes:
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - default
     expose:
       - 6379
     ports:
       - 6379:6379
+
+  # Admin
+  admin:
+    build:
+      context: .
+      dockerfile: docker/admin/Dockerfile
+    container_name: trax_admin
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - default
+    expose:
+      - 4282
+    ports:
+      - 4282:4282
