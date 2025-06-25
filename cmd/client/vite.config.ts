@@ -6,7 +6,7 @@ import vuetify from 'vite-plugin-vuetify'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import fs from 'fs';
 
-export default async() =>{
+export default async () => {
   let config = {}
   const loadConfigPlugin = {
     name: 'load-config',
@@ -25,7 +25,7 @@ export default async() =>{
 
       config = JSON.parse(configData);
     },
-    transform(code:any) : any {
+    transform(code: any): any {
       return {
         code: code.replace('__CONFIG__', JSON.stringify(config)),
         map: null,
@@ -40,7 +40,7 @@ export default async() =>{
       vueJsx(),
       vuetify(),
     ],
-    build :{
+    build: {
       sourcemap: true,
     },
     resolve: {
@@ -51,6 +51,7 @@ export default async() =>{
         '@api': fileURLToPath(new URL('./../../cmd/api/grpc', import.meta.url)),
         // imports from external files
         '@protobuf-ts': fileURLToPath(new URL('./node_modules/@protobuf-ts', import.meta.url)),
+        'google-protobuf': fileURLToPath(new URL('./node_modules/google-protobuf', import.meta.url)),
       }
     }
   })

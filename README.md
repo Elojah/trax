@@ -16,7 +16,6 @@ $ go install github.com/gogo/protobuf/protoc-gen-gogoslick
 $ go get github.com/gogo/protobuf/gogoproto
 # Protobuf TS (install node + npm latest versions with nvm)
 $ sudo npm i -g npx
-$ sudo npm i -g protoc-gen-ts
 $ cd cmd/client && npm install
 # Host aliases for local development
 $ cat scripts/add_localhost.hosts | sudo tee -a /etc/hosts > /dev/null
