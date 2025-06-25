@@ -13,7 +13,6 @@ $ sudo apt install -y protobuf-compiler
 $ export PATH=$PATH:$GOPATH/bin
 $ go get github.com/gogo/protobuf/proto
 $ go install github.com/gogo/protobuf/protoc-gen-gogoslick
-$ go get github.com/gogo/protobuf/gogoproto
 # Protobuf TS (install node + npm latest versions with nvm)
 $ sudo npm i -g npx
 $ cd cmd/client && npm install
