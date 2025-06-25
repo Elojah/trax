@@ -81,8 +81,8 @@ export namespace grpc {
                 responseStream: false,
                 requestSerialize: (message: dependency_8.dto.InviteUserReq) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => dependency_8.dto.InviteUserReq.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_8.dto.UserRoles) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_8.dto.UserRoles.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: dependency_4.user.U) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_4.user.U.deserialize(new Uint8Array(bytes))
             },
             FetchClaims: {
                 path: "/grpc.API/FetchClaims",
@@ -135,8 +135,8 @@ export namespace grpc {
                 responseStream: false,
                 requestSerialize: (message: dependency_6.dto.DeleteEntityReq) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => dependency_6.dto.DeleteEntityReq.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_6.dto.DeleteEntityResp) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_6.dto.DeleteEntityResp.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: dependency_3.user.Entity) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_3.user.Entity.deserialize(new Uint8Array(bytes))
             },
             ListRole: {
                 path: "/grpc.API/ListRole",
@@ -180,8 +180,8 @@ export namespace grpc {
                 responseStream: false,
                 requestSerialize: (message: dependency_7.dto.CreateRoleUserReq) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => dependency_7.dto.CreateRoleUserReq.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_8.dto.UserRoles) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_8.dto.UserRoles.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: dependency_7.dto.RoleUserResp) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_7.dto.RoleUserResp.deserialize(new Uint8Array(bytes))
             },
             DeleteRoleUser: {
                 path: "/grpc.API/DeleteRoleUser",
@@ -189,8 +189,8 @@ export namespace grpc {
                 responseStream: false,
                 requestSerialize: (message: dependency_7.dto.DeleteRoleUserReq) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => dependency_7.dto.DeleteRoleUserReq.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_8.dto.UserRoles) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_8.dto.UserRoles.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: dependency_7.dto.RoleUserResp) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_7.dto.RoleUserResp.deserialize(new Uint8Array(bytes))
             }
         };
         [method: string]: grpc_1.UntypedHandleCall;
@@ -198,19 +198,19 @@ export namespace grpc {
         abstract ListUser(call: grpc_1.ServerUnaryCall<dependency_8.dto.ListUserReq, dependency_8.dto.ListUserResp>, callback: grpc_1.sendUnaryData<dependency_8.dto.ListUserResp>): void;
         abstract FetchUser(call: grpc_1.ServerUnaryCall<dependency_8.dto.FetchUserReq, dependency_4.user.U>, callback: grpc_1.sendUnaryData<dependency_4.user.U>): void;
         abstract UpdateUser(call: grpc_1.ServerUnaryCall<dependency_8.dto.UpdateUserReq, dependency_4.user.U>, callback: grpc_1.sendUnaryData<dependency_4.user.U>): void;
-        abstract InviteUser(call: grpc_1.ServerUnaryCall<dependency_8.dto.InviteUserReq, dependency_8.dto.UserRoles>, callback: grpc_1.sendUnaryData<dependency_8.dto.UserRoles>): void;
+        abstract InviteUser(call: grpc_1.ServerUnaryCall<dependency_8.dto.InviteUserReq, dependency_4.user.U>, callback: grpc_1.sendUnaryData<dependency_4.user.U>): void;
         abstract FetchClaims(call: grpc_1.ServerUnaryCall<dependency_2.pbtypes.Empty, dependency_5.user.ClaimAuth>, callback: grpc_1.sendUnaryData<dependency_5.user.ClaimAuth>): void;
         abstract ListEntity(call: grpc_1.ServerUnaryCall<dependency_6.dto.ListEntityReq, dependency_6.dto.ListEntityResp>, callback: grpc_1.sendUnaryData<dependency_6.dto.ListEntityResp>): void;
         abstract FetchEntity(call: grpc_1.ServerUnaryCall<dependency_6.dto.FetchEntityReq, dependency_3.user.Entity>, callback: grpc_1.sendUnaryData<dependency_3.user.Entity>): void;
         abstract CreateEntity(call: grpc_1.ServerUnaryCall<dependency_6.dto.CreateEntityReq, dependency_3.user.Entity>, callback: grpc_1.sendUnaryData<dependency_3.user.Entity>): void;
         abstract UpdateEntity(call: grpc_1.ServerUnaryCall<dependency_6.dto.UpdateEntityReq, dependency_3.user.Entity>, callback: grpc_1.sendUnaryData<dependency_3.user.Entity>): void;
-        abstract DeleteEntity(call: grpc_1.ServerUnaryCall<dependency_6.dto.DeleteEntityReq, dependency_6.dto.DeleteEntityResp>, callback: grpc_1.sendUnaryData<dependency_6.dto.DeleteEntityResp>): void;
+        abstract DeleteEntity(call: grpc_1.ServerUnaryCall<dependency_6.dto.DeleteEntityReq, dependency_3.user.Entity>, callback: grpc_1.sendUnaryData<dependency_3.user.Entity>): void;
         abstract ListRole(call: grpc_1.ServerUnaryCall<dependency_7.dto.ListRoleReq, dependency_7.dto.ListRoleResp>, callback: grpc_1.sendUnaryData<dependency_7.dto.ListRoleResp>): void;
         abstract CreateRole(call: grpc_1.ServerUnaryCall<dependency_7.dto.CreateRoleReq, dependency_7.dto.RolePermission>, callback: grpc_1.sendUnaryData<dependency_7.dto.RolePermission>): void;
         abstract UpdateRole(call: grpc_1.ServerUnaryCall<dependency_7.dto.UpdateRoleReq, dependency_7.dto.RolePermission>, callback: grpc_1.sendUnaryData<dependency_7.dto.RolePermission>): void;
         abstract DeleteRole(call: grpc_1.ServerUnaryCall<dependency_7.dto.DeleteRoleReq, dependency_7.dto.RolePermission>, callback: grpc_1.sendUnaryData<dependency_7.dto.RolePermission>): void;
-        abstract CreateRoleUser(call: grpc_1.ServerUnaryCall<dependency_7.dto.CreateRoleUserReq, dependency_8.dto.UserRoles>, callback: grpc_1.sendUnaryData<dependency_8.dto.UserRoles>): void;
-        abstract DeleteRoleUser(call: grpc_1.ServerUnaryCall<dependency_7.dto.DeleteRoleUserReq, dependency_8.dto.UserRoles>, callback: grpc_1.sendUnaryData<dependency_8.dto.UserRoles>): void;
+        abstract CreateRoleUser(call: grpc_1.ServerUnaryCall<dependency_7.dto.CreateRoleUserReq, dependency_7.dto.RoleUserResp>, callback: grpc_1.sendUnaryData<dependency_7.dto.RoleUserResp>): void;
+        abstract DeleteRoleUser(call: grpc_1.ServerUnaryCall<dependency_7.dto.DeleteRoleUserReq, dependency_7.dto.RoleUserResp>, callback: grpc_1.sendUnaryData<dependency_7.dto.RoleUserResp>): void;
     }
     export class APIClient extends grpc_1.makeGenericClientConstructor(UnimplementedAPIService.definition, "API", {}) {
         constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
@@ -228,7 +228,7 @@ export namespace grpc {
         UpdateUser: GrpcUnaryServiceInterface<dependency_8.dto.UpdateUserReq, dependency_4.user.U> = (message: dependency_8.dto.UpdateUserReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_4.user.U>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_4.user.U>, callback?: grpc_1.requestCallback<dependency_4.user.U>): grpc_1.ClientUnaryCall => {
             return super.UpdateUser(message, metadata, options, callback);
         };
-        InviteUser: GrpcUnaryServiceInterface<dependency_8.dto.InviteUserReq, dependency_8.dto.UserRoles> = (message: dependency_8.dto.InviteUserReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_8.dto.UserRoles>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_8.dto.UserRoles>, callback?: grpc_1.requestCallback<dependency_8.dto.UserRoles>): grpc_1.ClientUnaryCall => {
+        InviteUser: GrpcUnaryServiceInterface<dependency_8.dto.InviteUserReq, dependency_4.user.U> = (message: dependency_8.dto.InviteUserReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_4.user.U>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_4.user.U>, callback?: grpc_1.requestCallback<dependency_4.user.U>): grpc_1.ClientUnaryCall => {
             return super.InviteUser(message, metadata, options, callback);
         };
         FetchClaims: GrpcUnaryServiceInterface<dependency_2.pbtypes.Empty, dependency_5.user.ClaimAuth> = (message: dependency_2.pbtypes.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_5.user.ClaimAuth>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_5.user.ClaimAuth>, callback?: grpc_1.requestCallback<dependency_5.user.ClaimAuth>): grpc_1.ClientUnaryCall => {
@@ -246,7 +246,7 @@ export namespace grpc {
         UpdateEntity: GrpcUnaryServiceInterface<dependency_6.dto.UpdateEntityReq, dependency_3.user.Entity> = (message: dependency_6.dto.UpdateEntityReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.user.Entity>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.user.Entity>, callback?: grpc_1.requestCallback<dependency_3.user.Entity>): grpc_1.ClientUnaryCall => {
             return super.UpdateEntity(message, metadata, options, callback);
         };
-        DeleteEntity: GrpcUnaryServiceInterface<dependency_6.dto.DeleteEntityReq, dependency_6.dto.DeleteEntityResp> = (message: dependency_6.dto.DeleteEntityReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_6.dto.DeleteEntityResp>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_6.dto.DeleteEntityResp>, callback?: grpc_1.requestCallback<dependency_6.dto.DeleteEntityResp>): grpc_1.ClientUnaryCall => {
+        DeleteEntity: GrpcUnaryServiceInterface<dependency_6.dto.DeleteEntityReq, dependency_3.user.Entity> = (message: dependency_6.dto.DeleteEntityReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.user.Entity>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.user.Entity>, callback?: grpc_1.requestCallback<dependency_3.user.Entity>): grpc_1.ClientUnaryCall => {
             return super.DeleteEntity(message, metadata, options, callback);
         };
         ListRole: GrpcUnaryServiceInterface<dependency_7.dto.ListRoleReq, dependency_7.dto.ListRoleResp> = (message: dependency_7.dto.ListRoleReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.ListRoleResp>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.ListRoleResp>, callback?: grpc_1.requestCallback<dependency_7.dto.ListRoleResp>): grpc_1.ClientUnaryCall => {
@@ -261,10 +261,10 @@ export namespace grpc {
         DeleteRole: GrpcUnaryServiceInterface<dependency_7.dto.DeleteRoleReq, dependency_7.dto.RolePermission> = (message: dependency_7.dto.DeleteRoleReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.RolePermission>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.RolePermission>, callback?: grpc_1.requestCallback<dependency_7.dto.RolePermission>): grpc_1.ClientUnaryCall => {
             return super.DeleteRole(message, metadata, options, callback);
         };
-        CreateRoleUser: GrpcUnaryServiceInterface<dependency_7.dto.CreateRoleUserReq, dependency_8.dto.UserRoles> = (message: dependency_7.dto.CreateRoleUserReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_8.dto.UserRoles>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_8.dto.UserRoles>, callback?: grpc_1.requestCallback<dependency_8.dto.UserRoles>): grpc_1.ClientUnaryCall => {
+        CreateRoleUser: GrpcUnaryServiceInterface<dependency_7.dto.CreateRoleUserReq, dependency_7.dto.RoleUserResp> = (message: dependency_7.dto.CreateRoleUserReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.RoleUserResp>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.RoleUserResp>, callback?: grpc_1.requestCallback<dependency_7.dto.RoleUserResp>): grpc_1.ClientUnaryCall => {
             return super.CreateRoleUser(message, metadata, options, callback);
         };
-        DeleteRoleUser: GrpcUnaryServiceInterface<dependency_7.dto.DeleteRoleUserReq, dependency_8.dto.UserRoles> = (message: dependency_7.dto.DeleteRoleUserReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_8.dto.UserRoles>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_8.dto.UserRoles>, callback?: grpc_1.requestCallback<dependency_8.dto.UserRoles>): grpc_1.ClientUnaryCall => {
+        DeleteRoleUser: GrpcUnaryServiceInterface<dependency_7.dto.DeleteRoleUserReq, dependency_7.dto.RoleUserResp> = (message: dependency_7.dto.DeleteRoleUserReq, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.RoleUserResp>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.dto.RoleUserResp>, callback?: grpc_1.requestCallback<dependency_7.dto.RoleUserResp>): grpc_1.ClientUnaryCall => {
             return super.DeleteRoleUser(message, metadata, options, callback);
         };
     }

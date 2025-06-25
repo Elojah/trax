@@ -5,7 +5,6 @@
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as dependency_1 from "./../../../pkg/gogoproto/gogo";
 import * as dependency_2 from "./../../../pkg/pbtypes/empty";
-import * as dependency_3 from "./../../../pkg/pbtypes/string";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace grpc {
     interface GrpcUnaryServiceInterface<P, R> {
@@ -34,15 +33,6 @@ export namespace grpc {
     }
     export abstract class UnimplementedAdminService {
         static definition = {
-            MigrateUp: {
-                path: "/grpc.Admin/MigrateUp",
-                requestStream: false,
-                responseStream: false,
-                requestSerialize: (message: dependency_3.pbtypes.String) => Buffer.from(message.serialize()),
-                requestDeserialize: (bytes: Buffer) => dependency_3.pbtypes.String.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_2.pbtypes.Empty) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_2.pbtypes.Empty.deserialize(new Uint8Array(bytes))
-            },
             RotateCookieKeys: {
                 path: "/grpc.Admin/RotateCookieKeys",
                 requestStream: false,
@@ -63,7 +53,6 @@ export namespace grpc {
             }
         };
         [method: string]: grpc_1.UntypedHandleCall;
-        abstract MigrateUp(call: grpc_1.ServerUnaryCall<dependency_3.pbtypes.String, dependency_2.pbtypes.Empty>, callback: grpc_1.sendUnaryData<dependency_2.pbtypes.Empty>): void;
         abstract RotateCookieKeys(call: grpc_1.ServerUnaryCall<dependency_2.pbtypes.Empty, dependency_2.pbtypes.Empty>, callback: grpc_1.sendUnaryData<dependency_2.pbtypes.Empty>): void;
         abstract Ping(call: grpc_1.ServerUnaryCall<dependency_2.pbtypes.Empty, dependency_2.pbtypes.Empty>, callback: grpc_1.sendUnaryData<dependency_2.pbtypes.Empty>): void;
     }
@@ -71,9 +60,6 @@ export namespace grpc {
         constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
             super(address, credentials, options);
         }
-        MigrateUp: GrpcUnaryServiceInterface<dependency_3.pbtypes.String, dependency_2.pbtypes.Empty> = (message: dependency_3.pbtypes.String, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_2.pbtypes.Empty>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_2.pbtypes.Empty>, callback?: grpc_1.requestCallback<dependency_2.pbtypes.Empty>): grpc_1.ClientUnaryCall => {
-            return super.MigrateUp(message, metadata, options, callback);
-        };
         RotateCookieKeys: GrpcUnaryServiceInterface<dependency_2.pbtypes.Empty, dependency_2.pbtypes.Empty> = (message: dependency_2.pbtypes.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_2.pbtypes.Empty>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_2.pbtypes.Empty>, callback?: grpc_1.requestCallback<dependency_2.pbtypes.Empty>): grpc_1.ClientUnaryCall => {
             return super.RotateCookieKeys(message, metadata, options, callback);
         };

@@ -7,6 +7,7 @@ import {
   CreateEntityReq,
   DeleteEntityReq,
   ListEntityReq,
+  ListEntityResp,
   UpdateEntityReq
 } from '@internal/user/dto/entity'
 import { useAuthStore } from './auth'
@@ -55,9 +56,9 @@ export const useEntityStore = defineStore('entity', () => {
 
   const delete_ = async (req: DeleteEntityReq) => {
     try {
-      const resp = await api.deleteEntity(req, { meta: { token: token.value } })
+      const resp: { response: Entity } = await api.deleteEntity(req, { meta: { token: token.value } })
 
-      entities.value?.delete(ulid(resp.response.entity.iD))
+      entities.value?.delete(ulid(resp.response.iD))
     } catch (err: any) {
       logger.error(err)
       throw err;
@@ -66,7 +67,7 @@ export const useEntityStore = defineStore('entity', () => {
 
   const list = async function (req: ListEntityReq): Promise<string[]> {
     try {
-      const resp = await api.listEntity(req, { meta: { token: token.value } })
+      const resp: { response: ListEntityResp } = await api.listEntity(req, { meta: { token: token.value } })
 
       resp.response.entities?.forEach((entity: Entity) => {
         entities.value?.set(ulid(entity.iD), entity)

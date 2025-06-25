@@ -7,7 +7,6 @@ import * as dependency_1 from "./../../../pkg/gogoproto/gogo";
 import * as dependency_2 from "./../../../pkg/pbtypes/string";
 import * as dependency_3 from "./../../../pkg/paginate/paginate";
 import * as dependency_4 from "./../user";
-import * as dependency_5 from "./../role";
 import * as pb_1 from "google-protobuf";
 export namespace dto {
     export class SigninResp extends pb_1.Message {
@@ -569,6 +568,7 @@ export namespace dto {
             OwnEntity?: boolean;
             IDs?: Uint8Array[];
             EntityIDs?: Uint8Array[];
+            RoleID?: Uint8Array;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [4, 5], this.#one_of_decls);
@@ -587,6 +587,9 @@ export namespace dto {
                 }
                 if ("EntityIDs" in data && data.EntityIDs != undefined) {
                     this.EntityIDs = data.EntityIDs;
+                }
+                if ("RoleID" in data && data.RoleID != undefined) {
+                    this.RoleID = data.RoleID;
                 }
             }
         }
@@ -623,12 +626,19 @@ export namespace dto {
         set EntityIDs(value: Uint8Array[]) {
             pb_1.Message.setField(this, 5, value);
         }
+        get RoleID() {
+            return pb_1.Message.getFieldWithDefault(this, 6, new Uint8Array(0)) as Uint8Array;
+        }
+        set RoleID(value: Uint8Array) {
+            pb_1.Message.setField(this, 6, value);
+        }
         static fromObject(data: {
             Paginate?: ReturnType<typeof dependency_3.paginate.Paginate.prototype.toObject>;
             Search?: string;
             OwnEntity?: boolean;
             IDs?: Uint8Array[];
             EntityIDs?: Uint8Array[];
+            RoleID?: Uint8Array;
         }): ListUserReq {
             const message = new ListUserReq({});
             if (data.Paginate != null) {
@@ -646,6 +656,9 @@ export namespace dto {
             if (data.EntityIDs != null) {
                 message.EntityIDs = data.EntityIDs;
             }
+            if (data.RoleID != null) {
+                message.RoleID = data.RoleID;
+            }
             return message;
         }
         toObject() {
@@ -655,6 +668,7 @@ export namespace dto {
                 OwnEntity?: boolean;
                 IDs?: Uint8Array[];
                 EntityIDs?: Uint8Array[];
+                RoleID?: Uint8Array;
             } = {};
             if (this.Paginate != null) {
                 data.Paginate = this.Paginate.toObject();
@@ -670,6 +684,9 @@ export namespace dto {
             }
             if (this.EntityIDs != null) {
                 data.EntityIDs = this.EntityIDs;
+            }
+            if (this.RoleID != null) {
+                data.RoleID = this.RoleID;
             }
             return data;
         }
@@ -687,6 +704,8 @@ export namespace dto {
                 writer.writeRepeatedBytes(4, this.IDs);
             if (this.EntityIDs.length)
                 writer.writeRepeatedBytes(5, this.EntityIDs);
+            if (this.RoleID.length)
+                writer.writeBytes(6, this.RoleID);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -711,6 +730,9 @@ export namespace dto {
                     case 5:
                         pb_1.Message.addToRepeatedField(message, 5, reader.readBytes());
                         break;
+                    case 6:
+                        message.RoleID = reader.readBytes();
+                        break;
                     default: reader.skipField();
                 }
             }
@@ -723,103 +745,10 @@ export namespace dto {
             return ListUserReq.deserialize(bytes);
         }
     }
-    export class UserRoles extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            User?: dependency_4.user.U;
-            Roles?: dependency_5.user.Role[];
-        }) {
-            super();
-            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2], this.#one_of_decls);
-            if (!Array.isArray(data) && typeof data == "object") {
-                if ("User" in data && data.User != undefined) {
-                    this.User = data.User;
-                }
-                if ("Roles" in data && data.Roles != undefined) {
-                    this.Roles = data.Roles;
-                }
-            }
-        }
-        get User() {
-            return pb_1.Message.getWrapperField(this, dependency_4.user.U, 1) as dependency_4.user.U;
-        }
-        set User(value: dependency_4.user.U) {
-            pb_1.Message.setWrapperField(this, 1, value);
-        }
-        get has_User() {
-            return pb_1.Message.getField(this, 1) != null;
-        }
-        get Roles() {
-            return pb_1.Message.getRepeatedWrapperField(this, dependency_5.user.Role, 2) as dependency_5.user.Role[];
-        }
-        set Roles(value: dependency_5.user.Role[]) {
-            pb_1.Message.setRepeatedWrapperField(this, 2, value);
-        }
-        static fromObject(data: {
-            User?: ReturnType<typeof dependency_4.user.U.prototype.toObject>;
-            Roles?: ReturnType<typeof dependency_5.user.Role.prototype.toObject>[];
-        }): UserRoles {
-            const message = new UserRoles({});
-            if (data.User != null) {
-                message.User = dependency_4.user.U.fromObject(data.User);
-            }
-            if (data.Roles != null) {
-                message.Roles = data.Roles.map(item => dependency_5.user.Role.fromObject(item));
-            }
-            return message;
-        }
-        toObject() {
-            const data: {
-                User?: ReturnType<typeof dependency_4.user.U.prototype.toObject>;
-                Roles?: ReturnType<typeof dependency_5.user.Role.prototype.toObject>[];
-            } = {};
-            if (this.User != null) {
-                data.User = this.User.toObject();
-            }
-            if (this.Roles != null) {
-                data.Roles = this.Roles.map((item: dependency_5.user.Role) => item.toObject());
-            }
-            return data;
-        }
-        serialize(): Uint8Array;
-        serialize(w: pb_1.BinaryWriter): void;
-        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-            const writer = w || new pb_1.BinaryWriter();
-            if (this.has_User)
-                writer.writeMessage(1, this.User, () => this.User.serialize(writer));
-            if (this.Roles.length)
-                writer.writeRepeatedMessage(2, this.Roles, (item: dependency_5.user.Role) => item.serialize(writer));
-            if (!w)
-                return writer.getResultBuffer();
-        }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UserRoles {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UserRoles();
-            while (reader.nextField()) {
-                if (reader.isEndGroup())
-                    break;
-                switch (reader.getFieldNumber()) {
-                    case 1:
-                        reader.readMessage(message.User, () => message.User = dependency_4.user.U.deserialize(reader));
-                        break;
-                    case 2:
-                        reader.readMessage(message.Roles, () => pb_1.Message.addToRepeatedWrapperField(message, 2, dependency_5.user.Role.deserialize(reader), dependency_5.user.Role));
-                        break;
-                    default: reader.skipField();
-                }
-            }
-            return message;
-        }
-        serializeBinary(): Uint8Array {
-            return this.serialize();
-        }
-        static deserializeBinary(bytes: Uint8Array): UserRoles {
-            return UserRoles.deserialize(bytes);
-        }
-    }
     export class ListUserResp extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            Users?: UserRoles[];
+            Users?: dependency_4.user.U[];
             Total?: number;
         }) {
             super();
@@ -834,9 +763,9 @@ export namespace dto {
             }
         }
         get Users() {
-            return pb_1.Message.getRepeatedWrapperField(this, UserRoles, 1) as UserRoles[];
+            return pb_1.Message.getRepeatedWrapperField(this, dependency_4.user.U, 1) as dependency_4.user.U[];
         }
-        set Users(value: UserRoles[]) {
+        set Users(value: dependency_4.user.U[]) {
             pb_1.Message.setRepeatedWrapperField(this, 1, value);
         }
         get Total() {
@@ -846,12 +775,12 @@ export namespace dto {
             pb_1.Message.setField(this, 2, value);
         }
         static fromObject(data: {
-            Users?: ReturnType<typeof UserRoles.prototype.toObject>[];
+            Users?: ReturnType<typeof dependency_4.user.U.prototype.toObject>[];
             Total?: number;
         }): ListUserResp {
             const message = new ListUserResp({});
             if (data.Users != null) {
-                message.Users = data.Users.map(item => UserRoles.fromObject(item));
+                message.Users = data.Users.map(item => dependency_4.user.U.fromObject(item));
             }
             if (data.Total != null) {
                 message.Total = data.Total;
@@ -860,11 +789,11 @@ export namespace dto {
         }
         toObject() {
             const data: {
-                Users?: ReturnType<typeof UserRoles.prototype.toObject>[];
+                Users?: ReturnType<typeof dependency_4.user.U.prototype.toObject>[];
                 Total?: number;
             } = {};
             if (this.Users != null) {
-                data.Users = this.Users.map((item: UserRoles) => item.toObject());
+                data.Users = this.Users.map((item: dependency_4.user.U) => item.toObject());
             }
             if (this.Total != null) {
                 data.Total = this.Total;
@@ -876,7 +805,7 @@ export namespace dto {
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
             if (this.Users.length)
-                writer.writeRepeatedMessage(1, this.Users, (item: UserRoles) => item.serialize(writer));
+                writer.writeRepeatedMessage(1, this.Users, (item: dependency_4.user.U) => item.serialize(writer));
             if (this.Total != 0)
                 writer.writeUint64(2, this.Total);
             if (!w)
@@ -889,7 +818,7 @@ export namespace dto {
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.Users, () => pb_1.Message.addToRepeatedWrapperField(message, 1, UserRoles.deserialize(reader), UserRoles));
+                        reader.readMessage(message.Users, () => pb_1.Message.addToRepeatedWrapperField(message, 1, dependency_4.user.U.deserialize(reader), dependency_4.user.U));
                         break;
                     case 2:
                         message.Total = reader.readUint64();

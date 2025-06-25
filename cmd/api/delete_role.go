@@ -70,7 +70,7 @@ func (h *handler) DeleteRole(ctx context.Context, req *dto.DeleteRoleReq) (*dto.
 	}
 
 	// check permissions
-	if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: user.R_role, Command: user.C_delete}); err != nil {
+	if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: user.R_role, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()

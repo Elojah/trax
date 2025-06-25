@@ -38,29 +38,30 @@ message UpdateRoleReq {
 }
 
 message ListRoleReq {
-	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
-	string Search                     = 2;
+	paginate.Paginate Paginate             = 1 [(gogoproto.nullable) = true];
+	string Search                          = 2;
 
-	bool Own                          = 3;
-	bool OwnEntity                    = 4;
+	bool Own                               = 3;
+	bool OwnEntity                         = 4;
 
-	repeated bytes IDs                = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes EntityIDs          = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-}
-
-message RoleUsers {
-    RolePermission Role               = 1 [(gogoproto.nullable) = false];
-    repeated user.U Users             = 2 [(gogoproto.nullable) = false];
+	repeated bytes IDs                     = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes EntityIDs               = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes UserID                           = 7 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message ListRoleResp {
-	repeated RoleUsers Roles          = 1 [(gogoproto.nullable) = false];
-	uint64 Total                      = 2;
+	repeated RolePermission Roles          = 1 [(gogoproto.nullable) = false];
+	uint64 Total                           = 2;
 }
 
 message CreateRoleUserReq {
 	bytes RoleID                           = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	bytes UserID                           = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
+message RoleUserResp {
+	user.U User                            = 1 [(gogoproto.nullable) = false];
+	RolePermission Role                    = 2 [(gogoproto.nullable) = false];
 }
 
 message DeleteRoleUserReq {

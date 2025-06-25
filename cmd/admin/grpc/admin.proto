@@ -16,13 +16,9 @@ option go_package = "github.com/elojah/trax/cmd/admin/grpc";
 import "pkg/gogoproto/gogo.proto";
 
 import "pkg/pbtypes/empty.proto";
-import "pkg/pbtypes/string.proto";
 
 service Admin {
 	// #MARK:## TECHNICAL ADMIN ###
-
-    // DB migrations
-    rpc MigrateUp(pbtypes.String) returns (pbtypes.Empty);
 
 	// Cookie secure management
 	rpc RotateCookieKeys(pbtypes.Empty) returns (pbtypes.Empty);

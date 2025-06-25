@@ -7,23 +7,26 @@ import { useErrorsStore } from '@/stores/errors';
 import { ulid, zero } from '@/utils/ulid';
 import { useUserStore } from '@/stores/user';
 import { ListUserReq } from '@internal/user/dto/user';
-import UserRoleTable from '@/components/user/RoleTable.vue';
 import type { ReadonlyHeaders } from '@/utils/headers';
 import RoleTable from '@/components/role/Table.vue';
-import type { RolePermission } from '@internal/user/dto/role';
 import type { U } from '@internal/user/user';
 import { useRoleStore } from '@/stores/role';
+import type { Role } from '@internal/user/role';
 
 const props = withDefaults(defineProps<{
-	roleID: Uint8Array | undefined;
-	roleIDOnly: boolean | undefined;
+	showActionRoleID: Uint8Array | undefined;
+	filterByRoleID: Uint8Array | undefined;
+	disableNewButton: boolean;
 }>(), {
-	roleID: undefined,
-	roleIDOnly: undefined,
+	showActionRoleID: undefined,
+	filterByRoleID: undefined,
+	disableNewButton: false,
 });
 
 const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
+
+const createActionText = props.showActionRoleID ? 'Add' : 'New';
 
 const nameRules = [
 	(v: string) => !!v || 'Required',
@@ -52,10 +55,6 @@ const {
 	selected: selectedEntities,
 } = toRefs(entityStore);
 
-const roleStore = useRoleStore();
-const {
-	users: usersRole,
-} = toRefs(roleStore);
 
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
@@ -67,10 +66,15 @@ const selectedEntity = computed(() => selectedEntities.value.at(0));
 const store = useUserStore();
 const {
 	users: users,
-	roles: roles,
+	usersByRole: usersByRole,
 	total: total,
-	resetRoleDry: resetRoleDry,
 } = toRefs(store);
+
+const roleStore = useRoleStore();
+const {
+	roles: roles,
+	rolesByUser: rolesByUser,
+} = toRefs(roleStore);
 
 const loading = ref(false);
 const search = ref('');
@@ -103,7 +107,7 @@ const views = computed(() => {
 });
 
 const expand = (_: any, item: any) => {
-	if (props.roleID) {
+	if (props.showActionRoleID) {
 		return
 	}
 	item.toggleExpand({ value: item.item });
@@ -121,6 +125,7 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 	try {
 		const newUserIDs = await store.list(ListUserReq.create({
 			entityIDs: [selectedEntity.value.iD],
+			roleID: props.filterByRoleID,
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * itemsPerPage) + 1), // page starts at 1, start starts at 1
@@ -141,12 +146,12 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 // refresh list when selected entity changes
 watch(selectedEntity, async () => {
 	await list();
-	await resetRoleDry.value(zero);
+	// await resetRoleDry.value(zero);
 });
 
 // reset roles for new user
 onMounted(async () => {
-	await resetRoleDry.value(zero);
+	// await resetRoleDry.value(zero);
 });
 
 const name = ref('');
@@ -174,7 +179,7 @@ const invite = async () => {
 
 	dialogInvite.value = false;
 	email.value = '';
-	roles.value.set(ulid(zero), []);
+	// users.value.set(ulid(zero), {});
 
 	await list()
 };
@@ -192,41 +197,38 @@ const confirmDelete = () => {
 const delete_ = () => {
 };
 
-const addRoleNewUser = async (role: RolePermission) => {
-	await store.addRoleDry(zero, role.role!);
-};
-
 const email = ref(null as string | null)
 const emailRules = [
 	(v: string) => !!v || "Required",
 	(v: string) => /.+@.+\..+/.test(v) || "Email must be valid"
 ]
 
-const addedRoles = computed(() => roles.value.get(ulid(zero)));
+// For invite user
+const addedRoles = computed(() => {
+	const result = Array.from(rolesByUser.value.get(ulid(zero)) ?? new Map())
+		?.map(
+			([roleID, _]) => roles.value.get(roleID)
+		);
 
-const deleteRole = async (roleID: Uint8Array) => {
-	await store.deleteRoleDry(zero, roleID);
-};
+	if (props.showActionRoleID) {
+		return result?.concat(roles.value.get(ulid(props.showActionRoleID)))
+	}
 
-// Optional add role to user id
+	return result
+});
+
 const roleUsers = computed(() => {
-	return usersRole.value.get(ulid(props.roleID))?.reduce((acc: Map<string, boolean>, u: U) => {
-		acc.set(ulid(u?.iD), true);
-
-		return acc;
-	}, new Map<string, boolean>())
+	return usersByRole.value.get(ulid(props.showActionRoleID))
 });
 
 const loadingAddUser = ref(false);
 
-
-
-const addUser = async (item: U) => {
-	if (props.roleID) {
+const addUserRole = async (item: U) => {
+	if (props.showActionRoleID) {
 		loadingAddUser.value = true;
 		let ok = true;
 		try {
-			await roleStore.addUser(props.roleID, item.iD);
+			await store.addRole(item.iD, props.showActionRoleID);
 		} catch (e) {
 			errorsStore.showGRPC(e);
 			ok = false;
@@ -239,12 +241,14 @@ const addUser = async (item: U) => {
 	}
 };
 
+const loadingRemoveUser = ref(false);
 
 const deleteUserRole = async (item: U) => {
-	if (props.roleID) {
+	if (props.showActionRoleID) {
+		loadingRemoveUser.value = true;
 		let ok = true;
 		try {
-			await roleStore.deleteUser(props.roleID!, item.iD);
+			await store.deleteRole(item.iD, props.showActionRoleID);
 		} catch (e) {
 			errorsStore.showGRPC(e);
 			ok = false;
@@ -253,25 +257,39 @@ const deleteUserRole = async (item: U) => {
 			message.value = `Role deleted successfully to user`;
 			success.value = true;
 		}
+		loadingRemoveUser.value = false;
 	}
 };
 
+const deleteRoleUser = async (item: Role, userID: Uint8Array) => {
+	let ok = true;
+	try {
+		await store.deleteRole(userID, item?.iD);
+	} catch (e) {
+		errorsStore.showGRPC(e);
+		ok = false;
+	}
+	if (ok) {
+		// message.value = `Role deleted successfully to user`;
+		// success.value = true;
+	}
+};
 
 </script>
 
 <template>
 	<v-container class="px-0">
 		<v-row>
-			<v-col cols="10">
+			<v-col :cols="!props.disableNewButton ? 10 : 12">
 				<v-text-field class="table-color-background" v-model="search" label="Search"
 					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
 				</v-text-field>
 			</v-col>
-			<v-col cols="2" class="d-flex align-center justify-end">
+			<v-col v-if="!props.disableNewButton" cols="2" class="d-flex align-center justify-end">
 				<v-dialog v-model="dialogInvite" max-width="1200px">
 					<template v-slot:activator="{ props }">
-						<v-btn variant="tonal" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
-							New
+						<v-btn variant="text" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
+							{{ createActionText }}
 							<template v-slot:prepend>
 								<v-icon color="primary"></v-icon>
 							</template>
@@ -296,16 +314,21 @@ const deleteUserRole = async (item: U) => {
 									</v-col>
 								</v-row>
 								<v-row v-if="addedRoles">
-									<v-chip v-for="item in addedRoles" :key="ulid(item.iD)" class="ma-2" variant="tonal"
-										closable label color="primary" @click:close="deleteRole(item.iD)">
+									<v-chip v-for="item in addedRoles" :key="ulid(item?.role?.iD)" class="ma-2"
+										variant="tonal" closable label color="primary"
+										@click:close="deleteRoleUser(item?.role!, zero)">
 										<v-icon icon="mdi-account-cog" start></v-icon>
-										{{ item.name }}
+										{{ item?.role?.name }}
 									</v-chip>
 								</v-row>
 							</v-form>
 						</v-container>
 						<v-divider></v-divider>
-						<RoleTable :user-i-d="zero" :add-role="addRoleNewUser"></RoleTable>
+						<Table v-if="props.showActionRoleID" :show-action-role-i-d="props.showActionRoleID"
+							:disable-new-button="true">
+						</Table>
+						<RoleTable v-else :show-action-user-i-d="zero" :disable-new-button="true">
+						</RoleTable>
 						<v-divider></v-divider>
 						<v-btn color="error" variant="tonal" @click="closeInvite">
 							Close
@@ -325,45 +348,39 @@ const deleteUserRole = async (item: U) => {
 		<template v-slot:item="{ item, internalItem, columns, isExpanded, index, props: itemProps }">
 			<v-hover v-slot="{ isHovering, props: hoverProps }">
 				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
-					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
+					<td :colspan="columns.length" class="px-1 py-1">
 						<v-card class="justify-center" :class="{
-							'row-hovered': isHovering,
+							'cursor-pointer': !props.showActionRoleID,
+							'row-hovered': isHovering && !props.showActionRoleID,
 							'row-expanded': isExpanded(internalItem),
 							'row-even': index % 2 === 0,
 							'row-odd': index % 2 !== 0,
 						}" :title="item.email" :subtitle="item.lastName + ' ' + item.firstName">
 							<template v-slot:prepend>
-								<v-icon v-if="!props.roleID && isExpanded(internalItem)" class="mr-4" icon="mdi-minus"
-									size="x-large" color="primary">
+								<v-icon v-if="!props.showActionRoleID && isExpanded(internalItem)" class="mr-4"
+									icon="mdi-minus" size="x-large" color="primary">
 								</v-icon>
-								<v-icon v-else-if="!props.roleID" class="mr-4" icon="mdi-plus" size="x-large"
+								<v-icon v-else-if="!props.showActionRoleID" class="mr-4" icon="mdi-plus" size="x-large"
 									color="primary"> </v-icon>
 								<v-divider vertical></v-divider>
 							</template>
 							<template v-slot:append>
-								<v-divider vertical v-if="props.roleID"></v-divider>
-								<v-btn v-if="props.roleID && props.roleIDOnly" variant="tonal"
-									prepend-icon="mdi-trash-can" color="error" v-bind="props"
-									@click="deleteUserRole(item)">
-									Remove
-									<template v-slot:prepend>
-										<v-icon color="error"></v-icon>
-									</template>
-								</v-btn>
-								<v-btn v-else-if="props.roleID && !roleUsers?.has(ulid(item?.iD))" variant="tonal"
+								<v-divider vertical v-if="props.showActionRoleID"></v-divider>
+								<v-btn v-if="props.showActionRoleID && !roleUsers?.has(ulid(item?.iD))" variant="tonal"
 									class="mr-4" prepend-icon="mdi-plus-box" color="primary" v-bind="props"
-									:loading="loadingAddUser" v-on:click.stop.prevent="addUser(item)">
-									Add user
+									:loading="loadingAddUser" v-on:click.stop.prevent="addUserRole(item)">
+									Add
 									<template v-slot:prepend>
 										<v-icon color="primary"></v-icon>
 									</template>
 								</v-btn>
-								<v-btn v-else-if="props.roleID && roleUsers?.has(ulid(item?.iD))" variant="tonal"
-									class="mr-4" disabled prepend-icon="mdi-check-bold" color="secondary" v-bind="props"
-									v-on:click.stop.prevent="async () => { }">
-									Added
+								<v-btn v-else-if="props.showActionRoleID && roleUsers?.has(ulid(item?.iD))"
+									variant="tonal" class="mr-4" prepend-icon="mdi-trash-can" color="error"
+									v-bind="props" :loading="loadingRemoveUser"
+									v-on:click.stop.prevent="deleteUserRole(item)">
+									Remove
 									<template v-slot:prepend>
-										<v-icon color="secondary"></v-icon>
+										<v-icon color="error"></v-icon>
 									</template>
 								</v-btn>
 								<v-divider vertical></v-divider>
@@ -377,8 +394,27 @@ const deleteUserRole = async (item: U) => {
 			</v-hover>
 		</template>
 		<template v-slot:expanded-row="{ columns, item }">
-			<UserRoleTable v-if="item && !props.roleID" :colspan="columns.length" :user-i-d="item.iD">
-			</UserRoleTable>
+			<tr v-if="!props.showActionRoleID">
+				<td :colspan="columns.length">
+					<v-sheet>
+						<v-row class="my-4">
+							<v-col cols="4">
+								<v-sheet class="fill-height fill-width">
+									<UserDetails :item="item">
+									</UserDetails>
+								</v-sheet>
+							</v-col>
+							<v-divider vertical></v-divider>
+							<v-col cols="8">
+								<v-sheet class="fill-height fill-width">
+									<RoleTable :filter-by-user-i-d="item?.iD" :show-action-user-i-d="item?.iD">
+									</RoleTable>
+								</v-sheet>
+							</v-col>
+						</v-row>
+					</v-sheet>
+				</td>
+			</tr>
 		</template>
 	</v-data-table-server>
 </template>

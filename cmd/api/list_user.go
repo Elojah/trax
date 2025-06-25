@@ -42,7 +42,7 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 	} else {
 		err := gerrors.ErrMissingAtLeast{
 			AtLeast: 1,
-			Fields:  []string{"user_entity_ids", "entity_ids"},
+			Fields:  []string{"own_entity", "entity_ids"},
 		}
 
 		logger.Error().Err(err).Msg("invalid argument")
@@ -54,13 +54,14 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 		ids = req.IDs
 	}
 
-	var userRoles []dto.UserRoles
+	var users []user.U
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		users, totalUser, err := h.user.ListByEntity(ctx, user.Filter{
+		users, total, err = h.user.ListByEntity(ctx, user.Filter{
 			EntityIDs: entityIDs,
 			IDs:       ids,
+			RoleID:    req.RoleID,
 			Paginate:  req.Paginate,
 			Search:    req.Search,
 		})
@@ -69,30 +70,6 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
-
-		roles, _, err := h.user.ListRoleByUser(ctx, user.FilterRole{
-			EntityIDs: entityIDs,
-			UserIDs:   ids,
-		})
-		if err != nil {
-			logger.Error().Err(err).Msg("failed to list roles")
-
-			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
-		}
-
-		for _, u := range users {
-			rs, ok := roles[u.ID.String()]
-			if !ok {
-				// should never happen, both queries should never return a user without roles
-				continue
-			}
-			userRoles = append(userRoles, dto.UserRoles{
-				User:  u,
-				Roles: rs,
-			})
-		}
-
-		total = totalUser
 
 		return transaction.Commit, nil
 	}); err != nil {
@@ -104,7 +81,7 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 	logger.Info().Msg("success")
 
 	return &dto.ListUserResp{
-		Users: userRoles,
+		Users: users,
 		Total: total,
 	}, nil
 }

@@ -12,8 +12,6 @@ import (
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	glog "github.com/elojah/trax/pkg/log"
-	migrateagg "github.com/elojah/trax/pkg/migrate/agg"
-	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
 	"github.com/rs/zerolog/log"
@@ -55,17 +53,6 @@ func run(prog string, filename string) {
 		return
 	}
 
-	// init ghttp web server
-	postgress := postgres.Service{}
-
-	if err := postgress.Dial(ctx, cfg.Postgres); err != nil {
-		log.Error().Err(err).Msg("failed to dial postgres")
-
-		return
-	}
-
-	cs = append(cs, &postgress)
-
 	// init redis storage
 	rediss := redis.Service{}
 	if err := rediss.Dial(ctx, cfg.Redis); err != nil {
@@ -88,13 +75,8 @@ func run(prog string, filename string) {
 		return
 	}
 
-	migrateAgg := &migrateagg.Agg{
-		// Service: &postgress,
-	}
-
 	h := handler{
-		cookie:  cookieAgg,
-		migrate: migrateAgg,
+		cookie: cookieAgg,
 	}
 
 	// init grpc api server

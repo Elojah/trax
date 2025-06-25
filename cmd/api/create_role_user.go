@@ -8,23 +8,24 @@ import (
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
+	"github.com/elojah/trax/pkg/paginate"
 	"github.com/elojah/trax/pkg/transaction"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq) (*dto.UserRoles, error) {
+func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq) (*dto.RoleUserResp, error) {
 	logger := log.With().Str("method", "create_role_user").Logger()
 
 	if req == nil {
-		return &dto.UserRoles{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &dto.RoleUserResp{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &dto.UserRoles{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &dto.RoleUserResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	var role user.Role
@@ -59,21 +60,21 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &dto.UserRoles{}, err
+		return &dto.RoleUserResp{}, err
 	}
 
-	// check permissions
-	if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: user.R_user, Command: user.C_update}); err != nil {
+	// #MARK:Check permissions
+	if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: user.R_user, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
-		return &dto.UserRoles{}, status.New(codes.InvalidArgument, err.Error()).Err()
+		return &dto.RoleUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
-	// current user need to have all assigned permissions to assign a role
+
 	for _, perm := range permissions {
 		if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
-			return &dto.UserRoles{}, status.New(codes.InvalidArgument, err.Error()).Err()
+			return &dto.RoleUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 		}
 	}
 
@@ -86,12 +87,15 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 	}
 
 	var u user.U
-	var roles []user.Role
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		rolesByUser, _, err := h.user.ListRoleByUser(ctx, user.FilterRole{
+		_, total, err := h.user.ListRole(ctx, user.FilterRole{
 			UserID:   req.UserID,
 			EntityID: role.EntityID,
+			Paginate: &paginate.Paginate{
+				Start: 0,
+				End:   1,
+			},
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list roles")
@@ -102,10 +106,7 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 		// user needs AT LEAST ONE ROLE in current entity to be assigned a new role
 		// if user has no role in current entity, it means he has no access to this entity
 		// if you want to assign a role to a user, you need to invite him with a role in the entity first
-		var ok bool
-
-		roles, ok = rolesByUser[req.UserID.String()]
-		if !ok || len(roles) == 0 {
+		if total == 0 {
 			err := gerrors.ErrNotFound{Resource: "user", Index: req.UserID.String()}
 			logger.Error().Err(err).Msg("user not found")
 
@@ -135,13 +136,16 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &dto.UserRoles{}, err
+		return &dto.RoleUserResp{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &dto.UserRoles{
-		User:  u,
-		Roles: append(roles, role),
+	return &dto.RoleUserResp{
+		User: u,
+		Role: dto.RolePermission{
+			Role:        role,
+			Permissions: permissions,
+		},
 	}, nil
 }

@@ -18,7 +18,6 @@ import "pkg/pbtypes/string.proto";
 import "pkg/paginate/paginate.proto";
 
 import "internal/user/user.proto";
-import "internal/user/role.proto";
 
 message SigninResp {
     string AccessToken    = 1;
@@ -58,15 +57,11 @@ message ListUserReq {
 
     repeated bytes IDs                = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	repeated bytes EntityIDs          = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-}
-
-message UserRoles {
-    user.U User                       = 1 [(gogoproto.nullable) = false];
-    repeated user.Role Roles          = 2 [(gogoproto.nullable) = false];
+	bytes RoleID                      = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message ListUserResp {
-	repeated UserRoles Users          = 1 [(gogoproto.nullable) = false];
+	repeated user.U Users             = 1 [(gogoproto.nullable) = false];
 	uint64 Total                      = 2;
 }
 

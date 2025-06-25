@@ -68,14 +68,13 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 
-	if err := claims.Require(user.Requirement{EntityID: r.EntityID, Resource: user.R_role, Command: user.C_update}); err != nil {
+	if err := claims.Require(user.Requirement{EntityID: r.EntityID, Resource: user.R_role, Command: user.C_edit}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 
-	// check permissions
-	// current user need to have all assigned permissions to create a role
+	// #MARK:Check permissions
 	for _, perm := range req.Permissions {
 		if err := claims.Require(user.Requirement{EntityID: r.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")

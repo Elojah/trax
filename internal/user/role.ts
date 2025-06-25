@@ -15,9 +15,8 @@ export namespace user {
     }
     export enum Command {
         C_read = 0,
-        C_create = 1,
-        C_update = 2,
-        C_delete = 3
+        C_edit = 1,
+        C_write = 2
     }
     export class Role extends pb_1.Message {
         #one_of_decls: number[][] = [];

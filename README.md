@@ -41,6 +41,10 @@ TODO:
   - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
     + Check user table w/ permission
 
+- [S] Search bar on right panel entity fill everything until new+ button
+- [S] Table footer in nested table must be smaller than table footer in container
+
+
 - ~ Clean UI (table, cards, etc.)
 
 - Find a way to have expire map for pinia stores

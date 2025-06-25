@@ -12,27 +12,27 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) DeleteEntity(ctx context.Context, req *dto.DeleteEntityReq) (*dto.DeleteEntityResp, error) {
+func (h *handler) DeleteEntity(ctx context.Context, req *dto.DeleteEntityReq) (*user.Entity, error) {
 	logger := log.With().Str("method", "delete_entity").Logger()
 
 	if req == nil {
-		return &dto.DeleteEntityResp{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &user.Entity{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &dto.DeleteEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	if err := claims.Require(user.Requirement{
 		EntityID: req.ID,
 		Resource: user.R_entity,
-		Command:  user.C_delete,
+		Command:  user.C_write,
 	}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
-		return &dto.DeleteEntityResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
+		return &user.Entity{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 
 	var e user.Entity
@@ -58,12 +58,10 @@ func (h *handler) DeleteEntity(ctx context.Context, req *dto.DeleteEntityReq) (*
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &dto.DeleteEntityResp{}, err
+		return &user.Entity{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &dto.DeleteEntityResp{
-		Entity: e,
-	}, nil
+	return &e, nil
 }
