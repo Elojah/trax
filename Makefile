@@ -72,7 +72,7 @@ auth:  ## Build auth binary
 .PHONY: client
 client:  ## Build client content
 	$(info $(M) building bundle client) @
-	$Q cd cmd/$(CLIENT) && npx vite build
+	$Q cd cmd/$(CLIENT) && CONFIG_FILE=$${CONFIG_FILE:-../../config/client/local.json} npx vite build
 	$Q mkdir -p bin && rm -rf bin/$(STATIC) && mkdir -p bin/$(CLIENT)/$(STATIC)/
 	$Q yes | cp -rf cmd/$(CLIENT)/dist/. bin/$(CLIENT)/$(STATIC)/
 
@@ -85,6 +85,12 @@ web_client: ## Build web_client binary
 		-ldflags '-X main.version=$(VERSION)' \
 		-o ../../bin/$(PACKAGE)_$(WEB_CLIENT)_$(VERSION)
 	$Q yes | cp -rf bin/$(PACKAGE)_$(WEB_CLIENT)_$(VERSION) bin/$(PACKAGE)_$(WEB_CLIENT)
+
+# NPM
+.PHONY: npm
+npm: ## Install npm dependencies
+	$(info $(M) running npm install) @
+	$Q cd cmd/$(CLIENT) && npm install
 
 # Proto lang
 .PHONY: proto-go proto-ts

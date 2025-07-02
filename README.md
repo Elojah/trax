@@ -23,7 +23,7 @@ $ cat scripts/add_localhost.hosts | sudo tee -a /etc/hosts > /dev/null
 Start:
 
 ```sh
-$ docker-compose up -d
+$ docker-compose up -d postgres redis
 $ make admin && ./bin/trax_admin config/admin/local.json
 $ make api && ./bin/trax_api config/api/local.json
 $ make auth && ./bin/trax_auth config/auth/local.json

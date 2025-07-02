@@ -11,14 +11,14 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
 ENV GO111MODULE=on
 
 # Create workspace directory
-WORKDIR /admin
+WORKDIR /auth
 COPY . .
 RUN make tidy
-RUN env GOARCH=amd64 GOOS=linux CGO_ENABLED=0 make admin
+RUN env GOARCH=amd64 GOOS=linux CGO_ENABLED=0 make auth
 
 FROM scratch AS runner
 
 WORKDIR /app
-COPY --from=builder --chmod=755 /admin/bin/trax_admin .
-COPY --from=builder /admin/config/admin/docker.json .
-ENTRYPOINT ["/app/trax_admin", "/app/docker.json"]
+COPY --from=builder --chmod=755 /auth/bin/trax_auth .
+COPY --from=builder /auth/config/auth/docker.json .
+ENTRYPOINT ["/app/trax_auth", "/app/docker.json"]
