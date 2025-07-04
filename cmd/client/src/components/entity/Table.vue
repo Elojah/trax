@@ -5,10 +5,8 @@ import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { ulid } from '@/utils/ulid';
 import { ListEntityReq } from '@internal/user/dto/entity';
-import type { ReadonlyHeaders } from '@/utils/headers';
 import { grpccodes } from '@/utils/errors';
 
-const form = ref<VForm | null>(null);
 const valid = ref(null as boolean | null)
 
 const pageOptions = [
@@ -43,21 +41,6 @@ const description = ref('');
 
 const loading = ref(false);
 const search = ref('');
-
-const headers: ReadonlyHeaders = [
-	{
-		title: 'Name',
-		key: 'name',
-		align: 'start',
-		sortable: true,
-	},
-	{
-		title: 'Created',
-		key: 'created_at',
-		align: 'end',
-		sortable: true,
-	},
-];
 
 const viewIDs = ref<string[]>([])
 
@@ -142,126 +125,6 @@ const short = (description: string): string => {
 </script>
 
 <template>
-	<v-container class="px-0">
-		<v-row>
-			<v-col cols="9">
-				<v-text-field class="table-color-background" v-model="search" label="Search"
-					prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line>
-				</v-text-field>
-			</v-col>
-			<v-col cols="3" class="d-flex align-center justify-end">
-				<v-dialog v-model="dialogCreate" max-width="800px">
-					<template v-slot:activator="{ props }">
-						<v-btn variant="text" prepend-icon="mdi-plus-box" color="primary" size="large" v-bind="props">
-							New
-							<template v-slot:prepend>
-								<v-icon color="primary"></v-icon>
-							</template>
-						</v-btn>
-					</template>
-					<v-card class="px-6 py-6 rounded" variant="elevated">
-						<v-form ref="form" v-model="valid" lazy-validation>
-							<v-card-title class="d-flex justify-center">
-								<span class="text-h5">Create entity</span>
-							</v-card-title>
-							<v-divider></v-divider>
-							<v-card-text>
-								<v-container>
-									<v-row>
-										<v-col cols="6">
-											<v-text-field v-model="name" :rules="nameRules" label="Name"></v-text-field>
-										</v-col>
-										<v-col cols="6">
-											<v-text-field v-model="avatarURL" label="Avatar URL"></v-text-field>
-										</v-col>
-									</v-row>
-									<v-row>
-										<v-col cols="12">
-											<v-textarea v-model="description" label="Description"></v-textarea>
-										</v-col>
-									</v-row>
-								</v-container>
-							</v-card-text>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="error" variant="text" @click="closeCreate">
-									Cancel
-								</v-btn>
-								<v-btn color="primary" variant="text" @click="create">
-									Create
-								</v-btn>
-							</v-card-actions>
-						</v-form>
-					</v-card>
-				</v-dialog>
-			</v-col>
-		</v-row>
-	</v-container>
-	<v-data-table-server class="px-2 overflow-y-auto flex-grow-1" :headers="headers" fixed-footer fixed-header
-		items-per-page-text="" :items-per-page-options="pageOptions" :items="views" :items-length="Number(total)"
-		:loading="loading" :search="search" item-value="iD" @update:options="list" v-model="selected"
-		@click:row="select" return-object item-selectable select-strategy="single">
-		<template v-slot:item="{ item, columns, isSelected, index, props: itemProps }">
-			<v-hover v-slot="{ isHovering, props: hoverProps }">
-				<tr v-if="item" v-bind="{ ...itemProps, ...hoverProps }" :key="ulid(item.iD)">
-					<td :colspan="columns.length" class="cursor-pointer px-1 py-1">
-						<v-card :class="{
-							'row-hovered': isHovering,
-							'row-even': index % 2 === 0,
-							'row-odd': index % 2 !== 0,
-							'row-selected': isSelected({ value: item, selectable: true }),
-							'text-primary': isSelected({ value: item, selectable: true }),
-						}" :title="item.name" :subtitle="short(item.description)">
-							<template v-slot:prepend>
-								<v-avatar class="mr-4" size="32" :color="!item.avatarURL ? 'primary' : ''">
-									<img v-if="item.avatarURL" :src="item.avatarURL" alt="Avatar">
-									<span v-else class=" mx-auto text-center text-h5">
-										{{ item?.name?.at(0)?.toUpperCase() }}
-									</span>
-								</v-avatar>
-								<v-divider vertical></v-divider>
-							</template>
-							<template v-slot:append>
-								<v-divider vertical></v-divider>
-								<p class="ml-4 font-italic font-weight-light">
-									{{ new Date(Number(item.createdAt) * 1000).toLocaleDateString('en-GB') }}
-								</p>
-							</template>
-						</v-card>
-					</td>
-				</tr>
-			</v-hover>
-		</template>
-	</v-data-table-server>
 </template>
 <style scoped>
-.table-color-background {
-	background-color: #212121;
-}
-
-.row-odd {
-	transition: background-color .2s ease-in-out;
-	background-color: #616161;
-}
-
-.row-odd:not(.row-hovered) {
-	background-color: #37474F;
-}
-
-.row-even {
-	transition: background-color .2s ease-in-out;
-	background-color: #616161;
-}
-
-.row-even:not(.row-hovered) {
-	background-color: #263238;
-}
-
-.row-selected {
-	background-color: rgb(33, 47, 59) !important;
-}
-
-.cursor-pointer {
-	cursor: pointer;
-}
 </style>

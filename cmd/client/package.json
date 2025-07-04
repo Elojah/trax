@@ -15,15 +15,17 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@primeuix/themes": "^1.2.1",
     "google-protobuf": "^3.21.2",
     "grpc-web": "^1.4.2",
     "marked": "^12.0.1",
     "pinia": "^2.1.7",
     "pino": "latest",
+    "primevue": "^4.3.6",
     "typescript-cookie": "^1.0.6",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
-    "vue3-google-signin": "^2.1.1",
+    "vue3-google-signin": "^2.1.1"
   },
   "devDependencies": {
     "@protobuf-ts/grpcweb-transport": "^2.9.4",

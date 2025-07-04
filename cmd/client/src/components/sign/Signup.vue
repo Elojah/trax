@@ -4,8 +4,6 @@ import { useErrorsStore } from '@/stores/errors';
 import { SignupReq } from '@internal/user/dto/user';
 import { toRefs, ref } from "vue";
 
-const form = ref<VForm | null>(null);
-
 const authStore = useAuthStore()
 
 const email = ref(null as string | null)
@@ -53,7 +51,7 @@ const signup = async function () {
     case 200: // success
       message.value = 'Successfully Signup ! You can now signin.'
       success.value = true
-      form?.value?.reset()
+      // form?.value?.reset()
       break;
     case 409: // conflict
       message.value = 'Failed to signup, email already exists.'
@@ -69,57 +67,5 @@ const signup = async function () {
 </script>
 
 <template>
-  <v-card class="px-6 py-6 rounded" variant="elevated">
-    <v-card-item class="justify-center mb-2" prepend-icon="mdi-account-plus">
-      <v-card-title>
-        SIGNUP
-      </v-card-title>
-      <template v-slot:prepend>
-        <v-icon color="primary"></v-icon>
-      </template>
-    </v-card-item>
-    <v-divider color="primary"></v-divider>
-    <v-card-text class="mt-6">
-      <v-form ref="form" v-model="valid" lazy-validation>
-        <v-row>
-          <v-col cols="6">
-            <v-text-field v-model="firstname" :rules="firstnameRules" label="First Name" maxlength="20" underlined
-              prepend-inner-icon="mdi-card-account-details" required clearable></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field v-model="lastname" :rules="lastnameRules" label="Last Name" maxlength="20" underlined
-              prepend-inner-icon="mdi-card-account-details" required clearable></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="email" label="Email" :rules="emailRules" preprnd-inner-icon="mdi-email" underlined
-              required clearable></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="password" prepend-inner-icon="mdi-lock"
-              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"
-              :type="showPassword ? 'text' : 'password'" label="Password" counter
-              @click:append-inner="showPassword = !showPassword" underlined required clearable>
-            </v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="passwordCheck" prepend-inner-icon="mdi-lock"
-              :append-inner-icon="showPasswordCheck ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="[...passwordRules, passwordMatch]" :type="showPasswordCheck ? 'text' : 'password'"
-              label="Confirm Password" counter @click:append-inner="showPasswordCheck = !showPasswordCheck" underlined
-              required clearable>
-            </v-text-field>
-          </v-col>
-          <v-col cols="12" align="center">
-            <v-btn size="large" :disabled="!valid" variant="tonal" append-icon="mdi-account-circle"
-              @click="signup">Signup
-              <template v-slot:append>
-                <v-icon color="primary"></v-icon>
-              </template>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-form>
-    </v-card-text>
-  </v-card>
 </template>
 <style scoped></style>

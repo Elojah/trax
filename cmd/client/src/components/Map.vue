@@ -6,20 +6,8 @@ let zoom = 3;
 </script>
 
 <template>
-	<v-row class="fill-height">
-		<v-col cols="12 pa-0 ma-0">
-			<l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
-				<l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
-					name="MAP"></l-tile-layer>
-			</l-map>
-		</v-col>
-	</v-row>
 </template>
 <style>
-.bg {
-	background: url('@/assets/img/main-background.svg') !important;
-}
-
 .leaflet-container {
 	background-color: rgba(255, 0, 0, 0.0);
 }

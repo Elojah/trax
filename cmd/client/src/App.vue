@@ -18,11 +18,6 @@ onUnmounted(() => clearInterval(timer.value))
 </script>
 
 <template>
-  <v-app id="trax">
-    <Drawer />
-    <RouterView />
-    <Errors />
-  </v-app>
 </template>
 
 <style scoped></style>

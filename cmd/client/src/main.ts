@@ -1,8 +1,6 @@
-import './assets/main.css'
-import '@mdi/font/css/materialdesignicons.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import PrimeVue from 'primevue/config';
 import GoogleSignInPlugin from "vue3-google-signin"
 
 import App from './App.vue'
@@ -17,16 +15,11 @@ app.use(GoogleSignInPlugin, {
   clientId: config.google_client_id,
 });
 
-app.use(createVuetify({
-  theme: {
-    defaultTheme: 'dark',
-  },
-  icons: {
-    defaultSet: 'mdi',
-  },
-}))
+app.use(PrimeVue, {
+  theme: { preset: 'aura' },
+  ripple: true,
+})
 
 app.use(router)
 
 app.mount('#app')
-
