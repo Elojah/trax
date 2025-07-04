@@ -2,7 +2,6 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import fs from 'fs';
 
@@ -38,7 +37,6 @@ export default async () => {
       loadConfigPlugin,
       vue(),
       vueJsx(),
-      vuetify(),
     ],
     build: {
       sourcemap: true,

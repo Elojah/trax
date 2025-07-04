@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useEntityStore } from '@/stores/entity';
 import { computed, ref, toRefs, watch } from 'vue';
-import type { VForm } from 'vuetify/components/VForm';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
 import { useRoleStore } from '@/stores/role';

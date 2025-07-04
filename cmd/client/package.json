@@ -21,11 +21,9 @@
     "pinia": "^2.1.7",
     "pino": "latest",
     "typescript-cookie": "^1.0.6",
-    "vite-plugin-vuetify": "^2.0.3",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
     "vue3-google-signin": "^2.1.1",
-    "vuetify": "^3.5.9"
   },
   "devDependencies": {
     "@protobuf-ts/grpcweb-transport": "^2.9.4",

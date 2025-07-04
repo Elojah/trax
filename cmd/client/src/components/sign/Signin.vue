@@ -3,7 +3,6 @@ import { toRefs, ref } from "vue";
 import { SigninReq } from '@internal/user/dto/user';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
-import type { VForm } from "vuetify/components/VForm";
 import { type CredentialResponse } from "vue3-google-signin";
 import router from "@/router";
 import { logger } from "@/config";

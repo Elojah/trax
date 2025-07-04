@@ -3,7 +3,6 @@ import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { SignupReq } from '@internal/user/dto/user';
 import { toRefs, ref } from "vue";
-import type { VForm } from 'vuetify/components/VForm';
 
 const form = ref<VForm | null>(null);
 

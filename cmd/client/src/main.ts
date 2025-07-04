@@ -1,10 +1,8 @@
 import './assets/main.css'
 import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createVuetify } from 'vuetify'
 import GoogleSignInPlugin from "vue3-google-signin"
 
 import App from './App.vue'
@@ -21,7 +19,7 @@ app.use(GoogleSignInPlugin, {
 
 app.use(createVuetify({
   theme: {
-    defaultTheme:'dark',
+    defaultTheme: 'dark',
   },
   icons: {
     defaultSet: 'mdi',
