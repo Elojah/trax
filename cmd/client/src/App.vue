@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Drawer from '@/components/Drawer.vue';
+import Menu from '@/components/Menu.vue';
 import Errors from '@/components/Errors.vue';
-import Menu from 'primevue/menu';
 
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from './stores/auth';
@@ -16,17 +15,16 @@ onMounted(async () => {
 });
 
 onUnmounted(() => clearInterval(timer.value))
-
-const items = ref([
-    { label: 'New', icon: 'pi pi-plus' },
-    { label: 'Search', icon: 'pi pi-search' }
-]);
 </script>
 
 <template>
-      <div class="card flex justify-center">
-        <Menu :model="items" />
+  <div class="layout">
+    <Menu />
+    <div class="layout-content">
+      <router-view />
+      <Errors />
     </div>
+  </div>
 </template>
 
 <style scoped></style>

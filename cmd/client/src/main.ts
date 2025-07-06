@@ -1,6 +1,9 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+
 import PrimeVue from 'primevue/config';
+import 'primeicons/primeicons.css';
+
 import GoogleSignInPlugin from "vue3-google-signin"
 
 import App from './App.vue'
@@ -16,7 +19,6 @@ app.use(GoogleSignInPlugin, {
 });
 
 app.use(PrimeVue, {
-  theme: { preset: 'aura' },
   ripple: true,
 })
 
