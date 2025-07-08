@@ -2,7 +2,6 @@
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router';
 import { computed, ref, toRefs } from 'vue';
-import type { VForm } from 'vuetify/components/VForm';
 
 const form = ref<VForm | null>(null);
 

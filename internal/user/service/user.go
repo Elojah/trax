@@ -1,4 +1,4 @@
-package agg
+package service
 
 import (
 	"context"
@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-var _ user.Agg = (*Agg)(nil)
+var _ user.Service = (*S)(nil)
 
-type Agg struct {
+type S struct {
 	transaction.Transactioner
 
 	user.Store
@@ -27,14 +27,14 @@ type Agg struct {
 	user.StorePermission
 	user.StoreRoleUser
 
-	Cookie cookie.Agg
+	Cookie cookie.Service
 }
 
-func (a *Agg) Dial(ctx context.Context) error {
+func (s *S) Dial(ctx context.Context) error {
 	return nil
 }
 
-func (a Agg) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string) (user.ClaimAuth, error) {
+func (s S) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string) (user.ClaimAuth, error) {
 	var ca user.ClaimAuth
 
 	// don't populate any claims for token other than access
@@ -42,10 +42,10 @@ func (a Agg) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string
 		return ca, nil
 	}
 
-	if err := a.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+	if err := s.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
-		ca, err = a.ListClaims(ctx, userID)
+		ca, err = s.ListClaims(ctx, userID)
 		if err != nil {
 			return transaction.Rollback, err
 		}
@@ -58,17 +58,17 @@ func (a Agg) fetchClaimAuth(ctx context.Context, userID ulid.ID, audience string
 	return ca, nil
 }
 
-func (a Agg) CreateJWT(ctx context.Context, u user.U, audience string, validity time.Duration) (string, error) {
+func (s S) CreateJWT(ctx context.Context, u user.U, audience string, validity time.Duration) (string, error) {
 	// #MARK:Create JWT
 	id := ulid.NewID()
 
-	// use cookie rotation encoding to generate a rotating secret for JWT
-	secret, err := a.Cookie.Encode(ctx, "jwt_secret", string(id.Bytes()))
+	// use cookie rotation encoding to generate s rotating secret for JWT
+	secret, err := s.Cookie.Encode(ctx, "jwt_secret", string(id.Bytes()))
 	if err != nil {
 		return "", err
 	}
 
-	ca, err := a.fetchClaimAuth(ctx, u.ID, audience)
+	ca, err := s.fetchClaimAuth(ctx, u.ID, audience)
 	if err != nil {
 		return "", err
 	}
@@ -95,7 +95,7 @@ func (a Agg) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 		return "", err
 	}
 
-	ck, err := a.Cookie.Encode(ctx, "token", ss)
+	ck, err := s.Cookie.Encode(ctx, "token", ss)
 	if err != nil {
 		return "", err
 	}
@@ -103,8 +103,8 @@ func (a Agg) CreateJWT(ctx context.Context, u user.U, audience string, validity 
 	return ck, nil
 }
 
-func (a Agg) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
-	ck, err := a.Cookie.Decode(ctx, "token", token)
+func (s S) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
+	ck, err := s.Cookie.Decode(ctx, "token", token)
 	if err != nil {
 		return user.Claims{}, err
 	}
@@ -115,7 +115,7 @@ func (a Agg) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
 			return user.Claims{}, user.ErrInvalidClaims{}
 		}
 
-		secret, err := a.Cookie.Decode(ctx, "jwt_secret", claims.RegisteredClaims.ID)
+		secret, err := s.Cookie.Decode(ctx, "jwt_secret", claims.RegisteredClaims.ID)
 		if err != nil {
 			return "", err
 		}
@@ -139,7 +139,7 @@ func (a Agg) ReadJWT(ctx context.Context, token string) (user.Claims, error) {
 	return *claims, nil
 }
 
-func (a Agg) Auth(ctx context.Context, audience string) (user.Claims, error) {
+func (s S) Auth(ctx context.Context, audience string) (user.Claims, error) {
 	// read & parse token
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -158,7 +158,7 @@ func (a Agg) Auth(ctx context.Context, audience string) (user.Claims, error) {
 		return user.Claims{}, errors.ErrMissingAuth{}
 	}
 
-	claims, err := a.ReadJWT(ctx, token)
+	claims, err := s.ReadJWT(ctx, token)
 	if err != nil {
 		return user.Claims{}, err
 	}

@@ -1,1 +1,1 @@
-export class SignInError extends Error {}
+export class SignInError extends Error { }

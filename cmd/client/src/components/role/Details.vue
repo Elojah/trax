@@ -70,31 +70,4 @@ const deleteRole = async () => {
 </script>
 
 <template>
-	<v-container class="px-0">
-		<v-card flat class="mb-4">
-			<PermissionTable :permissions="props.item?.permissions" ref="ps" :disabled="admin">
-			</PermissionTable>
-			<v-card-actions v-if="!admin">
-				<v-spacer></v-spacer>
-				<v-btn color="primary" variant="text" prepend-icon="mdi-pencil" @click="edit">
-					Edit
-					<template v-slot:prepend>
-						<v-icon color="primary"></v-icon>
-					</template>
-				</v-btn>
-				<v-btn color="warning" variant="text" prepend-icon="mdi-pencil-off" @click="reset">
-					Reset
-					<template v-slot:prepend>
-						<v-icon color="warning"></v-icon>
-					</template>
-				</v-btn>
-				<v-btn color="error" variant="text" prepend-icon="mdi-trash-can" @click="deleteRole">
-					Delete
-					<template v-slot:prepend>
-						<v-icon color="error"></v-icon>
-					</template>
-				</v-btn>
-			</v-card-actions>
-		</v-card>
-	</v-container>
 </template>

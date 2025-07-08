@@ -7,11 +7,11 @@ import (
 	"time"
 
 	authgrpc "github.com/elojah/trax/cmd/auth/grpc"
-	useragg "github.com/elojah/trax/internal/user/agg"
 	userpostgres "github.com/elojah/trax/internal/user/postgres"
-	cookieagg "github.com/elojah/trax/pkg/cookie/agg"
+	useragg "github.com/elojah/trax/internal/user/service"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
-	googleagg "github.com/elojah/trax/pkg/google/agg"
+	cookieagg "github.com/elojah/trax/pkg/cookie/service"
+	googleagg "github.com/elojah/trax/pkg/google/service"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	glog "github.com/elojah/trax/pkg/log"
 	"github.com/elojah/trax/pkg/postgres"
@@ -78,31 +78,31 @@ func run(prog string, filename string) {
 
 	cs = append(cs, &rediss)
 
-	googleAgg := googleagg.Agg{}
-	if err := googleAgg.Dial(ctx, cfg.Google); err != nil {
-		log.Error().Err(err).Msg("failed to dial google agg")
+	googleService := googleagg.S{}
+	if err := googleService.Dial(ctx, cfg.Google); err != nil {
+		log.Error().Err(err).Msg("failed to dial google service")
 
 		return
 	}
 
-	cs = append(cs, &googleAgg)
+	cs = append(cs, &googleService)
 
 	cookieCache := &cookieredis.Cache{Service: rediss}
-	cookieAgg := &cookieagg.A{
+	cookieService := &cookieagg.S{
 		CacheKeys: cookieCache,
 	}
 
 	userStore := &userpostgres.Store{}
-	userAgg := useragg.Agg{
+	userService := useragg.S{
 		Transactioner:   postgress,
 		Store:           userStore,
 		StoreEntity:     userStore,
 		StoreRole:       userStore,
 		StorePermission: userStore,
 		StoreRoleUser:   userStore,
-		Cookie:          cookieAgg,
+		Cookie:          cookieService,
 	}
-	if err := userAgg.Dial(ctx); err != nil {
+	if err := userService.Dial(ctx); err != nil {
 		log.Error().Err(err).Msg("failed to dial user application")
 
 		return
@@ -110,9 +110,9 @@ func run(prog string, filename string) {
 
 	// init handler
 	h := handler{
-		google: googleAgg,
+		google: googleService,
 
-		user: userAgg,
+		user: userService,
 	}
 
 	// init grpc api server

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Drawer from '@/components/Drawer.vue';
+import Menu from '@/components/Menu.vue';
 import Errors from '@/components/Errors.vue';
 
 import { onMounted, onUnmounted, ref } from 'vue'
@@ -18,11 +18,13 @@ onUnmounted(() => clearInterval(timer.value))
 </script>
 
 <template>
-  <v-app id="trax">
-    <Drawer />
-    <RouterView />
-    <Errors />
-  </v-app>
+  <div class="layout-container">
+    <Menu />
+    <div class="layout-grid">
+      <!-- <router-view /> -->
+      <!-- <Errors /> -->
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

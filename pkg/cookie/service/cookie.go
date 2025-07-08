@@ -1,4 +1,4 @@
-package agg
+package service
 
 import (
 	"context"
@@ -9,16 +9,16 @@ import (
 
 const maxCookieLength = 131072
 
-type A struct {
+type S struct {
 	cookie.CacheKeys
 }
 
 // Initial keys setup
 
-func (a *A) Setup(ctx context.Context, n int) error {
+func (s *S) Setup(ctx context.Context, n int) error {
 	keys := make([]cookie.Keys, 0, n)
 
-	if err := a.DeleteKeys(ctx, cookie.FilterKeys{
+	if err := s.DeleteKeys(ctx, cookie.FilterKeys{
 		All: true,
 	}); err != nil {
 		return err
@@ -28,7 +28,7 @@ func (a *A) Setup(ctx context.Context, n int) error {
 		keys = append(keys, cookie.NewKeys())
 	}
 
-	if err := a.CreateKeys(ctx, keys...); err != nil {
+	if err := s.CreateKeys(ctx, keys...); err != nil {
 		return err
 	}
 
@@ -37,8 +37,8 @@ func (a *A) Setup(ctx context.Context, n int) error {
 
 // Encoding/Decoding helpers
 
-func (a A) Encode(ctx context.Context, key string, value string) (string, error) {
-	ks, err := a.ReadKeys(ctx, cookie.FilterKeys{All: true})
+func (s S) Encode(ctx context.Context, key string, value string) (string, error) {
+	ks, err := s.ReadKeys(ctx, cookie.FilterKeys{All: true})
 	if err != nil {
 		return "", err
 	}
@@ -58,8 +58,8 @@ func (a A) Encode(ctx context.Context, key string, value string) (string, error)
 	return ck, nil
 }
 
-func (a A) Decode(ctx context.Context, key string, value string) (string, error) {
-	keys, err := a.ReadKeys(ctx, cookie.FilterKeys{All: true})
+func (s S) Decode(ctx context.Context, key string, value string) (string, error) {
+	keys, err := s.ReadKeys(ctx, cookie.FilterKeys{All: true})
 	if err != nil {
 		return "", err
 	}
@@ -73,11 +73,11 @@ func (a A) Decode(ctx context.Context, key string, value string) (string, error)
 		return result
 	}()
 
-	var s string
+	var result string
 
 	if err := securecookie.DecodeMulti(key, value, &s, scs...); err != nil {
 		return "", err
 	}
 
-	return s, nil
+	return result, nil
 }
