@@ -7,9 +7,9 @@ const (
 	NKeys     = 5
 )
 
-// Agg
+// Service
 
-type Agg interface {
+type Service interface {
 	CacheKeys
 
 	Encode(context.Context, string, string) (string, error)

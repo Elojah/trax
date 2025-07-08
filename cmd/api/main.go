@@ -8,14 +8,14 @@ import (
 	"os"
 	"time"
 
-	useragg "github.com/elojah/trax/internal/user/agg"
 	userpostgres "github.com/elojah/trax/internal/user/postgres"
+	useragg "github.com/elojah/trax/internal/user/service"
 
 	// userredis "github.com/elojah/trax/internal/user/redis"
 
 	apigrpc "github.com/elojah/trax/cmd/api/grpc"
-	cookieagg "github.com/elojah/trax/pkg/cookie/agg"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
+	cookieagg "github.com/elojah/trax/pkg/cookie/service"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	"github.com/elojah/trax/pkg/grpcweb"
 	ghttp "github.com/elojah/trax/pkg/http"
@@ -84,7 +84,7 @@ func run(prog string, filename string) {
 	cs = append(cs, &rediss)
 
 	cookieCache := &cookieredis.Cache{Service: rediss}
-	cookieAgg := &cookieagg.A{
+	cookieService := &cookieagg.S{
 		CacheKeys: cookieCache,
 	}
 
@@ -101,18 +101,18 @@ func run(prog string, filename string) {
 
 	userStore := &userpostgres.Store{}
 	// userCache := &userredis.Cache{Service: rediss}
-	userAgg := useragg.Agg{
+	userService := useragg.S{
 		Transactioner:   postgress,
 		Store:           userStore,
 		StoreEntity:     userStore,
 		StoreRole:       userStore,
 		StorePermission: userStore,
 		StoreRoleUser:   userStore,
-		Cookie:          cookieAgg,
+		Cookie:          cookieService,
 		// Cache: userCache,
 	}
 
-	if err := userAgg.Dial(ctx); err != nil {
+	if err := userService.Dial(ctx); err != nil {
 		log.Error().Err(err).Msg("failed to dial user application")
 
 		return
@@ -120,7 +120,7 @@ func run(prog string, filename string) {
 
 	// init handler
 	h := handler{
-		user: userAgg,
+		user: userService,
 	}
 
 	// init grpc ONLY server

@@ -8,8 +8,8 @@ import (
 
 	admingrpc "github.com/elojah/trax/cmd/admin/grpc"
 	"github.com/elojah/trax/pkg/cookie"
-	cookieagg "github.com/elojah/trax/pkg/cookie/agg"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
+	cookieagg "github.com/elojah/trax/pkg/cookie/service"
 	ggrpc "github.com/elojah/trax/pkg/grpc"
 	glog "github.com/elojah/trax/pkg/log"
 	"github.com/elojah/trax/pkg/redis"
@@ -64,19 +64,19 @@ func run(prog string, filename string) {
 	cs = append(cs, &rediss)
 
 	cookieCache := &cookieredis.Cache{Service: rediss}
-	cookieAgg := &cookieagg.A{
+	cookieService := &cookieagg.S{
 		CacheKeys: cookieCache,
 	}
 
 	// setup initial cookie keys
-	if err := cookieAgg.Setup(ctx, cookie.NKeys); err != nil {
+	if err := cookieService.Setup(ctx, cookie.NKeys); err != nil {
 		log.Error().Err(err).Msg("failed to setup cookie keys")
 
 		return
 	}
 
 	h := handler{
-		cookie: cookieAgg,
+		cookie: cookieService,
 	}
 
 	// init grpc api server

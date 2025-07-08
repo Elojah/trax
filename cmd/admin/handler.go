@@ -5,5 +5,5 @@ import (
 )
 
 type handler struct {
-	cookie cookie.Agg
+	cookie cookie.Service
 }

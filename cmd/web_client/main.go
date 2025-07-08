@@ -10,9 +10,9 @@ import (
 	"time"
 
 	authgrpc "github.com/elojah/trax/cmd/auth/grpc"
-	cookieagg "github.com/elojah/trax/pkg/cookie/agg"
 	cookieredis "github.com/elojah/trax/pkg/cookie/redis"
-	googleapp "github.com/elojah/trax/pkg/google/agg"
+	cookieagg "github.com/elojah/trax/pkg/cookie/service"
+	googleapp "github.com/elojah/trax/pkg/google/service"
 	tgrpc "github.com/elojah/trax/pkg/grpc"
 	thttp "github.com/elojah/trax/pkg/http"
 	tlog "github.com/elojah/trax/pkg/log"
@@ -98,7 +98,7 @@ func run(prog string, filename string) {
 	cs = append(cs, &rediss)
 
 	cookieCache := &cookieredis.Cache{Service: rediss}
-	cookieAgg := &cookieagg.A{
+	cookieService := &cookieagg.S{
 		CacheKeys: cookieCache,
 	}
 
@@ -111,16 +111,16 @@ func run(prog string, filename string) {
 
 	cs = append(cs, &authclient)
 
-	googleAgg := googleapp.Agg{}
-	if err := googleAgg.Dial(ctx, cfg.Google); err != nil {
-		log.Error().Err(err).Msg("failed to dial google agg")
+	googleService := googleapp.S{}
+	if err := googleService.Dial(ctx, cfg.Google); err != nil {
+		log.Error().Err(err).Msg("failed to dial google service")
 
 		return
 	}
 
 	h := handler{
-		cookie:     cookieAgg,
-		google:     googleAgg,
+		cookie:     cookieService,
+		google:     googleService,
 		AuthClient: authgrpc.NewAuthClient(authclient.ClientConn),
 	}
 
