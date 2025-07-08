@@ -18,11 +18,11 @@ onUnmounted(() => clearInterval(timer.value))
 </script>
 
 <template>
-  <div class="layout">
+  <div class="layout-container">
     <Menu />
-    <div class="layout-content">
-      <router-view />
-      <Errors />
+    <div class="layout-grid">
+      <!-- <router-view /> -->
+      <!-- <Errors /> -->
     </div>
   </div>
 </template>
