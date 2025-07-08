@@ -34,7 +34,7 @@ STATIC            = static
 
 ROOT               = .
 GEN_PB_GO          = protoc -I=$(ROOT) --gogoslick_out=plugins=grpc,paths=source_relative:$(ROOT)
-GEN_PB_TS          = cd cmd/client && npx protoc -I=../../$(ROOT) --ts_out ../../$(ROOT) --ts_opt generate_dependencies,optimize_speed,long_type_string
+GEN_PB_TS          = cd cmd/client && npx protoc -I=../../$(ROOT) --ts_out ../../$(ROOT) --ts_opt optimize_speed
 
 .PHONY: all
 all: admin api auth client web_client
