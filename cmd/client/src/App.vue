@@ -21,8 +21,8 @@ onUnmounted(() => clearInterval(timer.value))
   <div class="layout">
     <Menu />
     <div class="layout-content">
-      <router-view />
-      <Errors />
+      <!-- <router-view /> -->
+      <!-- <Errors /> -->
     </div>
   </div>
 </template>

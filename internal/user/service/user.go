@@ -62,7 +62,7 @@ func (s S) CreateJWT(ctx context.Context, u user.U, audience string, validity ti
 	// #MARK:Create JWT
 	id := ulid.NewID()
 
-	// use cookie rotation encoding to generate s rotating secret for JWT
+	// use cookie rotation encoding to generate a rotating secret for JWT
 	secret, err := s.Cookie.Encode(ctx, "jwt_secret", string(id.Bytes()))
 	if err != nil {
 		return "", err

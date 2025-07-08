@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
+import { separator } from '@primeuix/themes/aura/breadcrumb';
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -14,9 +15,15 @@ const active = true;
 
 const menu = [
 	{
+		separator: true
+	},
+	{
 		label: 'Dashboard',
 		icon: 'pi pi-fw pi-home',
 		command: () => redirect('dashboard')
+	},
+		{
+		separator: true
 	},
 	{
 		label: 'Settings',
@@ -44,13 +51,11 @@ const menu = [
 </script>
 
 <template>
-    <aside class="layout-sidebar" :class="{ active: active }">
-        <nav>
-            <ol class="layout-menu">
-                <AppMenuItem :menu="menu"></AppMenuItem>
-            </ol>
-        </nav>
-    </aside>
+	<Menu :model="menu">
+		<template #start>
+			<img src="@/assets/logo.svg" alt="Logo" class="logo" />
+		</template>
+	</Menu>
 </template>
 
 <style scoped>

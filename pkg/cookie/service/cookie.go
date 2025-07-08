@@ -75,7 +75,7 @@ func (s S) Decode(ctx context.Context, key string, value string) (string, error)
 
 	var result string
 
-	if err := securecookie.DecodeMulti(key, value, &s, scs...); err != nil {
+	if err := securecookie.DecodeMulti(key, value, &result, scs...); err != nil {
 		return "", err
 	}
 
