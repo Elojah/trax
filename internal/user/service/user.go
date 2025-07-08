@@ -21,7 +21,7 @@ type S struct {
 
 	user.Store
 
-	user.StoreEntity
+	user.StoreGroup
 
 	user.StoreRole
 	user.StorePermission

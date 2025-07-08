@@ -3,7 +3,7 @@ import Dashboard from '@/views/Dashboard.vue'
 import Sign from '@/views/Sign.vue'
 import User from '@/views/User.vue'
 import Map from '@/views/Map.vue'
-import Entity from '@/views/Entity.vue'
+import Group from '@/views/Group.vue'
 import NotFound from '@/views/NotFound.vue'
 import { useAuthStore } from '@/stores/auth'
 // import { config } from '@/config'
@@ -37,9 +37,9 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/entity',
-      name: 'entity',
-      component: Entity,
+      path: '/group',
+      name: 'group',
+      component: Group,
       meta: { requiresAuth: true }
     },
     {

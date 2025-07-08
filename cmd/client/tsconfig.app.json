@@ -8,25 +8,29 @@
     "../../internal/**/*.ts",
     "../../cmd/api/grpc/**/*.ts"
   ],
-  "exclude": ["src/**/__tests__/*"],
+  "exclude": [
+    "src/**/__tests__/*"
+  ],
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": [
+        "./src/*"
+      ],
       "@pkg/*": [
-				"../../pkg/*"
-			],
-			"@internal/*": [
-				"../../internal/*"
-			],
-			"@api/*": [
-				"../../cmd/api/grpc/*"
-			],
-			"@protobuf-ts/*": [
-				"./node_modules/@protobuf-ts"
-			],
+        "../../pkg/*"
+      ],
+      "@internal/*": [
+        "../../internal/*"
+      ],
+      "@api/*": [
+        "../../cmd/api/grpc/*"
+      ],
+      "@protobuf-ts/*": [
+        "./node_modules/@protobuf-ts"
+      ],
     },
   }
 }

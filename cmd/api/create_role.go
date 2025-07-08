@@ -28,7 +28,7 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.
 		return &dto.RolePermission{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_role, Command: user.C_write}); err != nil {
+	if err := claims.Require(user.Requirement{GroupID: req.GroupID, Resource: user.R_role, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
@@ -36,7 +36,7 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.
 
 	// #MARK:Check permissions
 	for _, perm := range req.Permissions {
-		if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
+		if err := claims.Require(user.Requirement{GroupID: req.GroupID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()
@@ -46,7 +46,7 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.
 	now := time.Now().Unix()
 	role := user.Role{
 		ID:        ulid.NewID(),
-		EntityID:  req.EntityID,
+		GroupID:   req.GroupID,
 		Name:      req.Name,
 		CreatedAt: now,
 		UpdatedAt: now,

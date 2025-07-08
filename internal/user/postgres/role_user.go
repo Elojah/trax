@@ -204,7 +204,7 @@ func (s Store) ListClaims(ctx context.Context, userID ulid.ID) (user.ClaimAuth, 
 
 	b := strings.Builder{}
 	b.WriteString(`
-		SELECT r.entity_id, r.id, p.resource, p.command
+		SELECT r.group_id, r.id, p.resource, p.command
 		FROM "user"."role_user" ru
 		JOIN "user"."role" r ON ru.role_id = r.id
 		JOIN "user"."permission" p ON r.id = p.role_id
@@ -219,40 +219,40 @@ func (s Store) ListClaims(ctx context.Context, userID ulid.ID) (user.ClaimAuth, 
 	var claim user.ClaimAuth
 
 	for rows.Next() {
-		var entityID, roleID ulid.ID
+		var groupID, roleID ulid.ID
 		var resource, command string
 
-		if err := rows.Scan(&entityID, &roleID, &resource, &command); err != nil {
+		if err := rows.Scan(&groupID, &roleID, &resource, &command); err != nil {
 			return user.ClaimAuth{}, postgres.Error(err, "role_user+claim", userID.String())
 		}
 
-		eid := entityID.String()
+		eid := groupID.String()
 		rid := roleID.String()
 
-		if claim.Entities == nil {
-			claim.Entities = make(map[string]user.ClaimEntity)
+		if claim.Groups == nil {
+			claim.Groups = make(map[string]user.ClaimGroup)
 		}
 
-		if _, ok := claim.Entities[eid]; !ok {
-			claim.Entities[eid] = user.ClaimEntity{
-				ID:        entityID,
+		if _, ok := claim.Groups[eid]; !ok {
+			claim.Groups[eid] = user.ClaimGroup{
+				ID:        groupID,
 				Roles:     make(map[string]pbtypes.Empty),
 				Resources: make(map[string]user.ClaimResources),
 			}
 		}
 
-		if _, ok := claim.Entities[eid].Roles[rid]; !ok {
-			claim.Entities[eid].Roles[rid] = pbtypes.Empty{}
+		if _, ok := claim.Groups[eid].Roles[rid]; !ok {
+			claim.Groups[eid].Roles[rid] = pbtypes.Empty{}
 		}
 
-		if _, ok := claim.Entities[eid].Resources[resource]; !ok {
-			claim.Entities[eid].Resources[resource] = user.ClaimResources{
+		if _, ok := claim.Groups[eid].Resources[resource]; !ok {
+			claim.Groups[eid].Resources[resource] = user.ClaimResources{
 				Commands: make(map[string]pbtypes.Empty),
 			}
 		}
 
-		if _, ok := claim.Entities[eid].Resources[resource].Commands[command]; !ok {
-			claim.Entities[eid].Resources[resource].Commands[command] = pbtypes.Empty{}
+		if _, ok := claim.Groups[eid].Resources[resource].Commands[command]; !ok {
+			claim.Groups[eid].Resources[resource].Commands[command] = pbtypes.Empty{}
 		}
 	}
 

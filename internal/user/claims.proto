@@ -22,7 +22,7 @@ message ClaimResources {
 	map<string, pbtypes.Empty> Commands            = 1 [(gogoproto.nullable) = false];
 }
 
-message ClaimEntity {
+message ClaimGroup {
 	bytes ID                                       = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	// Roles key must be a user.Role ID
 	map<string, pbtypes.Empty> Roles               = 2 [(gogoproto.nullable) = false];
@@ -31,6 +31,6 @@ message ClaimEntity {
 }
 
 message ClaimAuth {
-	// Entities key must be a entity.ID
-	map<string, ClaimEntity> Entities              = 1 [(gogoproto.nullable) = false];
+	// Groups key must be a group.ID
+	map<string, ClaimGroup> Groups              = 1 [(gogoproto.nullable) = false];
 }

@@ -104,7 +104,7 @@ func run(prog string, filename string) {
 	userService := useragg.S{
 		Transactioner:   postgress,
 		Store:           userStore,
-		StoreEntity:     userStore,
+		StoreGroup:      userStore,
 		StoreRole:       userStore,
 		StorePermission: userStore,
 		StoreRoleUser:   userStore,

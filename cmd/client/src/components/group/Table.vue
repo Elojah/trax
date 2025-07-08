@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useEntityStore } from '@/stores/entity';
+import { useGroupStore } from '@/stores/group';
 import { computed, ref, toRefs } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { ulid } from '@/utils/ulid';
-import { ListEntityReq } from '@internal/user/dto/entity';
+import { ListGroupReq } from '@internal/user/dto/group';
 import { grpccodes } from '@/utils/errors';
 
 const valid = ref(null as boolean | null)
@@ -25,9 +25,9 @@ const pageOptions = [
 ]
 
 const authStore = useAuthStore();
-const store = useEntityStore();
+const store = useGroupStore();
 const {
-	entities: entities,
+	groups: groups,
 	total: total,
 	selected: selected,
 } = toRefs(store);
@@ -45,7 +45,7 @@ const search = ref('');
 const viewIDs = ref<string[]>([])
 
 const views = computed(() => {
-	return viewIDs.value.map((entityID: string) => entities.value?.get(entityID));
+	return viewIDs.value.map((groupID: string) => groups.value?.get(groupID));
 });
 
 const select = (_: any, row: any) => {
@@ -58,7 +58,7 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 
 	try {
 		const { page, itemsPerPage, sortBy } = options;
-		const newIDs = await store.list(ListEntityReq.create({
+		const newIDs = await store.list(ListGroupReq.create({
 			own: true,
 			search: search.value,
 			paginate: {
@@ -81,7 +81,7 @@ defineExpose({
 	list,
 });
 
-// #MARK:Entity dialogs
+// #MARK:Group dialogs
 const nameRules = [
 	(v: string) => !!v || 'Required',
 	(v: string) => (v && v.length >= 1) || 'Min 1 character',
@@ -105,7 +105,7 @@ const create = async () => {
 	}
 
 	if (ok) {
-		message.value = `Entity ${name.value} created successfully`;
+		message.value = `Group ${name.value} created successfully`;
 		success.value = true;
 	}
 

@@ -36,7 +36,7 @@ CREATE TYPE "asset"."status" AS ENUM('owner', 'loan', 'transport');
 CREATE TABLE IF NOT EXISTS "asset"."holder" (
 	"id" UUID NOT NULL,
 	"asset_id" UUID NOT NULL,
-	"entity_id" UUID NOT NULL,
+	"group_id" UUID NOT NULL,
 	"status" "asset"."status" NOT NULL,
 	"transaction_id_init" UUID NOT NULL,
 	"transaction_id_term" UUID,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "asset"."holder" (
 	"updated_at" TIMESTAMP NOT NULL,
 	PRIMARY KEY ("id"),
 	CONSTRAINT "fk_holder_asset_id" FOREIGN KEY ("asset_id") REFERENCES "asset"."asset" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT "fk_holder_entity_id" FOREIGN KEY ("entity_id") REFERENCES "user"."entity" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "fk_holder_group_id" FOREIGN KEY ("group_id") REFERENCES "user"."group" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT "fk_holder_transaction_id_init" FOREIGN KEY ("transaction_id_init") REFERENCES "asset"."transaction" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT "fk_holder_transaction_id_term" FOREIGN KEY ("transaction_id_term") REFERENCES "asset"."transaction" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

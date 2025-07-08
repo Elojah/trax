@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { useEntityStore } from '@/stores/entity';
+import { useGroupStore } from '@/stores/group';
 import { Permission } from '@internal/user/role';
 import { ulid } from '@/utils/ulid';
 import { Command, Resource } from '@internal/user/role';
@@ -16,11 +16,11 @@ const {
 	claims: claims,
 } = toRefs(authStore);
 
-const entityStore = useEntityStore();
+const groupStore = useGroupStore();
 const {
-	selected: selectedEntities,
-} = toRefs(entityStore);
-const selectedEntityID = computed(() => ulid(selectedEntities.value.at(0)?.iD));
+	selected: selectedGroups,
+} = toRefs(groupStore);
+const selectedGroupID = computed(() => ulid(selectedGroups.value.at(0)?.iD));
 
 const hash = (resource: Resource, command: Command): string => {
 	return `${resource.toString()}_${command.toString()}`;

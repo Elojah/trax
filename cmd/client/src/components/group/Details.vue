@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { useEntityStore } from '@/stores/entity';
+import { useGroupStore } from '@/stores/group';
 import { computed, ref, toRefs } from 'vue';
 import { marked } from "marked";
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
-import { DeleteEntityReq, UpdateEntityReq } from '@internal/user/dto/entity';
+import { DeleteGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
 
 const props = defineProps<{
 	onDelete: () => void;
 }>();
 
 const authStore = useAuthStore();
-const store = useEntityStore();
+const store = useGroupStore();
 const {
 	selected: selected,
 } = toRefs(store);
@@ -19,10 +19,10 @@ const {
 const errorsStore = useErrorsStore()
 const { success, message } = toRefs(errorsStore)
 
-const e = computed(() => selected.value.at(0));
+const g = computed(() => selected.value.at(0));
 
 const mdDescription = computed(() => {
-	return marked.parse(e.value?.description || `*no description*`);
+	return marked.parse(g.value?.description || `*no description*`);
 });
 
 const dialogDelete = ref(false);
@@ -33,14 +33,14 @@ const closeDelete = () => {
 const confirmDelete = async () => {
 	let ok = true;
 	try {
-		await store.delete_(DeleteEntityReq.create({ iD: e.value?.iD }));
+		await store.delete_(DeleteGroupReq.create({ iD: g.value?.iD }));
 	} catch (e) {
 		errorsStore.showGRPC(e)
 		ok = false
 	}
 
 	if (ok) {
-		message.value = `Entity ${e.value?.name} deleted successfully`;
+		message.value = `Group ${g.value?.name} deleted successfully`;
 		success.value = true;
 	}
 
@@ -58,16 +58,16 @@ const updateName = async function () {
 	if (name.value) {
 		let ok = true;
 		try {
-			await store.update(UpdateEntityReq.create({
-				iD: e.value?.iD,
-				name: { value: e.value?.name },
+			await store.update(UpdateGroupReq.create({
+				iD: g.value?.iD,
+				name: { value: g.value?.name },
 			}));
 		} catch (e) {
 			errorsStore.showGRPC(e)
 			ok = false
 		}
 		if (ok) {
-			message.value = `Entity ${e.value?.name} updated name successfully`;
+			message.value = `Group ${g.value?.name} updated name successfully`;
 			success.value = true;
 		}
 	}
@@ -79,16 +79,16 @@ const updateDescription = async function () {
 	if (description.value) {
 		let ok = true;
 		try {
-			await store.update(UpdateEntityReq.create({
-				iD: e.value?.iD,
-				description: { value: e.value?.description },
+			await store.update(UpdateGroupReq.create({
+				iD: g.value?.iD,
+				description: { value: g.value?.description },
 			}));
 		} catch (e) {
 			errorsStore.showGRPC(e)
 			ok = false
 		}
 		if (ok) {
-			message.value = `Entity ${e.value?.name} updated description successfully`;
+			message.value = `Group ${g.value?.name} updated description successfully`;
 			success.value = true;
 		}
 	}

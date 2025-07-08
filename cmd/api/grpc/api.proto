@@ -17,10 +17,10 @@ import "pkg/gogoproto/gogo.proto";
 
 import "pkg/pbtypes/empty.proto";
 
-import "internal/user/entity.proto";
+import "internal/user/group.proto";
 import "internal/user/user.proto";
 import "internal/user/claims.proto";
-import "internal/user/dto/entity.proto";
+import "internal/user/dto/group.proto";
 import "internal/user/dto/role.proto";
 import "internal/user/dto/user.proto";
 
@@ -37,12 +37,12 @@ service API {
     // Claims
     rpc FetchClaims(pbtypes.Empty) returns (user.ClaimAuth);
 
-    // Entity
-    rpc ListEntity(dto.ListEntityReq) returns (dto.ListEntityResp);
-    rpc FetchEntity(dto.FetchEntityReq) returns (user.Entity);
-    rpc CreateEntity(dto.CreateEntityReq) returns (user.Entity);
-    rpc UpdateEntity(dto.UpdateEntityReq) returns (user.Entity);
-    rpc DeleteEntity(dto.DeleteEntityReq) returns (user.Entity);
+    // Group
+    rpc ListGroup(dto.ListGroupReq) returns (dto.ListGroupResp);
+    rpc FetchGroup(dto.FetchGroupReq) returns (user.Group);
+    rpc CreateGroup(dto.CreateGroupReq) returns (user.Group);
+    rpc UpdateGroup(dto.UpdateGroupReq) returns (user.Group);
+    rpc DeleteGroup(dto.DeleteGroupReq) returns (user.Group);
 
     // Roles
     rpc ListRole(dto.ListRoleReq) returns (dto.ListRoleResp);

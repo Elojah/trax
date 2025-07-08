@@ -26,10 +26,10 @@ export const useRoleStore = defineStore('role', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const create = async function (entityID: Uint8Array, name: string, permissions: Permission[]) {
+  const create = async function (groupID: Uint8Array, name: string, permissions: Permission[]) {
     try {
       const req = CreateRoleReq.create({
-        entityID: entityID,
+        groupID: groupID,
         name: name,
         permissions: permissions
       })
@@ -52,7 +52,7 @@ export const useRoleStore = defineStore('role', () => {
     }
   }
 
-  // Return roles ids and entity ids
+  // Return roles ids and group ids
   const list = async function (req: ListRoleReq): Promise<string[]> {
     try {
       const resp: { response: ListRoleResp } = await api.listRole(req, { meta: { token: token.value } })

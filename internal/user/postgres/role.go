@@ -23,7 +23,7 @@ var (
 
 type sqlRole struct {
 	ID        ulid.ID
-	EntityID  ulid.ID
+	GroupID   ulid.ID
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -32,7 +32,7 @@ type sqlRole struct {
 func newRole(r user.Role) sqlRole {
 	return sqlRole{
 		ID:        r.ID,
-		EntityID:  r.EntityID,
+		GroupID:   r.GroupID,
 		Name:      r.Name,
 		CreatedAt: time.Unix(r.CreatedAt, 0),
 		UpdatedAt: time.Unix(r.UpdatedAt, 0),
@@ -42,7 +42,7 @@ func newRole(r user.Role) sqlRole {
 func (sqlp sqlRole) role() user.Role {
 	return user.Role{
 		ID:        sqlp.ID,
-		EntityID:  sqlp.EntityID,
+		GroupID:   sqlp.GroupID,
 		Name:      sqlp.Name,
 		CreatedAt: sqlp.CreatedAt.Unix(),
 		UpdatedAt: sqlp.UpdatedAt.Unix(),
@@ -67,16 +67,16 @@ func (f filterRole) where(n int) (string, []any) {
 		n += len(f.IDs)
 	}
 
-	if f.EntityID != nil {
-		clause = append(clause, fmt.Sprintf(`r.entity_id = $%d`, n))
-		args = append(args, f.EntityID)
+	if f.GroupID != nil {
+		clause = append(clause, fmt.Sprintf(`r.group_id = $%d`, n))
+		args = append(args, f.GroupID)
 		n++
 	}
 
-	if len(f.EntityIDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`r.entity_id IN (%s)`, postgres.Array(n, len(f.EntityIDs))))
-		args = append(args, ulid.IDs(f.EntityIDs).Any()...)
-		n += len(f.EntityIDs)
+	if len(f.GroupIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`r.group_id IN (%s)`, postgres.Array(n, len(f.GroupIDs))))
+		args = append(args, ulid.IDs(f.GroupIDs).Any()...)
+		n += len(f.GroupIDs)
 	}
 
 	// ListRoleByUser only
@@ -116,12 +116,12 @@ func (f filterRole) index() string {
 		cols = append(cols, strings.Join(ss, "|"))
 	}
 
-	if f.EntityID != nil {
-		cols = append(cols, f.EntityID.String())
+	if f.GroupID != nil {
+		cols = append(cols, f.GroupID.String())
 	}
 
-	if f.EntityIDs != nil {
-		ss := ulid.IDs(f.EntityIDs).String()
+	if f.GroupIDs != nil {
+		ss := ulid.IDs(f.GroupIDs).String()
 		cols = append(cols, strings.Join(ss, "|"))
 	}
 
@@ -134,20 +134,20 @@ func (f filterRole) index() string {
 
 type patchRole user.PatchRole
 
-func (e patchRole) set() (string, []any, int) {
+func (p patchRole) set() (string, []any, int) {
 	var cols []string
 	var args []any
 	n := 1
 
-	if e.Name != nil {
+	if p.Name != nil {
 		cols = append(cols, fmt.Sprintf(`name = $%d`, n))
-		args = append(args, *e.Name)
+		args = append(args, *p.Name)
 		n++
 	}
 
-	if e.UpdatedAt != nil {
+	if p.UpdatedAt != nil {
 		cols = append(cols, fmt.Sprintf(`updated_at = $%d`, n))
-		args = append(args, time.Unix(*e.UpdatedAt, 0))
+		args = append(args, time.Unix(*p.UpdatedAt, 0))
 		n++
 	}
 
@@ -172,11 +172,11 @@ func (s Store) InsertRole(ctx context.Context, role user.Role) error {
 	r := newRole(role)
 
 	b := strings.Builder{}
-	b.WriteString(`INSERT INTO "user"."role" (id, entity_id, name, created_at, updated_at) VALUES (`)
+	b.WriteString(`INSERT INTO "user"."role" (id, group_id, name, created_at, updated_at) VALUES (`)
 	b.WriteString(postgres.Array(1, 5))
 	b.WriteString(`)`)
 
-	if _, err := tx.Exec(ctx, b.String(), r.ID, r.EntityID, r.Name, r.CreatedAt, r.UpdatedAt); err != nil {
+	if _, err := tx.Exec(ctx, b.String(), r.ID, r.GroupID, r.Name, r.CreatedAt, r.UpdatedAt); err != nil {
 		return postgres.Error(err, "role", r.ID.String())
 	}
 
@@ -200,18 +200,18 @@ func (s Store) UpdateRole(ctx context.Context, f user.FilterRole, p user.PatchRo
 
 	args = append(args, wargs...)
 
-	b.WriteString(` RETURNING id, entity_id, name, created_at, updated_at`)
+	b.WriteString(` RETURNING id, group_id, name, created_at, updated_at`)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
-		return nil, postgres.Error(err, "entity", filterRole(f).index())
+		return nil, postgres.Error(err, "group", filterRole(f).index())
 	}
 
 	var roles []user.Role
 
 	for rows.Next() {
 		var r sqlRole
-		if err := rows.Scan(&r.ID, &r.EntityID, &r.Name, &r.CreatedAt, &r.UpdatedAt); err != nil {
+		if err := rows.Scan(&r.ID, &r.GroupID, &r.Name, &r.CreatedAt, &r.UpdatedAt); err != nil {
 			return nil, postgres.Error(err, "role", filterRole(f).index())
 		}
 
@@ -228,7 +228,7 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at FROM "user"."role" r `)
+	b.WriteString(`SELECT r.id, r.group_id, r.name, r.created_at, r.updated_at FROM "user"."role" r `)
 
 	if f.UserID != nil {
 		b.WriteString(` JOIN "user"."role_user" ru ON r.id = ru.role_id `)
@@ -240,7 +240,7 @@ func (s Store) FetchRole(ctx context.Context, f user.FilterRole) (user.Role, err
 	q := tx.QueryRow(ctx, b.String(), args...)
 
 	var r sqlRole
-	if err := q.Scan(&r.ID, &r.EntityID, &r.Name, &r.CreatedAt, &r.UpdatedAt); err != nil {
+	if err := q.Scan(&r.ID, &r.GroupID, &r.Name, &r.CreatedAt, &r.UpdatedAt); err != nil {
 		return user.Role{}, postgres.Error(err, "role", filterRole(f).index())
 	}
 
@@ -254,7 +254,7 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT r.id, r.entity_id, r.name, r.created_at, r.updated_at, COUNT(1) OVER() `)
+	b.WriteString(`SELECT r.id, r.group_id, r.name, r.created_at, r.updated_at, COUNT(1) OVER() `)
 	if f.Paginate != nil {
 		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortRole))
 	} else {
@@ -287,7 +287,7 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 
 	for rows.Next() {
 		var r sqlRole
-		if err := rows.Scan(&r.ID, &r.EntityID, &r.Name, &r.CreatedAt, &r.UpdatedAt, &count, &row_number); err != nil {
+		if err := rows.Scan(&r.ID, &r.GroupID, &r.Name, &r.CreatedAt, &r.UpdatedAt, &count, &row_number); err != nil {
 			return nil, 0, postgres.Error(err, "role", filterRole(f).index())
 		}
 

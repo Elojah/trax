@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useEntityStore } from '@/stores/entity';
+import { useGroupStore } from '@/stores/group';
 import { computed, ref, toRefs, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { ulid } from '@/utils/ulid';
@@ -51,12 +51,12 @@ const authStore = useAuthStore();
 const errorsStore = useErrorsStore()
 const { success, message } = toRefs(errorsStore)
 
-const entityStore = useEntityStore();
+const groupStore = useGroupStore();
 const {
-	selected: selectedEntities,
-} = toRefs(entityStore);
+	selected: selectedGroups,
+} = toRefs(groupStore);
 
-const selectedEntity = computed(() => selectedEntities.value.at(0));
+const selectedGroup = computed(() => selectedGroups.value.at(0));
 
 // #MARK:Role
 // ______________________________________________________
@@ -84,7 +84,7 @@ const expand = (_: any, item: any) => {
 };
 
 const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 'created_at', order: 'desc' }] }) => {
-	if (!selectedEntity.value) {
+	if (!selectedGroup.value) {
 		viewIDs.value = [];
 
 		return
@@ -94,7 +94,7 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 	const { page, itemsPerPage, sortBy } = options;
 	try {
 		const newRoleIDs = await store.list(ListRoleReq.create({
-			entityIDs: [selectedEntity.value.iD],
+			groupIDs: [selectedGroup.value.iD],
 			userID: props.filterByUserID,
 			search: search.value,
 			paginate: {
@@ -113,8 +113,8 @@ const list = async (options: any = { page: 1, itemsPerPage: 10, sortBy: [{ key: 
 	loading.value = false;
 };
 
-// refresh list when selected entity changes
-watch(selectedEntity, async () => {
+// refresh list when selected group changes
+watch(selectedGroup, async () => {
 	await list();
 });
 
@@ -135,7 +135,7 @@ const create = async () => {
 
 	let ok = true;
 	try {
-		await store.create(selectedEntity?.value?.iD!, name.value, values);
+		await store.create(selectedGroup?.value?.iD!, name.value, values);
 	} catch (e) {
 		errorsStore.showGRPC(e)
 		ok = false;

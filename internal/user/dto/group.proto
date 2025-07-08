@@ -17,15 +17,15 @@ import "pkg/gogoproto/gogo.proto";
 import "pkg/pbtypes/string.proto";
 
 import "pkg/paginate/paginate.proto";
-import "internal/user/entity.proto";
+import "internal/user/group.proto";
 
-message CreateEntityReq {
+message CreateGroupReq {
 	string Name                 = 1;
     string Description          = 2;
     string AvatarURL            = 3;
 }
 
-message UpdateEntityReq {
+message UpdateGroupReq {
 	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
 	pbtypes.String Name           = 2;
@@ -33,11 +33,11 @@ message UpdateEntityReq {
     pbtypes.String AvatarURL      = 4;
 }
 
-message FetchEntityReq {
+message FetchGroupReq {
 	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
-message ListEntityReq {
+message ListGroupReq {
 	paginate.Paginate Paginate    = 1 [(gogoproto.nullable) = true];
 	string Search                 = 2;
 
@@ -45,11 +45,11 @@ message ListEntityReq {
 	repeated bytes IDs            = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
-message ListEntityResp {
-	repeated user.Entity Entities = 1 [(gogoproto.nullable) = false];
+message ListGroupResp {
+	repeated user.Group Groups = 1 [(gogoproto.nullable) = false];
 	uint64 Total                  = 2;
 }
 
-message DeleteEntityReq {
+message DeleteGroupReq {
 	bytes ID                      = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }

@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.1",
-    "google-protobuf": "^3.21.2",
+    "google-protobuf": "^3.21.4",
     "grpc-web": "^1.4.2",
     "marked": "^12.0.1",
     "pinia": "^2.1.7",

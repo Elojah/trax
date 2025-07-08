@@ -38,7 +38,7 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 		}
 	}
 
-	// Fetch entity from role
+	// Fetch group from role
 	if err := h.user.Tx(ctx, transaction.Read, func(ctx context.Context) (transaction.Operation, error) {
 		var err error
 
@@ -68,7 +68,7 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
 	}
 
-	if err := claims.Require(user.Requirement{EntityID: r.EntityID, Resource: user.R_role, Command: user.C_edit}); err != nil {
+	if err := claims.Require(user.Requirement{GroupID: r.GroupID, Resource: user.R_role, Command: user.C_edit}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &dto.RolePermission{}, status.New(codes.PermissionDenied, err.Error()).Err()
@@ -76,7 +76,7 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 
 	// #MARK:Check permissions
 	for _, perm := range req.Permissions {
-		if err := claims.Require(user.Requirement{EntityID: r.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
+		if err := claims.Require(user.Requirement{GroupID: r.GroupID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()

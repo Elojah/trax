@@ -19,9 +19,9 @@ export interface Role {
      */
     iD: Uint8Array;
     /**
-     * @generated from protobuf field: bytes EntityID = 2
+     * @generated from protobuf field: bytes GroupID = 2
      */
-    entityID: Uint8Array;
+    groupID: Uint8Array;
     /**
      * @generated from protobuf field: string Name = 3
      */
@@ -90,9 +90,9 @@ export enum Resource {
      */
     R_asset = 0,
     /**
-     * @generated from protobuf enum value: R_entity = 1;
+     * @generated from protobuf enum value: R_group = 1;
      */
-    R_entity = 1,
+    R_group = 1,
     /**
      * @generated from protobuf enum value: R_operation = 2;
      */
@@ -128,7 +128,7 @@ class Role$Type extends MessageType<Role> {
     constructor() {
         super("user.Role", [
             { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 2, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 2, name: "GroupID", kind: "scalar", jsonName: "GroupID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 3, name: "Name", kind: "scalar", jsonName: "Name", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "CreatedAt", kind: "scalar", jsonName: "CreatedAt", T: 3 /*ScalarType.INT64*/ },
             { no: 5, name: "UpdatedAt", kind: "scalar", jsonName: "UpdatedAt", T: 3 /*ScalarType.INT64*/ }
@@ -137,7 +137,7 @@ class Role$Type extends MessageType<Role> {
     create(value?: PartialMessage<Role>): Role {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.iD = new Uint8Array(0);
-        message.entityID = new Uint8Array(0);
+        message.groupID = new Uint8Array(0);
         message.name = "";
         message.createdAt = "0";
         message.updatedAt = "0";
@@ -153,8 +153,8 @@ class Role$Type extends MessageType<Role> {
                 case /* bytes ID */ 1:
                     message.iD = reader.bytes();
                     break;
-                case /* bytes EntityID */ 2:
-                    message.entityID = reader.bytes();
+                case /* bytes GroupID */ 2:
+                    message.groupID = reader.bytes();
                     break;
                 case /* string Name */ 3:
                     message.name = reader.string();
@@ -180,9 +180,9 @@ class Role$Type extends MessageType<Role> {
         /* bytes ID = 1; */
         if (message.iD.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
-        /* bytes EntityID = 2; */
-        if (message.entityID.length)
-            writer.tag(2, WireType.LengthDelimited).bytes(message.entityID);
+        /* bytes GroupID = 2; */
+        if (message.groupID.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.groupID);
         /* string Name = 3; */
         if (message.name !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.name);

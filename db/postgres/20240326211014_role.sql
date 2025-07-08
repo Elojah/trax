@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TYPE "user"."resource" AS ENUM(
 	'R_asset',
-	'R_entity',
+	'R_group',
 	'R_operation',
 	'R_role',
 	'R_user'
@@ -15,12 +15,12 @@ CREATE TYPE "user"."command" AS ENUM(
 CREATE TABLE IF NOT EXISTS "user"."role" (
 	"id" UUID NOT NULL,
 	"name" VARCHAR(255) NOT NULL,
-	"entity_id" UUID NOT NULL,
+	"group_id" UUID NOT NULL,
 	"created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	"updated_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	PRIMARY KEY ("id"),
-	UNIQUE ("entity_id", "name"),
-	CONSTRAINT "fk_role_entity_id" FOREIGN KEY ("entity_id") REFERENCES "user"."entity" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+	UNIQUE ("group_id", "name"),
+	CONSTRAINT "fk_role_group_id" FOREIGN KEY ("group_id") REFERENCES "user"."group" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "user"."permission" (
 	"role_id" UUID NOT NULL,

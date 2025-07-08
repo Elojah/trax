@@ -120,15 +120,15 @@ func BenchmarkClaimResourcesProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestClaimEntityProto(t *testing.T) {
+func TestClaimGroupProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedClaimEntity(popr, false)
+	p := NewPopulatedClaimGroup(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ClaimEntity{}
+	msg := &ClaimGroup{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -151,10 +151,10 @@ func TestClaimEntityProto(t *testing.T) {
 	}
 }
 
-func TestClaimEntityMarshalTo(t *testing.T) {
+func TestClaimGroupMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedClaimEntity(popr, false)
+	p := NewPopulatedClaimGroup(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -164,7 +164,7 @@ func TestClaimEntityMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ClaimEntity{}
+	msg := &ClaimGroup{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -176,12 +176,12 @@ func TestClaimEntityMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkClaimEntityProtoMarshal(b *testing.B) {
+func BenchmarkClaimGroupProtoMarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*ClaimEntity, 10000)
+	pops := make([]*ClaimGroup, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedClaimEntity(popr, false)
+		pops[i] = NewPopulatedClaimGroup(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -194,18 +194,18 @@ func BenchmarkClaimEntityProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkClaimEntityProtoUnmarshal(b *testing.B) {
+func BenchmarkClaimGroupProtoUnmarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedClaimEntity(popr, false))
+		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedClaimGroup(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &ClaimEntity{}
+	msg := &ClaimGroup{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -330,16 +330,16 @@ func TestClaimResourcesJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestClaimEntityJSON(t *testing.T) {
+func TestClaimGroupJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedClaimEntity(popr, true)
+	p := NewPopulatedClaimGroup(popr, true)
 	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ClaimEntity{}
+	msg := &ClaimGroup{}
 	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -394,12 +394,12 @@ func TestClaimResourcesProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestClaimEntityProtoText(t *testing.T) {
+func TestClaimGroupProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedClaimEntity(popr, true)
+	p := NewPopulatedClaimGroup(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
-	msg := &ClaimEntity{}
+	msg := &ClaimGroup{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -408,12 +408,12 @@ func TestClaimEntityProtoText(t *testing.T) {
 	}
 }
 
-func TestClaimEntityProtoCompactText(t *testing.T) {
+func TestClaimGroupProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedClaimEntity(popr, true)
+	p := NewPopulatedClaimGroup(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
-	msg := &ClaimEntity{}
+	msg := &ClaimGroup{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -463,9 +463,9 @@ func TestClaimResourcesGoString(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-func TestClaimEntityGoString(t *testing.T) {
+func TestClaimGroupGoString(t *testing.T) {
 	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedClaimEntity(popr, false)
+	p := NewPopulatedClaimGroup(popr, false)
 	s1 := p.GoString()
 	s2 := fmt.Sprintf("%#v", p)
 	if s1 != s2 {
@@ -525,10 +525,10 @@ func BenchmarkClaimResourcesSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestClaimEntitySize(t *testing.T) {
+func TestClaimGroupSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedClaimEntity(popr, true)
+	p := NewPopulatedClaimGroup(popr, true)
 	size2 := github_com_gogo_protobuf_proto.Size(p)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
@@ -547,12 +547,12 @@ func TestClaimEntitySize(t *testing.T) {
 	}
 }
 
-func BenchmarkClaimEntitySize(b *testing.B) {
+func BenchmarkClaimGroupSize(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*ClaimEntity, 1000)
+	pops := make([]*ClaimGroup, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedClaimEntity(popr, false)
+		pops[i] = NewPopulatedClaimGroup(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -606,9 +606,9 @@ func TestClaimResourcesStringer(t *testing.T) {
 		t.Fatalf("String want %v got %v", s1, s2)
 	}
 }
-func TestClaimEntityStringer(t *testing.T) {
+func TestClaimGroupStringer(t *testing.T) {
 	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedClaimEntity(popr, false)
+	p := NewPopulatedClaimGroup(popr, false)
 	s1 := p.String()
 	s2 := fmt.Sprintf("%v", p)
 	if s1 != s2 {

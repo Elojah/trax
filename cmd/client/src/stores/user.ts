@@ -27,7 +27,7 @@ export const useUserStore = defineStore('user', () => {
 
   const invite = async function (name: string, roles: Role[]) { throw new Error('not implemented') }
 
-  // Return users ids and entity ids
+  // Return users ids and group ids
   const list = async function (req: ListUserReq): Promise<string[]> {
     try {
       const resp: { response: ListUserResp } = await api.listUser(req, { meta: { token: token.value } })

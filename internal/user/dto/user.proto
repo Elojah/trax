@@ -40,7 +40,7 @@ message FetchUserReq {
     bool Me                     = 1;
 
 	bytes ID                    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	bytes EntityID              = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes GroupID              = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message UpdateUserReq {
@@ -53,10 +53,10 @@ message ListUserReq {
 	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
 	string Search                     = 2;
 
-	bool OwnEntity                    = 3;
+	bool OwnGroup                    = 3;
 
     repeated bytes IDs                = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes EntityIDs          = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes GroupIDs          = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	bytes RoleID                      = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
@@ -67,6 +67,6 @@ message ListUserResp {
 
 message InviteUserReq {
     string Email                      = 1;
-    bytes EntityID                    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+    bytes GroupID                    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	repeated bytes RoleIDs            = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }

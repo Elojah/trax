@@ -64,14 +64,14 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 	}
 
 	// #MARK:Check permissions
-	if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: user.R_user, Command: user.C_write}); err != nil {
+	if err := claims.Require(user.Requirement{GroupID: role.GroupID, Resource: user.R_user, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &dto.RoleUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
 	for _, perm := range permissions {
-		if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
+		if err := claims.Require(user.Requirement{GroupID: role.GroupID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.RoleUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
@@ -90,8 +90,8 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		_, total, err := h.user.ListRole(ctx, user.FilterRole{
-			UserID:   req.UserID,
-			EntityID: role.EntityID,
+			UserID:  req.UserID,
+			GroupID: role.GroupID,
 			Paginate: &paginate.Paginate{
 				Start: 0,
 				End:   1,
@@ -103,9 +103,9 @@ func (h *handler) CreateRoleUser(ctx context.Context, req *dto.CreateRoleUserReq
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		// user needs AT LEAST ONE ROLE in current entity to be assigned a new role
-		// if user has no role in current entity, it means he has no access to this entity
-		// if you want to assign a role to a user, you need to invite him with a role in the entity first
+		// user needs AT LEAST ONE ROLE in current group to be assigned a new role
+		// if user has no role in current group, it means he has no access to this group
+		// if you want to assign a role to a user, you need to invite him with a role in the group first
 		if total == 0 {
 			err := gerrors.ErrNotFound{Resource: "user", Index: req.UserID.String()}
 			logger.Error().Err(err).Msg("user not found")

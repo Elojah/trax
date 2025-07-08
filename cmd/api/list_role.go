@@ -26,24 +26,24 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 		return &dto.ListRoleResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
-	var entityIDs []ulid.ID
+	var groupIDs []ulid.ID
 	var ids []ulid.ID
 
-	// Check valid entity first
-	if req.OwnEntity || req.Own {
-		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_role, Command: user.C_read})
-	} else if len(req.EntityIDs) > 0 {
-		if err := claims.Require(user.NewRequirements(req.EntityIDs, user.R_role, user.C_read)...); err != nil {
+	// Check valid group first
+	if req.OwnGroup || req.Own {
+		groupIDs = claims.GroupIDs(user.Requirement{Resource: user.R_role, Command: user.C_read})
+	} else if len(req.GroupIDs) > 0 {
+		if err := claims.Require(user.NewRequirements(req.GroupIDs, user.R_role, user.C_read)...); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.ListRoleResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
 		}
 
-		entityIDs = req.EntityIDs
+		groupIDs = req.GroupIDs
 	} else {
 		err := gerrors.ErrMissingAtLeast{
 			AtLeast: 1,
-			Fields:  []string{"own", "own_entity", "entity_ids"},
+			Fields:  []string{"own", "own_group", "group_ids"},
 		}
 
 		logger.Error().Err(err).Msg("invalid argument")
@@ -63,11 +63,11 @@ func (h *handler) ListRole(ctx context.Context, req *dto.ListRoleReq) (*dto.List
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		roles, totalRole, err := h.user.ListRole(ctx, user.FilterRole{
-			IDs:       ids,
-			EntityIDs: entityIDs,
-			UserID:    req.UserID,
-			Paginate:  req.Paginate,
-			Search:    req.Search,
+			IDs:      ids,
+			GroupIDs: groupIDs,
+			UserID:   req.UserID,
+			Paginate: req.Paginate,
+			Search:   req.Search,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list role")

@@ -23,10 +23,10 @@ enum grpccodes {
   /// expire.
   DEADLINE_EXCEEDED = 'DEADLINE_EXCEEDED',
 
-  /// Some requested entity (e.g., file or directory) was not found.
+  /// Some requested group (e.g., file or directory) was not found.
   NOT_FOUND = 'NOT_FOUND',
 
-  /// Some entity that we attempted to create (e.g., file or directory) already
+  /// Some group that we attempted to create (e.g., file or directory) already
   /// exists.
   ALREADY_EXISTS = 'ALREADY_EXISTS',
 

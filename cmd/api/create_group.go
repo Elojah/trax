@@ -15,21 +15,21 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*user.Entity, error) {
-	logger := log.With().Str("method", "create_entity").Logger()
+func (h *handler) CreateGroup(ctx context.Context, req *dto.CreateGroupReq) (*user.Group, error) {
+	logger := log.With().Str("method", "create_group").Logger()
 
 	if req == nil {
-		return &user.Entity{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &user.Group{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &user.Entity{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &user.Group{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	now := time.Now().Unix()
-	e := user.Entity{
+	g := user.Group{
 		ID:          ulid.NewID(),
 		Name:        req.Name,
 		Description: req.Description,
@@ -39,19 +39,19 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 	}
 
 	// #MARK:Check request
-	if err := e.Check(); err != nil {
-		return &user.Entity{}, status.New(codes.InvalidArgument, err.Error()).Err()
+	if err := g.Check(); err != nil {
+		return &user.Group{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		if err = h.user.InsertEntity(ctx, e); err != nil {
+		if err = h.user.InsertGroup(ctx, g); err != nil {
 			if errors.As(err, &gerrors.ErrConflict{}) {
-				logger.Error().Err(err).Msg("failed to insert entity")
+				logger.Error().Err(err).Msg("failed to insert group")
 
 				return transaction.Rollback, status.New(codes.AlreadyExists, err.Error()).Err()
 			}
 
-			logger.Error().Err(err).Msg("failed to insert entity")
+			logger.Error().Err(err).Msg("failed to insert group")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
@@ -59,7 +59,7 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 		// insert default admin role with all permissions
 		role := user.Role{
 			ID:        ulid.NewID(),
-			EntityID:  e.ID,
+			GroupID:   g.ID,
 			Name:      "admin",
 			UpdatedAt: now,
 			CreatedAt: now,
@@ -89,13 +89,13 @@ func (h *handler) CreateEntity(ctx context.Context, req *dto.CreateEntityReq) (*
 
 		return transaction.Commit, nil
 	}); err != nil {
-		return &user.Entity{}, err
+		return &user.Group{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &user.Entity{
-		ID:   e.ID,
-		Name: e.Name,
+	return &user.Group{
+		ID:   g.ID,
+		Name: g.Name,
 	}, nil
 }

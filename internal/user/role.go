@@ -11,7 +11,7 @@ import (
 var (
 	Resources = map[Resource]struct{}{
 		R_asset:     {},
-		R_entity:    {},
+		R_group:     {},
 		R_operation: {},
 		R_role:      {},
 		R_user:      {},
@@ -28,8 +28,8 @@ type FilterRole struct {
 	ID  ulid.ID
 	IDs []ulid.ID
 
-	EntityID  ulid.ID
-	EntityIDs []ulid.ID
+	GroupID  ulid.ID
+	GroupIDs []ulid.ID
 
 	UserID ulid.ID
 

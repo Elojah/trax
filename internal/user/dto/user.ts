@@ -73,9 +73,9 @@ export interface FetchUserReq {
      */
     iD: Uint8Array;
     /**
-     * @generated from protobuf field: bytes EntityID = 3
+     * @generated from protobuf field: bytes GroupID = 3
      */
-    entityID: Uint8Array;
+    groupID: Uint8Array;
 }
 /**
  * @generated from protobuf message dto.UpdateUserReq
@@ -107,17 +107,17 @@ export interface ListUserReq {
      */
     search: string;
     /**
-     * @generated from protobuf field: bool OwnEntity = 3
+     * @generated from protobuf field: bool OwnGroup = 3
      */
-    ownEntity: boolean;
+    ownGroup: boolean;
     /**
      * @generated from protobuf field: repeated bytes IDs = 4
      */
     iDs: Uint8Array[];
     /**
-     * @generated from protobuf field: repeated bytes EntityIDs = 5
+     * @generated from protobuf field: repeated bytes GroupIDs = 5
      */
-    entityIDs: Uint8Array[];
+    groupIDs: Uint8Array[];
     /**
      * @generated from protobuf field: bytes RoleID = 6
      */
@@ -145,9 +145,9 @@ export interface InviteUserReq {
      */
     email: string;
     /**
-     * @generated from protobuf field: bytes EntityID = 2
+     * @generated from protobuf field: bytes GroupID = 2
      */
-    entityID: Uint8Array;
+    groupID: Uint8Array;
     /**
      * @generated from protobuf field: repeated bytes RoleIDs = 3
      */
@@ -340,14 +340,14 @@ class FetchUserReq$Type extends MessageType<FetchUserReq> {
         super("dto.FetchUserReq", [
             { no: 1, name: "Me", kind: "scalar", jsonName: "Me", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 3, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+            { no: 3, name: "GroupID", kind: "scalar", jsonName: "GroupID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
     }
     create(value?: PartialMessage<FetchUserReq>): FetchUserReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.me = false;
         message.iD = new Uint8Array(0);
-        message.entityID = new Uint8Array(0);
+        message.groupID = new Uint8Array(0);
         if (value !== undefined)
             reflectionMergePartial<FetchUserReq>(this, message, value);
         return message;
@@ -363,8 +363,8 @@ class FetchUserReq$Type extends MessageType<FetchUserReq> {
                 case /* bytes ID */ 2:
                     message.iD = reader.bytes();
                     break;
-                case /* bytes EntityID */ 3:
-                    message.entityID = reader.bytes();
+                case /* bytes GroupID */ 3:
+                    message.groupID = reader.bytes();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -384,9 +384,9 @@ class FetchUserReq$Type extends MessageType<FetchUserReq> {
         /* bytes ID = 2; */
         if (message.iD.length)
             writer.tag(2, WireType.LengthDelimited).bytes(message.iD);
-        /* bytes EntityID = 3; */
-        if (message.entityID.length)
-            writer.tag(3, WireType.LengthDelimited).bytes(message.entityID);
+        /* bytes GroupID = 3; */
+        if (message.groupID.length)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.groupID);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -463,18 +463,18 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
         super("dto.ListUserReq", [
             { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
             { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "OwnEntity", kind: "scalar", jsonName: "OwnEntity", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "OwnGroup", kind: "scalar", jsonName: "OwnGroup", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
-            { no: 5, name: "EntityIDs", kind: "scalar", jsonName: "EntityIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 5, name: "GroupIDs", kind: "scalar", jsonName: "GroupIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 6, name: "RoleID", kind: "scalar", jsonName: "RoleID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
     }
     create(value?: PartialMessage<ListUserReq>): ListUserReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.search = "";
-        message.ownEntity = false;
+        message.ownGroup = false;
         message.iDs = [];
-        message.entityIDs = [];
+        message.groupIDs = [];
         message.roleID = new Uint8Array(0);
         if (value !== undefined)
             reflectionMergePartial<ListUserReq>(this, message, value);
@@ -491,14 +491,14 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
                 case /* string Search */ 2:
                     message.search = reader.string();
                     break;
-                case /* bool OwnEntity */ 3:
-                    message.ownEntity = reader.bool();
+                case /* bool OwnGroup */ 3:
+                    message.ownGroup = reader.bool();
                     break;
                 case /* repeated bytes IDs */ 4:
                     message.iDs.push(reader.bytes());
                     break;
-                case /* repeated bytes EntityIDs */ 5:
-                    message.entityIDs.push(reader.bytes());
+                case /* repeated bytes GroupIDs */ 5:
+                    message.groupIDs.push(reader.bytes());
                     break;
                 case /* bytes RoleID */ 6:
                     message.roleID = reader.bytes();
@@ -521,15 +521,15 @@ class ListUserReq$Type extends MessageType<ListUserReq> {
         /* string Search = 2; */
         if (message.search !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.search);
-        /* bool OwnEntity = 3; */
-        if (message.ownEntity !== false)
-            writer.tag(3, WireType.Varint).bool(message.ownEntity);
+        /* bool OwnGroup = 3; */
+        if (message.ownGroup !== false)
+            writer.tag(3, WireType.Varint).bool(message.ownGroup);
         /* repeated bytes IDs = 4; */
         for (let i = 0; i < message.iDs.length; i++)
             writer.tag(4, WireType.LengthDelimited).bytes(message.iDs[i]);
-        /* repeated bytes EntityIDs = 5; */
-        for (let i = 0; i < message.entityIDs.length; i++)
-            writer.tag(5, WireType.LengthDelimited).bytes(message.entityIDs[i]);
+        /* repeated bytes GroupIDs = 5; */
+        for (let i = 0; i < message.groupIDs.length; i++)
+            writer.tag(5, WireType.LengthDelimited).bytes(message.groupIDs[i]);
         /* bytes RoleID = 6; */
         if (message.roleID.length)
             writer.tag(6, WireType.LengthDelimited).bytes(message.roleID);
@@ -603,14 +603,14 @@ class InviteUserReq$Type extends MessageType<InviteUserReq> {
     constructor() {
         super("dto.InviteUserReq", [
             { no: 1, name: "Email", kind: "scalar", jsonName: "Email", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "EntityID", kind: "scalar", jsonName: "EntityID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 2, name: "GroupID", kind: "scalar", jsonName: "GroupID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 3, name: "RoleIDs", kind: "scalar", jsonName: "RoleIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
     }
     create(value?: PartialMessage<InviteUserReq>): InviteUserReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.email = "";
-        message.entityID = new Uint8Array(0);
+        message.groupID = new Uint8Array(0);
         message.roleIDs = [];
         if (value !== undefined)
             reflectionMergePartial<InviteUserReq>(this, message, value);
@@ -624,8 +624,8 @@ class InviteUserReq$Type extends MessageType<InviteUserReq> {
                 case /* string Email */ 1:
                     message.email = reader.string();
                     break;
-                case /* bytes EntityID */ 2:
-                    message.entityID = reader.bytes();
+                case /* bytes GroupID */ 2:
+                    message.groupID = reader.bytes();
                     break;
                 case /* repeated bytes RoleIDs */ 3:
                     message.roleIDs.push(reader.bytes());
@@ -645,9 +645,9 @@ class InviteUserReq$Type extends MessageType<InviteUserReq> {
         /* string Email = 1; */
         if (message.email !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.email);
-        /* bytes EntityID = 2; */
-        if (message.entityID.length)
-            writer.tag(2, WireType.LengthDelimited).bytes(message.entityID);
+        /* bytes GroupID = 2; */
+        if (message.groupID.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.groupID);
         /* repeated bytes RoleIDs = 3; */
         for (let i = 0; i < message.roleIDs.length; i++)
             writer.tag(3, WireType.LengthDelimited).bytes(message.roleIDs[i]);

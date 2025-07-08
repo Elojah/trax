@@ -34,12 +34,12 @@ func (e ErrInvalidNameLength) Error() string {
 	return fmt.Sprintf("invalid name length %d : %s", e.Length, e.Name)
 }
 
-type ErrUnknownEntity struct {
-	EntityID string
+type ErrUnknownGroup struct {
+	GroupID string
 }
 
-func (e ErrUnknownEntity) Error() string {
-	return fmt.Sprintf("unknown entity: %s", e.EntityID)
+func (e ErrUnknownGroup) Error() string {
+	return fmt.Sprintf("unknown group: %s", e.GroupID)
 }
 
 type ErrUnauthorizedResource struct {

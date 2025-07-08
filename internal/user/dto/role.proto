@@ -26,7 +26,7 @@ message RolePermission {
 }
 
 message CreateRoleReq {
-	bytes EntityID                         = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes GroupID                         = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	string Name                            = 2;
 	repeated user.Permission Permissions   = 3 [(gogoproto.nullable) = false];
 }
@@ -42,10 +42,10 @@ message ListRoleReq {
 	string Search                          = 2;
 
 	bool Own                               = 3;
-	bool OwnEntity                         = 4;
+	bool OwnGroup                         = 4;
 
 	repeated bytes IDs                     = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes EntityIDs               = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes GroupIDs               = 6 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	bytes UserID                           = 7 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 

@@ -13,28 +13,28 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.ListEntityResp, error) {
-	logger := log.With().Str("method", "list_entity").Logger()
+func (h *handler) ListGroup(ctx context.Context, req *dto.ListGroupReq) (*dto.ListGroupResp, error) {
+	logger := log.With().Str("method", "list_group").Logger()
 
 	if req == nil {
-		return &dto.ListEntityResp{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
+		return &dto.ListGroupResp{}, status.New(codes.Internal, gerrors.ErrNullRequest{}.Error()).Err()
 	}
 
 	// #MARK:Authenticate
 	claims, err := h.user.Auth(ctx, "access")
 	if err != nil {
-		return &dto.ListEntityResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
+		return &dto.ListGroupResp{}, status.New(codes.Unauthenticated, err.Error()).Err()
 	}
 
 	var ids []ulid.ID
 
 	if req.Own {
-		ids = claims.EntityIDs()
+		ids = claims.GroupIDs()
 	} else if req.IDs != nil {
-		if err := claims.Require(user.NewRequirements(req.IDs, user.R_entity, user.C_read)...); err != nil {
+		if err := claims.Require(user.NewRequirements(req.IDs, user.R_group, user.C_read)...); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
-			return &dto.ListEntityResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
+			return &dto.ListGroupResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
 		}
 
 		ids = req.IDs
@@ -43,20 +43,20 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 
 		logger.Error().Err(err).Msg("invalid argument")
 
-		return &dto.ListEntityResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
+		return &dto.ListGroupResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
-	var entities []user.Entity
+	var groups []user.Group
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		entities, total, err = h.user.ListEntity(ctx, user.FilterEntity{
+		groups, total, err = h.user.ListGroup(ctx, user.FilterGroup{
 			IDs:      ids,
 			Paginate: req.Paginate,
 			Search:   req.Search,
 		})
 		if err != nil {
-			logger.Error().Err(err).Msg("failed to list entity")
+			logger.Error().Err(err).Msg("failed to list group")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
@@ -65,13 +65,13 @@ func (h *handler) ListEntity(ctx context.Context, req *dto.ListEntityReq) (*dto.
 	}); err != nil {
 		logger.Error().Err(err).Msg("failed transaction")
 
-		return &dto.ListEntityResp{}, err
+		return &dto.ListGroupResp{}, err
 	}
 
 	logger.Info().Msg("success")
 
-	return &dto.ListEntityResp{
-		Entities: entities,
-		Total:    total,
+	return &dto.ListGroupResp{
+		Groups: groups,
+		Total:  total,
 	}, nil
 }

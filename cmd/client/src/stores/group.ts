@@ -2,23 +2,23 @@ import { defineStore } from 'pinia'
 import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
-import { Entity } from '@internal/user/entity'
+import { Group } from '@internal/user/group'
 import {
-  CreateEntityReq,
-  DeleteEntityReq,
-  ListEntityReq,
-  ListEntityResp,
-  UpdateEntityReq
-} from '@internal/user/dto/entity'
+  CreateGroupReq,
+  DeleteGroupReq,
+  ListGroupReq,
+  ListGroupResp,
+  UpdateGroupReq
+} from '@internal/user/dto/group'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
 import { parse, ulid } from '@/utils/ulid'
 
-export const useEntityStore = defineStore('entity', () => {
-  const entities = ref<Map<string, Entity>>(new Map())
+export const useGroupStore = defineStore('group', () => {
+  const groups = ref<Map<string, Group>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
-  const selected = ref<Entity[]>([])
+  const selected = ref<Group[]>([])
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -30,54 +30,54 @@ export const useEntityStore = defineStore('entity', () => {
 
   const create = async function (name: string, avatarURL: string, description: string) {
     try {
-      const req = CreateEntityReq.create({
+      const req = CreateGroupReq.create({
         name: name,
         avatarURL: avatarURL,
         description: description
       })
 
-      return await api.createEntity(req, { meta: { token: token.value } })
+      return await api.createGroup(req, { meta: { token: token.value } })
     } catch (err: any) {
       logger.error(err)
       throw err
     }
   }
 
-  const update = async (req: UpdateEntityReq) => {
+  const update = async (req: UpdateGroupReq) => {
     try {
-      const resp = await api.updateEntity(req, { meta: { token: token.value } })
+      const resp = await api.updateGroup(req, { meta: { token: token.value } })
 
-      entities.value?.set(ulid(resp.response.iD), resp.response)
+      groups.value?.set(ulid(resp.response.iD), resp.response)
     } catch (err: any) {
       logger.error(err)
       throw err;
     }
   }
 
-  const delete_ = async (req: DeleteEntityReq) => {
+  const delete_ = async (req: DeleteGroupReq) => {
     try {
-      const resp: { response: Entity } = await api.deleteEntity(req, { meta: { token: token.value } })
+      const resp: { response: Group } = await api.deleteGroup(req, { meta: { token: token.value } })
 
-      entities.value?.delete(ulid(resp.response.iD))
+      groups.value?.delete(ulid(resp.response.iD))
     } catch (err: any) {
       logger.error(err)
       throw err;
     }
   }
 
-  const list = async function (req: ListEntityReq): Promise<string[]> {
+  const list = async function (req: ListGroupReq): Promise<string[]> {
     try {
-      const resp: { response: ListEntityResp } = await api.listEntity(req, { meta: { token: token.value } })
+      const resp: { response: ListGroupResp } = await api.listGroup(req, { meta: { token: token.value } })
 
-      resp.response.entities?.forEach((entity: Entity) => {
-        entities.value?.set(ulid(entity.iD), entity)
+      resp.response.groups?.forEach((group: Group) => {
+        groups.value?.set(ulid(group.iD), group)
       })
 
       if (req?.iDs.length === 0) {
         total.value = resp.response.total
       }
 
-      return resp.response.entities.map((entity: Entity) => ulid(entity.iD))
+      return resp.response.groups.map((group: Group) => ulid(group.iD))
     } catch (err: any) {
       logger.error(err)
       throw err
@@ -86,7 +86,7 @@ export const useEntityStore = defineStore('entity', () => {
 
   const populate = async function (ids: string[]) {
     const newIDs = ids.reduce((acc: Uint8Array[], id: string) => {
-      if (entities.value?.has(id)) {
+      if (groups.value?.has(id)) {
         return acc
       } else {
         return [...acc, parse(id)]
@@ -98,7 +98,7 @@ export const useEntityStore = defineStore('entity', () => {
     }
 
     await list(
-      ListEntityReq.create({
+      ListGroupReq.create({
         iDs: newIDs,
         paginate: {
           start: BigInt(0),
@@ -111,7 +111,7 @@ export const useEntityStore = defineStore('entity', () => {
   }
 
   return {
-    entities,
+    groups,
     total,
     selected,
     create,

@@ -6,7 +6,7 @@ import (
 
 var _ user.Store = (*Store)(nil)
 
-var _ user.StoreEntity = (*Store)(nil)
+var _ user.StoreGroup = (*Store)(nil)
 
 var _ user.StoreRole = (*Store)(nil)
 var _ user.StorePermission = (*Store)(nil)

@@ -6,16 +6,16 @@ import (
 )
 
 type Requirement struct {
-	EntityID ulid.ID
+	GroupID  ulid.ID
 	Resource Resource
 	Command  Command
 }
 
-func NewRequirements(entityIDs []ulid.ID, resource Resource, command Command) []Requirement {
-	requirements := make([]Requirement, 0, len(entityIDs))
-	for _, id := range entityIDs {
+func NewRequirements(groupIDs []ulid.ID, resource Resource, command Command) []Requirement {
+	requirements := make([]Requirement, 0, len(groupIDs))
+	for _, id := range groupIDs {
 		requirements = append(requirements, Requirement{
-			EntityID: id,
+			GroupID:  id,
 			Resource: resource,
 			Command:  command,
 		})
@@ -31,7 +31,7 @@ type Claims struct {
 	Auth   ClaimAuth
 }
 
-func (c ClaimEntity) Require(rs ...Requirement) error {
+func (c ClaimGroup) Require(rs ...Requirement) error {
 	for _, r := range rs {
 		resources, ok := c.Resources[r.Resource.String()]
 		if !ok {
@@ -46,29 +46,29 @@ func (c ClaimEntity) Require(rs ...Requirement) error {
 	return nil
 }
 
-func (c Claims) EntityIDs(rs ...Requirement) []ulid.ID {
-	result := make([]ulid.ID, 0, len(c.Auth.Entities))
-	for id, entity := range c.Auth.Entities {
-		entityID, err := ulid.Parse(id)
+func (c Claims) GroupIDs(rs ...Requirement) []ulid.ID {
+	result := make([]ulid.ID, 0, len(c.Auth.Groups))
+	for id, group := range c.Auth.Groups {
+		groupID, err := ulid.Parse(id)
 		if err != nil {
 			continue
 		}
 
-		if err := entity.Require(rs...); err != nil {
-			// ignore error but don't add entityID to result
+		if err := group.Require(rs...); err != nil {
+			// ignore error but don't add groupID to result
 			continue
 		}
 
-		result = append(result, entityID)
+		result = append(result, groupID)
 	}
 
 	return result
 }
 
 func (c Claims) RoleIDs() []ulid.ID {
-	result := make([]ulid.ID, 0, len(c.Auth.Entities))
-	for _, entity := range c.Auth.Entities {
-		for roleID := range entity.Roles {
+	result := make([]ulid.ID, 0, len(c.Auth.Groups))
+	for _, group := range c.Auth.Groups {
+		for roleID := range group.Roles {
 			id, err := ulid.Parse(roleID)
 			if err != nil {
 				continue
@@ -82,12 +82,12 @@ func (c Claims) RoleIDs() []ulid.ID {
 
 func (c Claims) Require(rs ...Requirement) error {
 	for _, r := range rs {
-		entities, ok := c.Auth.Entities[r.EntityID.String()]
+		groups, ok := c.Auth.Groups[r.GroupID.String()]
 		if !ok {
-			return ErrUnknownEntity{EntityID: r.EntityID.String()}
+			return ErrUnknownGroup{GroupID: r.GroupID.String()}
 		}
 
-		resources, ok := entities.Resources[r.Resource.String()]
+		resources, ok := groups.Resources[r.Resource.String()]
 		if !ok {
 			return ErrUnauthorizedResource{Resource: r.Resource.String()}
 		}
@@ -106,8 +106,8 @@ func (c Claims) RequireRoles(ids ...ulid.ID) error {
 		mapIDs[id.String()] = struct{}{}
 	}
 
-	for _, e := range c.Auth.Entities {
-		for id := range e.Roles {
+	for _, g := range c.Auth.Groups {
+		for id := range g.Roles {
 			if _, ok := mapIDs[id]; ok {
 				delete(mapIDs, id)
 				if len(mapIDs) == 0 {

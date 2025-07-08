@@ -10,13 +10,13 @@ import { RolePermission } from "../../../internal/user/dto/role";
 import { CreateRoleReq } from "../../../internal/user/dto/role";
 import { ListRoleResp } from "../../../internal/user/dto/role";
 import { ListRoleReq } from "../../../internal/user/dto/role";
-import { DeleteEntityReq } from "../../../internal/user/dto/entity";
-import { UpdateEntityReq } from "../../../internal/user/dto/entity";
-import { CreateEntityReq } from "../../../internal/user/dto/entity";
-import { Entity } from "../../../internal/user/entity";
-import { FetchEntityReq } from "../../../internal/user/dto/entity";
-import { ListEntityResp } from "../../../internal/user/dto/entity";
-import { ListEntityReq } from "../../../internal/user/dto/entity";
+import { DeleteGroupReq } from "../../../internal/user/dto/group";
+import { UpdateGroupReq } from "../../../internal/user/dto/group";
+import { CreateGroupReq } from "../../../internal/user/dto/group";
+import { Group } from "../../../internal/user/group";
+import { FetchGroupReq } from "../../../internal/user/dto/group";
+import { ListGroupResp } from "../../../internal/user/dto/group";
+import { ListGroupReq } from "../../../internal/user/dto/group";
 import { ClaimAuth } from "../../../internal/user/claims";
 import { InviteUserReq } from "../../../internal/user/dto/user";
 import { UpdateUserReq } from "../../../internal/user/dto/user";
@@ -30,21 +30,21 @@ import { ServiceType } from "@protobuf-ts/runtime-rpc";
  * @generated ServiceType for protobuf service grpc.API
  */
 export const API = new ServiceType("grpc.API", [
-    { name: "Ping", options: {}, I: Empty, O: Empty },
-    { name: "ListUser", options: {}, I: ListUserReq, O: ListUserResp },
-    { name: "FetchUser", options: {}, I: FetchUserReq, O: U },
-    { name: "UpdateUser", options: {}, I: UpdateUserReq, O: U },
-    { name: "InviteUser", options: {}, I: InviteUserReq, O: U },
-    { name: "FetchClaims", options: {}, I: Empty, O: ClaimAuth },
-    { name: "ListEntity", options: {}, I: ListEntityReq, O: ListEntityResp },
-    { name: "FetchEntity", options: {}, I: FetchEntityReq, O: Entity },
-    { name: "CreateEntity", options: {}, I: CreateEntityReq, O: Entity },
-    { name: "UpdateEntity", options: {}, I: UpdateEntityReq, O: Entity },
-    { name: "DeleteEntity", options: {}, I: DeleteEntityReq, O: Entity },
-    { name: "ListRole", options: {}, I: ListRoleReq, O: ListRoleResp },
-    { name: "CreateRole", options: {}, I: CreateRoleReq, O: RolePermission },
-    { name: "UpdateRole", options: {}, I: UpdateRoleReq, O: RolePermission },
-    { name: "DeleteRole", options: {}, I: DeleteRoleReq, O: RolePermission },
-    { name: "CreateRoleUser", options: {}, I: CreateRoleUserReq, O: RoleUserResp },
-    { name: "DeleteRoleUser", options: {}, I: DeleteRoleUserReq, O: RoleUserResp }
+  { name: "Ping", options: {}, I: Empty, O: Empty },
+  { name: "ListUser", options: {}, I: ListUserReq, O: ListUserResp },
+  { name: "FetchUser", options: {}, I: FetchUserReq, O: U },
+  { name: "UpdateUser", options: {}, I: UpdateUserReq, O: U },
+  { name: "InviteUser", options: {}, I: InviteUserReq, O: U },
+  { name: "FetchClaims", options: {}, I: Empty, O: ClaimAuth },
+  { name: "ListGroup", options: {}, I: ListGroupReq, O: ListGroupResp },
+  { name: "FetchGroup", options: {}, I: FetchGroupReq, O: Group },
+  { name: "CreateGroup", options: {}, I: CreateGroupReq, O: Group },
+  { name: "UpdateGroup", options: {}, I: UpdateGroupReq, O: Group },
+  { name: "DeleteGroup", options: {}, I: DeleteGroupReq, O: Group },
+  { name: "ListRole", options: {}, I: ListRoleReq, O: ListRoleResp },
+  { name: "CreateRole", options: {}, I: CreateRoleReq, O: RolePermission },
+  { name: "UpdateRole", options: {}, I: UpdateRoleReq, O: RolePermission },
+  { name: "DeleteRole", options: {}, I: DeleteRoleReq, O: RolePermission },
+  { name: "CreateRoleUser", options: {}, I: CreateRoleUserReq, O: RoleUserResp },
+  { name: "DeleteRoleUser", options: {}, I: DeleteRoleUserReq, O: RoleUserResp }
 ]);

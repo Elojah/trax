@@ -17,7 +17,7 @@ import "pkg/gogoproto/gogo.proto";
 
 enum Resource {
 	R_asset      = 0;
-	R_entity     = 1;
+	R_group      = 1;
 	R_operation  = 2;
 	R_role       = 3;
 	R_user       = 4;
@@ -32,7 +32,7 @@ enum Command {
 message Role {
 	bytes ID               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
-	bytes EntityID         = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes GroupID          = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	string Name            = 3;
 
 	int64 CreatedAt        = 4;

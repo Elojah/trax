@@ -106,12 +106,12 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$Q $(GEN_PB_$(PB_LANG)) pkg/cookie/keys.proto
 	$(info $(M) generate internal) @
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/claims.proto
-	$Q $(GEN_PB_$(PB_LANG)) internal/user/entity.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/group.proto
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/role.proto
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/user.proto
 	$(info $(M) generate clients) @
 	$(info $(M) generate dto) @
-	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/entity.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/group.proto
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/role.proto
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/user.proto
 	$(info $(M) generate services) @
@@ -166,11 +166,11 @@ clean:
 .PHONY: clean-proto
 clean-proto:
 	$(info $(M) cleaning protobuf generated files) @
-	$Q find . -name "*_pb.d.ts" -type f -delete
-	$Q find . -name "*_pb.js" -type f -delete
-	$Q find . -name "*.pb.go" -type f -delete
-	$Q find . -name "*pb_test.go" -type f -delete
-	$Q find . -name "*ServiceClientPb.ts" -type f -delete
+	$Q find cmd internal pkg -name "*_pb.d.ts" -type f -delete
+	$Q find cmd internal pkg -name "*_pb.js" -type f -delete
+	$Q find cmd internal pkg -name "*.pb.go" -type f -delete
+	$Q find cmd internal pkg -name "*pb_test.go" -type f -delete
+	$Q find cmd internal pkg -name "*ServiceClientPb.ts" -type f -delete
 
 ## Helpers
 

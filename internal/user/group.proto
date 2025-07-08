@@ -15,7 +15,7 @@ option go_package = "github.com/elojah/trax/internal/user";
 
 import "pkg/gogoproto/gogo.proto";
 
-message Entity {
+message Group {
 	bytes ID                     = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 
 	string Name                  = 2;

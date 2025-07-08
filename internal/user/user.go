@@ -16,7 +16,7 @@ type Service interface {
 
 	Store
 
-	StoreEntity
+	StoreGroup
 
 	StoreRole
 	StorePermission
@@ -35,10 +35,10 @@ type Filter struct {
 	Email    *string
 	GoogleID *string
 
-	// ListByEntity only
-	EntityIDs []ulid.ID
-	RoleID    ulid.ID
-	RoleIDs   []ulid.ID
+	// ListByGroup only
+	GroupIDs []ulid.ID
+	RoleID   ulid.ID
+	RoleIDs  []ulid.ID
 
 	*paginate.Paginate
 	Search string
@@ -59,7 +59,7 @@ type Store interface {
 	Delete(context.Context, Filter) error
 
 	FetchWithPassword(context.Context, Filter) (U, error)
-	ListByEntity(context.Context, Filter) ([]U, uint64, error)
+	ListByGroup(context.Context, Filter) ([]U, uint64, error)
 	ListByRole(context.Context, Filter) (map[string][]U, uint64, error)
 }
 

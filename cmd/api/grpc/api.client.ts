@@ -13,13 +13,13 @@ import type { RolePermission } from "../../../internal/user/dto/role";
 import type { CreateRoleReq } from "../../../internal/user/dto/role";
 import type { ListRoleResp } from "../../../internal/user/dto/role";
 import type { ListRoleReq } from "../../../internal/user/dto/role";
-import type { DeleteEntityReq } from "../../../internal/user/dto/entity";
-import type { UpdateEntityReq } from "../../../internal/user/dto/entity";
-import type { CreateEntityReq } from "../../../internal/user/dto/entity";
-import type { Entity } from "../../../internal/user/entity";
-import type { FetchEntityReq } from "../../../internal/user/dto/entity";
-import type { ListEntityResp } from "../../../internal/user/dto/entity";
-import type { ListEntityReq } from "../../../internal/user/dto/entity";
+import type { DeleteGroupReq } from "../../../internal/user/dto/group";
+import type { UpdateGroupReq } from "../../../internal/user/dto/group";
+import type { CreateGroupReq } from "../../../internal/user/dto/group";
+import type { Group } from "../../../internal/user/group";
+import type { FetchGroupReq } from "../../../internal/user/dto/group";
+import type { ListGroupResp } from "../../../internal/user/dto/group";
+import type { ListGroupReq } from "../../../internal/user/dto/group";
 import type { ClaimAuth } from "../../../internal/user/claims";
 import type { InviteUserReq } from "../../../internal/user/dto/user";
 import type { UpdateUserReq } from "../../../internal/user/dto/user";
@@ -66,27 +66,27 @@ export interface IAPIClient {
      */
     fetchClaims(input: Empty, options?: RpcOptions): UnaryCall<Empty, ClaimAuth>;
     /**
-     * Entity
+     * Group
      *
-     * @generated from protobuf rpc: ListEntity
+     * @generated from protobuf rpc: ListGroup
      */
-    listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp>;
+    listGroup(input: ListGroupReq, options?: RpcOptions): UnaryCall<ListGroupReq, ListGroupResp>;
     /**
-     * @generated from protobuf rpc: FetchEntity
+     * @generated from protobuf rpc: FetchGroup
      */
-    fetchEntity(input: FetchEntityReq, options?: RpcOptions): UnaryCall<FetchEntityReq, Entity>;
+    fetchGroup(input: FetchGroupReq, options?: RpcOptions): UnaryCall<FetchGroupReq, Group>;
     /**
-     * @generated from protobuf rpc: CreateEntity
+     * @generated from protobuf rpc: CreateGroup
      */
-    createEntity(input: CreateEntityReq, options?: RpcOptions): UnaryCall<CreateEntityReq, Entity>;
+    createGroup(input: CreateGroupReq, options?: RpcOptions): UnaryCall<CreateGroupReq, Group>;
     /**
-     * @generated from protobuf rpc: UpdateEntity
+     * @generated from protobuf rpc: UpdateGroup
      */
-    updateEntity(input: UpdateEntityReq, options?: RpcOptions): UnaryCall<UpdateEntityReq, Entity>;
+    updateGroup(input: UpdateGroupReq, options?: RpcOptions): UnaryCall<UpdateGroupReq, Group>;
     /**
-     * @generated from protobuf rpc: DeleteEntity
+     * @generated from protobuf rpc: DeleteGroup
      */
-    deleteEntity(input: DeleteEntityReq, options?: RpcOptions): UnaryCall<DeleteEntityReq, Entity>;
+    deleteGroup(input: DeleteGroupReq, options?: RpcOptions): UnaryCall<DeleteGroupReq, Group>;
     /**
      * Roles
      *
@@ -174,41 +174,41 @@ export class APIClient implements IAPIClient, ServiceInfo {
         return stackIntercept<Empty, ClaimAuth>("unary", this._transport, method, opt, input);
     }
     /**
-     * Entity
+     * Group
      *
-     * @generated from protobuf rpc: ListEntity
+     * @generated from protobuf rpc: ListGroup
      */
-    listEntity(input: ListEntityReq, options?: RpcOptions): UnaryCall<ListEntityReq, ListEntityResp> {
+    listGroup(input: ListGroupReq, options?: RpcOptions): UnaryCall<ListGroupReq, ListGroupResp> {
         const method = this.methods[6], opt = this._transport.mergeOptions(options);
-        return stackIntercept<ListEntityReq, ListEntityResp>("unary", this._transport, method, opt, input);
+        return stackIntercept<ListGroupReq, ListGroupResp>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: FetchEntity
+     * @generated from protobuf rpc: FetchGroup
      */
-    fetchEntity(input: FetchEntityReq, options?: RpcOptions): UnaryCall<FetchEntityReq, Entity> {
+    fetchGroup(input: FetchGroupReq, options?: RpcOptions): UnaryCall<FetchGroupReq, Group> {
         const method = this.methods[7], opt = this._transport.mergeOptions(options);
-        return stackIntercept<FetchEntityReq, Entity>("unary", this._transport, method, opt, input);
+        return stackIntercept<FetchGroupReq, Group>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: CreateEntity
+     * @generated from protobuf rpc: CreateGroup
      */
-    createEntity(input: CreateEntityReq, options?: RpcOptions): UnaryCall<CreateEntityReq, Entity> {
+    createGroup(input: CreateGroupReq, options?: RpcOptions): UnaryCall<CreateGroupReq, Group> {
         const method = this.methods[8], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreateEntityReq, Entity>("unary", this._transport, method, opt, input);
+        return stackIntercept<CreateGroupReq, Group>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: UpdateEntity
+     * @generated from protobuf rpc: UpdateGroup
      */
-    updateEntity(input: UpdateEntityReq, options?: RpcOptions): UnaryCall<UpdateEntityReq, Entity> {
+    updateGroup(input: UpdateGroupReq, options?: RpcOptions): UnaryCall<UpdateGroupReq, Group> {
         const method = this.methods[9], opt = this._transport.mergeOptions(options);
-        return stackIntercept<UpdateEntityReq, Entity>("unary", this._transport, method, opt, input);
+        return stackIntercept<UpdateGroupReq, Group>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: DeleteEntity
+     * @generated from protobuf rpc: DeleteGroup
      */
-    deleteEntity(input: DeleteEntityReq, options?: RpcOptions): UnaryCall<DeleteEntityReq, Entity> {
+    deleteGroup(input: DeleteGroupReq, options?: RpcOptions): UnaryCall<DeleteGroupReq, Group> {
         const method = this.methods[10], opt = this._transport.mergeOptions(options);
-        return stackIntercept<DeleteEntityReq, Entity>("unary", this._transport, method, opt, input);
+        return stackIntercept<DeleteGroupReq, Group>("unary", this._transport, method, opt, input);
     }
     /**
      * Roles

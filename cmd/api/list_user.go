@@ -27,22 +27,22 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 	}
 
 	var ids []ulid.ID
-	var entityIDs []ulid.ID
+	var groupIDs []ulid.ID
 
-	if req.OwnEntity {
-		entityIDs = claims.EntityIDs(user.Requirement{Resource: user.R_user, Command: user.C_read})
-	} else if len(req.EntityIDs) > 0 {
-		if err := claims.Require(user.NewRequirements(req.EntityIDs, user.R_user, user.C_read)...); err != nil {
+	if req.OwnGroup {
+		groupIDs = claims.GroupIDs(user.Requirement{Resource: user.R_user, Command: user.C_read})
+	} else if len(req.GroupIDs) > 0 {
+		if err := claims.Require(user.NewRequirements(req.GroupIDs, user.R_user, user.C_read)...); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.ListUserResp{}, status.New(codes.PermissionDenied, err.Error()).Err()
 		}
 
-		entityIDs = req.EntityIDs
+		groupIDs = req.GroupIDs
 	} else {
 		err := gerrors.ErrMissingAtLeast{
 			AtLeast: 1,
-			Fields:  []string{"own_entity", "entity_ids"},
+			Fields:  []string{"own_group", "group_ids"},
 		}
 
 		logger.Error().Err(err).Msg("invalid argument")
@@ -58,12 +58,12 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		users, total, err = h.user.ListByEntity(ctx, user.Filter{
-			EntityIDs: entityIDs,
-			IDs:       ids,
-			RoleID:    req.RoleID,
-			Paginate:  req.Paginate,
-			Search:    req.Search,
+		users, total, err = h.user.ListByGroup(ctx, user.Filter{
+			GroupIDs: groupIDs,
+			IDs:      ids,
+			RoleID:   req.RoleID,
+			Paginate: req.Paginate,
+			Search:   req.Search,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list user")

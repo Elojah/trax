@@ -70,14 +70,14 @@ func (h *handler) DeleteRole(ctx context.Context, req *dto.DeleteRoleReq) (*dto.
 	}
 
 	// check permissions
-	if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: user.R_role, Command: user.C_write}); err != nil {
+	if err := claims.Require(user.Requirement{GroupID: role.GroupID, Resource: user.R_role, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 	// current user need to have all assigned permissions to delete a role
 	for _, perm := range permissions {
-		if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
+		if err := claims.Require(user.Requirement{GroupID: role.GroupID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.RolePermission{}, status.New(codes.InvalidArgument, err.Error()).Err()

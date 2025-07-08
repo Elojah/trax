@@ -98,10 +98,10 @@ func (f filter) where(n int) (string, []any) {
 	}
 
 	// !!! Only available if role r is joined
-	if len(f.EntityIDs) > 0 {
-		clause = append(clause, fmt.Sprintf(`r.entity_id IN (%s)`, postgres.Array(n, len(f.EntityIDs))))
-		args = append(args, ulid.IDs(f.EntityIDs).Any()...)
-		n += len(f.EntityIDs)
+	if len(f.GroupIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`r.group_id IN (%s)`, postgres.Array(n, len(f.GroupIDs))))
+		args = append(args, ulid.IDs(f.GroupIDs).Any()...)
+		n += len(f.GroupIDs)
 	}
 
 	// !!! Only available if role r is joined
@@ -159,8 +159,8 @@ func (f filter) index() string {
 		cols = append(cols, f.Search)
 	}
 
-	if f.EntityIDs != nil {
-		ss := ulid.IDs(f.EntityIDs).String()
+	if f.GroupIDs != nil {
+		ss := ulid.IDs(f.GroupIDs).String()
 		cols = append(cols, strings.Join(ss, "|"))
 	}
 
@@ -323,7 +323,7 @@ func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error
 	return users, count, nil
 }
 
-func (s Store) ListByEntity(ctx context.Context, f user.Filter) ([]user.U, uint64, error) {
+func (s Store) ListByGroup(ctx context.Context, f user.Filter) ([]user.U, uint64, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return nil, 0, err

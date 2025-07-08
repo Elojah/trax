@@ -34,8 +34,8 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 		var err error
 
 		roles, _, err = h.user.ListRole(ctx, user.FilterRole{
-			IDs:      req.RoleIDs,
-			EntityID: req.EntityID,
+			IDs:     req.RoleIDs,
+			GroupID: req.GroupID,
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to fetch role")
@@ -70,14 +70,14 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 	}
 
 	// check permissions
-	if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: user.R_user, Command: user.C_write}); err != nil {
+	if err := claims.Require(user.Requirement{GroupID: req.GroupID, Resource: user.R_user, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &user.U{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 	// current user need to have all assigned permissions to assign a role
 	for _, perm := range permissions {
-		if err := claims.Require(user.Requirement{EntityID: req.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
+		if err := claims.Require(user.Requirement{GroupID: req.GroupID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &user.U{}, status.New(codes.InvalidArgument, err.Error()).Err()
@@ -100,7 +100,7 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 	// if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 	// 	rolesByUser, _, err := h.user.ListRoleByUser(ctx, user.FilterRole{
 	// 		UserID:   req.UserID,
-	// 		EntityID: role.EntityID,
+	// 		GroupID: role.GroupID,
 	// 	})
 	// 	if err != nil {
 	// 		logger.Error().Err(err).Msg("failed to list roles")
@@ -108,9 +108,9 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 	// 		return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 	// 	}
 
-	// 	// user needs AT LEAST ONE ROLE in current entity to be assigned a new role
-	// 	// if user has no role in current entity, it means he has no access to this entity
-	// 	// if you want to assign a role to a user, you need to invite him with a role in the entity first
+	// 	// user needs AT LEAST ONE ROLE in current group to be assigned a new role
+	// 	// if user has no role in current group, it means he has no access to this group
+	// 	// if you want to assign a role to a user, you need to invite him with a role in the group first
 	// 	var ok bool
 
 	// 	roles, ok = rolesByUser[req.UserID.String()]

@@ -62,14 +62,14 @@ func (h *handler) DeleteRoleUser(ctx context.Context, req *dto.DeleteRoleUserReq
 	}
 
 	// #MARK:Check permissions
-	if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: user.R_user, Command: user.C_write}); err != nil {
+	if err := claims.Require(user.Requirement{GroupID: role.GroupID, Resource: user.R_user, Command: user.C_write}); err != nil {
 		logger.Error().Err(err).Msg("permission denied")
 
 		return &dto.RoleUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
 	for _, perm := range permissions {
-		if err := claims.Require(user.Requirement{EntityID: role.EntityID, Resource: perm.Resource, Command: perm.Command}); err != nil {
+		if err := claims.Require(user.Requirement{GroupID: role.GroupID, Resource: perm.Resource, Command: perm.Command}); err != nil {
 			logger.Error().Err(err).Msg("permission denied")
 
 			return &dto.RoleUserResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
@@ -80,9 +80,9 @@ func (h *handler) DeleteRoleUser(ctx context.Context, req *dto.DeleteRoleUserReq
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		_, err := h.user.FetchRole(ctx, user.FilterRole{
-			ID:       role.ID,
-			UserID:   req.UserID,
-			EntityID: role.EntityID,
+			ID:      role.ID,
+			UserID:  req.UserID,
+			GroupID: role.GroupID,
 		})
 		if err != nil {
 			if errors.As(err, &gerrors.ErrNotFound{}) {
