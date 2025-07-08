@@ -7,8 +7,8 @@ import (
 )
 
 type handler struct {
-	cookie cookie.Agg
-	google google.Agg
+	cookie cookie.Service
+	google google.Service
 
 	grpc.AuthClient
 }

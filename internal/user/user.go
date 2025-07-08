@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-type Agg interface {
+type Service interface {
 	transaction.Transactioner
 
 	Store
