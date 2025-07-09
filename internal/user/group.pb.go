@@ -5,16 +5,15 @@ package user
 
 import (
 	fmt "fmt"
+	_ "github.com/elojah/trax/pkg/gogoproto"
+	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
+	proto "github.com/gogo/protobuf/proto"
+	golang_proto "github.com/golang/protobuf/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
-
-	_ "github.com/elojah/trax/pkg/gogoproto"
-	github_com_elojah_trax_pkg_ulid "github.com/elojah/trax/pkg/ulid"
-	proto "github.com/gogo/protobuf/proto"
-	golang_proto "github.com/golang/protobuf/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -38,34 +37,34 @@ type Group struct {
 	UpdatedAt   int64                              `protobuf:"varint,6,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
 }
 
-func (g *Group) Reset()      { *g = Group{} }
+func (m *Group) Reset()      { *m = Group{} }
 func (*Group) ProtoMessage() {}
 func (*Group) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4c0061eda31742fb, []int{0}
 }
-func (g *Group) XXX_Unmarshal(b []byte) error {
-	return g.Unmarshal(b)
+func (m *Group) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
 }
-func (g *Group) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Group) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Group.Marshal(b, g, deterministic)
+		return xxx_messageInfo_Group.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := g.MarshalToSizedBuffer(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
 		return b[:n], nil
 	}
 }
-func (g *Group) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Group.Merge(g, src)
+func (m *Group) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Group.Merge(m, src)
 }
-func (g *Group) XXX_Size() int {
-	return g.Size()
+func (m *Group) XXX_Size() int {
+	return m.Size()
 }
-func (g *Group) XXX_DiscardUnknown() {
-	xxx_messageInfo_Group.DiscardUnknown(g)
+func (m *Group) XXX_DiscardUnknown() {
+	xxx_messageInfo_Group.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_Group proto.InternalMessageInfo
@@ -102,9 +101,9 @@ var fileDescriptor_4c0061eda31742fb = []byte{
 	0x68, 0x19, 0xf4, 0x5d, 0x89, 0x01, 0x00, 0x00,
 }
 
-func (g *Group) Equal(that interface{}) bool {
+func (this *Group) Equal(that interface{}) bool {
 	if that == nil {
-		return g == nil
+		return this == nil
 	}
 
 	that1, ok := that.(*Group)
@@ -117,42 +116,42 @@ func (g *Group) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		return g == nil
-	} else if g == nil {
+		return this == nil
+	} else if this == nil {
 		return false
 	}
-	if !g.ID.Equal(that1.ID) {
+	if !this.ID.Equal(that1.ID) {
 		return false
 	}
-	if g.Name != that1.Name {
+	if this.Name != that1.Name {
 		return false
 	}
-	if g.AvatarURL != that1.AvatarURL {
+	if this.AvatarURL != that1.AvatarURL {
 		return false
 	}
-	if g.Description != that1.Description {
+	if this.Description != that1.Description {
 		return false
 	}
-	if g.CreatedAt != that1.CreatedAt {
+	if this.CreatedAt != that1.CreatedAt {
 		return false
 	}
-	if g.UpdatedAt != that1.UpdatedAt {
+	if this.UpdatedAt != that1.UpdatedAt {
 		return false
 	}
 	return true
 }
-func (g *Group) GoString() string {
-	if g == nil {
+func (this *Group) GoString() string {
+	if this == nil {
 		return "nil"
 	}
 	s := make([]string, 0, 10)
 	s = append(s, "&user.Group{")
-	s = append(s, "ID: "+fmt.Sprintf("%#v", g.ID)+",\n")
-	s = append(s, "Name: "+fmt.Sprintf("%#v", g.Name)+",\n")
-	s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", g.AvatarURL)+",\n")
-	s = append(s, "Description: "+fmt.Sprintf("%#v", g.Description)+",\n")
-	s = append(s, "CreatedAt: "+fmt.Sprintf("%#v", g.CreatedAt)+",\n")
-	s = append(s, "UpdatedAt: "+fmt.Sprintf("%#v", g.UpdatedAt)+",\n")
+	s = append(s, "ID: "+fmt.Sprintf("%#v", this.ID)+",\n")
+	s = append(s, "Name: "+fmt.Sprintf("%#v", this.Name)+",\n")
+	s = append(s, "AvatarURL: "+fmt.Sprintf("%#v", this.AvatarURL)+",\n")
+	s = append(s, "Description: "+fmt.Sprintf("%#v", this.Description)+",\n")
+	s = append(s, "CreatedAt: "+fmt.Sprintf("%#v", this.CreatedAt)+",\n")
+	s = append(s, "UpdatedAt: "+fmt.Sprintf("%#v", this.UpdatedAt)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -164,61 +163,61 @@ func valueToGoStringGroup(v interface{}, typ string) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
 }
-func (g *Group) Marshal() (dAtA []byte, err error) {
-	size := g.Size()
+func (m *Group) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := g.MarshalToSizedBuffer(dAtA[:size])
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
 	return dAtA[:n], nil
 }
 
-func (g *Group) MarshalTo(dAtA []byte) (int, error) {
-	size := g.Size()
-	return g.MarshalToSizedBuffer(dAtA[:size])
+func (m *Group) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (g *Group) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Group) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if g.UpdatedAt != 0 {
-		i = encodeVarintGroup(dAtA, i, uint64(g.UpdatedAt))
+	if m.UpdatedAt != 0 {
+		i = encodeVarintGroup(dAtA, i, uint64(m.UpdatedAt))
 		i--
 		dAtA[i] = 0x30
 	}
-	if g.CreatedAt != 0 {
-		i = encodeVarintGroup(dAtA, i, uint64(g.CreatedAt))
+	if m.CreatedAt != 0 {
+		i = encodeVarintGroup(dAtA, i, uint64(m.CreatedAt))
 		i--
 		dAtA[i] = 0x28
 	}
-	if len(g.Description) > 0 {
-		i -= len(g.Description)
-		copy(dAtA[i:], g.Description)
-		i = encodeVarintGroup(dAtA, i, uint64(len(g.Description)))
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintGroup(dAtA, i, uint64(len(m.Description)))
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(g.AvatarURL) > 0 {
-		i -= len(g.AvatarURL)
-		copy(dAtA[i:], g.AvatarURL)
-		i = encodeVarintGroup(dAtA, i, uint64(len(g.AvatarURL)))
+	if len(m.AvatarURL) > 0 {
+		i -= len(m.AvatarURL)
+		copy(dAtA[i:], m.AvatarURL)
+		i = encodeVarintGroup(dAtA, i, uint64(len(m.AvatarURL)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(g.Name) > 0 {
-		i -= len(g.Name)
-		copy(dAtA[i:], g.Name)
-		i = encodeVarintGroup(dAtA, i, uint64(len(g.Name)))
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGroup(dAtA, i, uint64(len(m.Name)))
 		i--
 		dAtA[i] = 0x12
 	}
 	{
-		size := g.ID.Size()
+		size := m.ID.Size()
 		i -= size
-		if _, err := g.ID.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.ID.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintGroup(dAtA, i, uint64(size))
@@ -331,31 +330,31 @@ func encodeVarintPopulateGroup(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (g *Group) Size() (n int) {
-	if g == nil {
+func (m *Group) Size() (n int) {
+	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = g.ID.Size()
+	l = m.ID.Size()
 	n += 1 + l + sovGroup(uint64(l))
-	l = len(g.Name)
+	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovGroup(uint64(l))
 	}
-	l = len(g.AvatarURL)
+	l = len(m.AvatarURL)
 	if l > 0 {
 		n += 1 + l + sovGroup(uint64(l))
 	}
-	l = len(g.Description)
+	l = len(m.Description)
 	if l > 0 {
 		n += 1 + l + sovGroup(uint64(l))
 	}
-	if g.CreatedAt != 0 {
-		n += 1 + sovGroup(uint64(g.CreatedAt))
+	if m.CreatedAt != 0 {
+		n += 1 + sovGroup(uint64(m.CreatedAt))
 	}
-	if g.UpdatedAt != 0 {
-		n += 1 + sovGroup(uint64(g.UpdatedAt))
+	if m.UpdatedAt != 0 {
+		n += 1 + sovGroup(uint64(m.UpdatedAt))
 	}
 	return n
 }
@@ -366,17 +365,17 @@ func sovGroup(x uint64) (n int) {
 func sozGroup(x uint64) (n int) {
 	return sovGroup(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (g *Group) String() string {
-	if g == nil {
+func (this *Group) String() string {
+	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&Group{`,
-		`ID:` + fmt.Sprintf("%v", g.ID) + `,`,
-		`Name:` + fmt.Sprintf("%v", g.Name) + `,`,
-		`AvatarURL:` + fmt.Sprintf("%v", g.AvatarURL) + `,`,
-		`Description:` + fmt.Sprintf("%v", g.Description) + `,`,
-		`CreatedAt:` + fmt.Sprintf("%v", g.CreatedAt) + `,`,
-		`UpdatedAt:` + fmt.Sprintf("%v", g.UpdatedAt) + `,`,
+		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`AvatarURL:` + fmt.Sprintf("%v", this.AvatarURL) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`CreatedAt:` + fmt.Sprintf("%v", this.CreatedAt) + `,`,
+		`UpdatedAt:` + fmt.Sprintf("%v", this.UpdatedAt) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -389,7 +388,7 @@ func valueToStringGroup(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (g *Group) Unmarshal(dAtA []byte) error {
+func (m *Group) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -447,7 +446,7 @@ func (g *Group) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := g.ID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -481,7 +480,7 @@ func (g *Group) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			g.Name = string(dAtA[iNdEx:postIndex])
+			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -513,7 +512,7 @@ func (g *Group) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			g.AvatarURL = string(dAtA[iNdEx:postIndex])
+			m.AvatarURL = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -545,13 +544,13 @@ func (g *Group) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			g.Description = string(dAtA[iNdEx:postIndex])
+			m.Description = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
 			}
-			g.CreatedAt = 0
+			m.CreatedAt = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGroup
@@ -561,7 +560,7 @@ func (g *Group) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				g.CreatedAt |= int64(b&0x7F) << shift
+				m.CreatedAt |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -570,7 +569,7 @@ func (g *Group) Unmarshal(dAtA []byte) error {
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
 			}
-			g.UpdatedAt = 0
+			m.UpdatedAt = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGroup
@@ -580,7 +579,7 @@ func (g *Group) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				g.UpdatedAt |= int64(b&0x7F) << shift
+				m.UpdatedAt |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
