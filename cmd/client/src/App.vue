@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Menu from '@/components/Menu.vue';
 import Errors from '@/components/Errors.vue';
+import Badge from 'primevue/badge';
 
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from './stores/auth';
@@ -10,7 +11,7 @@ const timer = ref();
 
 onMounted(async () => {
   timer.value = setInterval(() => {
-    authStore.refreshToken();
+    // authStore.refreshToken();
   }, 10 * 60 * 1000); // TODO: configurable
 });
 
@@ -18,13 +19,10 @@ onUnmounted(() => clearInterval(timer.value))
 </script>
 
 <template>
-  <div class="layout">
-    <Menu />
-    <div class="layout-content">
-      <!-- <router-view /> -->
-      <!-- <Errors /> -->
-    </div>
-  </div>
+  <v-app id="trax">
+    <RouterView />
+    <Errors />
+  </v-app>
 </template>
 
 <style scoped></style>

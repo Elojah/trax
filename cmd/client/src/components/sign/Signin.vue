@@ -6,11 +6,19 @@ import { useErrorsStore } from '@/stores/errors';
 import router from "@/router";
 import { type CredentialResponse } from "vue3-google-signin";
 
-import { Form } from '@primevue/forms';
+import Button from 'primevue/button';
+import Checkbox from 'primevue/checkbox';
+import Divider from 'primevue/divider';
+import InputText from 'primevue/inputtext';
+import Form from '@primevue/forms/form';
+import FormField from '@primevue/forms/formfield';
+
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 
 import { logger } from "@/config";
+
+const checked2 = ref(true);
 
 const authStore = useAuthStore()
 
@@ -19,11 +27,11 @@ const password = ref(null as string | null)
 const valid = ref(null as boolean | null)
 const showPassword = ref(false as boolean)
 
-const resolver =  zodResolver(
-    z.object({
-        username: z.string().min(1, { message: 'Username is required.' }).email('Username must be a valid email.'),
-        password: z.string().min(1, { message: 'Password is required.' }).min(8, { message: 'Password must be at least 8 characters long.' }),
-    })
+const resolver = zodResolver(
+  z.object({
+    email: z.string().min(1, { message: 'Email is required.' }).email('Email must be valid.'),
+    password: z.string().min(1, { message: 'Password is required.' }).min(8, { message: 'Password must be at least 8 characters long.' }),
+  })
 );
 
 const errorsStore = useErrorsStore()
@@ -33,6 +41,8 @@ const {
 } = toRefs(errorsStore)
 
 const signin = async function () {
+  console.log('signin', email.value, password.value)
+
   const req = SigninReq.create({
     email: email.value,
     password: password.value,
@@ -86,26 +96,42 @@ const signInGoogleError = async function (error: any) {
 </script>
 
 <template>
-<template>
-    <div class="card flex justify-center">
-        <Toast />
-        <Form v-slot="$form" :resolver @submit="signin" class="flex flex-col gap-4 w-full sm:w-60">
-            <div class="flex flex-col gap-1">
-                <InputText name="username" type="text" placeholder="Username" fluid />
-                <Message v-if="$form.username?.invalid" severity="error" size="small" variant="simple">{{ $form.username.error.message }}</Message>
-            </div>
-            <div class="flex flex-col gap-1">
-                <Password name="password" placeholder="Password" :feedback="false" toggleMask fluid />
-                <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">
-                    <ul class="my-0 px-4 flex flex-col gap-1">
-                        <li v-for="(error, index) of $form.password.errors" :key="index">{{ error.message }}</li>
-                    </ul>
-                </Message>
-            </div>
-            <Button type="submit" severity="secondary" label="Submit" />
-        </Form>
+  <div
+    class="w-full md:w-6/12 px-8 md:px-12 lg:px-24 py-16 bg-surface-0 dark:bg-surface-900 rounded-2xl md:rounded-l-none flex flex-col gap-12">
+    <Form v-slot="$form" :resolver @submit="signin" class="flex flex-col gap-6">
+      <div class="text-surface-900 dark:text-surface-0 text-2xl font-medium leading-tight">Login</div>
+      <FormField class="flex flex-col gap-2">
+        <label for="email3" class="text-surface-900 dark:text-surface-0 font-medium">Email
+          Address</label>
+        <InputText v-model="email" id="email3" type="text" class="w-full rounded-md shadow-sm" />
+      </FormField>
+      <FormField class="flex flex-col gap-2">
+        <label for="password3" class="text-surface-900 dark:text-surface-0 font-medium">Password</label>
+        <InputText v-model="password" id="password3" type="password" class="w-full rounded-md shadow-sm" />
+      </FormField>
+      <div
+        class="flex flex-col sm:flex-row md:flex-col lg:flex-row items-start sm:items-center md:items-start lg:items-center justify-between w-full gap-2">
+        <div class="flex items-center gap-2">
+          <Checkbox id="rememberme2" v-model="checked2" :binary="true" />
+          <label for="rememberme2" class="text-surface-900 dark:text-surface-0">Remember me</label>
+        </div>
+        <a
+          class="text-surface-500 dark:text-surface-400 font-medium cursor-pointer hover:text-surface-600 dark:hover:text-surface-300">Forgot
+          your password?</a>
+      </div>
+    </Form>
+    <div class="flex flex-col gap-6">
+      <Button label="Login" class="w-full" />
+      <Divider align="center">
+        <span class="text-surface-500 dark:text-surface-400">or</span>
+      </Divider>
+      <Button label="Sign In with Google" icon="pi pi-google !text-base !leading-none" severity="secondary"
+        class="w-full" />
     </div>
+    <div class="text-center">
+      <span class="text-surface-600 dark:text-surface-300">Don't have an account? </span>
+      <span class="text-primary font-medium cursor-pointer hover:text-primary-emphasis">Sign up</span>
+    </div>
+  </div>
 </template>
-</template>
-<style scoped>
-</style>
+<style scoped></style>

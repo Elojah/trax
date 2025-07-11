@@ -1,8 +1,9 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import './index.css'
 
 import PrimeVue from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
+import Aura from '@primevue/themes/aura';
 import 'primeicons/primeicons.css';
 
 import GoogleSignInPlugin from "vue3-google-signin"
