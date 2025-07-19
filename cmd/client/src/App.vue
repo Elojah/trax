@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Menu from '@/components/Menu.vue';
+import Menu from '@/components/Sidebar.vue';
 import Errors from '@/components/Errors.vue';
 import Badge from 'primevue/badge';
 
@@ -11,7 +11,7 @@ const timer = ref();
 
 onMounted(async () => {
   timer.value = setInterval(() => {
-    // authStore.refreshToken();
+    authStore.refreshToken();
   }, 10 * 60 * 1000); // TODO: configurable
 });
 

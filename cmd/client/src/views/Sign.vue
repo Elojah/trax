@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Signin from '@/components/sign/Signin.vue';
 
-
 </script>
 <template>
     <div class="px-12 py-20 md:px-12 lg:px-20 bg-no-repeat bg-cover" style="
