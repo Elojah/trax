@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { useRouter } from 'vue-router'
-import { toRefs, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router'
+import { toRefs, ref, computed } from 'vue';
 import Avatar from 'primevue/avatar';
 
 const router = useRouter()
+const route = useRoute()
 
 const authStore = useAuthStore();
 const {
@@ -41,45 +42,42 @@ const redirect = function (name: string) {
 // 	}
 // ];
 
-const selectedNav = ref('Dashboard');
+const selectedNav = computed(() => route.name?.toString() || 'dashboard');
 const navs = ref([
 	{
-		label: '_',
-		separator: true
-	},
-	{
-		label: 'Dashboard',
+		label: 'dashboard',
 		icon: 'pi pi-fw pi-home',
 		command: () => redirect('dashboard')
 	},
-	{ label: 'Map', icon: 'pi pi-map' },
-	{ label: 'Users', icon: 'pi pi-users' },
+	{
+		label: 'map',
+		icon: 'pi pi-map',
+		command: () => redirect('map')
+	},
+	{
+		label: 'group',
+		icon: 'pi pi-users',
+		command: () => redirect('group')
+	},
 ]);
 
 const bottomNavs = ref([
 	{
 		label: 'Settings',
 		icon: 'pi pi-fw pi-cog',
-		items: [
-			{
-				label: 'Profile',
-				icon: 'pi pi-fw pi-user',
-				command: () => redirect('profile')
-			},
-			{
-				label: 'Preferences',
-				icon: 'pi pi-fw pi-sliders-h',
-				command: () => redirect('preferences')
-			}
-		]
 	},
 ]);
 
+const selectNav = (item: any) => {
+	if (item.command) {
+		item.command();
+	}
+};
 
 </script>
 
 <template>
-	<div id="app-sidebar-floating-slim"
+	<div v-if="user" id="app-sidebar-floating-slim"
 		class="p-6 bg-surface-0 dark:bg-surface-900 rounded-2xl border border-surface-100 dark:border-surface-700 flex flex-col w-24">
 		<div class="flex justify-center">
 			<svg xmlns="http://www.w3.org/2000/svg" width="33" height="32" viewBox="0 0 33 32" fill="none">
@@ -96,7 +94,7 @@ const bottomNavs = ref([
 						? 'bg-surface-0 dark:bg-surface-950 text-surface-900 dark:text-surface-0 border-surface-200 dark:border-surface-700'
 						: 'bg-transparent border-transparent text-surface-600 dark:text-surface-500'
 						" class="w-10 h-10 flex items-center justify-center rounded-lg border hover:bg-surface-0 dark:hover:bg-surface-950 hover:text-surface-900 dark:hover:text-surface-0 hover:border-surface-200 dark:hover:border-surface-700 transition-all"
-						@click="selectedNav = item.label">
+						@click="selectNav(item)">
 						<i :class="item.icon" class="!text-xl !leading-normal" />
 					</button>
 				</template>
@@ -109,12 +107,13 @@ const bottomNavs = ref([
 					? 'bg-surface-0 dark:bg-surface-950 text-surface-900 dark:text-surface-0 border-surface-200 dark:border-surface-700'
 					: 'bg-transparent border-transparent text-surface-600 dark:text-surface-500'
 					" class="w-10 h-10 flex items-center justify-center rounded-lg border hover:bg-surface-0 dark:hover:bg-surface-950 hover:text-surface-900 dark:hover:text-surface-0 hover:border-surface-200 dark:hover:border-surface-700 transition-all"
-					@click="selectedNav = item.label">
+					@click="selectNav(item)">
 					<i :class="item.icon" class="!text-xl !leading-normal" />
 				</button>
 			</template>
 			<div class="w-full h-px bg-surface-200 dark:bg-surface-700 my-4" />
-			<Avatar :image="user?.avatarURL" class="!w-10 !h-10 cursor-pointer" />
+			<Avatar :image="user?.avatarURL" class="!w-10 !h-10 cursor-pointer" shape="circle"
+				@click="selectNav({ label: 'user', command: () => redirect('user') })" />
 		</div>
 	</div>
 </template>

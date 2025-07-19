@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Menu from '@/components/Sidebar.vue';
+import Sidebar from '@/components/Sidebar.vue';
 import Errors from '@/components/Errors.vue';
-import Badge from 'primevue/badge';
 
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from './stores/auth';
@@ -20,8 +19,11 @@ onUnmounted(() => clearInterval(timer.value))
 
 <template>
   <v-app id="trax">
-    <RouterView />
-    <Errors />
+    <div class="flex relative lg:static bg-surface-50 dark:bg-surface-950">
+      <Sidebar />
+      <RouterView />
+      <Errors />
+    </div>
   </v-app>
 </template>
 

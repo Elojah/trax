@@ -3,7 +3,7 @@ import Signin from '@/components/sign/Signin.vue';
 
 </script>
 <template>
-    <div class="px-12 py-20 md:px-12 lg:px-20 bg-no-repeat bg-cover" style="
+    <div class="px-12 py-20 md:px-12 lg:px-20 bg-no-repeat bg-cover w-full" style="
             background:
                 linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%),
                 linear-gradient(0deg, var(--p-primary-500) 0%, var(--p-primary-500) 100%),
