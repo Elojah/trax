@@ -19,7 +19,7 @@ onUnmounted(() => clearInterval(timer.value))
 
 <template>
   <v-app id="trax">
-    <div class="flex relative lg:static bg-surface-50 dark:bg-surface-950">
+    <div class="min-h-screen flex relative lg:static bg-surface-0 dark:bg-surface-950">
       <Sidebar />
       <RouterView />
       <Errors />

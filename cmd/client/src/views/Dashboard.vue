@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+
 import { toRefs, ref } from "vue";
 
 const search = ref('');
