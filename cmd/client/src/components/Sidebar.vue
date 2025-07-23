@@ -15,7 +15,7 @@ const redirect = function (name: string) {
 	router.push({ name: name });
 }
 
-const selectedItem = computed(() => route.name?.toString() || 'dashboard');
+const selectedItem = computed(() => route.name?.toString() || 'home');
 
 interface MenuItem {
 	label: string;
@@ -31,9 +31,9 @@ const selectItem = (item: MenuItem) => {
 
 const menuItems = ref([
 	{
-		label: 'dashboard',
+		label: 'home',
 		icon: 'pi pi-fw pi-home',
-		command: () => redirect('dashboard')
+		command: () => redirect('home')
 	},
 	{
 		label: 'map',
@@ -73,7 +73,7 @@ const menuItems = ref([
 							:class="[item.icon, selectedItem === item.label ? 'text-primary' : 'text-surface-600 dark:text-surface-300 group-hover:text-primary', '!text-2xl !leading-none']" />
 						<span class="text-sm font-medium text-center"
 							:class="selectedItem === item.label ? 'text-primary' : 'text-surface-600 dark:text-surface-300 group-hover:text-primary'">{{
-								item.label }}</span>
+								item.label.charAt(0).toUpperCase() + item.label.slice(1) }}</span>
 					</div>
 					<div class="w-1 h-full bg-transparent" />
 				</div>

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '@/views/Dashboard.vue'
+import Home from '@/views/Home.vue'
 import Sign from '@/views/Sign.vue'
 import User from '@/views/User.vue'
 import Map from '@/views/Map.vue'
@@ -14,8 +14,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'dashboard',
-      component: Dashboard,
+      name: 'home',
+      component: Home,
       meta: { requiresAuth: true }
     },
     {
@@ -66,7 +66,7 @@ router.beforeEach((to, from, next) => {
       if (!authStore.user) {
         next()
       } else {
-        next({ name: 'dashboard' })
+        next({ name: 'home' })
       }
     })
   } else {

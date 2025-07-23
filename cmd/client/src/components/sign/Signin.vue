@@ -56,7 +56,7 @@ const signin = async function (e: FormSubmitEvent) {
 
   switch (resp.status) {
     case 200: // success
-      router.push({ name: 'dashboard' })
+      router.push({ name: 'home' })
       break;
     case 401: // unauthorized
       message.value = 'Failed to signin, wrong email/password.'
@@ -76,7 +76,7 @@ const signInGoogle = async function (credentials: CredentialResponse) {
 
   switch (resp.status) {
     case 200: // success
-      router.push({ name: 'dashboard' })
+      router.push({ name: 'home' })
       break;
     case 401: // unauthorized
       message.value = 'Failed to signin, wrong email/password.'

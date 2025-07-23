@@ -13,7 +13,7 @@ const search = ref('');
 	<div class="overflow-auto flex-1 flex flex-col gap-8 transition-all pb-20">
 		<div class="flex flex-col md:flex-row md:items-center md:justify-between py-6 px-8 gap-4 pb-0">
 			<div class="flex flex-col gap-1">
-				<h1 class="text-lg font-medium text-surface-900 dark:text-surface-0 leading-tight">Dashboard</h1>
+				<h1 class="text-lg font-medium text-surface-900 dark:text-surface-0 leading-tight">Home</h1>
 				<p class="text-surface-500 leading-tight">Solar metrics</p>
 			</div>
 			<div class="flex items-center gap-2">
