@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { ulid } from '@/utils/ulid';
 import { ListGroupReq } from '@internal/user/dto/group';
+import { Group } from '@internal/user/group';
 import { grpccodes } from '@/utils/errors';
 
 import DataTable, { type DataTableFilterEvent, type DataTablePageEvent, type DataTableProps, type DataTableSortEvent } from 'primevue/datatable';
@@ -199,7 +200,7 @@ onMounted(() => {
 			<div class="flex justify-between items-center gap-4">
 				<IconField icon-position="left">
 					<InputIcon class="pi pi-search text-surface-400" />
-					<InputText type="text" class="w-full sm:w-80" placeholder="Search groups..." v-model="search"
+					<InputText type="text" class="w-full sm:w-80" placeholder="Search group" v-model="search"
 						@input="onSearch" />
 				</IconField>
 				<Button label="Create Group" icon="pi pi-plus-circle" @click="visible = true" />
@@ -207,9 +208,9 @@ onMounted(() => {
 		</template>
 
 		<Column field="name" header="Name" sortable style="width: 25%">
-			<template #body="{ data }">
+			<template #body="{ data }: { data: Group }">
 				<div class="flex items-center gap-2">
-					<Avatar v-if="data.avatar_url" :image="data.avatar_url" size="large" shape="circle" />
+					<Avatar v-if="data.avatarURL" :image="data.avatarURL" size="large" shape="circle" />
 					<Avatar v-else :label="data.name.charAt(0).toUpperCase()" size="large" shape="circle" />
 					<span class="font-semibold">{{ data.name }}</span>
 				</div>
@@ -217,19 +218,19 @@ onMounted(() => {
 		</Column>
 
 		<Column field="description" header="Description" style="width: 50%">
-			<template #body="{ data }">
+			<template #body="{ data }: { data: Group }">
 				<span>{{ short(data.description) }}</span>
 			</template>
 		</Column>
 
 		<Column field="created_at" header="Created" sortable style="width: 20%">
-			<template #body="{ data }">
-				<span>{{ data.created_at }}</span>
+			<template #body="{ data }: { data: Group }">
+				<span>{{ new Date(Number(data.createdAt) * 1000).toLocaleDateString('en-GB') }}</span>
 			</template>
 		</Column>
 
 		<Column header="" style="width: 5%">
-			<template #body="{ data }">
+			<template #body="{ data }: { data: Group }">
 				<Button icon="pi pi-ellipsis-v" severity="secondary" text
 					@click="(event) => {/* Add your menu logic here */ }" aria-haspopup="true" />
 			</template>
@@ -253,13 +254,13 @@ onMounted(() => {
 				<i class="pi pi-users !text-xl !leading-none" />
 			</div>
 		</div>
-		<div class="flex flex-col gap-6">
+		<Form v-slot="$form" class="flex flex-col gap-6">
 			<div class="flex items-start gap-4">
 				<div class="flex-1 flex flex-col gap-2">
 					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Create
 						New group</h1>
-					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Manage users in
-						groups.</span>
+					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Manage your
+						users seamlessly.</span>
 				</div>
 				<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
 					@click="visible = false" />
@@ -292,7 +293,7 @@ onMounted(() => {
 				<Button label="Cancel" outlined @click="close" />
 				<Button label="Create" @click="create" />
 			</div>
-		</div>
+		</Form>
 	</Dialog>
 </template>
 <style scoped></style>
