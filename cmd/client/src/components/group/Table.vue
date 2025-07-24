@@ -1,30 +1,49 @@
 <script setup lang="ts">
-import { useGroupStore } from '@/stores/group';
+// Vue and Store imports
 import { computed, ref, toRefs, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
+import { useGroupStore } from '@/stores/group';
+
+// Internal utilities and types
 import { ulid } from '@/utils/ulid';
-import { ListGroupReq } from '@internal/user/dto/group';
-import { Group } from '@internal/user/group';
 import { grpccodes } from '@/utils/errors';
 import { logger } from "@/config";
+import { DeleteGroupReq, ListGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
+import { Group } from '@internal/user/group';
 
-import DataTable, { type DataTableFilterEvent, type DataTablePageEvent, type DataTableProps, type DataTableSortEvent } from 'primevue/datatable';
+// PrimeVue UI Components
+import DataTable, {
+	type DataTableFilterEvent,
+	type DataTablePageEvent,
+	type DataTableProps,
+	type DataTableSortEvent
+} from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import ConfirmDialog from 'primevue/confirmdialog';
+import Message from 'primevue/message';
+import Avatar from 'primevue/avatar';
+import AvatarGroup from 'primevue/avatargroup';
+import Textarea from 'primevue/textarea';
+import Menu from 'primevue/menu';
+
+// PrimeVue Input Components
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
-import Avatar from 'primevue/avatar';
-import Dialog from 'primevue/dialog';
-import Textarea from 'primevue/textarea';
+
+// Form Validation
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import z from 'zod';
-import type { FormEmits, FormSubmitEvent } from '@primevue/forms';
-
+import { Form, FormField } from '@primevue/forms';
+import type { FormSubmitEvent } from '@primevue/forms';
+import { useConfirm } from 'primevue/useconfirm';
 
 const authStore = useAuthStore();
 const store = useGroupStore();
+const confirm = useConfirm();
 const {
 	groups: groups,
 	total: total,
@@ -147,39 +166,144 @@ const resolver = zodResolver(
 	})
 );
 
-const visible = ref(false);
+const initialValues = ref({
+	name: '',
+	"avatar-url": '',
+	description: '',
+});
+
+const dialogCreateGroup = ref(false);
+const dialogManageGroup = ref(false);
+const dialogManageRoles = ref(false);
+const dialogManageUsers = ref(false);
+
+const menu = ref();
+const selectedGroup = ref<Group | null>(null);
+const menuItems = ref([
+	{
+		label: 'Manage group',
+		icon: 'pi pi-cog',
+		command: () => {
+			if (selectedGroup.value) {
+				// Populate form with current group data
+				initialValues.value = {
+					name: selectedGroup.value.name,
+					"avatar-url": selectedGroup.value.avatarURL || '',
+					description: selectedGroup.value.description || '',
+				};
+				dialogManageGroup.value = true;
+			}
+		}
+	},
+	{
+		label: 'Manage roles',
+		icon: 'pi pi-shield',
+		command: () => {
+			if (selectedGroup.value) {
+				dialogManageRoles.value = true;
+			}
+		}
+	},
+	{
+		label: 'Manage users',
+		icon: 'pi pi-users',
+		command: () => {
+			if (selectedGroup.value) {
+				dialogManageUsers.value = true;
+			}
+		}
+	}
+]);
+
+const toggleMenu = (event: Event, group: Group) => {
+	selectedGroup.value = group;
+	menu.value.toggle(event);
+};
+
 const close = () => {
-	visible.value = false;
-	// name.value = '';
-	// avatarURL.value = '';
-	// description.value = '';
+	dialogCreateGroup.value = false;
 };
 
 const create = async (e: FormSubmitEvent) => {
-	logger.info('Create group form is invalid', e.states);
 	if (!e.valid) {
 		logger.error('Create group form is invalid', e);
 		return;
 	}
 
-	let ok = true;
 	try {
-		await store.create(e.states.name.value, e.states['avatar-url'].value, e.states.description.value);
+		await store.create(e.states.name.value, e.states["avatar-url"].value, e.states.description.value);
 	} catch (e) {
 		errorsStore.showGRPC(e)
-		ok = false
+		return
 	}
 
-	if (ok) {
-		message.value = `Group ${e.states.name.value} created successfully`;
-		success.value = true;
-	}
-
-	visible.value = false;
+	message.value = `Group ${e.states.name.value} created successfully`;
+	success.value = true;
+	dialogCreateGroup.value = false;
 	e.reset()
-
 	await authStore.refreshToken();
 	await list();
+};
+
+const update = async (e: FormSubmitEvent) => {
+	if (!e.valid || !selectedGroup.value) {
+		logger.error('Update group form is invalid', e);
+		return;
+	}
+
+	try {
+		await store.update(UpdateGroupReq.create({
+			iD: selectedGroup.value?.iD,
+			name: { value: e.states.name.value },
+			avatarURL: { value: e.states["avatar-url"].value },
+			description: { value: e.states.description.value },
+		}));
+	} catch (e) {
+		errorsStore.showGRPC(e)
+		return
+	}
+
+	message.value = `Group ${e.states.name.value} updated successfully`;
+	success.value = true;
+	dialogManageGroup.value = false;
+	e.reset()
+	await authStore.refreshToken();
+	await list();
+};
+
+const deleteGroup = () => {
+	if (!selectedGroup.value) return;
+
+	confirm.require({
+		message: `Are you sure you want to delete the group "${selectedGroup.value.name}"? This action cannot be undone.`,
+		header: 'Delete Group',
+		icon: 'pi pi-exclamation-triangle',
+		rejectProps: {
+			label: 'Cancel',
+			severity: 'secondary',
+			outlined: true
+		},
+		acceptProps: {
+			label: 'Delete',
+			severity: 'danger'
+		},
+		accept: async () => {
+			if (!selectedGroup.value) return;
+
+			try {
+				await store.delete_(DeleteGroupReq.create({ iD: selectedGroup.value?.iD }));
+			} catch (e) {
+				errorsStore.showGRPC(e);
+				return
+			}
+
+			message.value = `Group "${selectedGroup.value.name}" deleted successfully`;
+			success.value = true;
+			dialogManageGroup.value = false;
+			await authStore.refreshToken();
+			await list();
+		}
+	});
 };
 
 const short = (description: string): string => {
@@ -203,42 +327,102 @@ onMounted(() => {
 		currentPageReportTemplate="{first} - {last} ({totalRecords})">
 
 		<template #header>
-			<div class="flex justify-between items-center gap-4">
-				<IconField icon-position="left">
-					<InputIcon class="pi pi-search text-surface-400" />
-					<InputText type="text" class="w-full sm:w-80" placeholder="Search group" v-model="search"
-						@input="onSearch" />
-				</IconField>
-				<Button label="Create Group" icon="pi pi-plus-circle" @click="visible = true" />
+			<div
+				class="flex justify-between items-center gap-6 p-4 bg-surface-50 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700">
+				<div class="flex items-center gap-4">
+					<div class="flex items-center gap-3">
+						<div
+							class="flex items-center justify-center w-10 h-10 bg-primary-100 dark:bg-primary-400/30 text-primary-600 dark:text-primary-300 rounded-lg border border-primary-200 dark:border-primary-400/20">
+							<i class="pi pi-building text-lg"></i>
+						</div>
+						<div class="flex flex-col">
+							<h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">Groups</h2>
+							<span class="text-sm text-surface-500 dark:text-surface-400">Manage your groups and
+								permissions</span>
+						</div>
+					</div>
+					<div class="flex items-center gap-3 ml-6">
+						<IconField icon-position="left" class="relative">
+							<InputIcon class="pi pi-search text-surface-400" />
+							<InputText type="text"
+								class="w-96 pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-900 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800 transition-all duration-200"
+								placeholder="Search groups by name or description..." v-model="search"
+								@input="onSearch" />
+						</IconField>
+					</div>
+				</div>
+				<div class="flex items-center gap-3">
+					<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10" @click="list()"
+						v-tooltip.bottom="'Refresh groups'" />
+					<Button label="" icon="pi pi-plus" severity="primary" class="font-medium"
+						@click="dialogCreateGroup = true" />
+				</div>
 			</div>
 		</template>
 
 		<Column field="name" header="Name" sortable style="width: 25%">
 			<template #body="{ data }: { data: Group }">
-				<div class="flex items-center gap-2">
-					<Avatar v-if="data.avatarURL" :image="data.avatarURL" size="large" shape="circle" />
-					<Avatar v-else :label="data.name.charAt(0).toUpperCase()" size="large" shape="circle" />
-					<span class="font-semibold">{{ data.name }}</span>
+				<div v-if="data" class="flex items-center gap-3">
+					<div class="relative">
+						<Avatar v-if="data.avatarURL" :image="data.avatarURL" size="large" shape="circle"
+							class="border-2 border-surface-200 dark:border-surface-700" />
+						<Avatar v-else :label="data.name.charAt(0).toUpperCase()" size="large" shape="circle"
+							class="bg-primary-100 dark:bg-primary-400/30 text-primary-600 dark:text-primary-300 border-2 border-primary-200 dark:border-primary-400/20" />
+					</div>
+					<div class="flex flex-col">
+						<span class="font-semibold text-surface-900 dark:text-surface-0">{{ data.name }}</span>
+					</div>
 				</div>
 			</template>
 		</Column>
 
-		<Column field="description" header="Description" style="width: 50%">
+		<Column field="description" header="Description" style="width: 40%">
 			<template #body="{ data }: { data: Group }">
-				<span>{{ short(data.description) }}</span>
+				<div v-if="data" class="flex flex-col gap-1">
+					<span class="text-surface-700 dark:text-surface-200 line-clamp-2">{{ short(data.description)
+					}}</span>
+					<div class="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+						<AvatarGroup>
+							<Avatar v-for="member in ['Raton', 'Belette', 'Nyx', 'Test']" :key="member.charAt(0)"
+								:label="member.charAt(0).toUpperCase()" size="small" shape="circle" />
+							<Avatar label="+2" shape="circle" />
+						</AvatarGroup>
+					</div>
+				</div>
 			</template>
 		</Column>
 
-		<Column field="created_at" header="Created" sortable style="width: 20%">
+		<Column field="created_at" header="Created" sortable style="width: 25%">
 			<template #body="{ data }: { data: Group }">
-				<span>{{ new Date(Number(data.createdAt) * 1000).toLocaleDateString('en-GB') }}</span>
+				<div v-if="data" class="flex flex-col gap-1">
+					<div class="flex items-center gap-2">
+						<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
+						<span class="font-medium text-surface-700 dark:text-surface-200">
+							{{ new Date(Number(data.createdAt) * 1000).toLocaleDateString('en-GB', {
+								day: 'numeric',
+								month: 'short',
+								year: 'numeric'
+							}) }}
+						</span>
+					</div>
+					<span class="text-xs text-surface-500 dark:text-surface-400">
+						{{ new Date(Number(data.createdAt) * 1000).toLocaleTimeString('en-GB', {
+							hour: '2-digit',
+							minute: '2-digit'
+						}) }}
+					</span>
+				</div>
 			</template>
 		</Column>
 
-		<Column header="" style="width: 5%">
+		<Column header="Actions" style="width: 10%">
 			<template #body="{ data }: { data: Group }">
-				<Button icon="pi pi-ellipsis-v" severity="secondary" text
-					@click="(event) => {/* Add your menu logic here */ }" aria-haspopup="true" />
+				<div v-if="data" class="flex justify-center">
+					<Button icon="pi pi-ellipsis-v" severity="secondary" text rounded
+						class="w-8 h-8 hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
+						@click="(event) => toggleMenu(event, data)" aria-haspopup="true"
+						v-tooltip.top="'More actions'" />
+				</div>
 			</template>
 		</Column>
 
@@ -250,26 +434,41 @@ onMounted(() => {
 		</template>
 	</DataTable>
 
+	<!-- Actions Menu -->
+	<Menu ref="menu" :model="menuItems" :popup="true" class="w-48">
+		<template #item="{ item, props }">
+			<a v-bind="props.action" class="flex items-center gap-3 px-3 py-2 text-sm">
+				<i :class="item.icon" class="text-surface-500 dark:text-surface-400"></i>
+				<span class="font-medium">{{ item.label }}</span>
+			</a>
+		</template>
+	</Menu>
+
 	<!-- Create Group Dialog -->
-	<Dialog v-model:visible="visible" append-to="body" modal :breakpoints="{ '960px': '75vw', '640px': '80vw' }"
-		:style="{ width: '40rem' }" :draggable="false" :resizable="false" :show-header="false"
-		class="shadow-sm rounded-2xl" :pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
-		<div class="flex gap-4">
-			<div
-				class="flex items-center justify-center w-9 h-9 bg-primary-100 dark:bg-primary-400/30 text-primary-500 dark:text-primary-200 rounded-3xl border border-primary-200 dark:border-primary-400/20 shrink-0">
-				<i class="pi pi-users !text-xl !leading-none" />
+	<Dialog v-model:visible="dialogCreateGroup" append-to="body" modal
+		:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '40rem' }" :draggable="false"
+		:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
+		:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
+		<div class="flex justify-between items-start gap-4">
+			<div class="flex gap-4">
+				<div
+					class="flex items-center justify-center w-9 h-9 bg-primary-100 dark:bg-primary-400/30 text-primary-500 dark:text-primary-200 rounded-3xl border border-primary-200 dark:border-primary-400/20 shrink-0">
+					<i class="pi pi-building !text-xl !leading-none" />
+				</div>
 			</div>
+			<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
+				@click="dialogCreateGroup = false" />
 		</div>
-		<Form v-slot="$form" :resolver @submit="create" class="flex flex-col gap-6">
+		<Form v-slot="$form" :resolver :initialValues @submit="create" class="flex flex-col gap-6">
 			<div class="flex items-start gap-4">
 				<div class="flex-1 flex flex-col gap-2">
 					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Create
-						New group</h1>
-					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Manage your
-						users seamlessly.</span>
+						group
+					</h1>
+					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">You will be
+						automatically
+						assigned as the group's administrator.</span>
 				</div>
-				<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
-					@click="visible = false" />
 			</div>
 			<div class="flex flex-col gap-6">
 				<FormField v-slot="$field" name="name" class="flex flex-col gap-2">
@@ -306,10 +505,162 @@ onMounted(() => {
 				</FormField>
 			</div>
 			<div class="flex justify-end gap-4">
-				<Button label="Cancel" outlined severity="secondary" @click="close" />
-				<Button label="Create" type="submit" severity="secondary" />
+				<Button label="Cancel" outlined @click="close" />
+				<Button label="Create" type="submit" />
 			</div>
 		</Form>
 	</Dialog>
+
+	<!-- Manage Group Dialog -->
+	<Dialog v-model:visible="dialogManageGroup" append-to="body" modal
+		:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '40rem' }" :draggable="false"
+		:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
+		:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
+		<div class="flex justify-between items-start gap-4">
+			<div class="flex gap-4">
+				<div
+					class="flex items-center justify-center w-9 h-9 bg-orange-100 dark:bg-orange-400/30 text-orange-600 dark:text-orange-300 rounded-3xl border border-orange-200 dark:border-orange-400/20 shrink-0">
+					<i class="pi pi-cog !text-xl !leading-none" />
+				</div>
+			</div>
+			<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
+				@click="dialogManageGroup = false" />
+		</div>
+		<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="update"
+			class="flex flex-col gap-6">
+			<div class="flex items-start gap-4">
+				<div class="flex-1 flex flex-col gap-2">
+					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Manage
+						group
+					</h1>
+					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Edit group details
+						and manage settings.</span>
+				</div>
+			</div>
+			<div class="flex flex-col gap-6">
+				<FormField v-slot="$field" name="name" class="flex flex-col gap-2">
+					<label for="manage-name" class="text-color text-base">Name</label>
+					<IconField icon-position="left" class="w-full">
+						<InputIcon class="pi pi-user" />
+						<InputText id="manage-name" name="name" placeholder="Enter group name" type="text"
+							class="w-full" />
+					</IconField>
+					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
+						$field.error?.message
+					}}
+					</Message>
+				</FormField>
+				<FormField v-slot="$field" name="avatar-url" class="flex flex-col gap-2">
+					<label for="manage-avatar-url" class="text-color text-base">Avatar URL</label>
+					<IconField icon-position="left" class="w-full">
+						<InputIcon class="pi pi-image" />
+						<InputText id="manage-avatar-url" name="avatar-url" placeholder="Enter avatar URL" type="text"
+							class="w-full" />
+					</IconField>
+					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
+						$field.error?.message
+					}}
+					</Message>
+				</FormField>
+				<FormField v-slot="$field" name="description" class="flex flex-col gap-2">
+					<label for="manage-description" class="text-color text-base">Description</label>
+					<Textarea id="manage-description" name="description" placeholder="Enter group description" rows="3"
+						class="w-full" />
+					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
+						$field.error?.message
+					}}
+					</Message>
+				</FormField>
+			</div>
+			<div class="flex justify-between items-center">
+				<Button label="Delete Group" icon="pi pi-trash" severity="danger" outlined class="font-medium"
+					@click="deleteGroup" />
+				<div class="flex gap-4">
+					<Button label="Cancel" outlined @click="dialogManageGroup = false" />
+					<Button label="Update" type="submit" />
+				</div>
+			</div>
+		</Form>
+	</Dialog>
+
+	<!-- Confirm Dialog -->
+	<ConfirmDialog />
+
+	<!-- Manage Roles Dialog -->
+	<Dialog v-model:visible="dialogManageRoles" append-to="body" modal
+		:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '50rem' }" :draggable="false"
+		:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
+		:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
+		<div class="flex justify-between items-start gap-4">
+			<div class="flex gap-4">
+				<div
+					class="flex items-center justify-center w-9 h-9 bg-purple-100 dark:bg-purple-400/30 text-purple-600 dark:text-purple-300 rounded-3xl border border-purple-200 dark:border-purple-400/20 shrink-0">
+					<i class="pi pi-shield !text-xl !leading-none" />
+				</div>
+			</div>
+			<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
+				@click="dialogManageRoles = false" />
+		</div>
+		<div class="flex flex-col gap-6">
+			<div class="flex items-start gap-4">
+				<div class="flex-1 flex flex-col gap-2">
+					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Manage
+						roles
+					</h1>
+					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Configure roles and
+						permissions for <strong v-if="selectedGroup">{{ selectedGroup.name }}</strong>.</span>
+				</div>
+			</div>
+			<div class="flex flex-col gap-4">
+				<!-- Role management content will go here -->
+				<div class="text-center p-8 text-surface-500 dark:text-surface-400">
+					<i class="pi pi-shield text-4xl mb-4"></i>
+					<p>Role management interface will be implemented here.</p>
+				</div>
+			</div>
+			<div class="flex justify-end gap-4">
+				<Button label="Close" outlined @click="dialogManageRoles = false" />
+			</div>
+		</div>
+	</Dialog>
+
+	<!-- Manage Users Dialog -->
+	<Dialog v-model:visible="dialogManageUsers" append-to="body" modal
+		:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '50rem' }" :draggable="false"
+		:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
+		:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
+		<div class="flex justify-between items-start gap-4">
+			<div class="flex gap-4">
+				<div
+					class="flex items-center justify-center w-9 h-9 bg-green-100 dark:bg-green-400/30 text-green-600 dark:text-green-300 rounded-3xl border border-green-200 dark:border-green-400/20 shrink-0">
+					<i class="pi pi-users !text-xl !leading-none" />
+				</div>
+			</div>
+			<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
+				@click="dialogManageUsers = false" />
+		</div>
+		<div class="flex flex-col gap-6">
+			<div class="flex items-start gap-4">
+				<div class="flex-1 flex flex-col gap-2">
+					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Manage
+						users
+					</h1>
+					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Add, remove, and
+						manage users in <strong v-if="selectedGroup">{{ selectedGroup.name }}</strong>.</span>
+				</div>
+			</div>
+			<div class="flex flex-col gap-4">
+				<!-- User management content will go here -->
+				<div class="text-center p-8 text-surface-500 dark:text-surface-400">
+					<i class="pi pi-users text-4xl mb-4"></i>
+					<p>User management interface will be implemented here.</p>
+				</div>
+			</div>
+			<div class="flex justify-end gap-4">
+				<Button label="Close" outlined @click="dialogManageUsers = false" />
+			</div>
+		</div>
+	</Dialog>
+
 </template>
 <style scoped></style>

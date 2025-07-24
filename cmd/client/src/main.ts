@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import './index.css'
 
 import PrimeVue from 'primevue/config';
+import { ConfirmationService, ToastService } from 'primevue';
 import Aura from '@primevue/themes/aura';
 import 'primeicons/primeicons.css';
 
@@ -26,6 +27,8 @@ app.use(PrimeVue, {
     preset: Aura
   }
 });
+app.use(ConfirmationService);
+app.use(ToastService);
 
 app.use(router)
 

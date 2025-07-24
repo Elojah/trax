@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Sidebar from '@/components/Sidebar.vue';
 import Errors from '@/components/Errors.vue';
-
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from './stores/auth';
 

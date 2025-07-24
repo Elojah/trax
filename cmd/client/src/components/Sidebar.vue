@@ -42,7 +42,7 @@ const menuItems = ref([
 	},
 	{
 		label: 'group',
-		icon: 'pi pi-users',
+		icon: 'pi pi-building',
 		command: () => redirect('group')
 	},
 	{
