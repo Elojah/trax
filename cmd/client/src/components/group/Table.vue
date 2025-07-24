@@ -7,6 +7,7 @@ import { ulid } from '@/utils/ulid';
 import { ListGroupReq } from '@internal/user/dto/group';
 import { Group } from '@internal/user/group';
 import { grpccodes } from '@/utils/errors';
+import { logger } from "@/config";
 
 import DataTable, { type DataTableFilterEvent, type DataTablePageEvent, type DataTableProps, type DataTableSortEvent } from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -17,6 +18,9 @@ import InputIcon from 'primevue/inputicon';
 import Avatar from 'primevue/avatar';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
+import { zodResolver } from '@primevue/forms/resolvers/zod';
+import z from 'zod';
+import type { FormEmits, FormSubmitEvent } from '@primevue/forms';
 
 
 const authStore = useAuthStore();
@@ -29,10 +33,6 @@ const {
 
 const errorsStore = useErrorsStore()
 const { success, message } = toRefs(errorsStore)
-
-const name = ref('');
-const avatarURL = ref('');
-const description = ref('');
 
 const loading = ref(false);
 const search = ref('');
@@ -139,38 +139,44 @@ const onSearch = () => {
 	});
 };
 
-// #MARK:Group dialogs
-const nameRules = [
-	(v: string) => !!v || 'Required',
-	(v: string) => (v && v.length >= 1) || 'Min 1 character',
-];
+const resolver = zodResolver(
+	z.object({
+		name: z.string().min(1, { message: 'Name is required.' }),
+		"avatar-url": z.string().url({ message: 'Avatar URL must be a valid URL.' }).optional(),
+		description: z.string().max(256, { message: 'Description must be at most 256 characters long.' }).optional(),
+	})
+);
 
 const visible = ref(false);
 const close = () => {
 	visible.value = false;
-	name.value = '';
-	avatarURL.value = '';
-	description.value = '';
+	// name.value = '';
+	// avatarURL.value = '';
+	// description.value = '';
 };
 
-const create = async () => {
+const create = async (e: FormSubmitEvent) => {
+	logger.info('Create group form is invalid', e.states);
+	if (!e.valid) {
+		logger.error('Create group form is invalid', e);
+		return;
+	}
+
 	let ok = true;
 	try {
-		await store.create(name.value, avatarURL.value, description.value);
+		await store.create(e.states.name.value, e.states['avatar-url'].value, e.states.description.value);
 	} catch (e) {
 		errorsStore.showGRPC(e)
 		ok = false
 	}
 
 	if (ok) {
-		message.value = `Group ${name.value} created successfully`;
+		message.value = `Group ${e.states.name.value} created successfully`;
 		success.value = true;
 	}
 
 	visible.value = false;
-	name.value = '';
-	avatarURL.value = '';
-	description.value = '';
+	e.reset()
 
 	await authStore.refreshToken();
 	await list();
@@ -254,7 +260,7 @@ onMounted(() => {
 				<i class="pi pi-users !text-xl !leading-none" />
 			</div>
 		</div>
-		<Form v-slot="$form" class="flex flex-col gap-6">
+		<Form v-slot="$form" :resolver @submit="create" class="flex flex-col gap-6">
 			<div class="flex items-start gap-4">
 				<div class="flex-1 flex flex-col gap-2">
 					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Create
@@ -266,32 +272,42 @@ onMounted(() => {
 					@click="visible = false" />
 			</div>
 			<div class="flex flex-col gap-6">
-				<div class="flex flex-col gap-2">
+				<FormField v-slot="$field" name="name" class="flex flex-col gap-2">
 					<label for="cardholder" class="text-color text-base">Name</label>
 					<IconField icon-position="left" class="w-full">
 						<InputIcon class="pi pi-user" />
 						<InputText id="name" name="name" placeholder="Enter group name" type="text" class="w-full" />
 					</IconField>
-				</div>
-
-				<div class="flex flex-col gap-2">
+					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
+						$field.error?.message
+					}}
+					</Message>
+				</FormField>
+				<FormField v-slot="$field" name="avatar-url" class="flex flex-col gap-2">
 					<label for="avatar-url" class="text-color text-base">Avatar URL</label>
 					<IconField icon-position="left" class="w-full">
 						<InputIcon class="pi pi-image" />
 						<InputText id="avatar-url" name="avatar-url" placeholder="Enter avatar URL" type="text"
 							class="w-full" />
 					</IconField>
-				</div>
-
-				<div class="flex flex-col gap-2">
+					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
+						$field.error?.message
+					}}
+					</Message>
+				</FormField>
+				<FormField v-slot="$field" name="description" class="flex flex-col gap-2">
 					<label for="description" class="text-color text-base">Description</label>
 					<Textarea id="description" name="description" placeholder="Enter group description" rows="3"
 						class="w-full" />
-				</div>
+					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
+						$field.error?.message
+					}}
+					</Message>
+				</FormField>
 			</div>
 			<div class="flex justify-end gap-4">
-				<Button label="Cancel" outlined @click="close" />
-				<Button label="Create" @click="create" />
+				<Button label="Cancel" outlined severity="secondary" @click="close" />
+				<Button label="Create" type="submit" severity="secondary" />
 			</div>
 		</Form>
 	</Dialog>

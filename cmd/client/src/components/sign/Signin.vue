@@ -106,7 +106,7 @@ const signInGoogleError = async function (error: any) {
     <div class="flex flex-col gap-6">
       <FormField v-slot="$field" name="email" class="flex flex-col gap-2">
         <label for="email3" class="text-surface-900 dark:text-surface-0 font-medium">Email Address</label>
-        <InputText id="email3" type="text" class=" w-full rounded-md shadow-sm" />
+        <InputText id="email3" type="text" name="email" class=" w-full rounded-md shadow-sm" />
         <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{ $field.error?.message }}
         </Message>
       </FormField>
@@ -133,7 +133,6 @@ const signInGoogleError = async function (error: any) {
         <span class="text-surface-600 dark:text-surface-300">Don't have an account? </span>
         <span class="text-primary font-medium cursor-pointer hover:text-primary-emphasis">Sign up</span>
       </div>
-
       <Divider align="center">
         <span class="text-surface-500 dark:text-surface-400">or</span>
       </Divider>
