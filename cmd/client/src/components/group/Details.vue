@@ -20,7 +20,10 @@ import Avatar from 'primevue/avatar';
 import Card from 'primevue/card';
 import Skeleton from 'primevue/skeleton';
 import Textarea from 'primevue/textarea';
-import TabView from 'primevue/tabview';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 
 // PrimeVue Input Components
@@ -51,7 +54,7 @@ const { success, message } = toRefs(errorsStore);
 
 const loading = ref(true);
 const groupId = computed(() => route.params.id as string);
-const activeTab = ref(0);
+const activeTab = ref("0");
 
 // Dialog states
 const dialogManageGroup = ref(false);
@@ -250,182 +253,183 @@ onMounted(() => {
 				</Card>
 
 				<!-- Group Content with Tabs -->
-				<TabView v-else v-model:activeIndex="activeTab" class="w-full">
-					<!-- Details Tab -->
-					<TabPanel value="0">
-						<template #header>
+				<Tabs v-else v-model:value="activeTab" class="w-full">
+					<TabList>
+						<Tab value="0">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-info-circle"></i>
 								<span>Details</span>
 							</div>
-						</template>
-
-						<Card class="shadow-lg border-0">
-							<template #content>
-								<div class="p-8">
-									<!-- Hero Section with Edit Button -->
-									<div class="flex flex-col md:flex-row items-start gap-8 mb-8">
-										<!-- Avatar -->
-										<div class="flex-shrink-0 relative">
-											<Avatar v-if="group.group?.avatarURL" :image="group.group?.avatarURL"
-												size="xlarge" shape="circle"
-												class="border-4 border-surface-200 dark:border-surface-700 shadow-lg" />
-											<Avatar v-else :label="group.group?.name.charAt(0).toUpperCase()"
-												size="xlarge" shape="circle"
-												class="bg-gradient-to-br from-primary-400 to-primary-600 text-white border-4 border-surface-200 dark:border-surface-700 shadow-lg text-4xl font-bold" />
-										</div>
-
-										<!-- Group Info -->
-										<div class="flex-1 min-w-0">
-											<div
-												class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-												<div>
-													<h1
-														class="text-4xl font-bold text-surface-900 dark:text-surface-0 mb-2">
-														{{ group.group?.name }}
-													</h1>
-													<div
-														class="flex items-center gap-2 text-surface-500 dark:text-surface-400">
-														<i class="pi pi-calendar text-sm"></i>
-														<span class="text-sm">
-															Created {{ formatDate(group.group?.createdAt) }}
-														</span>
-													</div>
-												</div>
-												<div class="flex items-center gap-3">
-													<Button label="" icon="pi pi-cog" outlined severity="primary"
-														class="font-medium" @click="openManageGroup"
-														v-tooltip.bottom="'Edit group settings'" />
-												</div>
+						</Tab>
+						<Tab value="1">
+							<div class="flex items-center gap-2">
+								<i class="pi pi-shield"></i>
+								<span>Roles</span>
+							</div>
+						</Tab>
+						<Tab value="2">
+							<div class="flex items-center gap-2">
+								<i class="pi pi-users"></i>
+								<span>Users</span>
+							</div>
+						</Tab>
+					</TabList>
+					<TabPanels>
+						<!-- Details Tab -->
+						<TabPanel value="0">
+							<Card class="shadow-lg border-0">
+								<template #content>
+									<div class="p-8">
+										<!-- Hero Section with Edit Button -->
+										<div class="flex flex-col md:flex-row items-start gap-8 mb-8">
+											<!-- Avatar -->
+											<div class="flex-shrink-0 relative">
+												<Avatar v-if="group.group?.avatarURL" :image="group.group?.avatarURL"
+													size="xlarge" shape="circle"
+													class="border-4 border-surface-200 dark:border-surface-700 shadow-lg" />
+												<Avatar v-else :label="group.group?.name.charAt(0).toUpperCase()"
+													size="xlarge" shape="circle"
+													class="bg-gradient-to-br from-primary-400 to-primary-600 text-white border-4 border-surface-200 dark:border-surface-700 shadow-lg text-4xl font-bold" />
 											</div>
 
-											<!-- Description -->
-											<div class="mb-8">
+											<!-- Group Info -->
+											<div class="flex-1 min-w-0">
+												<div
+													class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+													<div>
+														<h1
+															class="text-4xl font-bold text-surface-900 dark:text-surface-0 mb-2">
+															{{ group.group?.name }}
+														</h1>
+														<div
+															class="flex items-center gap-2 text-surface-500 dark:text-surface-400">
+															<i class="pi pi-calendar text-sm"></i>
+															<span class="text-sm">
+																Created {{ formatDate(group.group?.createdAt) }}
+															</span>
+														</div>
+													</div>
+													<div class="flex items-center gap-3">
+														<Button label="" icon="pi pi-cog" outlined severity="primary"
+															class="font-medium" @click="openManageGroup"
+															v-tooltip.bottom="'Edit group settings'" />
+													</div>
+												</div>
+
+												<!-- Description -->
+												<div class="mb-8">
+													<div
+														class="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
+														<h3
+															class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-3 flex items-center gap-2">
+															<i class="pi pi-info-circle text-primary-500"></i>
+															Description
+														</h3>
+														<p
+															class="text-surface-700 dark:text-surface-200 leading-relaxed text-base">
+															{{ group.group?.description || 'No description.' }}
+														</p>
+													</div>
+												</div>
+
+												<!-- Statistics Cards -->
+												<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+													<div
+														class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700/50">
+														<div class="flex items-center gap-3">
+															<div
+																class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+																<i class="pi pi-users text-white text-xl"></i>
+															</div>
+															<div>
+																<p
+																	class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+																	{{ group.userCount }}
+																</p>
+																<p
+																	class="text-blue-600 dark:text-blue-400 text-sm font-medium">
+																	Member(s)</p>
+															</div>
+														</div>
+													</div>
+
+													<div
+														class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700/50">
+														<div class="flex items-center gap-3">
+															<div
+																class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+																<i class="pi pi-shield text-white text-xl"></i>
+															</div>
+															<div>
+																<p
+																	class="text-2xl font-bold text-purple-700 dark:text-purple-300">
+																	{{ group.roleCount }}
+																</p>
+																<p
+																	class="text-purple-600 dark:text-purple-400 text-sm font-medium">
+																	Role(s)</p>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<!-- Metadata -->
 												<div
 													class="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
 													<h3
-														class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-3 flex items-center gap-2">
-														<i class="pi pi-info-circle text-primary-500"></i>
-														Description
+														class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4 flex items-center gap-2">
+														<i class="pi pi-info text-primary-500"></i>
+														Information
 													</h3>
-													<p
-														class="text-surface-700 dark:text-surface-200 leading-relaxed text-base">
-														{{ group.group?.description || 'No description.' }}
-													</p>
-												</div>
-											</div>
+													<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+														<div class="flex flex-col gap-2">
+															<h4
+																class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
+																Created
+															</h4>
+															<div class="flex items-center gap-2">
+																<i
+																	class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
+																<span class="text-surface-700 dark:text-surface-200">
+																	{{ formatDate(group.group?.createdAt) }}
+																</span>
+															</div>
+														</div>
 
-											<!-- Statistics Cards -->
-											<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
-												<div
-													class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700/50">
-													<div class="flex items-center gap-3">
-														<div
-															class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-															<i class="pi pi-users text-white text-xl"></i>
-														</div>
-														<div>
-															<p
-																class="text-2xl font-bold text-blue-700 dark:text-blue-300">
-																{{ group.userCount }}
-															</p>
-															<p
-																class="text-blue-600 dark:text-blue-400 text-sm font-medium">
-																Member(s)</p>
-														</div>
-													</div>
-												</div>
-
-												<div
-													class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700/50">
-													<div class="flex items-center gap-3">
-														<div
-															class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
-															<i class="pi pi-shield text-white text-xl"></i>
-														</div>
-														<div>
-															<p
-																class="text-2xl font-bold text-purple-700 dark:text-purple-300">
-																{{ group.roleCount }}
-															</p>
-															<p
-																class="text-purple-600 dark:text-purple-400 text-sm font-medium">
-																Role(s)</p>
-														</div>
-													</div>
-												</div>
-											</div>
-
-											<!-- Metadata -->
-											<div
-												class="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
-												<h3
-													class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4 flex items-center gap-2">
-													<i class="pi pi-info text-primary-500"></i>
-													Information
-												</h3>
-												<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-													<div class="flex flex-col gap-2">
-														<h4
-															class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
-															Created
-														</h4>
-														<div class="flex items-center gap-2">
-															<i
-																class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
-															<span class="text-surface-700 dark:text-surface-200">
-																{{ formatDate(group.group?.createdAt) }}
-															</span>
-														</div>
-													</div>
-
-													<div class="flex flex-col gap-2"
-														v-if="group.group?.updatedAt && group.group?.updatedAt !== group.group?.createdAt">
-														<h4
-															class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
-															Last Updated
-														</h4>
-														<div class="flex items-center gap-2">
-															<i
-																class="pi pi-clock text-surface-500 dark:text-surface-400"></i>
-															<span class="text-surface-700 dark:text-surface-200">
-																{{ formatDate(group.group?.updatedAt) }}
-															</span>
+														<div class="flex flex-col gap-2"
+															v-if="group.group?.updatedAt && group.group?.updatedAt !== group.group?.createdAt">
+															<h4
+																class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
+																Last Updated
+															</h4>
+															<div class="flex items-center gap-2">
+																<i
+																	class="pi pi-clock text-surface-500 dark:text-surface-400"></i>
+																<span class="text-surface-700 dark:text-surface-200">
+																	{{ formatDate(group.group?.updatedAt) }}
+																</span>
+															</div>
 														</div>
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							</template>
-						</Card>
-					</TabPanel>
+								</template>
+							</Card>
+						</TabPanel>
 
-					<!-- Roles Tab -->
-					<TabPanel value="1">
-						<template #header>
-							<div class="flex items-center gap-2">
-								<i class="pi pi-shield"></i>
-								<span>Roles</span>
-							</div>
-						</template>
+						<!-- Roles Tab -->
+						<TabPanel value="1">
+							<RoleTable :groupId="groupId" />
+						</TabPanel>
 
-						<RoleTable :groupId="groupId" />
-					</TabPanel>
-
-					<!-- Users Tab -->
-					<TabPanel value="2">
-						<template #header>
-							<div class="flex items-center gap-2">
-								<i class="pi pi-users"></i>
-								<span>Users</span>
-							</div>
-						</template>
-
-						<UserTable :groupId="groupId" />
-					</TabPanel>
-				</TabView>
+						<!-- Users Tab -->
+						<TabPanel value="2">
+							<UserTable :groupId="groupId" />
+						</TabPanel>
+					</TabPanels>
+				</Tabs>
 			</div>
 		</div>
 
