@@ -315,7 +315,7 @@ onMounted(() => {
 											</div>
 
 											<!-- Statistics Cards -->
-											<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+											<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
 												<div
 													class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700/50">
 													<div class="flex items-center gap-3">

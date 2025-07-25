@@ -200,7 +200,7 @@ const create = async (e: FormSubmitEvent) => {
 };
 
 const short = (description: string): string => {
-	return description.length > 64 ? description.substring(0, 64) + '...' :
+	return description.length > 128 ? description.substring(0, 128) + '...' :
 		description || 'No description'
 }
 
@@ -230,8 +230,8 @@ onMounted(() => {
 						</div>
 						<div class="flex flex-col">
 							<h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">Groups</h2>
-							<span class="text-sm text-surface-500 dark:text-surface-400">Manage your groups and
-								permissions</span>
+							<span class="text-sm text-surface-500 dark:text-surface-400">Manage group, roles and
+								users</span>
 						</div>
 					</div>
 					<div class="flex items-center gap-3 ml-6">
@@ -273,7 +273,7 @@ onMounted(() => {
 			</template>
 		</Column>
 
-		<Column field="description" header="Description" style="width: 40%">
+		<Column field="description" header="Description" style="width: 60%">
 			<template #body="{ data }: { data: Group }">
 				<div v-if="data" class="flex flex-col gap-1">
 					<span class="text-surface-700 dark:text-surface-200 line-clamp-2">{{ short(data.description)
@@ -289,7 +289,7 @@ onMounted(() => {
 			</template>
 		</Column>
 
-		<Column field="created_at" header="Created" sortable style="width: 35%">
+		<Column field="created_at" header="Created" sortable style="width: 15%">
 			<template #body="{ data }: { data: Group }">
 				<div v-if="data" class="flex flex-col gap-1">
 					<div class="flex items-center gap-2">
