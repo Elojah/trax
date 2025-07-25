@@ -23,14 +23,14 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
-import Card from 'primevue/card';
-import Skeleton from 'primevue/skeleton';
-import Textarea from 'primevue/textarea';
 
 // PrimeVue Input Components
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+
+// Table components
+import PermissionTable from '@/components/permission/Table.vue';
 
 // Form Validation
 import { zodResolver } from '@primevue/forms/resolvers/zod';
@@ -55,6 +55,7 @@ const confirmRole = useConfirm();
 const loading = ref(false);
 const search = ref('');
 const viewIDs = ref<string[]>([]);
+const permissions = ref()
 
 const group = computed(() => {
 	return groups.value.get(props.groupId) || null;
@@ -193,7 +194,11 @@ const create = async (e: FormSubmitEvent) => {
 	}
 
 	try {
-		await roleStore.create(group.value.group?.iD!, e.states.name.value, []);
+		await roleStore.create(
+			group.value.group?.iD!,
+			e.states.name.value,
+			permissions.value?.selected() || [],
+		);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		return;
@@ -203,6 +208,10 @@ const create = async (e: FormSubmitEvent) => {
 	success.value = true;
 	dialogCreateRole.value = false;
 	e.reset();
+
+	// Clear permissions table for next use
+	permissions.value?.clear();
+
 	await authStore.refreshToken();
 	await list();
 };
@@ -358,16 +367,7 @@ watch(() => props.groupId, () => {
 				</template>
 			</Column>
 
-			<Column field="description" header="Description" style="width: 40%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex flex-col gap-1">
-						<span class="text-surface-700 dark:text-surface-200 line-clamp-2">No description
-							available</span>
-					</div>
-				</template>
-			</Column>
-
-			<Column field="permissions" header="Permissions" style="width: 15%">
+			<Column field="permissions" header="Permissions" style="width: 55%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-shield text-surface-500 dark:text-surface-400"></i>
@@ -440,6 +440,10 @@ watch(() => props.groupId, () => {
 						</Message>
 					</FormField>
 				</div>
+				<div class="flex flex-col gap-6">
+					<PermissionTable :disabled="false" :permissions="[]" ref="permissions" />
+				</div>
+
 				<div class="flex justify-end gap-4">
 					<Button label="Cancel" outlined @click="dialogCreateRole = false" />
 					<Button label="Create" type="submit" />
@@ -486,6 +490,9 @@ watch(() => props.groupId, () => {
 						}}
 						</Message>
 					</FormField>
+				</div>
+				<div class="flex flex-col gap-6">
+					<PermissionTable :disabled="true" :permissions="selectedRole?.permissions" />
 				</div>
 				<div class="flex justify-between items-center">
 					<Button label="Delete Role" icon="pi pi-trash" severity="danger" outlined class="font-medium"

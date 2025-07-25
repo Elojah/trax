@@ -7,10 +7,8 @@ import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
 
 // Internal utilities and types
-import { ulid } from '@/utils/ulid';
 import { logger } from "@/config";
 import { DeleteGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
-import { Group } from '@internal/user/group';
 
 // PrimeVue UI Components
 import Button from 'primevue/button';
@@ -32,8 +30,8 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 
 // Table Components
-import RoleTable from './RoleTable.vue';
-import UserTable from './UserTable.vue';
+import RoleTable from '@/components/group/RoleTable.vue';
+import UserTable from '@/components/group/UserTable.vue';
 
 // Form Validation
 import { zodResolver } from '@primevue/forms/resolvers/zod';
