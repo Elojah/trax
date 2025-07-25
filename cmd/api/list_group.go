@@ -46,11 +46,11 @@ func (h *handler) ListGroup(ctx context.Context, req *dto.ListGroupReq) (*dto.Li
 		return &dto.ListGroupResp{}, status.New(codes.InvalidArgument, err.Error()).Err()
 	}
 
-	var groups []user.Group
+	var groupViews []dto.GroupView
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		groups, total, err = h.user.ListGroup(ctx, user.FilterGroup{
+		groups, totalGroup, err := h.user.ListGroup(ctx, user.FilterGroup{
 			IDs:      ids,
 			Paginate: req.Paginate,
 			Search:   req.Search,
@@ -59,6 +59,65 @@ func (h *handler) ListGroup(ctx context.Context, req *dto.ListGroupReq) (*dto.Li
 			logger.Error().Err(err).Msg("failed to list group")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		if len(groups) == 0 {
+			logger.Info().Msg("no groups found")
+			return transaction.Commit, nil
+		}
+
+		users, _, err := h.user.ListByGroup(ctx, user.Filter{
+			GroupIDs: ids,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to list users by group")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		countUser, err := h.user.CountByGroup(ctx, user.Filter{
+			GroupIDs: ids,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to count users by group")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		countRole, err := h.user.CountRoleByGroup(ctx, user.FilterRole{
+			GroupIDs: ids,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to count roles by group")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		total = totalGroup
+		groupViews = make([]dto.GroupView, 0, len(groups))
+		for _, group := range groups {
+			groupView := dto.GroupView{
+				Group: group,
+				UserSample: func() []user.U {
+					if sample, ok := users[group.ID.String()]; ok {
+						return sample
+					}
+					return []user.U{}
+				}(),
+				UserCount: func() uint64 {
+					if count, ok := countUser[group.ID.String()]; ok {
+						return count
+					}
+					return 0
+				}(),
+				RoleCount: func() uint64 {
+					if count, ok := countRole[group.ID.String()]; ok {
+						return count
+					}
+					return 0
+				}(),
+			}
+			groupViews = append(groupViews, groupView)
 		}
 
 		return transaction.Commit, nil
@@ -71,7 +130,7 @@ func (h *handler) ListGroup(ctx context.Context, req *dto.ListGroupReq) (*dto.Li
 	logger.Info().Msg("success")
 
 	return &dto.ListGroupResp{
-		Groups: groups,
+		Groups: groupViews,
 		Total:  total,
 	}, nil
 }

@@ -104,7 +104,7 @@ const list = async (props: DataTableProps = {
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await roleStore.list(ListRoleReq.create({
-			groupIDs: [group.value.iD],
+			groupIDs: [group.value.group?.iD],
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * (props.rows ?? 10)) + 1),
@@ -194,7 +194,7 @@ const create = async (e: FormSubmitEvent) => {
 	}
 
 	try {
-		await roleStore.create(group.value.iD, e.states.name.value, []);
+		await roleStore.create(group.value.group?.iD!, e.states.name.value, []);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		return;

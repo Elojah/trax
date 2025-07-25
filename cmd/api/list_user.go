@@ -58,7 +58,7 @@ func (h *handler) ListUser(ctx context.Context, req *dto.ListUserReq) (*dto.List
 	var total uint64
 
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-		users, total, err = h.user.ListByGroup(ctx, user.Filter{
+		users, total, err = h.user.List(ctx, user.Filter{
 			GroupIDs: groupIDs,
 			IDs:      ids,
 			RoleID:   req.RoleID,

@@ -48,6 +48,8 @@ type StoreRole interface {
 	FetchRole(context.Context, FilterRole) (Role, error)
 	ListRole(context.Context, FilterRole) ([]Role, uint64, error)
 	DeleteRole(context.Context, FilterRole) error
+
+	CountRoleByGroup(context.Context, FilterRole) (map[string]uint64, error)
 }
 
 type FilterPermission struct {

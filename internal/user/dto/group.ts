@@ -10,9 +10,31 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Group } from "../group";
 import { Paginate } from "../../../pkg/paginate/paginate";
 import { String$ } from "../../../pkg/pbtypes/string";
+import { U } from "../user";
+import { Group } from "../group";
+/**
+ * @generated from protobuf message dto.GroupView
+ */
+export interface GroupView {
+    /**
+     * @generated from protobuf field: user.Group Group = 1
+     */
+    group?: Group;
+    /**
+     * @generated from protobuf field: repeated user.U UserSample = 2
+     */
+    userSample: U[];
+    /**
+     * @generated from protobuf field: uint64 UserCount = 3
+     */
+    userCount: bigint;
+    /**
+     * @generated from protobuf field: uint64 RoleCount = 4
+     */
+    roleCount: bigint;
+}
 /**
  * @generated from protobuf message dto.CreateGroupReq
  */
@@ -86,9 +108,9 @@ export interface ListGroupReq {
  */
 export interface ListGroupResp {
     /**
-     * @generated from protobuf field: repeated user.Group Groups = 1
+     * @generated from protobuf field: repeated dto.GroupView Groups = 1
      */
-    groups: Group[];
+    groups: GroupView[];
     /**
      * @generated from protobuf field: uint64 Total = 2
      */
@@ -103,6 +125,76 @@ export interface DeleteGroupReq {
      */
     iD: Uint8Array;
 }
+// @generated message type with reflection information, may provide speed optimized methods
+class GroupView$Type extends MessageType<GroupView> {
+    constructor() {
+        super("dto.GroupView", [
+            { no: 1, name: "Group", kind: "message", jsonName: "Group", T: () => Group, options: { "gogoproto.nullable": false } },
+            { no: 2, name: "UserSample", kind: "message", jsonName: "UserSample", repeat: 2 /*RepeatType.UNPACKED*/, T: () => U, options: { "gogoproto.nullable": false } },
+            { no: 3, name: "UserCount", kind: "scalar", jsonName: "UserCount", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 4, name: "RoleCount", kind: "scalar", jsonName: "RoleCount", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+    create(value?: PartialMessage<GroupView>): GroupView {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.userSample = [];
+        message.userCount = 0n;
+        message.roleCount = 0n;
+        if (value !== undefined)
+            reflectionMergePartial<GroupView>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GroupView): GroupView {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* user.Group Group */ 1:
+                    message.group = Group.internalBinaryRead(reader, reader.uint32(), options, message.group);
+                    break;
+                case /* repeated user.U UserSample */ 2:
+                    message.userSample.push(U.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* uint64 UserCount */ 3:
+                    message.userCount = reader.uint64().toBigInt();
+                    break;
+                case /* uint64 RoleCount */ 4:
+                    message.roleCount = reader.uint64().toBigInt();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GroupView, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* user.Group Group = 1; */
+        if (message.group)
+            Group.internalBinaryWrite(message.group, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated user.U UserSample = 2; */
+        for (let i = 0; i < message.userSample.length; i++)
+            U.internalBinaryWrite(message.userSample[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* uint64 UserCount = 3; */
+        if (message.userCount !== 0n)
+            writer.tag(3, WireType.Varint).uint64(message.userCount);
+        /* uint64 RoleCount = 4; */
+        if (message.roleCount !== 0n)
+            writer.tag(4, WireType.Varint).uint64(message.roleCount);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.GroupView
+ */
+export const GroupView = new GroupView$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class CreateGroupReq$Type extends MessageType<CreateGroupReq> {
     constructor() {
@@ -355,7 +447,7 @@ export const ListGroupReq = new ListGroupReq$Type();
 class ListGroupResp$Type extends MessageType<ListGroupResp> {
     constructor() {
         super("dto.ListGroupResp", [
-            { no: 1, name: "Groups", kind: "message", jsonName: "Groups", repeat: 2 /*RepeatType.UNPACKED*/, T: () => Group, options: { "gogoproto.nullable": false } },
+            { no: 1, name: "Groups", kind: "message", jsonName: "Groups", repeat: 2 /*RepeatType.UNPACKED*/, T: () => GroupView, options: { "gogoproto.nullable": false } },
             { no: 2, name: "Total", kind: "scalar", jsonName: "Total", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
@@ -372,8 +464,8 @@ class ListGroupResp$Type extends MessageType<ListGroupResp> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated user.Group Groups */ 1:
-                    message.groups.push(Group.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated dto.GroupView Groups */ 1:
+                    message.groups.push(GroupView.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* uint64 Total */ 2:
                     message.total = reader.uint64().toBigInt();
@@ -390,9 +482,9 @@ class ListGroupResp$Type extends MessageType<ListGroupResp> {
         return message;
     }
     internalBinaryWrite(message: ListGroupResp, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated user.Group Groups = 1; */
+        /* repeated dto.GroupView Groups = 1; */
         for (let i = 0; i < message.groups.length; i++)
-            Group.internalBinaryWrite(message.groups[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            GroupView.internalBinaryWrite(message.groups[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* uint64 Total = 2; */
         if (message.total !== 0n)
             writer.tag(2, WireType.Varint).uint64(message.total);

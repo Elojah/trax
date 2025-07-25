@@ -31,6 +31,45 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type GroupView struct {
+	Group      user.Group `protobuf:"bytes,1,opt,name=Group,proto3" json:"Group"`
+	UserSample []user.U   `protobuf:"bytes,2,rep,name=UserSample,proto3" json:"UserSample"`
+	UserCount  uint64     `protobuf:"varint,3,opt,name=UserCount,proto3" json:"UserCount,omitempty"`
+	RoleCount  uint64     `protobuf:"varint,4,opt,name=RoleCount,proto3" json:"RoleCount,omitempty"`
+}
+
+func (m *GroupView) Reset()      { *m = GroupView{} }
+func (*GroupView) ProtoMessage() {}
+func (*GroupView) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e31ea7c0b7bb0a1e, []int{0}
+}
+func (m *GroupView) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GroupView) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GroupView.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GroupView) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GroupView.Merge(m, src)
+}
+func (m *GroupView) XXX_Size() int {
+	return m.Size()
+}
+func (m *GroupView) XXX_DiscardUnknown() {
+	xxx_messageInfo_GroupView.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GroupView proto.InternalMessageInfo
+
 type CreateGroupReq struct {
 	Name        string `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=Description,proto3" json:"Description,omitempty"`
@@ -40,7 +79,7 @@ type CreateGroupReq struct {
 func (m *CreateGroupReq) Reset()      { *m = CreateGroupReq{} }
 func (*CreateGroupReq) ProtoMessage() {}
 func (*CreateGroupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e31ea7c0b7bb0a1e, []int{0}
+	return fileDescriptor_e31ea7c0b7bb0a1e, []int{1}
 }
 func (m *CreateGroupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -79,7 +118,7 @@ type UpdateGroupReq struct {
 func (m *UpdateGroupReq) Reset()      { *m = UpdateGroupReq{} }
 func (*UpdateGroupReq) ProtoMessage() {}
 func (*UpdateGroupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e31ea7c0b7bb0a1e, []int{1}
+	return fileDescriptor_e31ea7c0b7bb0a1e, []int{2}
 }
 func (m *UpdateGroupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -115,7 +154,7 @@ type FetchGroupReq struct {
 func (m *FetchGroupReq) Reset()      { *m = FetchGroupReq{} }
 func (*FetchGroupReq) ProtoMessage() {}
 func (*FetchGroupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e31ea7c0b7bb0a1e, []int{2}
+	return fileDescriptor_e31ea7c0b7bb0a1e, []int{3}
 }
 func (m *FetchGroupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -154,7 +193,7 @@ type ListGroupReq struct {
 func (m *ListGroupReq) Reset()      { *m = ListGroupReq{} }
 func (*ListGroupReq) ProtoMessage() {}
 func (*ListGroupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e31ea7c0b7bb0a1e, []int{3}
+	return fileDescriptor_e31ea7c0b7bb0a1e, []int{4}
 }
 func (m *ListGroupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -184,14 +223,14 @@ func (m *ListGroupReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListGroupReq proto.InternalMessageInfo
 
 type ListGroupResp struct {
-	Groups []user.Group `protobuf:"bytes,1,rep,name=Groups,proto3" json:"Groups"`
-	Total  uint64       `protobuf:"varint,2,opt,name=Total,proto3" json:"Total,omitempty"`
+	Groups []GroupView `protobuf:"bytes,1,rep,name=Groups,proto3" json:"Groups"`
+	Total  uint64      `protobuf:"varint,2,opt,name=Total,proto3" json:"Total,omitempty"`
 }
 
 func (m *ListGroupResp) Reset()      { *m = ListGroupResp{} }
 func (*ListGroupResp) ProtoMessage() {}
 func (*ListGroupResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e31ea7c0b7bb0a1e, []int{4}
+	return fileDescriptor_e31ea7c0b7bb0a1e, []int{5}
 }
 func (m *ListGroupResp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -227,7 +266,7 @@ type DeleteGroupReq struct {
 func (m *DeleteGroupReq) Reset()      { *m = DeleteGroupReq{} }
 func (*DeleteGroupReq) ProtoMessage() {}
 func (*DeleteGroupReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e31ea7c0b7bb0a1e, []int{5}
+	return fileDescriptor_e31ea7c0b7bb0a1e, []int{6}
 }
 func (m *DeleteGroupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -257,6 +296,8 @@ func (m *DeleteGroupReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_DeleteGroupReq proto.InternalMessageInfo
 
 func init() {
+	proto.RegisterType((*GroupView)(nil), "dto.GroupView")
+	golang_proto.RegisterType((*GroupView)(nil), "dto.GroupView")
 	proto.RegisterType((*CreateGroupReq)(nil), "dto.CreateGroupReq")
 	golang_proto.RegisterType((*CreateGroupReq)(nil), "dto.CreateGroupReq")
 	proto.RegisterType((*UpdateGroupReq)(nil), "dto.UpdateGroupReq")
@@ -277,41 +318,84 @@ func init() {
 }
 
 var fileDescriptor_e31ea7c0b7bb0a1e = []byte{
-	// 512 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x53, 0x3f, 0x8f, 0xd3, 0x4e,
-	0x10, 0xf5, 0xc6, 0xfe, 0x45, 0x77, 0xeb, 0xbb, 0xfc, 0xd0, 0x0a, 0x21, 0xf3, 0x6f, 0x12, 0x99,
-	0x26, 0x20, 0x61, 0x8b, 0x40, 0x85, 0x68, 0x08, 0x16, 0x28, 0x22, 0x82, 0x93, 0x8f, 0x6b, 0xe8,
-	0x36, 0xf1, 0xca, 0x31, 0xf8, 0xbc, 0x66, 0xbd, 0xe1, 0x4f, 0xc7, 0x47, 0xe0, 0x63, 0x50, 0xf0,
-	0x01, 0x28, 0xaf, 0x4c, 0x19, 0x89, 0xe6, 0x44, 0x11, 0x61, 0xa7, 0xa1, 0xbc, 0x92, 0x12, 0x79,
-	0x63, 0x82, 0x23, 0x8e, 0x02, 0xe9, 0xba, 0x99, 0x79, 0xb3, 0xfb, 0xde, 0x9b, 0xd9, 0xc5, 0x57,
-	0xa3, 0x44, 0x32, 0x91, 0xd0, 0xd8, 0x9d, 0x66, 0x4c, 0xb8, 0x81, 0xe4, 0x6e, 0x28, 0xf8, 0x34,
-	0x75, 0x52, 0xc1, 0x25, 0x27, 0x7a, 0x20, 0xf9, 0x25, 0x2b, 0x7d, 0x19, 0xba, 0x21, 0x0f, 0xb9,
-	0xaa, 0xa9, 0x68, 0x05, 0xaf, 0x90, 0x74, 0x24, 0xdf, 0xa5, 0x2c, 0x73, 0x33, 0x29, 0xa2, 0x24,
-	0xac, 0x90, 0xcb, 0x0a, 0xa1, 0x61, 0x94, 0x50, 0xc9, 0xd6, 0x41, 0x05, 0x5e, 0xdc, 0x24, 0xad,
-	0x11, 0xda, 0x01, 0x6e, 0x3d, 0x10, 0x8c, 0x4a, 0xf6, 0xa8, 0x2c, 0xfa, 0xec, 0x15, 0x21, 0xd8,
-	0x78, 0x42, 0x0f, 0x99, 0x85, 0x3a, 0xa8, 0xbb, 0xed, 0xab, 0x98, 0x74, 0xb0, 0xe9, 0xb1, 0x6c,
-	0x2c, 0xa2, 0x54, 0x46, 0x3c, 0xb1, 0x1a, 0x0a, 0xaa, 0x97, 0xc8, 0x15, 0xbc, 0x7d, 0xff, 0x35,
-	0x95, 0x54, 0x1c, 0xf8, 0x43, 0x4b, 0x57, 0xf8, 0xef, 0x82, 0xfd, 0x05, 0xe1, 0xd6, 0x41, 0x1a,
-	0xd4, 0x69, 0xee, 0xe2, 0xc6, 0xc0, 0x53, 0x24, 0x3b, 0xfd, 0x1b, 0xb3, 0x45, 0x5b, 0xfb, 0xba,
-	0x68, 0xdb, 0x61, 0x24, 0x27, 0xd3, 0x91, 0x33, 0xe6, 0x87, 0x2e, 0x8b, 0xf9, 0x0b, 0x3a, 0x71,
-	0xa5, 0xa0, 0x6f, 0xdd, 0xd2, 0xdb, 0x34, 0x8e, 0x02, 0x67, 0xe0, 0xf9, 0x8d, 0x81, 0x47, 0xae,
-	0x55, 0x12, 0x4b, 0x1d, 0x66, 0xef, 0x7f, 0xa7, 0x9a, 0x88, 0xb3, 0xaf, 0x26, 0x52, 0x69, 0xbe,
-	0xb5, 0xa9, 0x59, 0x3f, 0xbd, 0x77, 0xc3, 0xc4, 0xcd, 0xba, 0x09, 0xe3, 0xf4, 0x03, 0x35, 0x57,
-	0x8f, 0xf1, 0xee, 0x43, 0x26, 0xc7, 0x93, 0xb3, 0xf0, 0x64, 0x7f, 0x42, 0x78, 0x67, 0x18, 0x65,
-	0x72, 0x7d, 0xd9, 0x1d, 0xbc, 0xb5, 0x57, 0xad, 0x51, 0x5d, 0x69, 0xf6, 0x88, 0xb3, 0xde, 0xeb,
-	0x2f, 0xa4, 0x6f, 0xcc, 0x16, 0x6d, 0xe4, 0xaf, 0x3b, 0xc9, 0x05, 0xdc, 0xdc, 0x67, 0x54, 0x8c,
-	0x27, 0xd5, 0x92, 0xaa, 0x8c, 0x9c, 0xc3, 0xfa, 0xd3, 0x37, 0xab, 0x29, 0x6c, 0xf9, 0x65, 0x48,
-	0xee, 0x61, 0x7d, 0xe0, 0x65, 0x96, 0xd1, 0xd1, 0xff, 0x51, 0x6d, 0x79, 0xcc, 0xde, 0xc3, 0xbb,
-	0x35, 0xb5, 0x59, 0x4a, 0xae, 0xe3, 0xa6, 0x4a, 0x32, 0x0b, 0x75, 0xf4, 0xae, 0xd9, 0x33, 0x9d,
-	0xf2, 0xad, 0x39, 0xaa, 0xa6, 0x54, 0x6a, 0x7e, 0xd5, 0x40, 0xce, 0xe3, 0xff, 0x9e, 0x71, 0x49,
-	0x63, 0x25, 0xd1, 0xf0, 0x57, 0x89, 0x3d, 0xc4, 0x2d, 0x8f, 0xc5, 0xec, 0x6c, 0x9e, 0x48, 0x5f,
-	0xcc, 0x72, 0xd0, 0xe6, 0x39, 0x68, 0xc7, 0x39, 0x68, 0x27, 0x39, 0xa0, 0x1f, 0x39, 0xa0, 0xf7,
-	0x05, 0xa0, 0x8f, 0x05, 0xa0, 0xcf, 0x05, 0xa0, 0xa3, 0x02, 0xd0, 0xac, 0x00, 0x34, 0x2f, 0x00,
-	0x7d, 0x2b, 0x00, 0x7d, 0x2f, 0x40, 0x3b, 0x29, 0x00, 0x7d, 0x58, 0x82, 0x76, 0xb4, 0x04, 0x34,
-	0x5f, 0x82, 0x76, 0xbc, 0x04, 0xed, 0x79, 0xf7, 0x2f, 0x8c, 0x7f, 0x7c, 0xe4, 0x51, 0x53, 0x7d,
-	0xa9, 0xdb, 0x3f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x7a, 0x10, 0x65, 0x15, 0xe4, 0x03, 0x00, 0x00,
+	// 590 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x31, 0x6f, 0xd3, 0x40,
+	0x14, 0xf6, 0xc5, 0x6e, 0x69, 0x2e, 0x6d, 0x40, 0x27, 0x84, 0x4c, 0x81, 0x6b, 0x64, 0x06, 0x22,
+	0x44, 0x6d, 0x51, 0x98, 0x10, 0x0b, 0xad, 0x05, 0x8a, 0x88, 0x00, 0x39, 0x84, 0x81, 0xed, 0x12,
+	0x9f, 0x1c, 0x83, 0xe3, 0x33, 0xe7, 0x0b, 0x85, 0x8d, 0x9f, 0xc0, 0x3f, 0x60, 0x65, 0xe0, 0x07,
+	0x30, 0x76, 0xcc, 0x18, 0x89, 0xa5, 0x62, 0xa8, 0x88, 0xb3, 0x30, 0x76, 0x64, 0x44, 0x3e, 0x1f,
+	0xae, 0x23, 0xca, 0x80, 0xd4, 0xc5, 0x7a, 0xef, 0x7d, 0xdf, 0xf9, 0x7d, 0xef, 0xde, 0x67, 0xc3,
+	0x6b, 0x61, 0x2c, 0x28, 0x8f, 0x49, 0xe4, 0x4c, 0x52, 0xca, 0x1d, 0x5f, 0x30, 0x27, 0xe0, 0x6c,
+	0x92, 0xd8, 0x09, 0x67, 0x82, 0x21, 0xdd, 0x17, 0x6c, 0xd3, 0x4c, 0x5e, 0x07, 0x4e, 0xc0, 0x02,
+	0x26, 0x6b, 0x32, 0x2a, 0xe0, 0x02, 0x49, 0x06, 0xe2, 0x7d, 0x42, 0x53, 0x27, 0x15, 0x3c, 0x8c,
+	0x03, 0x85, 0x5c, 0x91, 0x08, 0x09, 0xc2, 0x98, 0x08, 0x5a, 0x06, 0x0a, 0xbc, 0xbc, 0xdc, 0xb4,
+	0xd2, 0x70, 0xd3, 0x5c, 0x86, 0xf2, 0x47, 0x81, 0x58, 0x9f, 0x00, 0xac, 0x3f, 0xca, 0x99, 0x2f,
+	0x42, 0xba, 0x8f, 0x6e, 0xc0, 0x15, 0x99, 0x98, 0xa0, 0x05, 0xda, 0x8d, 0x9d, 0x86, 0x2d, 0x99,
+	0xb2, 0xb4, 0x6b, 0x4c, 0x8f, 0xb6, 0x34, 0xaf, 0xc0, 0xd1, 0x36, 0x84, 0xfd, 0x94, 0xf2, 0x1e,
+	0x19, 0x27, 0x11, 0x35, 0x6b, 0x2d, 0xbd, 0xdd, 0xd8, 0x39, 0x57, 0xb0, 0xfb, 0x8a, 0x59, 0x21,
+	0xa0, 0xab, 0xb0, 0x9e, 0x67, 0x7b, 0x6c, 0x12, 0x0b, 0x53, 0x6f, 0x81, 0xb6, 0xe1, 0x9d, 0x14,
+	0x72, 0xd4, 0x63, 0x11, 0x2d, 0x50, 0xa3, 0x40, 0xcb, 0x82, 0xe5, 0xc3, 0xe6, 0x1e, 0xa7, 0x44,
+	0x50, 0xd9, 0xd9, 0xa3, 0x6f, 0x10, 0x82, 0xc6, 0x13, 0x32, 0xa6, 0x52, 0x64, 0xdd, 0x93, 0x31,
+	0x6a, 0xc1, 0x86, 0x4b, 0xd3, 0x21, 0x0f, 0x13, 0x11, 0xb2, 0xd8, 0xac, 0x49, 0xa8, 0x5a, 0xca,
+	0xbb, 0x3c, 0x78, 0x4b, 0x04, 0xe1, 0x7d, 0xaf, 0x2b, 0x35, 0xd4, 0xbd, 0x93, 0x82, 0xf5, 0x0d,
+	0xc0, 0x66, 0x3f, 0xf1, 0xab, 0x6d, 0xee, 0xc1, 0x5a, 0xc7, 0x95, 0x4d, 0xd6, 0x77, 0x6f, 0xe6,
+	0x23, 0x7d, 0x3f, 0xda, 0xb2, 0x82, 0x50, 0x8c, 0x26, 0x03, 0x7b, 0xc8, 0xc6, 0x0e, 0x8d, 0xd8,
+	0x2b, 0x32, 0x72, 0x04, 0x27, 0xef, 0x9c, 0x7c, 0x2f, 0x93, 0x28, 0xf4, 0xed, 0x8e, 0xeb, 0xd5,
+	0x3a, 0x2e, 0xba, 0xae, 0x24, 0xd6, 0xe4, 0x3d, 0x9e, 0xb7, 0xd5, 0x36, 0xed, 0x9e, 0xdc, 0xa6,
+	0xd2, 0x7c, 0x7b, 0x59, 0xb3, 0x7e, 0x3a, 0x77, 0x69, 0x88, 0xed, 0xea, 0x10, 0xc6, 0xe9, 0x07,
+	0x2a, 0x53, 0x3d, 0x86, 0x1b, 0x0f, 0xa9, 0x18, 0x8e, 0xce, 0x62, 0x26, 0xeb, 0x0b, 0x80, 0xeb,
+	0xdd, 0x30, 0x15, 0xe5, 0xcb, 0xee, 0xc2, 0xb5, 0x67, 0xca, 0x82, 0xca, 0x30, 0xc8, 0x2e, 0x3d,
+	0xf9, 0x07, 0x91, 0x6e, 0x00, 0x5e, 0xc9, 0x44, 0x97, 0xe0, 0x6a, 0x8f, 0x12, 0x3e, 0x1c, 0xa9,
+	0x25, 0xa9, 0x0c, 0x5d, 0x80, 0xfa, 0xd3, 0xfd, 0xe2, 0x16, 0xd6, 0xbc, 0x3c, 0x44, 0xf7, 0xa1,
+	0xde, 0x71, 0x53, 0xd3, 0x68, 0xe9, 0xff, 0xa9, 0x36, 0x3f, 0x66, 0xf5, 0xe0, 0x46, 0x45, 0x6d,
+	0x9a, 0xa0, 0x5b, 0x70, 0x55, 0x26, 0xa9, 0x09, 0xa4, 0x5f, 0x9b, 0xb6, 0x2f, 0x98, 0x5d, 0x9a,
+	0x5f, 0xd9, 0x56, 0x71, 0xd0, 0x45, 0xb8, 0xf2, 0x9c, 0x09, 0x12, 0x49, 0x95, 0x86, 0x57, 0x24,
+	0x56, 0x17, 0x36, 0x5d, 0x1a, 0xd1, 0xb3, 0x71, 0xc9, 0x2e, 0x9f, 0xce, 0xb1, 0x36, 0x9b, 0x63,
+	0xed, 0x70, 0x8e, 0xb5, 0xe3, 0x39, 0x06, 0xbf, 0xe6, 0x18, 0x7c, 0xc8, 0x30, 0xf8, 0x9c, 0x61,
+	0xf0, 0x35, 0xc3, 0xe0, 0x20, 0xc3, 0x60, 0x9a, 0x61, 0x30, 0xcb, 0x30, 0xf8, 0x91, 0x61, 0xf0,
+	0x33, 0xc3, 0xda, 0x71, 0x86, 0xc1, 0xc7, 0x05, 0xd6, 0x0e, 0x16, 0x18, 0xcc, 0x16, 0x58, 0x3b,
+	0x5c, 0x60, 0xed, 0x65, 0xfb, 0x1f, 0x1d, 0xff, 0xfa, 0x0f, 0x0d, 0x56, 0xe5, 0x77, 0x7f, 0xe7,
+	0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0xcb, 0x81, 0x5f, 0x94, 0xa3, 0x04, 0x00, 0x00,
 }
 
+func (this *GroupView) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*GroupView)
+	if !ok {
+		that2, ok := that.(GroupView)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Group.Equal(&that1.Group) {
+		return false
+	}
+	if len(this.UserSample) != len(that1.UserSample) {
+		return false
+	}
+	for i := range this.UserSample {
+		if !this.UserSample[i].Equal(&that1.UserSample[i]) {
+			return false
+		}
+	}
+	if this.UserCount != that1.UserCount {
+		return false
+	}
+	if this.RoleCount != that1.RoleCount {
+		return false
+	}
+	return true
+}
 func (this *CreateGroupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -493,6 +577,25 @@ func (this *DeleteGroupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *GroupView) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 8)
+	s = append(s, "&dto.GroupView{")
+	s = append(s, "Group: "+strings.Replace(this.Group.GoString(), `&`, ``, 1)+",\n")
+	if this.UserSample != nil {
+		vs := make([]user.U, len(this.UserSample))
+		for i := range vs {
+			vs[i] = this.UserSample[i]
+		}
+		s = append(s, "UserSample: "+fmt.Sprintf("%#v", vs)+",\n")
+	}
+	s = append(s, "UserCount: "+fmt.Sprintf("%#v", this.UserCount)+",\n")
+	s = append(s, "RoleCount: "+fmt.Sprintf("%#v", this.RoleCount)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
 func (this *CreateGroupReq) GoString() string {
 	if this == nil {
 		return "nil"
@@ -556,7 +659,7 @@ func (this *ListGroupResp) GoString() string {
 	s := make([]string, 0, 6)
 	s = append(s, "&dto.ListGroupResp{")
 	if this.Groups != nil {
-		vs := make([]user.Group, len(this.Groups))
+		vs := make([]GroupView, len(this.Groups))
 		for i := range vs {
 			vs[i] = this.Groups[i]
 		}
@@ -584,6 +687,63 @@ func valueToGoStringGroup(v interface{}, typ string) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
 }
+func (m *GroupView) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GroupView) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GroupView) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.RoleCount != 0 {
+		i = encodeVarintGroup(dAtA, i, uint64(m.RoleCount))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.UserCount != 0 {
+		i = encodeVarintGroup(dAtA, i, uint64(m.UserCount))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.UserSample) > 0 {
+		for iNdEx := len(m.UserSample) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.UserSample[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGroup(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	{
+		size, err := m.Group.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGroup(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func (m *CreateGroupReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -882,6 +1042,25 @@ func encodeVarintGroup(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func NewPopulatedGroupView(r randyGroup, easy bool) *GroupView {
+	this := &GroupView{}
+	v1 := user.NewPopulatedGroup(r, easy)
+	this.Group = *v1
+	if r.Intn(5) != 0 {
+		v2 := r.Intn(5)
+		this.UserSample = make([]user.U, v2)
+		for i := 0; i < v2; i++ {
+			v3 := user.NewPopulatedU(r, easy)
+			this.UserSample[i] = *v3
+		}
+	}
+	this.UserCount = uint64(uint64(r.Uint32()))
+	this.RoleCount = uint64(uint64(r.Uint32()))
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedCreateGroupReq(r randyGroup, easy bool) *CreateGroupReq {
 	this := &CreateGroupReq{}
 	this.Name = string(randStringGroup(r))
@@ -894,8 +1073,8 @@ func NewPopulatedCreateGroupReq(r randyGroup, easy bool) *CreateGroupReq {
 
 func NewPopulatedUpdateGroupReq(r randyGroup, easy bool) *UpdateGroupReq {
 	this := &UpdateGroupReq{}
-	v1 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.ID = *v1
+	v4 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.ID = *v4
 	if r.Intn(5) != 0 {
 		this.Name = pbtypes.NewPopulatedString(r, easy)
 	}
@@ -912,8 +1091,8 @@ func NewPopulatedUpdateGroupReq(r randyGroup, easy bool) *UpdateGroupReq {
 
 func NewPopulatedFetchGroupReq(r randyGroup, easy bool) *FetchGroupReq {
 	this := &FetchGroupReq{}
-	v2 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.ID = *v2
+	v5 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.ID = *v5
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -926,11 +1105,11 @@ func NewPopulatedListGroupReq(r randyGroup, easy bool) *ListGroupReq {
 	}
 	this.Search = string(randStringGroup(r))
 	this.Own = bool(bool(r.Intn(2) == 0))
-	v3 := r.Intn(10)
-	this.IDs = make([]github_com_elojah_trax_pkg_ulid.ID, v3)
-	for i := 0; i < v3; i++ {
-		v4 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-		this.IDs[i] = *v4
+	v6 := r.Intn(10)
+	this.IDs = make([]github_com_elojah_trax_pkg_ulid.ID, v6)
+	for i := 0; i < v6; i++ {
+		v7 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+		this.IDs[i] = *v7
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -940,11 +1119,11 @@ func NewPopulatedListGroupReq(r randyGroup, easy bool) *ListGroupReq {
 func NewPopulatedListGroupResp(r randyGroup, easy bool) *ListGroupResp {
 	this := &ListGroupResp{}
 	if r.Intn(5) != 0 {
-		v5 := r.Intn(5)
-		this.Groups = make([]user.Group, v5)
-		for i := 0; i < v5; i++ {
-			v6 := user.NewPopulatedGroup(r, easy)
-			this.Groups[i] = *v6
+		v8 := r.Intn(5)
+		this.Groups = make([]GroupView, v8)
+		for i := 0; i < v8; i++ {
+			v9 := NewPopulatedGroupView(r, easy)
+			this.Groups[i] = *v9
 		}
 	}
 	this.Total = uint64(uint64(r.Uint32()))
@@ -955,8 +1134,8 @@ func NewPopulatedListGroupResp(r randyGroup, easy bool) *ListGroupResp {
 
 func NewPopulatedDeleteGroupReq(r randyGroup, easy bool) *DeleteGroupReq {
 	this := &DeleteGroupReq{}
-	v7 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.ID = *v7
+	v10 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.ID = *v10
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -981,9 +1160,9 @@ func randUTF8RuneGroup(r randyGroup) rune {
 	return rune(ru + 61)
 }
 func randStringGroup(r randyGroup) string {
-	v8 := r.Intn(100)
-	tmps := make([]rune, v8)
-	for i := 0; i < v8; i++ {
+	v11 := r.Intn(100)
+	tmps := make([]rune, v11)
+	for i := 0; i < v11; i++ {
 		tmps[i] = randUTF8RuneGroup(r)
 	}
 	return string(tmps)
@@ -1005,11 +1184,11 @@ func randFieldGroup(dAtA []byte, r randyGroup, fieldNumber int, wire int) []byte
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateGroup(dAtA, uint64(key))
-		v9 := r.Int63()
+		v12 := r.Int63()
 		if r.Intn(2) == 0 {
-			v9 *= -1
+			v12 *= -1
 		}
-		dAtA = encodeVarintPopulateGroup(dAtA, uint64(v9))
+		dAtA = encodeVarintPopulateGroup(dAtA, uint64(v12))
 	case 1:
 		dAtA = encodeVarintPopulateGroup(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1034,6 +1213,29 @@ func encodeVarintPopulateGroup(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
+func (m *GroupView) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Group.Size()
+	n += 1 + l + sovGroup(uint64(l))
+	if len(m.UserSample) > 0 {
+		for _, e := range m.UserSample {
+			l = e.Size()
+			n += 1 + l + sovGroup(uint64(l))
+		}
+	}
+	if m.UserCount != 0 {
+		n += 1 + sovGroup(uint64(m.UserCount))
+	}
+	if m.RoleCount != 0 {
+		n += 1 + sovGroup(uint64(m.RoleCount))
+	}
+	return n
+}
+
 func (m *CreateGroupReq) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1150,6 +1352,24 @@ func sovGroup(x uint64) (n int) {
 func sozGroup(x uint64) (n int) {
 	return sovGroup(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
+func (this *GroupView) String() string {
+	if this == nil {
+		return "nil"
+	}
+	repeatedStringForUserSample := "[]U{"
+	for _, f := range this.UserSample {
+		repeatedStringForUserSample += fmt.Sprintf("%v", f) + ","
+	}
+	repeatedStringForUserSample += "}"
+	s := strings.Join([]string{`&GroupView{`,
+		`Group:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Group), "Group", "user.Group", 1), `&`, ``, 1) + `,`,
+		`UserSample:` + repeatedStringForUserSample + `,`,
+		`UserCount:` + fmt.Sprintf("%v", this.UserCount) + `,`,
+		`RoleCount:` + fmt.Sprintf("%v", this.RoleCount) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *CreateGroupReq) String() string {
 	if this == nil {
 		return "nil"
@@ -1202,9 +1422,9 @@ func (this *ListGroupResp) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForGroups := "[]Group{"
+	repeatedStringForGroups := "[]GroupView{"
 	for _, f := range this.Groups {
-		repeatedStringForGroups += fmt.Sprintf("%v", f) + ","
+		repeatedStringForGroups += strings.Replace(strings.Replace(f.String(), "GroupView", "GroupView", 1), `&`, ``, 1) + ","
 	}
 	repeatedStringForGroups += "}"
 	s := strings.Join([]string{`&ListGroupResp{`,
@@ -1231,6 +1451,161 @@ func valueToStringGroup(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
+}
+func (m *GroupView) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGroup
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GroupView: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GroupView: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Group", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGroup
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGroup
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGroup
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Group.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserSample", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGroup
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGroup
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGroup
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserSample = append(m.UserSample, user.U{})
+			if err := m.UserSample[len(m.UserSample)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserCount", wireType)
+			}
+			m.UserCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGroup
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.UserCount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoleCount", wireType)
+			}
+			m.RoleCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGroup
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RoleCount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGroup(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGroup
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *CreateGroupReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1883,7 +2258,7 @@ func (m *ListGroupResp) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Groups = append(m.Groups, user.Group{})
+			m.Groups = append(m.Groups, GroupView{})
 			if err := m.Groups[len(m.Groups)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

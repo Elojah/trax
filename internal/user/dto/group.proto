@@ -18,6 +18,14 @@ import "pkg/pbtypes/string.proto";
 
 import "pkg/paginate/paginate.proto";
 import "internal/user/group.proto";
+import "internal/user/user.proto";
+
+message GroupView {
+	user.Group Group             = 1 [(gogoproto.nullable) = false];
+	repeated user.U UserSample   = 2 [(gogoproto.nullable) = false];
+	uint64 UserCount             = 3;
+	uint64 RoleCount             = 4;
+}
 
 message CreateGroupReq {
 	string Name                 = 1;
@@ -46,7 +54,7 @@ message ListGroupReq {
 }
 
 message ListGroupResp {
-	repeated user.Group Groups = 1 [(gogoproto.nullable) = false];
+	repeated GroupView Groups     = 1 [(gogoproto.nullable) = false];
 	uint64 Total                  = 2;
 }
 

@@ -103,7 +103,7 @@ const list = async (props: DataTableProps = {
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await userStore.list(ListUserReq.create({
-			groupIDs: [group.value.iD],
+			groupIDs: [group.value.group?.iD],
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * (props.rows ?? 10)) + 1),
@@ -187,7 +187,7 @@ const inviteUser = async (e: FormSubmitEvent) => {
 	try {
 		// TODO: Implement user invitation logic
 		// await userStore.invite(e.states.email.value, group.value.iD);
-		console.log('Inviting user:', e.states.email.value, 'to group:', group.value.name);
+		console.log('Inviting user:', e.states.email.value, 'to group:', group.value.group?.name);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		return;

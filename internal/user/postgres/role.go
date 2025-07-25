@@ -298,6 +298,41 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 	return roles, count, nil
 }
 
+func (s Store) CountRoleByGroup(ctx context.Context, f user.FilterRole) (map[string]uint64, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT r.group_id, COUNT(1) FROM "user"."role" r `)
+
+	clause, args := filterRole(f).where(1)
+	b.WriteString(clause)
+
+	b.WriteString(` GROUP BY r.group_id`)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, postgres.Error(err, "role", filterRole(f).index())
+	}
+
+	counts := make(map[string]uint64)
+
+	for rows.Next() {
+		var groupID ulid.ID
+		var count uint64
+
+		if err := rows.Scan(&groupID, &count); err != nil {
+			return nil, postgres.Error(err, "role", filterRole(f).index())
+		}
+
+		counts[groupID.String()] = count
+	}
+
+	return counts, nil
+}
+
 func (s Store) DeleteRole(ctx context.Context, f user.FilterRole) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {

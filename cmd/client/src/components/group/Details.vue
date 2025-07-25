@@ -104,9 +104,9 @@ const openManageGroup = () => {
 	if (group.value) {
 		// Populate form with current group data
 		initialValues.value = {
-			name: group.value.name,
-			"avatar-url": group.value.avatarURL || '',
-			description: group.value.description || '',
+			name: group.value.group?.name || '',
+			"avatar-url": group.value.group?.avatarURL || '',
+			description: group.value.group?.description || '',
 		};
 		dialogManageGroup.value = true;
 	}
@@ -120,7 +120,7 @@ const update = async (e: FormSubmitEvent) => {
 
 	try {
 		await store.update(UpdateGroupReq.create({
-			iD: group.value?.iD,
+			iD: group.value?.group?.iD,
 			name: { value: e.states.name.value },
 			avatarURL: { value: e.states["avatar-url"].value },
 			description: { value: e.states.description.value },
@@ -142,7 +142,7 @@ const deleteGroup = () => {
 	if (!group.value) return;
 
 	confirm.require({
-		message: `Are you sure you want to delete the group "${group.value.name}"? This action cannot be undone.`,
+		message: `Are you sure you want to delete the group "${group.value.group?.name}"? This action cannot be undone.`,
 		header: 'Delete Group',
 		icon: 'pi pi-exclamation-triangle',
 		rejectProps: {
@@ -157,10 +157,10 @@ const deleteGroup = () => {
 		accept: async () => {
 			if (!group.value) return;
 
-			const name = group.value.name
+			const name = group.value.group?.name || '';
 
 			try {
-				await store.delete_(DeleteGroupReq.create({ iD: group.value?.iD }));
+				await store.delete_(DeleteGroupReq.create({ iD: group.value?.group?.iD }));
 			} catch (e) {
 				errorsStore.showGRPC(e);
 				return
@@ -174,7 +174,9 @@ const deleteGroup = () => {
 	});
 };
 
-const formatDate = (timestamp: bigint): string => {
+const formatDate = (timestamp: bigint | undefined): string => {
+	if (!timestamp) return 'Unknown';
+
 	return new Date(Number(timestamp) * 1000).toLocaleDateString('en-GB', {
 		day: 'numeric',
 		month: 'long',
@@ -205,7 +207,7 @@ onMounted(() => {
 					</div>
 					<div class="flex flex-col">
 						<h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">
-							{{ group?.name || 'Loading...' }}
+							{{ group?.group?.name || 'Loading...' }}
 						</h2>
 						<span class="text-sm text-surface-500 dark:text-surface-400">Group management</span>
 					</div>
@@ -266,11 +268,11 @@ onMounted(() => {
 									<div class="flex flex-col md:flex-row items-start gap-8 mb-8">
 										<!-- Avatar -->
 										<div class="flex-shrink-0 relative">
-											<Avatar v-if="group.avatarURL" :image="group.avatarURL" size="xlarge"
-												shape="circle"
+											<Avatar v-if="group.group?.avatarURL" :image="group.group?.avatarURL"
+												size="xlarge" shape="circle"
 												class="border-4 border-surface-200 dark:border-surface-700 shadow-lg" />
-											<Avatar v-else :label="group.name.charAt(0).toUpperCase()" size="xlarge"
-												shape="circle"
+											<Avatar v-else :label="group.group?.name.charAt(0).toUpperCase()"
+												size="xlarge" shape="circle"
 												class="bg-gradient-to-br from-primary-400 to-primary-600 text-white border-4 border-surface-200 dark:border-surface-700 shadow-lg text-4xl font-bold" />
 										</div>
 
@@ -281,13 +283,13 @@ onMounted(() => {
 												<div>
 													<h1
 														class="text-4xl font-bold text-surface-900 dark:text-surface-0 mb-2">
-														{{ group.name }}
+														{{ group.group?.name }}
 													</h1>
 													<div
 														class="flex items-center gap-2 text-surface-500 dark:text-surface-400">
 														<i class="pi pi-calendar text-sm"></i>
 														<span class="text-sm">
-															Created {{ formatDate(group.createdAt) }}
+															Created {{ formatDate(group.group?.createdAt) }}
 														</span>
 													</div>
 												</div>
@@ -309,7 +311,7 @@ onMounted(() => {
 													</h3>
 													<p
 														class="text-surface-700 dark:text-surface-200 leading-relaxed text-base">
-														{{ group.description || 'No description.' }}
+														{{ group.group?.description || 'No description.' }}
 													</p>
 												</div>
 											</div>
@@ -326,11 +328,11 @@ onMounted(() => {
 														<div>
 															<p
 																class="text-2xl font-bold text-blue-700 dark:text-blue-300">
-																12
+																{{ group.userCount }}
 															</p>
 															<p
 																class="text-blue-600 dark:text-blue-400 text-sm font-medium">
-																Members</p>
+																Member(s)</p>
 														</div>
 													</div>
 												</div>
@@ -345,11 +347,11 @@ onMounted(() => {
 														<div>
 															<p
 																class="text-2xl font-bold text-purple-700 dark:text-purple-300">
-																4
+																{{ group.roleCount }}
 															</p>
 															<p
 																class="text-purple-600 dark:text-purple-400 text-sm font-medium">
-																Roles</p>
+																Role(s)</p>
 														</div>
 													</div>
 												</div>
@@ -373,13 +375,13 @@ onMounted(() => {
 															<i
 																class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
 															<span class="text-surface-700 dark:text-surface-200">
-																{{ formatDate(group.createdAt) }}
+																{{ formatDate(group.group?.createdAt) }}
 															</span>
 														</div>
 													</div>
 
 													<div class="flex flex-col gap-2"
-														v-if="group.updatedAt && group.updatedAt !== group.createdAt">
+														v-if="group.group?.updatedAt && group.group?.updatedAt !== group.group?.createdAt">
 														<h4
 															class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
 															Last Updated
@@ -388,7 +390,7 @@ onMounted(() => {
 															<i
 																class="pi pi-clock text-surface-500 dark:text-surface-400"></i>
 															<span class="text-surface-700 dark:text-surface-200">
-																{{ formatDate(group.updatedAt) }}
+																{{ formatDate(group.group?.updatedAt) }}
 															</span>
 														</div>
 													</div>

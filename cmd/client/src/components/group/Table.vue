@@ -10,7 +10,7 @@ import { useGroupStore } from '@/stores/group';
 import { ulid } from '@/utils/ulid';
 import { grpccodes } from '@/utils/errors';
 import { logger } from "@/config";
-import { DeleteGroupReq, ListGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
+import { DeleteGroupReq, GroupView, ListGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
 import { Group } from '@internal/user/group';
 
 // PrimeVue UI Components
@@ -174,8 +174,8 @@ const close = () => {
 	dialogCreateGroup.value = false;
 };
 
-const navigateToDetails = (group: Group) => {
-	router.push({ name: 'group-details', params: { id: ulid(group.iD) } });
+const navigateToDetails = (group: GroupView) => {
+	router.push({ name: 'group-details', params: { id: ulid(group.group?.iD) } });
 };
 
 const create = async (e: FormSubmitEvent) => {
@@ -199,9 +199,10 @@ const create = async (e: FormSubmitEvent) => {
 	await list();
 };
 
-const short = (description: string): string => {
-	return description.length > 128 ? description.substring(0, 128) + '...' :
-		description || 'No description'
+const short = (description: string | undefined): string => {
+	if (!description) return 'No description';
+
+	return description.length > 128 ? description.substring(0, 128) + '...' : description
 }
 
 // Initialize data on component mount
@@ -254,19 +255,19 @@ onMounted(() => {
 		</template>
 
 		<Column field="name" header="Name" sortable style="width: 25%">
-			<template #body="{ data }: { data: Group }">
+			<template #body="{ data }: { data: GroupView }">
 				<div v-if="data" class="flex items-center gap-3">
 					<div class="relative">
-						<Avatar v-if="data.avatarURL" :image="data.avatarURL" size="large" shape="circle"
+						<Avatar v-if="data.group?.avatarURL" :image="data.group?.avatarURL" size="large" shape="circle"
 							class="border-2 border-surface-200 dark:border-surface-700" />
-						<Avatar v-else :label="data.name.charAt(0).toUpperCase()" size="large" shape="circle"
+						<Avatar v-else :label="data.group?.name.charAt(0).toUpperCase()" size="large" shape="circle"
 							class="bg-primary-100 dark:bg-primary-400/30 text-primary-600 dark:text-primary-300 border-2 border-primary-200 dark:border-primary-400/20" />
 					</div>
 					<div class="flex flex-col">
 						<span
 							class="font-semibold text-surface-900 dark:text-surface-0 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
 							@click="navigateToDetails(data)" v-tooltip.top="'View group details'">
-							{{ data.name }}
+							{{ data.group?.name }}
 						</span>
 					</div>
 				</div>
@@ -274,15 +275,18 @@ onMounted(() => {
 		</Column>
 
 		<Column field="description" header="Description" style="width: 60%">
-			<template #body="{ data }: { data: Group }">
+			<template #body="{ data }: { data: GroupView }">
 				<div v-if="data" class="flex flex-col gap-1">
-					<span class="text-surface-700 dark:text-surface-200 line-clamp-2">{{ short(data.description)
+					<span class="text-surface-700 dark:text-surface-200 line-clamp-2">{{ short(data.group?.description)
 					}}</span>
 					<div class="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
 						<AvatarGroup>
-							<Avatar v-for="member in ['Raton', 'Belette', 'Nyx', 'Test']" :key="member.charAt(0)"
-								:label="member.charAt(0).toUpperCase()" size="small" shape="circle" />
-							<Avatar label="+2" shape="circle" />
+							<Avatar v-for="member in data.userSample" :key="ulid(member.iD)"
+								:image="member.avatarURL ? member.avatarURL : undefined"
+								:label="!member.avatarURL ? member.firstName?.charAt(0).toUpperCase() : undefined"
+								size="small" shape="circle" />
+							<Avatar v-if="data.userCount > data.userSample.length"
+								:label="'+' + (data.userCount - BigInt(data.userSample.length))" shape="circle" />
 						</AvatarGroup>
 					</div>
 				</div>
@@ -290,12 +294,12 @@ onMounted(() => {
 		</Column>
 
 		<Column field="created_at" header="Created" sortable style="width: 15%">
-			<template #body="{ data }: { data: Group }">
+			<template #body="{ data }: { data: GroupView }">
 				<div v-if="data" class="flex flex-col gap-1">
 					<div class="flex items-center gap-2">
 						<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
 						<span class="font-medium text-surface-700 dark:text-surface-200">
-							{{ new Date(Number(data.createdAt) * 1000).toLocaleDateString('en-GB', {
+							{{ new Date(Number(data.group?.createdAt) * 1000).toLocaleDateString('en-GB', {
 								day: 'numeric',
 								month: 'short',
 								year: 'numeric'
@@ -303,7 +307,7 @@ onMounted(() => {
 						</span>
 					</div>
 					<span class="text-xs text-surface-500 dark:text-surface-400">
-						{{ new Date(Number(data.createdAt) * 1000).toLocaleTimeString('en-GB', {
+						{{ new Date(Number(data.group?.createdAt) * 1000).toLocaleTimeString('en-GB', {
 							hour: '2-digit',
 							minute: '2-digit'
 						}) }}

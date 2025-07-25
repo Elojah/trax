@@ -6,6 +6,7 @@ import { Group } from '@internal/user/group'
 import {
   CreateGroupReq,
   DeleteGroupReq,
+  GroupView,
   ListGroupReq,
   ListGroupResp,
   UpdateGroupReq
@@ -15,10 +16,10 @@ import { computed, ref } from 'vue'
 import { parse, ulid } from '@/utils/ulid'
 
 export const useGroupStore = defineStore('group', () => {
-  const groups = ref<Map<string, Group>>(new Map())
+  const groups = ref<Map<string, GroupView>>(new Map())
   const total = ref<bigint>(BigInt(0))
 
-  const selected = ref<Group[]>([])
+  const selected = ref<GroupView[]>([])
 
   const api = new APIClient(
     new GrpcWebFetchTransport({
@@ -47,7 +48,10 @@ export const useGroupStore = defineStore('group', () => {
     try {
       const resp = await api.updateGroup(req, { meta: { token: token.value } })
 
-      groups.value?.set(ulid(resp.response.iD), resp.response)
+      const newGroup = groups.value?.get(ulid(resp.response.iD))!
+      newGroup.group = resp.response
+
+      groups.value?.set(ulid(resp.response.iD), newGroup)
     } catch (err: any) {
       logger.error(err)
       throw err;
@@ -69,15 +73,15 @@ export const useGroupStore = defineStore('group', () => {
     try {
       const resp: { response: ListGroupResp } = await api.listGroup(req, { meta: { token: token.value } })
 
-      resp.response.groups?.forEach((group: Group) => {
-        groups.value?.set(ulid(group.iD), group)
+      resp.response.groups?.forEach((group: GroupView) => {
+        groups.value?.set(ulid(group.group?.iD), group)
       })
 
       if (req?.iDs.length === 0) {
         total.value = resp.response.total
       }
 
-      return resp.response.groups.map((group: Group) => ulid(group.iD))
+      return resp.response.groups.map((group: GroupView) => ulid(group.group?.iD))
     } catch (err: any) {
       logger.error(err)
       throw err

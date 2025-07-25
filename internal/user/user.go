@@ -59,8 +59,10 @@ type Store interface {
 	Delete(context.Context, Filter) error
 
 	FetchWithPassword(context.Context, Filter) (U, error)
-	ListByGroup(context.Context, Filter) ([]U, uint64, error)
+	ListByGroup(context.Context, Filter) (map[string][]U, uint64, error)
 	ListByRole(context.Context, Filter) (map[string][]U, uint64, error)
+
+	CountByGroup(context.Context, Filter) (map[string]uint64, error)
 }
 
 const (
