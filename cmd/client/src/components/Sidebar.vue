@@ -55,7 +55,7 @@ const menuItems = ref([
 
 <template>
 	<div v-if="user" id="app-sidebar-9"
-		class="h-screen bg-surface-0 dark:bg-surface-950 hidden lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-10 border-r border-surface w-24 lg:w-24 w-72 select-none">
+		class="h-screen bg-surface-0 dark:bg-surface-950 hidden lg:block fixed left-0 top-0 z-10 border-r border-surface w-24 lg:w-24 w-72 select-none">
 		<div class="flex flex-col h-full">
 			<div class="flex items-center justify-center p-4 flex-shrink-0 bg-surface-0 dark:bg-surface-900">
 				<svg xmlns="http://www.w3.org/2000/svg" width="33" height="32" viewBox="0 0 33 32" fill="none">
@@ -67,12 +67,13 @@ const menuItems = ref([
 			<div class="flex-1 py-4 flex flex-col">
 				<div v-for="(item) in menuItems" :key="item.label"
 					class="flex items-center cursor-pointer group lg:flex hidden" @click="selectItem(item)">
-					<div class="w-1 h-full" :class="selectedItem === item.label ? 'bg-primary' : 'bg-transparent'" />
+					<div class="w-1 h-full"
+						:class="selectedItem.startsWith(item.label) ? 'bg-primary' : 'bg-transparent'" />
 					<div class="flex-1 flex flex-col items-center py-3 gap-2 transition-colors duration-150">
 						<i
-							:class="[item.icon, selectedItem === item.label ? 'text-primary' : 'text-surface-600 dark:text-surface-300 group-hover:text-primary', '!text-2xl !leading-none']" />
+							:class="[item.icon, selectedItem.startsWith(item.label) ? 'text-primary' : 'text-surface-600 dark:text-surface-300 group-hover:text-primary', '!text-2xl !leading-none']" />
 						<span class="text-sm font-medium text-center"
-							:class="selectedItem === item.label ? 'text-primary' : 'text-surface-600 dark:text-surface-300 group-hover:text-primary'">{{
+							:class="selectedItem.startsWith(item.label) ? 'text-primary' : 'text-surface-600 dark:text-surface-300 group-hover:text-primary'">{{
 								item.label.charAt(0).toUpperCase() + item.label.slice(1) }}</span>
 					</div>
 					<div class="w-1 h-full bg-transparent" />
@@ -81,10 +82,10 @@ const menuItems = ref([
 				<div class="lg:hidden flex flex-col gap-2 mt-4">
 					<a v-for="(item) in menuItems" :key="item.label"
 						class="w-full flex items-center cursor-pointer p-3 gap-3"
-						:class="[selectedItem === item.label ? 'text-primary  border-l-4 border-primary' : 'text-surface-700 dark:text-surface-300 hover:text-primary border-l-4 border-transparent']"
+						:class="[selectedItem.startsWith(item.label) ? 'text-primary  border-l-4 border-primary' : 'text-surface-700 dark:text-surface-300 hover:text-primary border-l-4 border-transparent']"
 						@click="selectItem(item)">
 						<i
-							:class="[item.icon, '!text-lg !leading-none', selectedItem === item.label ? 'text-primary' : 'text-surface-600 dark:text-surface-300']" />
+							:class="[item.icon, '!text-lg !leading-none', selectedItem.startsWith(item.label) ? 'text-primary' : 'text-surface-600 dark:text-surface-300']" />
 						<span class="font-medium text-base leading-tight">{{ item.label.charAt(0).toUpperCase() +
 							item.label.slice(1) }}</span>
 					</a>

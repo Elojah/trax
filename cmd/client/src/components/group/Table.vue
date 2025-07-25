@@ -213,10 +213,10 @@ onMounted(() => {
 
 <template>
 	<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
-		:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
-		v-model:selection="selected" @row-select="select" @page="onPage" @sort="onSort" @filter="onFilter" dataKey="id"
-		filterDisplay="menu" :globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
-		:rowsPerPageOptions="[10, 25, 50, 100]"
+		:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters" :scrollable="true"
+		scrollHeight="calc(100vh - 9rem)" v-model:selection="selected" @row-select="select" @page="onPage"
+		@sort="onSort" @filter="onFilter" dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'created_at']"
+		tableStyle="min-width: 50rem" :rowsPerPageOptions="[10, 25, 50, 100]"
 		paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 		currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
 
@@ -248,7 +248,7 @@ onMounted(() => {
 				<div class="flex items-center gap-3">
 					<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10" @click="list()"
 						v-tooltip.bottom="'Refresh groups'" />
-					<Button label="Create group" icon="pi pi-plus" severity="primary" class="font-medium"
+					<Button label="Create" icon="pi pi-plus" severity="primary" class="font-medium"
 						@click="dialogCreateGroup = true" />
 				</div>
 			</div>

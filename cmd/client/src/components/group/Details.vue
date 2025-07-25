@@ -15,7 +15,6 @@ import { Group } from '@internal/user/group';
 // PrimeVue UI Components
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import ConfirmDialog from 'primevue/confirmdialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
 import Card from 'primevue/card';
@@ -501,9 +500,6 @@ onMounted(() => {
 				</div>
 			</Form>
 		</Dialog>
-
-		<!-- Confirm Dialog -->
-		<ConfirmDialog />
 	</div>
 </template>
 

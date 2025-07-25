@@ -339,7 +339,7 @@ func (s Store) ListByGroup(ctx context.Context, f user.Filter) (map[string][]use
 	b := strings.Builder{}
 	b.WriteString(`SELECT DISTINCT ON (u.id, r.group_id) u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, r.group_id, COUNT(1) OVER() `)
 	if f.Paginate != nil {
-		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).RowPartition(sortUser, "r.group_id"))
 	} else {
 		b.WriteString(`, 0`)
 	}

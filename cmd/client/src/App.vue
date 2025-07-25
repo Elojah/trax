@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Sidebar from '@/components/Sidebar.vue';
 import Errors from '@/components/Errors.vue';
+import ConfirmDialog from 'primevue/confirmdialog';
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from './stores/auth';
 
@@ -18,10 +19,13 @@ onUnmounted(() => clearInterval(timer.value))
 
 <template>
   <v-app id="trax">
-    <div class="min-h-screen flex relative lg:static bg-surface-0 dark:bg-surface-950">
+    <div class="min-h-screen bg-surface-0 dark:bg-surface-950">
       <Sidebar />
-      <RouterView />
+      <div class="lg:ml-24 h-screen overflow-y-auto">
+        <RouterView />
+      </div>
       <Errors />
+      <ConfirmDialog />
     </div>
   </v-app>
 </template>

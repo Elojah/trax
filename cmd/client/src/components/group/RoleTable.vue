@@ -21,7 +21,6 @@ import DataTable, {
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import ConfirmDialog from 'primevue/confirmdialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
 import Card from 'primevue/card';
@@ -51,7 +50,7 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const roleStore = useRoleStore();
 const { roles, total } = toRefs(roleStore);
-const confirm = useConfirm();
+const confirmRole = useConfirm();
 
 const loading = ref(false);
 const search = ref('');
@@ -236,7 +235,7 @@ const update = async (e: FormSubmitEvent) => {
 const deleteRole = (role: RolePermission) => {
 	if (!role.role) return;
 
-	confirm.require({
+	confirmRole.require({
 		message: `Are you sure you want to delete the role "${role.role.name}"? This action cannot be undone.`,
 		header: 'Delete Role',
 		icon: 'pi pi-exclamation-triangle',
@@ -301,9 +300,9 @@ watch(() => props.groupId, () => {
 		<Message v-if="success && message" severity="success" class="mb-4">{{ message }}</Message>
 
 		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
-			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters" @page="onPage"
-			@sort="onSort" @filter="onFilter" dataKey="id" filterDisplay="menu"
-			:globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
+			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
+			:scrollable="true" scrollHeight="calc(100vh - 16rem)" @page="onPage" @sort="onSort" @filter="onFilter"
+			dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
 			:rowsPerPageOptions="[10, 25, 50, 100]"
 			paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 			currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
@@ -335,7 +334,7 @@ watch(() => props.groupId, () => {
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
 							@click="list()" v-tooltip.bottom="'Refresh roles'" />
-						<Button label="Create role" icon="pi pi-plus" severity="primary" class="font-medium"
+						<Button label="Create" icon="pi pi-plus" severity="primary" class="font-medium"
 							@click="openCreateRole" />
 					</div>
 				</div>
@@ -498,9 +497,6 @@ watch(() => props.groupId, () => {
 				</div>
 			</Form>
 		</Dialog>
-
-		<!-- Confirm Dialog -->
-		<ConfirmDialog />
 	</div>
 </template>
 

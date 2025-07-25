@@ -28,6 +28,27 @@ func (p Paginate) Row(sortCols map[string]string) string {
 	return b.String()
 }
 
+func (p Paginate) RowPartition(sortCols map[string]string, partition string) string {
+	sort, ok := sortCols[p.Sort]
+
+	b := strings.Builder{}
+	b.WriteString(`, ROW_NUMBER() OVER (PARTITION BY `)
+	// partition value is not checked, it is assumed to be valid
+	b.WriteString(partition)
+	if ok {
+		b.WriteString(` ORDER BY `)
+		b.WriteString(sort)
+		if p.Order {
+			b.WriteString(` ASC `)
+		} else {
+			b.WriteString(` DESC `)
+		}
+	}
+	b.WriteString(` )`)
+
+	return b.String()
+}
+
 func (p Paginate) CTE(subquery string) string {
 	b := strings.Builder{}
 	b.WriteString(`WITH cte as ( `)

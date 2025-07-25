@@ -6,6 +6,7 @@ import (
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
+	"github.com/elojah/trax/pkg/paginate"
 	"github.com/elojah/trax/pkg/transaction"
 	"github.com/elojah/trax/pkg/ulid"
 	"github.com/rs/zerolog/log"
@@ -68,6 +69,12 @@ func (h *handler) ListGroup(ctx context.Context, req *dto.ListGroupReq) (*dto.Li
 
 		users, _, err := h.user.ListByGroup(ctx, user.Filter{
 			GroupIDs: ids,
+			Paginate: &paginate.Paginate{
+				Start: 0,
+				End:   9,
+				Sort:  "created_at",
+				Order: false,
+			},
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("failed to list users by group")
