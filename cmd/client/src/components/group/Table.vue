@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Vue and Store imports
 import { computed, ref, toRefs, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
@@ -27,7 +28,6 @@ import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
 import AvatarGroup from 'primevue/avatargroup';
 import Textarea from 'primevue/textarea';
-import Menu from 'primevue/menu';
 
 // PrimeVue Input Components
 import InputText from 'primevue/inputtext';
@@ -39,11 +39,10 @@ import { zodResolver } from '@primevue/forms/resolvers/zod';
 import z from 'zod';
 import { Form, FormField } from '@primevue/forms';
 import type { FormSubmitEvent } from '@primevue/forms';
-import { useConfirm } from 'primevue/useconfirm';
 
+const router = useRouter();
 const authStore = useAuthStore();
 const store = useGroupStore();
-const confirm = useConfirm();
 const {
 	groups: groups,
 	total: total,
@@ -64,10 +63,7 @@ const views = computed(() => {
 
 const properties = ref<DataTableProps>({});
 
-// const select = (_: any, row: any) => {
-// 	selected.value = [];
-// 	row.toggleSelect({ value: row.item, selectable: true });
-// };
+const select = () => { };
 
 const list = async (props: DataTableProps = {
 	first: 0,
@@ -173,55 +169,13 @@ const initialValues = ref({
 });
 
 const dialogCreateGroup = ref(false);
-const dialogManageGroup = ref(false);
-const dialogManageRoles = ref(false);
-const dialogManageUsers = ref(false);
-
-const menu = ref();
-const selectedGroup = ref<Group | null>(null);
-const menuItems = ref([
-	{
-		label: 'Manage group',
-		icon: 'pi pi-cog',
-		command: () => {
-			if (selectedGroup.value) {
-				// Populate form with current group data
-				initialValues.value = {
-					name: selectedGroup.value.name,
-					"avatar-url": selectedGroup.value.avatarURL || '',
-					description: selectedGroup.value.description || '',
-				};
-				dialogManageGroup.value = true;
-			}
-		}
-	},
-	{
-		label: 'Manage roles',
-		icon: 'pi pi-shield',
-		command: () => {
-			if (selectedGroup.value) {
-				dialogManageRoles.value = true;
-			}
-		}
-	},
-	{
-		label: 'Manage users',
-		icon: 'pi pi-users',
-		command: () => {
-			if (selectedGroup.value) {
-				dialogManageUsers.value = true;
-			}
-		}
-	}
-]);
-
-const toggleMenu = (event: Event, group: Group) => {
-	selectedGroup.value = group;
-	menu.value.toggle(event);
-};
 
 const close = () => {
 	dialogCreateGroup.value = false;
+};
+
+const navigateToDetails = (group: Group) => {
+	router.push({ name: 'group-details', params: { id: ulid(group.iD) } });
 };
 
 const create = async (e: FormSubmitEvent) => {
@@ -245,67 +199,6 @@ const create = async (e: FormSubmitEvent) => {
 	await list();
 };
 
-const update = async (e: FormSubmitEvent) => {
-	if (!e.valid || !selectedGroup.value) {
-		logger.error('Update group form is invalid', e);
-		return;
-	}
-
-	try {
-		await store.update(UpdateGroupReq.create({
-			iD: selectedGroup.value?.iD,
-			name: { value: e.states.name.value },
-			avatarURL: { value: e.states["avatar-url"].value },
-			description: { value: e.states.description.value },
-		}));
-	} catch (e) {
-		errorsStore.showGRPC(e)
-		return
-	}
-
-	message.value = `Group ${e.states.name.value} updated successfully`;
-	success.value = true;
-	dialogManageGroup.value = false;
-	e.reset()
-	await authStore.refreshToken();
-	await list();
-};
-
-const deleteGroup = () => {
-	if (!selectedGroup.value) return;
-
-	confirm.require({
-		message: `Are you sure you want to delete the group "${selectedGroup.value.name}"? This action cannot be undone.`,
-		header: 'Delete Group',
-		icon: 'pi pi-exclamation-triangle',
-		rejectProps: {
-			label: 'Cancel',
-			severity: 'secondary',
-			outlined: true
-		},
-		acceptProps: {
-			label: 'Delete',
-			severity: 'danger'
-		},
-		accept: async () => {
-			if (!selectedGroup.value) return;
-
-			try {
-				await store.delete_(DeleteGroupReq.create({ iD: selectedGroup.value?.iD }));
-			} catch (e) {
-				errorsStore.showGRPC(e);
-				return
-			}
-
-			message.value = `Group "${selectedGroup.value.name}" deleted successfully`;
-			success.value = true;
-			dialogManageGroup.value = false;
-			await authStore.refreshToken();
-			await list();
-		}
-	});
-};
-
 const short = (description: string): string => {
 	return description.length > 64 ? description.substring(0, 64) + '...' :
 		description || 'No description'
@@ -320,11 +213,11 @@ onMounted(() => {
 <template>
 	<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
 		:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
-		v-model:selection="selected" @page="onPage" @sort="onSort" @filter="onFilter" dataKey="id" filterDisplay="menu"
-		:globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
+		v-model:selection="selected" @row-select="select" @page="onPage" @sort="onSort" @filter="onFilter" dataKey="id"
+		filterDisplay="menu" :globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
 		:rowsPerPageOptions="[10, 25, 50, 100]"
 		paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-		currentPageReportTemplate="{first} - {last} ({totalRecords})">
+		currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
 
 		<template #header>
 			<div
@@ -332,8 +225,8 @@ onMounted(() => {
 				<div class="flex items-center gap-4">
 					<div class="flex items-center gap-3">
 						<div
-							class="flex items-center justify-center w-10 h-10 bg-primary-100 dark:bg-primary-400/30 text-primary-600 dark:text-primary-300 rounded-lg border border-primary-200 dark:border-primary-400/20">
-							<i class="pi pi-building text-lg"></i>
+							class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-400/30 border border-blue-200 dark:border-blue-400/20">
+							<i class="pi pi-building text-lg text-blue-600 dark:text-blue-300"></i>
 						</div>
 						<div class="flex flex-col">
 							<h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">Groups</h2>
@@ -354,7 +247,7 @@ onMounted(() => {
 				<div class="flex items-center gap-3">
 					<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10" @click="list()"
 						v-tooltip.bottom="'Refresh groups'" />
-					<Button label="" icon="pi pi-plus" severity="primary" class="font-medium"
+					<Button label="Create group" icon="pi pi-plus" severity="primary" class="font-medium"
 						@click="dialogCreateGroup = true" />
 				</div>
 			</div>
@@ -370,7 +263,11 @@ onMounted(() => {
 							class="bg-primary-100 dark:bg-primary-400/30 text-primary-600 dark:text-primary-300 border-2 border-primary-200 dark:border-primary-400/20" />
 					</div>
 					<div class="flex flex-col">
-						<span class="font-semibold text-surface-900 dark:text-surface-0">{{ data.name }}</span>
+						<span
+							class="font-semibold text-surface-900 dark:text-surface-0 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
+							@click="navigateToDetails(data)" v-tooltip.top="'View group details'">
+							{{ data.name }}
+						</span>
 					</div>
 				</div>
 			</template>
@@ -392,7 +289,7 @@ onMounted(() => {
 			</template>
 		</Column>
 
-		<Column field="created_at" header="Created" sortable style="width: 25%">
+		<Column field="created_at" header="Created" sortable style="width: 35%">
 			<template #body="{ data }: { data: Group }">
 				<div v-if="data" class="flex flex-col gap-1">
 					<div class="flex items-center gap-2">
@@ -415,17 +312,6 @@ onMounted(() => {
 			</template>
 		</Column>
 
-		<Column header="Actions" style="width: 10%">
-			<template #body="{ data }: { data: Group }">
-				<div v-if="data" class="flex justify-center">
-					<Button icon="pi pi-ellipsis-v" severity="secondary" text rounded
-						class="w-8 h-8 hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
-						@click="(event) => toggleMenu(event, data)" aria-haspopup="true"
-						v-tooltip.top="'More actions'" />
-				</div>
-			</template>
-		</Column>
-
 		<template #empty>
 			<div class="text-center p-4">
 				<i class="pi pi-search text-4xl text-gray-400 mb-4"></i>
@@ -433,16 +319,6 @@ onMounted(() => {
 			</div>
 		</template>
 	</DataTable>
-
-	<!-- Actions Menu -->
-	<Menu ref="menu" :model="menuItems" :popup="true" class="w-48">
-		<template #item="{ item, props }">
-			<a v-bind="props.action" class="flex items-center gap-3 px-3 py-2 text-sm">
-				<i :class="item.icon" class="text-surface-500 dark:text-surface-400"></i>
-				<span class="font-medium">{{ item.label }}</span>
-			</a>
-		</template>
-	</Menu>
 
 	<!-- Create Group Dialog -->
 	<Dialog v-model:visible="dialogCreateGroup" append-to="body" modal
@@ -452,7 +328,7 @@ onMounted(() => {
 		<div class="flex justify-between items-start gap-4">
 			<div class="flex gap-4">
 				<div
-					class="flex items-center justify-center w-9 h-9 bg-primary-100 dark:bg-primary-400/30 text-primary-500 dark:text-primary-200 rounded-3xl border border-primary-200 dark:border-primary-400/20 shrink-0">
+					class="flex items-center justify-center w-9 h-9 bg-blue-100 dark:bg-blue-400/30 text-blue-600 dark:text-blue-300 rounded-3xl border border-blue-200 dark:border-blue-400/20 shrink-0">
 					<i class="pi pi-building !text-xl !leading-none" />
 				</div>
 			</div>
@@ -509,157 +385,6 @@ onMounted(() => {
 				<Button label="Create" type="submit" />
 			</div>
 		</Form>
-	</Dialog>
-
-	<!-- Manage Group Dialog -->
-	<Dialog v-model:visible="dialogManageGroup" append-to="body" modal
-		:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '40rem' }" :draggable="false"
-		:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
-		:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
-		<div class="flex justify-between items-start gap-4">
-			<div class="flex gap-4">
-				<div
-					class="flex items-center justify-center w-9 h-9 bg-orange-100 dark:bg-orange-400/30 text-orange-600 dark:text-orange-300 rounded-3xl border border-orange-200 dark:border-orange-400/20 shrink-0">
-					<i class="pi pi-cog !text-xl !leading-none" />
-				</div>
-			</div>
-			<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
-				@click="dialogManageGroup = false" />
-		</div>
-		<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="update"
-			class="flex flex-col gap-6">
-			<div class="flex items-start gap-4">
-				<div class="flex-1 flex flex-col gap-2">
-					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Manage
-						group
-					</h1>
-					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Edit group details
-						and manage settings.</span>
-				</div>
-			</div>
-			<div class="flex flex-col gap-6">
-				<FormField v-slot="$field" name="name" class="flex flex-col gap-2">
-					<label for="manage-name" class="text-color text-base">Name</label>
-					<IconField icon-position="left" class="w-full">
-						<InputIcon class="pi pi-user" />
-						<InputText id="manage-name" name="name" placeholder="Enter group name" type="text"
-							class="w-full" />
-					</IconField>
-					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
-						$field.error?.message
-					}}
-					</Message>
-				</FormField>
-				<FormField v-slot="$field" name="avatar-url" class="flex flex-col gap-2">
-					<label for="manage-avatar-url" class="text-color text-base">Avatar URL</label>
-					<IconField icon-position="left" class="w-full">
-						<InputIcon class="pi pi-image" />
-						<InputText id="manage-avatar-url" name="avatar-url" placeholder="Enter avatar URL" type="text"
-							class="w-full" />
-					</IconField>
-					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
-						$field.error?.message
-					}}
-					</Message>
-				</FormField>
-				<FormField v-slot="$field" name="description" class="flex flex-col gap-2">
-					<label for="manage-description" class="text-color text-base">Description</label>
-					<Textarea id="manage-description" name="description" placeholder="Enter group description" rows="3"
-						class="w-full" />
-					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
-						$field.error?.message
-					}}
-					</Message>
-				</FormField>
-			</div>
-			<div class="flex justify-between items-center">
-				<Button label="Delete Group" icon="pi pi-trash" severity="danger" outlined class="font-medium"
-					@click="deleteGroup" />
-				<div class="flex gap-4">
-					<Button label="Cancel" outlined @click="dialogManageGroup = false" />
-					<Button label="Update" type="submit" />
-				</div>
-			</div>
-		</Form>
-	</Dialog>
-
-	<!-- Confirm Dialog -->
-	<ConfirmDialog />
-
-	<!-- Manage Roles Dialog -->
-	<Dialog v-model:visible="dialogManageRoles" append-to="body" modal
-		:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '50rem' }" :draggable="false"
-		:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
-		:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
-		<div class="flex justify-between items-start gap-4">
-			<div class="flex gap-4">
-				<div
-					class="flex items-center justify-center w-9 h-9 bg-purple-100 dark:bg-purple-400/30 text-purple-600 dark:text-purple-300 rounded-3xl border border-purple-200 dark:border-purple-400/20 shrink-0">
-					<i class="pi pi-shield !text-xl !leading-none" />
-				</div>
-			</div>
-			<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
-				@click="dialogManageRoles = false" />
-		</div>
-		<div class="flex flex-col gap-6">
-			<div class="flex items-start gap-4">
-				<div class="flex-1 flex flex-col gap-2">
-					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Manage
-						roles
-					</h1>
-					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Configure roles and
-						permissions for <strong v-if="selectedGroup">{{ selectedGroup.name }}</strong>.</span>
-				</div>
-			</div>
-			<div class="flex flex-col gap-4">
-				<!-- Role management content will go here -->
-				<div class="text-center p-8 text-surface-500 dark:text-surface-400">
-					<i class="pi pi-shield text-4xl mb-4"></i>
-					<p>Role management interface will be implemented here.</p>
-				</div>
-			</div>
-			<div class="flex justify-end gap-4">
-				<Button label="Close" outlined @click="dialogManageRoles = false" />
-			</div>
-		</div>
-	</Dialog>
-
-	<!-- Manage Users Dialog -->
-	<Dialog v-model:visible="dialogManageUsers" append-to="body" modal
-		:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '50rem' }" :draggable="false"
-		:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
-		:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
-		<div class="flex justify-between items-start gap-4">
-			<div class="flex gap-4">
-				<div
-					class="flex items-center justify-center w-9 h-9 bg-green-100 dark:bg-green-400/30 text-green-600 dark:text-green-300 rounded-3xl border border-green-200 dark:border-green-400/20 shrink-0">
-					<i class="pi pi-users !text-xl !leading-none" />
-				</div>
-			</div>
-			<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
-				@click="dialogManageUsers = false" />
-		</div>
-		<div class="flex flex-col gap-6">
-			<div class="flex items-start gap-4">
-				<div class="flex-1 flex flex-col gap-2">
-					<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Manage
-						users
-					</h1>
-					<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Add, remove, and
-						manage users in <strong v-if="selectedGroup">{{ selectedGroup.name }}</strong>.</span>
-				</div>
-			</div>
-			<div class="flex flex-col gap-4">
-				<!-- User management content will go here -->
-				<div class="text-center p-8 text-surface-500 dark:text-surface-400">
-					<i class="pi pi-users text-4xl mb-4"></i>
-					<p>User management interface will be implemented here.</p>
-				</div>
-			</div>
-			<div class="flex justify-end gap-4">
-				<Button label="Close" outlined @click="dialogManageUsers = false" />
-			</div>
-		</div>
 	</Dialog>
 
 </template>
