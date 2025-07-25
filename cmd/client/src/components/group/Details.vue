@@ -293,7 +293,7 @@ onMounted(() => {
 													</div>
 												</div>
 												<div class="flex items-center gap-3">
-													<Button label="Edit Group" icon="pi pi-cog" severity="primary"
+													<Button label="" icon="pi pi-cog" outlined severity="primary"
 														class="font-medium" @click="openManageGroup"
 														v-tooltip.bottom="'Edit group settings'" />
 												</div>

@@ -248,7 +248,7 @@ onMounted(() => {
 				<div class="flex items-center gap-3">
 					<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10" @click="list()"
 						v-tooltip.bottom="'Refresh groups'" />
-					<Button label="Create" icon="pi pi-plus" severity="primary" class="font-medium"
+					<Button label="" icon="pi pi-plus" outlined severity="primary" class="font-medium"
 						@click="dialogCreateGroup = true" />
 				</div>
 			</div>
