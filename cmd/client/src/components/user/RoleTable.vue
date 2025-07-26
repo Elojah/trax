@@ -1,16 +1,17 @@
 <script setup lang="ts">
 // Vue and Store imports
 import { computed, ref, toRefs, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
 import { useRoleStore } from '@/stores/role';
+import { useUserStore } from '@/stores/user';
 
 // Internal utilities and types
-import { ulid } from '@/utils/ulid';
+import { parse, ulid } from '@/utils/ulid';
 import { logger } from "@/config";
-import { ListRoleReq, RolePermission, CreateRoleReq } from '@internal/user/dto/role';
+import { ListRoleReq } from '@internal/user/dto/role';
+import type { RolePermission } from '@internal/user/dto/role';
 
 // PrimeVue UI Components
 import DataTable, {
@@ -21,44 +22,51 @@ import DataTable, {
 } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
+import ConfirmDialog from 'primevue/confirmdialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
+import Tag from 'primevue/tag';
 
 // PrimeVue Input Components
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 
-// Table components
-import PermissionTable from '@/components/permission/Table.vue';
-
 // Form Validation
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import z from 'zod';
-import { Form, FormField } from '@primevue/forms';
-import type { FormSubmitEvent } from '@primevue/forms';
+import { useConfirm } from 'primevue/useconfirm';
+import router from '@/router';
 
 const props = defineProps<{
+	userId: string;
 	groupId: string;
 }>();
 
-const router = useRouter();
 const authStore = useAuthStore();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const roleStore = useRoleStore();
-const { roles, total } = toRefs(roleStore);
+const { roles, rolesByUser, total } = toRefs(roleStore);
+const userStore = useUserStore();
+const confirm = useConfirm();
 
 const loading = ref(false);
 const search = ref('');
 const viewIDs = ref<string[]>([]);
-const permissions = ref()
 
 const group = computed(() => {
 	return groups.value.get(props.groupId) || null;
+});
+
+const userRoleIds = computed(() => {
+	const userHasRoles = new Map<string, boolean>();
+	rolesByUser.value.get(props.userId)?.forEach((ok, roleId) => {
+		if (ok) {
+			userHasRoles.set(roleId, true);
+		}
+	});
+	return userHasRoles;
 });
 
 const views = computed(() => {
@@ -66,20 +74,6 @@ const views = computed(() => {
 });
 
 const properties = ref<DataTableProps>({});
-
-// Dialog states
-const dialogCreateRole = ref(false);
-
-// Form validation
-const resolver = zodResolver(
-	z.object({
-		name: z.string().min(1, { message: 'Name is required.' }),
-	})
-);
-
-const initialValues = ref({
-	name: '',
-});
 
 const list = async (p: DataTableProps = {
 	first: 0,
@@ -118,6 +112,23 @@ const list = async (p: DataTableProps = {
 			properties.value = p;
 		}
 
+	} catch (e) {
+		errorsStore.showGRPC(e);
+	}
+
+	loading.value = false;
+};
+
+const loadRoles = async () => {
+	if (!group.value) return;
+
+	loading.value = true;
+
+	try {
+		await roleStore.list(ListRoleReq.create({
+			userID: parse(props.userId),
+			groupIDs: [group.value.group?.iD],
+		}));
 	} catch (e) {
 		errorsStore.showGRPC(e);
 	}
@@ -170,51 +181,54 @@ const onSearch = () => {
 	});
 };
 
-const openCreateRole = () => {
-	initialValues.value = {
-		name: '',
-	};
-	dialogCreateRole.value = true;
-};
-
-const navigateToRoleDetails = (role: RolePermission) => {
+const addRole = async (role: RolePermission) => {
 	if (!role.role) return;
-	router.push({
-		name: 'role-details',
-		params: {
-			groupId: props.groupId,
-			roleId: ulid(role.role.iD)
-		}
-	});
-};
-
-const create = async (e: FormSubmitEvent) => {
-	if (!e.valid || !group.value) {
-		logger.error('Create role form is invalid', e);
-		return;
-	}
 
 	try {
-		await roleStore.create(
-			group.value.group?.iD!,
-			e.states.name.value,
-			permissions.value?.selected() || [],
+		await userStore.addRole(
+			parse(props.userId),
+			role.role.iD
 		);
+		message.value = `Role "${role.role.name}" added to user`;
+		success.value = true;
+		await authStore.refreshToken();
 	} catch (e) {
 		errorsStore.showGRPC(e);
-		return;
 	}
+};
 
-	message.value = `Role ${e.states.name.value} created successfully`;
-	success.value = true;
-	dialogCreateRole.value = false;
-	e.reset();
+const removeRole = (role: RolePermission) => {
+	if (!role.role) return;
 
-	// Clear permissions table for next use
-	permissions.value?.clear();
+	confirm.require({
+		message: `Are you sure you want to remove the role "${role.role.name}" from this user?`,
+		header: 'Remove Role',
+		icon: 'pi pi-exclamation-triangle',
+		rejectProps: {
+			label: 'Cancel',
+			severity: 'secondary',
+			outlined: true
+		},
+		acceptProps: {
+			label: 'Remove',
+			severity: 'danger'
+		},
+		accept: async () => {
+			if (!role.role) return;
 
-	await authStore.refreshToken();
-	await list();
+			try {
+				await userStore.deleteRole(
+					parse(props.userId),
+					role.role.iD
+				);
+				message.value = `Role "${role.role.name}" removed from user`;
+				success.value = true;
+				await authStore.refreshToken();
+			} catch (e) {
+				errorsStore.showGRPC(e);
+			}
+		}
+	});
 };
 
 const formatDate = (timestamp: bigint): string => {
@@ -225,18 +239,11 @@ const formatDate = (timestamp: bigint): string => {
 	});
 };
 
-const short = (description: string): string => {
-	return description && description.length > 64 ? description.substring(0, 64) + '...' :
-		description || 'No description';
-};
-
 // Initialize data on component mount
 onMounted(() => {
-	if (group.value) {
-		list();
-	}
+	loadRoles()
+	list()
 });
-
 </script>
 
 <template>
@@ -262,9 +269,10 @@ onMounted(() => {
 								<i class="pi pi-shield text-lg text-purple-600 dark:text-purple-300"></i>
 							</div>
 							<div class="flex flex-col">
-								<h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">Roles</h3>
-								<span class="text-sm text-surface-500 dark:text-surface-400">Manage group roles and
-									permissions</span>
+								<h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">User Roles
+								</h3>
+								<span class="text-sm text-surface-500 dark:text-surface-400">Roles assigned to this
+									user</span>
 							</div>
 						</div>
 						<div class="flex items-center gap-3 ml-6">
@@ -279,13 +287,11 @@ onMounted(() => {
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
 							@click="list()" v-tooltip.bottom="'Refresh roles'" />
-						<Button label="" icon="pi pi-plus" outlined severity="primary" class="font-medium"
-							@click="openCreateRole" />
 					</div>
 				</div>
 			</template>
 
-			<Column field="name" header="Name" sortable style="width: 30%">
+			<Column field="name" header="Role" sortable style="width: 40%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.role" class="flex items-center gap-3">
 						<div class="relative">
@@ -293,9 +299,7 @@ onMounted(() => {
 								class="bg-purple-100 dark:bg-purple-400/30 text-purple-600 dark:text-purple-300 border-2 border-purple-200 dark:border-purple-400/20" />
 						</div>
 						<div class="flex flex-col">
-							<span
-								class="font-semibold text-surface-900 dark:text-surface-0 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-								@click="navigateToRoleDetails(data)" v-tooltip.top="'View role details'">
+							<span class="font-semibold text-surface-900 dark:text-surface-0">
 								{{ data.role.name }}
 							</span>
 						</div>
@@ -303,7 +307,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="permissions" header="Permissions" style="width: 55%">
+			<Column field="permissions" header="Permissions" style="width: 25%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-shield text-surface-500 dark:text-surface-400"></i>
@@ -314,15 +318,22 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="created_at" header="Created" sortable style="width: 15%">
+			<Column field="status" header="Status" style="width: 20%">
 				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex flex-col gap-1">
-						<div class="flex items-center gap-2">
-							<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
-							<span class="font-medium text-surface-700 dark:text-surface-200">
-								{{ formatDate(data.role.createdAt) }}
-							</span>
-						</div>
+					<div v-if="data?.role" class="flex items-center gap-2">
+						<Tag v-if="userRoleIds.has(ulid(data.role.iD))" value="Assigned" severity="success" />
+						<Tag v-else value="Not Assigned" severity="secondary" />
+					</div>
+				</template>
+			</Column>
+
+			<Column field="actions" header="" style="width: 15%">
+				<template #body="{ data }: { data: RolePermission }">
+					<div v-if="data?.role" class="flex items-center gap-2 justify-end">
+						<Button v-if="!userRoleIds.has(ulid(data.role.iD))" icon="pi pi-plus" severity="success"
+							outlined size="small" @click="addRole(data)" v-tooltip.top="'Add role'" />
+						<Button v-else icon="pi pi-minus" severity="danger" outlined size="small"
+							@click="removeRole(data)" v-tooltip.top="'Remove role'" />
 					</div>
 				</template>
 			</Column>
@@ -334,58 +345,6 @@ onMounted(() => {
 				</div>
 			</template>
 		</DataTable>
-
-		<!-- Create Role Dialog -->
-		<Dialog v-model:visible="dialogCreateRole" append-to="body" modal
-			:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '40rem' }" :draggable="false"
-			:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
-			:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
-			<div class="flex justify-between items-start gap-4">
-				<div class="flex gap-4">
-					<div
-						class="flex items-center justify-center w-9 h-9 bg-purple-100 dark:bg-purple-400/30 text-purple-600 dark:text-purple-300 rounded-3xl border border-purple-200 dark:border-purple-400/20 shrink-0">
-						<i class="pi pi-shield !text-xl !leading-none" />
-					</div>
-				</div>
-				<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
-					@click="dialogCreateRole = false" />
-			</div>
-			<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="create"
-				class="flex flex-col gap-6">
-				<div class="flex items-start gap-4">
-					<div class="flex-1 flex flex-col gap-2">
-						<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Create
-							role
-						</h1>
-						<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Create a new role
-							for
-							this group.</span>
-					</div>
-				</div>
-				<div class="flex flex-col gap-6">
-					<FormField v-slot="$field" name="name" class="flex flex-col gap-2">
-						<label for="create-name" class="text-color text-base">Name</label>
-						<IconField icon-position="left" class="w-full">
-							<InputIcon class="pi pi-shield" />
-							<InputText id="create-name" name="name" placeholder="Enter role name" type="text"
-								class="w-full" />
-						</IconField>
-						<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
-							$field.error?.message
-						}}
-						</Message>
-					</FormField>
-				</div>
-				<div class="flex flex-col gap-6">
-					<PermissionTable :disabled="false" :permissions="[]" ref="permissions" />
-				</div>
-
-				<div class="flex justify-end gap-4">
-					<Button label="Cancel" outlined @click="dialogCreateRole = false" />
-					<Button label="Create" type="submit" />
-				</div>
-			</Form>
-		</Dialog>
 	</div>
 </template>
 

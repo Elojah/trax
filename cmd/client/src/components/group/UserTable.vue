@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Vue and Store imports
 import { computed, ref, toRefs, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
@@ -45,6 +46,7 @@ const props = defineProps<{
 	groupId: string;
 }>();
 
+const router = useRouter();
 const authStore = useAuthStore();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
@@ -82,7 +84,7 @@ const initialValues = ref({
 	email: '',
 });
 
-const list = async (props: DataTableProps = {
+const list = async (p: DataTableProps = {
 	first: 0,
 	rows: 10,
 	sortField: 'created_at',
@@ -96,18 +98,18 @@ const list = async (props: DataTableProps = {
 	loading.value = true;
 
 	try {
-		const page = Math.floor((props.first ?? 0) / (props.rows ?? 1)) + 1;
-		const sortBy = props.sortField ? [{
-			key: props.sortField,
-			order: props.sortOrder === 1 ? 'asc' : 'desc'
+		const page = Math.floor((p.first ?? 0) / (p.rows ?? 1)) + 1;
+		const sortBy = p.sortField ? [{
+			key: p.sortField,
+			order: p.sortOrder === 1 ? 'asc' : 'desc'
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await userStore.list(ListUserReq.create({
 			groupIDs: [group.value.group?.iD],
 			search: search.value,
 			paginate: {
-				start: BigInt(((page - 1) * (props.rows ?? 10)) + 1),
-				end: BigInt(page * (props.rows ?? 10)),
+				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
+				end: BigInt(page * (p.rows ?? 10)),
 				sort: sortBy?.at(0)?.key ?? '',
 				order: sortBy?.at(0)?.order === 'asc' ? true : false,
 			}
@@ -115,8 +117,8 @@ const list = async (props: DataTableProps = {
 
 		viewIDs.value = newIDs;
 
-		if (props) {
-			properties.value = props;
+		if (p) {
+			properties.value = p;
 		}
 
 	} catch (e) {
@@ -201,38 +203,13 @@ const inviteUser = async (e: FormSubmitEvent) => {
 	await list();
 };
 
-const removeUser = (user: U) => {
+const navigateToUserDetails = (user: U) => {
 	if (!user) return;
-
-	confirmUser.require({
-		message: `Are you sure you want to remove "${user.email}" from this group? This action cannot be undone.`,
-		header: 'Remove User',
-		icon: 'pi pi-exclamation-triangle',
-		rejectProps: {
-			label: 'Cancel',
-			severity: 'secondary',
-			outlined: true
-		},
-		acceptProps: {
-			label: 'Remove',
-			severity: 'danger'
-		},
-		accept: async () => {
-			if (!user) return;
-
-			try {
-				// TODO: Implement user removal logic
-				// await userStore.removeFromGroup(user.iD, group.value.iD);
-				console.log('Removing user:', user.email, 'from group');
-			} catch (e) {
-				errorsStore.showGRPC(e);
-				return;
-			}
-
-			message.value = `User "${user.email}" removed successfully`;
-			success.value = true;
-			await authStore.refreshToken();
-			await list();
+	router.push({
+		name: 'user-details',
+		params: {
+			groupId: props.groupId,
+			userId: ulid(user.iD)
 		}
 	});
 };
@@ -261,13 +238,6 @@ const getUserDisplayName = (user: U): string => {
 
 // Initialize data on component mount
 onMounted(() => {
-	if (group.value) {
-		list();
-	}
-});
-
-// Watch for group changes
-watch(() => props.groupId, () => {
 	if (group.value) {
 		list();
 	}
@@ -319,7 +289,7 @@ watch(() => props.groupId, () => {
 				</div>
 			</template>
 
-			<Column field="user" header="User" sortable style="width: 25%">
+			<Column field="user" header="User" sortable style="width: 35%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex items-center gap-3">
 						<div class="relative">
@@ -329,7 +299,9 @@ watch(() => props.groupId, () => {
 								class="bg-green-100 dark:bg-green-400/30 text-green-600 dark:text-green-300 border-2 border-green-200 dark:border-green-400/20" />
 						</div>
 						<div class="flex flex-col">
-							<span class="font-semibold text-surface-900 dark:text-surface-0">
+							<span
+								class="font-semibold text-surface-900 dark:text-surface-0 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
+								@click="navigateToUserDetails(data)" v-tooltip.top="'View user details'">
 								{{ getUserDisplayName(data) }}
 							</span>
 							<span class="text-sm text-surface-500 dark:text-surface-400">
@@ -370,15 +342,6 @@ watch(() => props.groupId, () => {
 								{{ formatDate(data.createdAt) }}
 							</span>
 						</div>
-					</div>
-				</template>
-			</Column>
-
-			<Column field="actions" header="" style="width: 10%">
-				<template #body="{ data }: { data: U }">
-					<div v-if="data" class="flex items-center gap-2">
-						<Button icon="pi pi-trash" severity="danger" class="w-full" outlined size="large"
-							@click="removeUser(data)" v-tooltip.top="'Remove from group'" />
 					</div>
 				</template>
 			</Column>

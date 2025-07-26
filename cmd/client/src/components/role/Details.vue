@@ -99,7 +99,7 @@ const loadRole = async () => {
 
 	try {
 		// Load role data
-		await roleStore.populate([roleId.value]);
+		await roleStore.populate([roleId.value], [groupId.value]);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		router.push({ name: 'group-details', params: { id: groupId.value } });

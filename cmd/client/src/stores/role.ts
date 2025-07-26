@@ -150,7 +150,7 @@ export const useRoleStore = defineStore('role', () => {
     }
   }
 
-  const populate = async function (ids: string[]) {
+  const populate = async function (ids: string[], groupIDs: string[]) {
     const newIDs = ids.reduce((acc: Uint8Array[], id: string) => {
       if (roles.value?.has(id)) {
         return acc
@@ -166,6 +166,7 @@ export const useRoleStore = defineStore('role', () => {
     await list(
       ListRoleReq.create({
         iDs: newIDs,
+        groupIDs: groupIDs.map(id => parse(id)),
         ownGroup: true,
         paginate: {
           start: BigInt(0),

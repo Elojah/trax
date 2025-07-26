@@ -65,7 +65,7 @@ const properties = ref<DataTableProps>({});
 
 const select = () => { };
 
-const list = async (props: DataTableProps = {
+const list = async (p: DataTableProps = {
 	first: 0,
 	rows: 10,
 	sortField: 'created_at',
@@ -75,20 +75,20 @@ const list = async (props: DataTableProps = {
 
 	try {
 		// Use event data if provided (from DataTable lazy loading), otherwise use current p
-		const page = Math.floor((props.first ?? 0) / (props.rows ?? 1)) + 1; // Convert first index to page number
+		const page = Math.floor((p.first ?? 0) / (p.rows ?? 1)) + 1; // Convert first index to page number
 
 		// Map PrimeVue sort order to your API format
-		const sortBy = props.sortField ? [{
-			key: props.sortField,
-			order: props.sortOrder === 1 ? 'asc' : 'desc'
+		const sortBy = p.sortField ? [{
+			key: p.sortField,
+			order: p.sortOrder === 1 ? 'asc' : 'desc'
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await store.list(ListGroupReq.create({
 			own: true,
 			search: search.value,
 			paginate: {
-				start: BigInt(((page - 1) * (props.rows ?? 10)) + 1), // page starts at 1, start starts at 1
-				end: BigInt(page * (props.rows ?? 10)),
+				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1), // page starts at 1, start starts at 1
+				end: BigInt(page * (p.rows ?? 10)),
 				sort: sortBy?.at(0)?.key ?? '',
 				order: sortBy?.at(0)?.order === 'asc' ? true : false,
 			}
@@ -97,8 +97,8 @@ const list = async (props: DataTableProps = {
 		viewIDs.value = newIDs;
 
 		// Update props if event is provided
-		if (props) {
-			properties.value = props
+		if (p) {
+			properties.value = p
 		}
 
 	} catch (e) {
