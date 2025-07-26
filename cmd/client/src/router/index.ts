@@ -5,6 +5,7 @@ import User from '@/views/User.vue'
 import Map from '@/views/Map.vue'
 import Group from '@/views/Group.vue'
 import GroupDetails from '@/components/group/Details.vue'
+import RoleDetails from '@/components/role/Details.vue'
 import NotFound from '@/views/NotFound.vue'
 import { useAuthStore } from '@/stores/auth'
 // import { config } from '@/config'
@@ -47,6 +48,12 @@ const router = createRouter({
       path: '/group/:id',
       name: 'group-details',
       component: GroupDetails,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/group/:groupId/role/:roleId',
+      name: 'role-details',
+      component: RoleDetails,
       meta: { requiresAuth: true }
     },
     {

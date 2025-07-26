@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Vue and Store imports
 import { computed, ref, toRefs, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
@@ -9,7 +10,7 @@ import { useRoleStore } from '@/stores/role';
 // Internal utilities and types
 import { ulid } from '@/utils/ulid';
 import { logger } from "@/config";
-import { ListRoleReq, RolePermission, CreateRoleReq, UpdateRoleReq, DeleteRoleReq } from '@internal/user/dto/role';
+import { ListRoleReq, RolePermission, CreateRoleReq } from '@internal/user/dto/role';
 
 // PrimeVue UI Components
 import DataTable, {
@@ -37,12 +38,12 @@ import { zodResolver } from '@primevue/forms/resolvers/zod';
 import z from 'zod';
 import { Form, FormField } from '@primevue/forms';
 import type { FormSubmitEvent } from '@primevue/forms';
-import { useConfirm } from 'primevue/useconfirm';
 
 const props = defineProps<{
 	groupId: string;
 }>();
 
+const router = useRouter();
 const authStore = useAuthStore();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
@@ -50,7 +51,6 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const roleStore = useRoleStore();
 const { roles, total } = toRefs(roleStore);
-const confirmRole = useConfirm();
 
 const loading = ref(false);
 const search = ref('');
@@ -69,8 +69,6 @@ const properties = ref<DataTableProps>({});
 
 // Dialog states
 const dialogCreateRole = ref(false);
-const dialogManageRole = ref(false);
-const selectedRole = ref<RolePermission | null>(null);
 
 // Form validation
 const resolver = zodResolver(
@@ -179,12 +177,15 @@ const openCreateRole = () => {
 	dialogCreateRole.value = true;
 };
 
-const openManageRole = (role: RolePermission) => {
-	selectedRole.value = role;
-	initialValues.value = {
-		name: role.role?.name || '',
-	};
-	dialogManageRole.value = true;
+const navigateToRoleDetails = (role: RolePermission) => {
+	if (!role.role) return;
+	router.push({
+		name: 'role-details',
+		params: {
+			groupId: props.groupId,
+			roleId: ulid(role.role.iD)
+		}
+	});
 };
 
 const create = async (e: FormSubmitEvent) => {
@@ -214,65 +215,6 @@ const create = async (e: FormSubmitEvent) => {
 
 	await authStore.refreshToken();
 	await list();
-};
-
-const update = async (e: FormSubmitEvent) => {
-	if (!e.valid || !selectedRole.value?.role) {
-		logger.error('Update role form is invalid', e);
-		return;
-	}
-
-	try {
-		await roleStore.update(UpdateRoleReq.create({
-			iD: selectedRole.value.role.iD,
-			name: { value: e.states.name.value },
-			description: { value: e.states.description.value },
-		}));
-	} catch (e) {
-		errorsStore.showGRPC(e);
-		return;
-	}
-
-	message.value = `Role ${e.states.name.value} updated successfully`;
-	success.value = true;
-	dialogManageRole.value = false;
-	e.reset();
-	await authStore.refreshToken();
-	await list();
-};
-
-const deleteRole = (role: RolePermission) => {
-	if (!role.role) return;
-
-	confirmRole.require({
-		message: `Are you sure you want to delete the role "${role.role.name}"? This action cannot be undone.`,
-		header: 'Delete Role',
-		icon: 'pi pi-exclamation-triangle',
-		rejectProps: {
-			label: 'Cancel',
-			severity: 'secondary',
-			outlined: true
-		},
-		acceptProps: {
-			label: 'Delete',
-			severity: 'danger'
-		},
-		accept: async () => {
-			if (!role.role) return;
-
-			try {
-				await roleStore.delete_(DeleteRoleReq.create({ iD: role.role.iD }));
-			} catch (e) {
-				errorsStore.showGRPC(e);
-				return;
-			}
-
-			message.value = `Role "${role.role.name}" deleted successfully`;
-			success.value = true;
-			await authStore.refreshToken();
-			await list();
-		}
-	});
 };
 
 const formatDate = (timestamp: bigint): string => {
@@ -359,7 +301,7 @@ watch(() => props.groupId, () => {
 						<div class="flex flex-col">
 							<span
 								class="font-semibold text-surface-900 dark:text-surface-0 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-								@click="openManageRole(data)" v-tooltip.top="'Edit role'">
+								@click="navigateToRoleDetails(data)" v-tooltip.top="'View role details'">
 								{{ data.role.name }}
 							</span>
 						</div>
@@ -447,60 +389,6 @@ watch(() => props.groupId, () => {
 				<div class="flex justify-end gap-4">
 					<Button label="Cancel" outlined @click="dialogCreateRole = false" />
 					<Button label="Create" type="submit" />
-				</div>
-			</Form>
-		</Dialog>
-
-		<!-- Manage Role Dialog -->
-		<Dialog v-model:visible="dialogManageRole" append-to="body" modal
-			:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '40rem' }" :draggable="false"
-			:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
-			:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
-			<div class="flex justify-between items-start gap-4">
-				<div class="flex gap-4">
-					<div
-						class="flex items-center justify-center w-9 h-9 bg-purple-100 dark:bg-purple-400/30 text-purple-600 dark:text-purple-300 rounded-3xl border border-purple-200 dark:border-purple-400/20 shrink-0">
-						<i class="pi pi-shield !text-xl !leading-none" />
-					</div>
-				</div>
-				<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
-					@click="dialogManageRole = false" />
-			</div>
-			<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="update"
-				class="flex flex-col gap-6">
-				<div class="flex items-start gap-4">
-					<div class="flex-1 flex flex-col gap-2">
-						<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Manage
-							role
-						</h1>
-						<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Edit role details
-							and permissions.</span>
-					</div>
-				</div>
-				<div class="flex flex-col gap-6">
-					<FormField v-slot="$field" name="name" class="flex flex-col gap-2">
-						<label for="manage-role-name" class="text-color text-base">Name</label>
-						<IconField icon-position="left" class="w-full">
-							<InputIcon class="pi pi-shield" />
-							<InputText id="manage-role-name" name="name" placeholder="Enter role name" type="text"
-								class="w-full" />
-						</IconField>
-						<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
-							$field.error?.message
-						}}
-						</Message>
-					</FormField>
-				</div>
-				<div class="flex flex-col gap-6">
-					<PermissionTable :disabled="true" :permissions="selectedRole?.permissions" />
-				</div>
-				<div class="flex justify-between items-center">
-					<Button label="Delete Role" icon="pi pi-trash" severity="danger" outlined class="font-medium"
-						@click="deleteRole(selectedRole!)" />
-					<div class="flex gap-4">
-						<Button label="Cancel" outlined @click="dialogManageRole = false" />
-						<Button label="Update" type="submit" />
-					</div>
 				</div>
 			</Form>
 		</Dialog>

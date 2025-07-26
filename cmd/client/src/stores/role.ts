@@ -5,7 +5,7 @@ import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { CreateRoleReq, CreateRoleUserReq, DeleteRoleReq, DeleteRoleUserReq, ListRoleReq, ListRoleResp, RolePermission, RoleUserResp, UpdateRoleReq } from '@internal/user/dto/role'
 import { useAuthStore } from './auth'
 import { computed, ref } from 'vue'
-import { ulid, zero } from '@/utils/ulid'
+import { parse, ulid, zero } from '@/utils/ulid'
 import type { Permission } from '@internal/user/role'
 
 export const useRoleStore = defineStore('role', () => {
@@ -150,6 +150,34 @@ export const useRoleStore = defineStore('role', () => {
     }
   }
 
+  const populate = async function (ids: string[]) {
+    const newIDs = ids.reduce((acc: Uint8Array[], id: string) => {
+      if (roles.value?.has(id)) {
+        return acc
+      } else {
+        return [...acc, parse(id)]
+      }
+    }, [])
+
+    if (newIDs.length === 0) {
+      return
+    }
+
+    await list(
+      ListRoleReq.create({
+        iDs: newIDs,
+        ownGroup: true,
+        paginate: {
+          start: BigInt(0),
+          end: BigInt(newIDs.length),
+          order: true,
+          sort: 'created_at'
+        }
+      })
+    )
+  }
+
+
   return {
     roles,
     rolesByUser,
@@ -161,5 +189,6 @@ export const useRoleStore = defineStore('role', () => {
     delete_,
     addUser,
     deleteUser,
+    populate,
   }
 })

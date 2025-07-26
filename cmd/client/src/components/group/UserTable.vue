@@ -282,7 +282,7 @@ watch(() => props.groupId, () => {
 		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
 			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
 			:scrollable="true" scrollHeight="calc(100vh - 16rem)" @page="onPage" @sort="onSort" @filter="onFilter"
-			dataKey="id" filterDisplay="menu" :globalFilterFields="['email', 'firstName', 'lastName', 'created_at']"
+			dataKey="id" filterDisplay="menu" :globalFilterFields="['email', 'name', 'created_at']"
 			tableStyle="min-width: 50rem" :rowsPerPageOptions="[10, 25, 50, 100]"
 			paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 			currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
@@ -319,7 +319,7 @@ watch(() => props.groupId, () => {
 				</div>
 			</template>
 
-			<Column field="user" header="User" sortable style="width: 35%">
+			<Column field="user" header="User" sortable style="width: 25%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex items-center gap-3">
 						<div class="relative">
@@ -340,12 +340,22 @@ watch(() => props.groupId, () => {
 				</template>
 			</Column>
 
-			<Column field="firstName" header="Name" sortable style="width: 25%">
+			<Column field="name" header="Name" sortable style="width: 25%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex flex-col gap-1">
 						<span class="text-surface-700 dark:text-surface-200">
-							{{ data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : 'Not provided'
+							{{ data.firstName && data.lastName ? `${data.lastName} ${data.firstName}` : 'Not provided'
 							}}
+						</span>
+					</div>
+				</template>
+			</Column>
+
+			<Column field="email" header="Email" sortable style="width: 25%">
+				<template #body="{ data }: { data: U }">
+					<div v-if="data" class="flex flex-col gap-1">
+						<span class="text-surface-700 dark:text-surface-200">
+							{{ data.email }}
 						</span>
 					</div>
 				</template>
@@ -364,10 +374,10 @@ watch(() => props.groupId, () => {
 				</template>
 			</Column>
 
-			<Column field="actions" header="Actions" style="width: 20%">
+			<Column field="actions" header="" style="width: 10%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex items-center gap-2">
-						<Button icon="pi pi-trash" severity="danger" outlined size="small" class="p-2"
+						<Button icon="pi pi-trash" severity="danger" class="w-full" outlined size="large"
 							@click="removeUser(data)" v-tooltip.top="'Remove from group'" />
 					</div>
 				</template>
