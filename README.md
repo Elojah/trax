@@ -23,27 +23,19 @@ $ cat scripts/add_localhost.hosts | sudo tee -a /etc/hosts > /dev/null
 Start:
 
 ```sh
-$ docker-compose up -d postgres redis
-$ make admin && ./bin/trax_admin config/admin/local.json
-$ make api && ./bin/trax_api config/api/local.json
-$ make auth && ./bin/trax_auth config/auth/local.json
-$ make client && ./bin/trax_web_client config/web_client/local.json
+docker-compose up -d postgres redis
+make admin && ./bin/trax_admin config/admin/local.json
+make api && ./bin/trax_api config/api/local.json
+make auth && ./bin/trax_auth config/auth/local.json
+make client && ./bin/trax_web_client config/web_client/local.json
 ```
 
 TODO:
 
-- Add Create & Update & delete on everything
-
-  - Create/Invite (add at least 1 role) User
-  - Edit role name
-  - !!! Show edit/delete only for users with permissions -> Manage permissions globally with v-if to hide impossible action
-    + Check user table w/ permission
-
-- [S] Search bar on right panel group fill everything until new+ button
-- [S] Table footer in nested table must be smaller than table footer in container
-
-
-- ~ Clean UI (table, cards, etc.)
+- Reactivity of tables and details after ALL actions
+- Invite User
+- Small UI pas on tag/status
+- Write test flows
 
 - Find a way to have expire map for pinia stores
 
