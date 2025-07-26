@@ -1,18 +1,17 @@
 <script setup lang="ts">
 // Vue and Store imports
 import { computed, ref, toRefs, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
-import { useRoleStore } from '@/stores/role';
 import { useUserStore } from '@/stores/user';
 
 // Internal utilities and types
-import { parse, ulid } from '@/utils/ulid';
+import { ulid, parse } from '@/utils/ulid';
 import { logger } from "@/config";
-import { ListRoleReq } from '@internal/user/dto/role';
-import type { RolePermission } from '@internal/user/dto/role';
-import { Command } from '@internal/user/role';
+import { ListUserReq } from '@internal/user/dto/user';
+import type { U } from '@internal/user/user';
 
 // PrimeVue UI Components
 import DataTable, {
@@ -35,21 +34,20 @@ import InputIcon from 'primevue/inputicon';
 
 // Form Validation
 import { useConfirm } from 'primevue/useconfirm';
-import router from '@/router';
 
 const props = defineProps<{
-	userId: string;
+	roleId: string;
 	groupId: string;
 }>();
 
+const router = useRouter();
 const authStore = useAuthStore();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
-const roleStore = useRoleStore();
-const { roles, rolesByUser, total } = toRefs(roleStore);
 const userStore = useUserStore();
+const { users, total, usersByRole } = toRefs(userStore);
 const confirm = useConfirm();
 
 const loading = ref(false);
@@ -60,21 +58,16 @@ const group = computed(() => {
 	return groups.value.get(props.groupId) || null;
 });
 
-const userRoleIds = computed(() => {
-	const userHasRoles = new Map<string, boolean>();
-	rolesByUser.value.get(props.userId)?.forEach((ok, roleId) => {
-		if (ok) {
-			userHasRoles.set(roleId, true);
-		}
-	});
-	return userHasRoles;
-});
-
 const views = computed(() => {
-	return viewIDs.value.map((roleId: string) => roles.value?.get(roleId));
+	return viewIDs.value.map((userId: string) => users.value?.get(userId));
 });
 
 const properties = ref<DataTableProps>({});
+
+// Get users who have this role
+const usersWithRole = computed(() => {
+	return usersByRole.value.get(props.roleId) || new Map<string, boolean>();
+});
 
 const list = async (p: DataTableProps = {
 	first: 0,
@@ -96,7 +89,7 @@ const list = async (p: DataTableProps = {
 			order: p.sortOrder === 1 ? 'asc' : 'desc'
 		}] : [{ key: 'created_at', order: 'desc' }];
 
-		const newIDs = await roleStore.list(ListRoleReq.create({
+		const newIDs = await userStore.list(ListUserReq.create({
 			groupIDs: [group.value.group?.iD],
 			search: search.value,
 			paginate: {
@@ -120,21 +113,18 @@ const list = async (p: DataTableProps = {
 	loading.value = false;
 };
 
-const loadRoles = async () => {
-	if (!group.value) return;
-
-	loading.value = true;
+// Load users with this role
+const loadUsersWithRole = async () => {
+	if (!group.value || !props.roleId) return;
 
 	try {
-		await roleStore.list(ListRoleReq.create({
-			userID: parse(props.userId),
+		await userStore.list(ListUserReq.create({
 			groupIDs: [group.value.group?.iD],
+			roleID: parse(props.roleId),
 		}));
 	} catch (e) {
 		errorsStore.showGRPC(e);
 	}
-
-	loading.value = false;
 };
 
 // Handle DataTable lazy loading events
@@ -182,27 +172,28 @@ const onSearch = () => {
 	});
 };
 
-const addRole = async (role: RolePermission) => {
-	if (!role.role) return;
+const addRole = async (user: U) => {
+	if (!user) return;
 
 	try {
 		await userStore.addRole(
-			parse(props.userId),
-			role.role.iD
+			user.iD,
+			parse(props.roleId)
 		);
-		message.value = `Role "${role.role.name}" added to user`;
+		message.value = `Role assigned to user "${getUserDisplayName(user)}"`;
 		success.value = true;
 		await authStore.refreshToken();
+		await loadUsersWithRole();
 	} catch (e) {
 		errorsStore.showGRPC(e);
 	}
 };
 
-const removeRole = (role: RolePermission) => {
-	if (!role.role) return;
+const removeRole = (user: U) => {
+	if (!user) return;
 
 	confirm.require({
-		message: `Are you sure you want to remove the role "${role.role.name}" from this user?`,
+		message: `Are you sure you want to remove this role from user "${getUserDisplayName(user)}"?`,
 		header: 'Remove Role',
 		icon: 'pi pi-exclamation-triangle',
 		rejectProps: {
@@ -215,19 +206,31 @@ const removeRole = (role: RolePermission) => {
 			severity: 'danger'
 		},
 		accept: async () => {
-			if (!role.role) return;
+			if (!user) return;
 
 			try {
 				await userStore.deleteRole(
-					parse(props.userId),
-					role.role.iD
+					user.iD,
+					parse(props.roleId)
 				);
-				message.value = `Role "${role.role.name}" removed from user`;
+				message.value = `Role removed from user "${getUserDisplayName(user)}"`;
 				success.value = true;
 				await authStore.refreshToken();
+				await loadUsersWithRole();
 			} catch (e) {
 				errorsStore.showGRPC(e);
 			}
+		}
+	});
+};
+
+const navigateToUserDetails = (user: U) => {
+	if (!user) return;
+	router.push({
+		name: 'user-details',
+		params: {
+			groupId: props.groupId,
+			userId: ulid(user.iD)
 		}
 	});
 };
@@ -240,10 +243,34 @@ const formatDate = (timestamp: bigint): string => {
 	});
 };
 
+const getUserInitials = (user: U): string => {
+	if (user.firstName && user.lastName) {
+		return (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
+	}
+	return user.email.charAt(0).toUpperCase();
+};
+
+const getUserDisplayName = (user: U): string => {
+	if (user.firstName && user.lastName) {
+		return `${user.firstName} ${user.lastName}`;
+	}
+	return user.email;
+};
+
 // Initialize data on component mount
 onMounted(() => {
-	loadRoles()
-	list()
+	if (group.value) {
+		list();
+		loadUsersWithRole();
+	}
+});
+
+// Watch for group changes
+watch(() => props.groupId, () => {
+	if (group.value) {
+		list();
+		loadUsersWithRole();
+	}
 });
 </script>
 
@@ -255,7 +282,7 @@ onMounted(() => {
 		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
 			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
 			:scrollable="true" scrollHeight="calc(100vh - 16rem)" @page="onPage" @sort="onSort" @filter="onFilter"
-			dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'status', 'created_at']"
+			dataKey="id" filterDisplay="menu" :globalFilterFields="['email', 'name', 'created_at']"
 			tableStyle="min-width: 50rem" :rowsPerPageOptions="[10, 25, 50, 100]"
 			paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 			currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
@@ -266,14 +293,14 @@ onMounted(() => {
 					<div class="flex items-center gap-4">
 						<div class="flex items-center gap-3">
 							<div
-								class="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-400/30 border border-purple-200 dark:border-purple-400/20">
-								<i class="pi pi-shield text-lg text-purple-600 dark:text-purple-300"></i>
+								class="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100 dark:bg-green-400/30 border border-green-200 dark:border-green-400/20">
+								<i class="pi pi-users text-lg text-green-600 dark:text-green-300"></i>
 							</div>
 							<div class="flex flex-col">
-								<h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">User Roles
+								<h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">Role Users
 								</h3>
-								<span class="text-sm text-surface-500 dark:text-surface-400">Roles assigned to this
-									user</span>
+								<span class="text-sm text-surface-500 dark:text-surface-400">Users in group and their
+									role assignment status</span>
 							</div>
 						</div>
 						<div class="flex items-center gap-3 ml-6">
@@ -281,82 +308,78 @@ onMounted(() => {
 								<InputIcon class="pi pi-search text-surface-400" />
 								<InputText type="text"
 									class="w-96 pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-900 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800 transition-all duration-200"
-									placeholder="Search roles by name..." v-model="search" @input="onSearch" />
+									placeholder="Search users by name or email..." v-model="search" @input="onSearch" />
 							</IconField>
 						</div>
 					</div>
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
-							@click="list()" v-tooltip.bottom="'Refresh roles'" />
+							@click="list()" v-tooltip.bottom="'Refresh users'" />
 					</div>
 				</div>
 			</template>
 
-			<Column field="name" header="Role" sortable style="width: 40%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex items-center gap-3">
+			<Column field="user" header="User" sortable style="width: 35%">
+				<template #body="{ data }: { data: U }">
+					<div v-if="data" class="flex items-center gap-3">
 						<div class="relative">
-							<Avatar :label="data.role.name.charAt(0).toUpperCase()" size="large" shape="circle"
-								class="bg-purple-100 dark:bg-purple-400/30 text-purple-600 dark:text-purple-300 border-2 border-purple-200 dark:border-purple-400/20" />
+							<Avatar v-if="data.avatarURL" :image="data.avatarURL" size="large" shape="circle"
+								class="border-2 border-surface-200 dark:border-surface-700" />
+							<Avatar v-else :label="getUserInitials(data)" size="large" shape="circle"
+								class="bg-green-100 dark:bg-green-400/30 text-green-600 dark:text-green-300 border-2 border-green-200 dark:border-green-400/20" />
 						</div>
 						<div class="flex flex-col">
 							<span
-								@click="router.push({ name: 'role-details', params: { groupId: props.groupId, roleId: ulid(data.role.iD) } })"
-								class="font-semibold text-surface-900 dark:text-surface-0 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors duration-200">
-								{{ data.role.name }}
+								class="font-semibold text-surface-900 dark:text-surface-0 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
+								@click="navigateToUserDetails(data)" v-tooltip.top="'View user details'">
+								{{ getUserDisplayName(data) }}
+							</span>
+							<span class="text-sm text-surface-500 dark:text-surface-400">
+								{{ data.email }}
 							</span>
 						</div>
 					</div>
 				</template>
 			</Column>
 
-			<Column field="readPermissions" header="Read" style="width: 8%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.permissions" class="flex items-center gap-2">
-						<i class="pi pi-eye text-blue-500 dark:text-blue-400"></i>
-						<span class="font-medium text-surface-700 dark:text-surface-200">
-							{{data.permissions.filter(p => p.command === Command.C_read).length}}
+			<Column field="name" header="Name" sortable style="width: 20%">
+				<template #body="{ data }: { data: U }">
+					<div v-if="data" class="flex flex-col gap-1">
+						<span class="text-surface-700 dark:text-surface-200">
+							{{ data.firstName && data.lastName ? `${data.lastName} ${data.firstName}` : 'Not provided'
+							}}
 						</span>
 					</div>
 				</template>
 			</Column>
 
-			<Column field="editPermissions" header="Edit" style="width: 8%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.permissions" class="flex items-center gap-2">
-						<i class="pi pi-pencil text-orange-500 dark:text-orange-400"></i>
-						<span class="font-medium text-surface-700 dark:text-surface-200">
-							{{data.permissions.filter(p => p.command === Command.C_edit).length}}
-						</span>
+			<Column field="status" header="Role Status" style="width: 15%">
+				<template #body="{ data }: { data: U }">
+					<div v-if="data" class="flex items-center gap-2">
+						<Tag v-if="usersWithRole.has(ulid(data.iD))" value="Has Role" severity="success" />
+						<Tag v-else value="No Role" severity="secondary" />
 					</div>
 				</template>
 			</Column>
 
-			<Column field="writePermissions" header="Write" style="width: 9%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.permissions" class="flex items-center gap-2">
-						<i class="pi pi-file-edit text-green-500 dark:text-green-400"></i>
-						<span class="font-medium text-surface-700 dark:text-surface-200">
-							{{data.permissions.filter(p => p.command === Command.C_write).length}}
-						</span>
-					</div>
-				</template>
-			</Column>
-
-			<Column field="status" header="Status" style="width: 20%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex items-center gap-2">
-						<Tag v-if="userRoleIds.has(ulid(data.role.iD))" value="Assigned" severity="success" />
-						<Tag v-else value="Not Assigned" severity="secondary" />
+			<Column field="created_at" header="Joined" sortable style="width: 15%">
+				<template #body="{ data }: { data: U }">
+					<div v-if="data" class="flex flex-col gap-1">
+						<div class="flex items-center gap-2">
+							<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
+							<span class="font-medium text-surface-700 dark:text-surface-200">
+								{{ formatDate(data.createdAt) }}
+							</span>
+						</div>
 					</div>
 				</template>
 			</Column>
 
 			<Column field="actions" header="" style="width: 15%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex items-center gap-2 justify-end">
-						<Button v-if="!userRoleIds.has(ulid(data.role.iD))" icon="pi pi-plus" severity="success"
-							outlined size="small" @click="addRole(data)" v-tooltip.top="'Add role'" />
+				<template #body="{ data }: { data: U }">
+					<div v-if="data" class="flex items-center gap-2 justify-end">
+						<Button v-if="!usersWithRole.has(ulid(data.iD))" icon="pi pi-plus" severity="success" outlined
+							size="small" @click="addRole(data)" v-tooltip.top="'Assign role'" />
 						<Button v-else icon="pi pi-minus" severity="danger" outlined size="small"
 							@click="removeRole(data)" v-tooltip.top="'Remove role'" />
 					</div>
@@ -365,11 +388,14 @@ onMounted(() => {
 
 			<template #empty>
 				<div class="text-center p-4">
-					<i class="pi pi-shield text-4xl text-gray-400 mb-4"></i>
-					<p class="text-gray-500">No roles found.</p>
+					<i class="pi pi-users text-4xl text-gray-400 mb-4"></i>
+					<p class="text-gray-500">No users found.</p>
 				</div>
 			</template>
 		</DataTable>
+
+		<!-- Confirm Dialog -->
+		<ConfirmDialog />
 	</div>
 </template>
 

@@ -258,7 +258,7 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 	if f.Paginate != nil {
 		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortRole))
 	} else {
-		b.WriteString(`, 0`)
+		b.WriteString(`, 0 `)
 	}
 	b.WriteString(` FROM "user"."role" r `)
 

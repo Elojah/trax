@@ -202,7 +202,7 @@ func (s Store) ListGroup(ctx context.Context, f user.FilterGroup) ([]user.Group,
 	if f.Paginate != nil {
 		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortGroup))
 	} else {
-		b.WriteString(`, 0`)
+		b.WriteString(`, 0 `)
 	}
 	b.WriteString(` FROM "user"."group" g `)
 

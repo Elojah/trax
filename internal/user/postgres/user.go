@@ -294,7 +294,7 @@ func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error
 	if f.Paginate != nil {
 		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
 	} else {
-		b.WriteString(`, 0`)
+		b.WriteString(`, 0 `)
 	}
 	b.WriteString(`FROM "user"."user" u `)
 
@@ -341,7 +341,7 @@ func (s Store) ListByGroup(ctx context.Context, f user.Filter) (map[string][]use
 	if f.Paginate != nil {
 		b.WriteString(pagpostgres.Paginate(*f.Paginate).RowPartition(sortUser, "r.group_id"))
 	} else {
-		b.WriteString(`, 0`)
+		b.WriteString(`, 0 `)
 	}
 	b.WriteString(`
 	FROM "user"."user" u
@@ -387,7 +387,7 @@ func (s Store) ListByRole(ctx context.Context, f user.Filter) (map[string][]user
 	if f.Paginate != nil {
 		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
 	} else {
-		b.WriteString(`, 0`)
+		b.WriteString(`, 0 `)
 	}
 	b.WriteString(`
 	FROM "user"."user" u

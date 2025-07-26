@@ -11,7 +11,7 @@ import {
   ListGroupResp,
   UpdateGroupReq
 } from '@internal/user/dto/group'
-import { useAuthStore } from './auth'
+import { useAuthStore } from '@/stores/auth'
 import { computed, ref } from 'vue'
 import { parse, ulid } from '@/utils/ulid'
 

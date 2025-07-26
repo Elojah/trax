@@ -3,7 +3,7 @@ import Sidebar from '@/components/Sidebar.vue';
 import Errors from '@/components/Errors.vue';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { onMounted, onUnmounted, ref } from 'vue'
-import { useAuthStore } from './stores/auth';
+import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 const timer = ref();

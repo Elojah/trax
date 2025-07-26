@@ -20,6 +20,11 @@ import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
 import Card from 'primevue/card';
 import Skeleton from 'primevue/skeleton';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 
 // PrimeVue Input Components
 import InputText from 'primevue/inputtext';
@@ -28,6 +33,7 @@ import InputIcon from 'primevue/inputicon';
 
 // Table Components
 import PermissionTable from '@/components/permission/Table.vue';
+import RoleUserTable from '@/components/role/UserTable.vue';
 
 // Form Validation
 import { zodResolver } from '@primevue/forms/resolvers/zod';
@@ -51,6 +57,7 @@ const { success, message } = toRefs(errorsStore);
 const loading = ref(true);
 const roleId = computed(() => route.params.roleId as string);
 const groupId = computed(() => route.params.groupId as string);
+const activeTab = ref("0");
 
 // Dialog states
 const dialogManageRole = ref(false);
@@ -110,7 +117,7 @@ const loadRole = async () => {
 };
 
 const goBack = () => {
-	router.push({ name: 'group-details', params: { id: groupId.value } });
+	router.go(-1);
 };
 
 // Action handlers
@@ -286,139 +293,174 @@ onMounted(() => {
 					</template>
 				</Card>
 
-				<!-- Role Details -->
-				<Card v-else class="shadow-lg border-0">
-					<template #content>
-						<div class="p-8">
-							<!-- Hero Section with Edit Button -->
-							<div class="flex flex-col md:flex-row items-start gap-8 mb-8">
-								<!-- Avatar -->
-								<div class="flex-shrink-0 relative">
-									<Avatar :label="role.role?.name.charAt(0).toUpperCase()" size="xlarge"
-										shape="circle"
-										class="bg-gradient-to-br from-purple-400 to-purple-600 text-white border-4 border-surface-200 dark:border-surface-700 shadow-lg text-4xl font-bold" />
-								</div>
-
-								<!-- Role Info -->
-								<div class="flex-1 min-w-0">
-									<div
-										class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-										<div>
-											<h1 class="text-4xl font-bold text-surface-900 dark:text-surface-0 mb-2">
-												{{ role.role?.name }}
-											</h1>
-											<div class="flex items-center gap-2 text-surface-500 dark:text-surface-400">
-												<i class="pi pi-calendar text-sm"></i>
-												<span class="text-sm">
-													Created {{ formatDate(role.role?.createdAt) }}
-												</span>
-											</div>
-										</div>
-										<div class="flex items-center gap-3">
-											<Button label="" icon="pi pi-cog" outlined severity="primary"
-												class="font-medium" @click="openManageRole"
-												v-tooltip.bottom="'Edit role settings'" />
-										</div>
-									</div>
-
-									<!-- Statistics Cards -->
-									<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
-										<div
-											class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700/50">
-											<div class="flex items-center gap-3">
-												<div
-													class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
-													<i class="pi pi-key text-white text-xl"></i>
-												</div>
-												<div>
-													<p class="text-2xl font-bold text-purple-700 dark:text-purple-300">
-														{{ role.permissions?.length || 0 }}
-													</p>
-													<p class="text-purple-600 dark:text-purple-400 text-sm font-medium">
-														Permission(s)</p>
-												</div>
-											</div>
-										</div>
-
-										<div
-											class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700/50">
-											<div class="flex items-center gap-3">
-												<div
-													class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-													<i class="pi pi-building text-white text-xl"></i>
-												</div>
-												<div>
-													<p class="text-2xl font-bold text-blue-700 dark:text-blue-300">
-														{{ group?.group?.name || 'Unknown' }}
-													</p>
-													<p class="text-blue-600 dark:text-blue-400 text-sm font-medium">
-														Group</p>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<!-- Permissions Section -->
-									<div class="mb-8">
-										<div
-											class="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
-											<div class="flex justify-between items-center mb-4">
-												<h3
-													class="text-lg font-semibold text-surface-900 dark:text-surface-0 flex items-center gap-2">
-													<i class="pi pi-key text-primary-500"></i>
-													Permissions
-												</h3>
-												<Button label="" icon="pi pi-pencil" outlined severity="primary"
-													class="font-medium" @click="openEditPermissions"
-													v-tooltip.bottom="'Edit permissions'" />
-											</div>
-											<PermissionTable :disabled="true" :permissions="role.permissions" />
-										</div>
-									</div>
-
-									<!-- Metadata -->
-									<div
-										class="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
-										<h3
-											class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4 flex items-center gap-2">
-											<i class="pi pi-info text-primary-500"></i>
-											Information
-										</h3>
-										<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-											<div class="flex flex-col gap-2">
-												<h4
-													class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
-													Created
-												</h4>
-												<div class="flex items-center gap-2">
-													<i
-														class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
-													<span class="text-surface-700 dark:text-surface-200">
-														{{ formatDate(role.role?.createdAt) }}
-													</span>
-												</div>
-											</div>
-
-											<div class="flex flex-col gap-2"
-												v-if="role.role?.updatedAt && role.role?.updatedAt !== role.role?.createdAt">
-												<h4
-													class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
-													Last Updated
-												</h4>
-												<div class="flex items-center gap-2">
-													<i class="pi pi-clock text-surface-500 dark:text-surface-400"></i>
-													<span class="text-surface-700 dark:text-surface-200">
-														{{ formatDate(role.role?.updatedAt) }}
-													</span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+				<!-- Role Content with Tabs -->
+				<Tabs v-else v-model:value="activeTab" class="w-full">
+					<TabList>
+						<Tab value="0">
+							<div class="flex items-center gap-2">
+								<i class="pi pi-info-circle"></i>
+								<span>Details</span>
 							</div>
-						</div>
-					</template>
-				</Card>
+						</Tab>
+						<Tab value="1">
+							<div class="flex items-center gap-2">
+								<i class="pi pi-users"></i>
+								<span>Users</span>
+							</div>
+						</Tab>
+					</TabList>
+					<TabPanels>
+						<!-- Details Tab -->
+						<TabPanel value="0">
+							<Card class="shadow-lg border-0">
+								<template #content>
+									<div class="p-8">
+										<!-- Hero Section with Edit Button -->
+										<div class="flex flex-col md:flex-row items-start gap-8 mb-8">
+											<!-- Avatar -->
+											<div class="flex-shrink-0 relative">
+												<Avatar :label="role.role?.name.charAt(0).toUpperCase()" size="xlarge"
+													shape="circle"
+													class="bg-gradient-to-br from-purple-400 to-purple-600 text-white border-4 border-surface-200 dark:border-surface-700 shadow-lg text-4xl font-bold" />
+											</div>
+
+											<!-- Role Info -->
+											<div class="flex-1 min-w-0">
+												<div
+													class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+													<div>
+														<h1
+															class="text-4xl font-bold text-surface-900 dark:text-surface-0 mb-2">
+															{{ role.role?.name }}
+														</h1>
+														<div
+															class="flex items-center gap-2 text-surface-500 dark:text-surface-400">
+															<i class="pi pi-calendar text-sm"></i>
+															<span class="text-sm">
+																Created {{ formatDate(role.role?.createdAt) }}
+															</span>
+														</div>
+													</div>
+													<div class="flex items-center gap-3">
+														<Button label="" icon="pi pi-cog" outlined severity="primary"
+															class="font-medium" @click="openManageRole"
+															v-tooltip.bottom="'Edit role settings'" />
+													</div>
+												</div>
+
+												<!-- Statistics Cards -->
+												<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+													<div
+														class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700/50">
+														<div class="flex items-center gap-3">
+															<div
+																class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+																<i class="pi pi-key text-white text-xl"></i>
+															</div>
+															<div>
+																<p
+																	class="text-2xl font-bold text-purple-700 dark:text-purple-300">
+																	{{ role.permissions?.length || 0 }}
+																</p>
+																<p
+																	class="text-purple-600 dark:text-purple-400 text-sm font-medium">
+																	Permission(s)</p>
+															</div>
+														</div>
+													</div>
+
+													<div
+														class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700/50">
+														<div class="flex items-center gap-3">
+															<div
+																class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+																<i class="pi pi-building text-white text-xl"></i>
+															</div>
+															<div>
+																<p
+																	class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+																	{{ group?.group?.name || 'Unknown' }}
+																</p>
+																<p
+																	class="text-blue-600 dark:text-blue-400 text-sm font-medium">
+																	Group</p>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<!-- Permissions Section -->
+												<div class="mb-8">
+													<div
+														class="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
+														<div class="flex justify-between items-center mb-4">
+															<h3
+																class="text-lg font-semibold text-surface-900 dark:text-surface-0 flex items-center gap-2">
+																<i class="pi pi-key text-primary-500"></i>
+																Permissions
+															</h3>
+															<Button label="" icon="pi pi-pencil" outlined
+																severity="primary" class="font-medium"
+																@click="openEditPermissions"
+																v-tooltip.bottom="'Edit permissions'" />
+														</div>
+														<PermissionTable :disabled="true"
+															:permissions="role.permissions" />
+													</div>
+												</div>
+
+												<!-- Metadata -->
+												<div
+													class="bg-surface-50 dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700">
+													<h3
+														class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4 flex items-center gap-2">
+														<i class="pi pi-info text-primary-500"></i>
+														Information
+													</h3>
+													<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+														<div class="flex flex-col gap-2">
+															<h4
+																class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
+																Created
+															</h4>
+															<div class="flex items-center gap-2">
+																<i
+																	class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
+																<span class="text-surface-700 dark:text-surface-200">
+																	{{ formatDate(role.role?.createdAt) }}
+																</span>
+															</div>
+														</div>
+
+														<div class="flex flex-col gap-2"
+															v-if="role.role?.updatedAt && role.role?.updatedAt !== role.role?.createdAt">
+															<h4
+																class="text-sm font-semibold text-surface-900 dark:text-surface-0 uppercase tracking-wide">
+																Last Updated
+															</h4>
+															<div class="flex items-center gap-2">
+																<i
+																	class="pi pi-clock text-surface-500 dark:text-surface-400"></i>
+																<span class="text-surface-700 dark:text-surface-200">
+																	{{ formatDate(role.role?.updatedAt) }}
+																</span>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</template>
+							</Card>
+						</TabPanel>
+
+						<!-- Users Tab -->
+						<TabPanel value="1">
+							<RoleUserTable :role-id="roleId" :group-id="groupId" />
+						</TabPanel>
+					</TabPanels>
+				</Tabs>
 			</div>
 		</div>
 

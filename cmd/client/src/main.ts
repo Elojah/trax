@@ -9,9 +9,9 @@ import 'primeicons/primeicons.css';
 
 import GoogleSignInPlugin from "vue3-google-signin"
 
-import App from './App.vue'
-import router from './router'
-import { config } from './config'
+import App from '@/App.vue'
+import router from '@/router'
+import { config } from '@/config'
 import { definePreset } from '@primevue/themes';
 
 const app = createApp(App)

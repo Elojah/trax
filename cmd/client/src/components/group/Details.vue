@@ -96,7 +96,7 @@ const loadGroup = async () => {
 };
 
 const goBack = () => {
-	router.push({ name: 'group' });
+	router.go(-1);
 };
 
 // Action handlers

@@ -28,7 +28,7 @@ import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 
 // Table Components
-import UserRoleTable from './RoleTable.vue';
+import UserRoleTable from '@/components/user/RoleTable.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -84,7 +84,7 @@ const loadUser = async () => {
 };
 
 const goBack = () => {
-	router.push({ name: 'group-details', params: { id: groupId.value } });
+	router.go(-1);
 };
 
 const formatDate = (timestamp: bigint | undefined): string => {

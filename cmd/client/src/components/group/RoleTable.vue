@@ -11,6 +11,7 @@ import { useRoleStore } from '@/stores/role';
 import { ulid } from '@/utils/ulid';
 import { logger } from "@/config";
 import { ListRoleReq, RolePermission, CreateRoleReq } from '@internal/user/dto/role';
+import { Command } from '@internal/user/role';
 
 // PrimeVue UI Components
 import DataTable, {
@@ -303,12 +304,34 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="permissions" header="Permissions" style="width: 55%">
+			<Column field="readPermissions" header="Read" style="width: 18%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
-						<i class="pi pi-shield text-surface-500 dark:text-surface-400"></i>
+						<i class="pi pi-eye text-blue-500 dark:text-blue-400"></i>
 						<span class="font-medium text-surface-700 dark:text-surface-200">
-							{{ data.permissions.length }}
+							{{data.permissions.filter(p => p.command === Command.C_read).length}}
+						</span>
+					</div>
+				</template>
+			</Column>
+
+			<Column field="editPermissions" header="Edit" style="width: 18%">
+				<template #body="{ data }: { data: RolePermission }">
+					<div v-if="data?.permissions" class="flex items-center gap-2">
+						<i class="pi pi-pencil text-orange-500 dark:text-orange-400"></i>
+						<span class="font-medium text-surface-700 dark:text-surface-200">
+							{{data.permissions.filter(p => p.command === Command.C_edit).length}}
+						</span>
+					</div>
+				</template>
+			</Column>
+
+			<Column field="writePermissions" header="Write" style="width: 19%">
+				<template #body="{ data }: { data: RolePermission }">
+					<div v-if="data?.permissions" class="flex items-center gap-2">
+						<i class="pi pi-file-edit text-green-500 dark:text-green-400"></i>
+						<span class="font-medium text-surface-700 dark:text-surface-200">
+							{{data.permissions.filter(p => p.command === Command.C_write).length}}
 						</span>
 					</div>
 				</template>
