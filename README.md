@@ -33,9 +33,9 @@ make client && ./bin/trax_web_client config/web_client/local.json
 TODO:
 
 - [x] Reactivity of tables and details after ALL actions
-- Multi roles user bug when listing gorup users
+- [x] Multi roles user bug when listing gorup users
+- [x] Small UI pas on tag/status
 - Invite User
-- Small UI pas on tag/status
 - Write test flows
 
 - Find a way to have expire map for pinia stores

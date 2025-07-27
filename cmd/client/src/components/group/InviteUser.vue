@@ -1,14 +1,14 @@
 <script setup lang="ts">
 // Vue and Store imports
 import { computed, ref, toRefs, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
 import { useRoleStore } from '@/stores/role';
-import { useUserStore } from '@/stores/user';
 
 // Internal utilities and types
-import { parse, ulid } from '@/utils/ulid';
+import { ulid } from '@/utils/ulid';
 import { logger } from "@/config";
 import { ListRoleReq } from '@internal/user/dto/role';
 import type { RolePermission } from '@internal/user/dto/role';
@@ -25,7 +25,7 @@ import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
-import Tag from 'primevue/tag';
+import Checkbox from 'primevue/checkbox';
 
 // PrimeVue Input Components
 import InputText from 'primevue/inputtext';
@@ -33,41 +33,30 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 
 // Form Validation
-import { useConfirm } from 'primevue/useconfirm';
-import router from '@/router';
+import { zodResolver } from '@primevue/forms/resolvers/zod';
+import z from 'zod';
+import { Form, FormField } from '@primevue/forms';
+import type { FormSubmitEvent } from '@primevue/forms';
 
-const props = defineProps<{
-	userId: string;
-	groupId: string;
-}>();
-
+const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const roleStore = useRoleStore();
-const { roles, rolesByUser, total } = toRefs(roleStore);
-const userStore = useUserStore();
-const { users } = toRefs(userStore);
-const confirm = useConfirm();
+const { roles, total } = toRefs(roleStore);
+
+const groupId = computed(() => route.params.groupId as string);
 
 const loading = ref(false);
 const search = ref('');
 const viewIDs = ref<string[]>([]);
+const selectedRoles = ref<string[]>([]);
 
-const group = groups.value.get(props.groupId);
-
-const user = users.value.get(props.userId);
-
-const userRoleIds = computed(() => {
-	const userHasRoles = new Map<string, boolean>();
-	rolesByUser.value.get(ulid(user?.iD))?.forEach((ok, roleId) => {
-		if (ok) {
-			userHasRoles.set(roleId, true);
-		}
-	});
-	return userHasRoles;
+const group = computed(() => {
+	return groups.value.get(groupId.value) || null;
 });
 
 const views = computed(() => {
@@ -76,13 +65,24 @@ const views = computed(() => {
 
 const properties = ref<DataTableProps>({});
 
+// Form validation
+const resolver = zodResolver(
+	z.object({
+		email: z.string().email({ message: 'Please enter a valid email address.' }),
+	})
+);
+
+const initialValues = ref({
+	email: '',
+});
+
 const list = async (p: DataTableProps = {
 	first: 0,
 	rows: 10,
 	sortField: 'created_at',
 	sortOrder: -1,
 }) => {
-	if (!group) {
+	if (!group.value) {
 		viewIDs.value = [];
 		return;
 	}
@@ -97,7 +97,7 @@ const list = async (p: DataTableProps = {
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await roleStore.list(ListRoleReq.create({
-			groupIDs: [group.group?.iD],
+			groupIDs: [group.value.group?.iD],
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
@@ -113,23 +113,6 @@ const list = async (p: DataTableProps = {
 			properties.value = p;
 		}
 
-	} catch (e) {
-		errorsStore.showGRPC(e);
-	}
-
-	loading.value = false;
-};
-
-const loadRoles = async () => {
-	if (!group) return;
-
-	loading.value = true;
-
-	try {
-		await roleStore.list(ListRoleReq.create({
-			userID: user?.iD,
-			groupIDs: [group.group?.iD],
-		}));
 	} catch (e) {
 		errorsStore.showGRPC(e);
 	}
@@ -182,64 +165,55 @@ const onSearch = () => {
 	});
 };
 
-const addRole = async (role: RolePermission) => {
-	if (!role.role) return;
-
-	try {
-		await roleStore.addUser(
-			role.role.iD,
-			user?.iD!,
-		);
-		await userStore.addRole(
-			user?.iD!,
-			role.role.iD,
-			true // dry run to update local state only
-		);
-		message.value = `Role "${role.role.name}" added to user`;
-		success.value = true;
-		await authStore.refreshToken();
-	} catch (e) {
-		errorsStore.showGRPC(e);
+const toggleRoleSelection = (roleId: string) => {
+	const index = selectedRoles.value.indexOf(roleId);
+	if (index > -1) {
+		selectedRoles.value.splice(index, 1);
+	} else {
+		selectedRoles.value.push(roleId);
 	}
 };
 
-const removeRole = (role: RolePermission) => {
-	if (!role.role) return;
+const isRoleSelected = (roleId: string): boolean => {
+	return selectedRoles.value.includes(roleId);
+};
 
-	confirm.require({
-		message: `Are you sure you want to remove the role "${role.role.name}" from this user?`,
-		header: 'Remove Role',
-		icon: 'pi pi-exclamation-triangle',
-		rejectProps: {
-			label: 'Cancel',
-			severity: 'secondary',
-			outlined: true
-		},
-		acceptProps: {
-			label: 'Remove',
-			severity: 'danger'
-		},
-		accept: async () => {
-			if (!role.role) return;
-
-			try {
-				await roleStore.deleteUser(
-					role.role.iD,
-					user?.iD!,
-				);
-				await userStore.deleteRole(
-					user?.iD!,
-					role.role.iD,
-					true
-				);
-				message.value = `Role "${role.role.name}" removed from user`;
-				success.value = true;
-				await authStore.refreshToken();
-			} catch (e) {
-				errorsStore.showGRPC(e);
-			}
-		}
+const goBack = () => {
+	router.push({
+		name: 'group-details',
+		params: { id: groupId.value }
 	});
+};
+
+const inviteUser = async (e: FormSubmitEvent) => {
+	if (!e.valid || !group.value) {
+		logger.error('Invite user form is invalid', e);
+		return;
+	}
+
+	try {
+		// TODO: Implement user invitation logic with selected roles
+		// await userStore.invite(e.states.email.value, group.value.iD, selectedRoles.value);
+		console.log('Inviting user:', e.states.email.value, 'to group:', group.value.group?.name);
+		if (selectedRoles.value.length > 0) {
+			console.log('Selected roles:', selectedRoles.value);
+		}
+	} catch (e) {
+		errorsStore.showGRPC(e);
+		return;
+	}
+
+	message.value = `User ${e.states.email.value} invited successfully${selectedRoles.value.length > 0 ? ` with ${selectedRoles.value.length} role(s)` : ''}`;
+	success.value = true;
+
+	// Reset form and go back to group details
+	e.reset();
+	selectedRoles.value = [];
+
+	// Wait a bit to show the success message, then navigate back
+	setTimeout(() => {
+		goBack();
+	}, 2000);
 };
 
 const formatDate = (timestamp: bigint): string => {
@@ -251,22 +225,79 @@ const formatDate = (timestamp: bigint): string => {
 };
 
 // Initialize data on component mount
-onMounted(() => {
-	loadRoles()
-	list()
+onMounted(async () => {
+	// Load group data if not already loaded
+	if (!group.value) {
+		try {
+			await groupStore.populate([groupId.value]);
+		} catch (e) {
+			errorsStore.showGRPC(e);
+			goBack();
+			return;
+		}
+	}
+
+	if (group.value) {
+		list();
+	}
 });
 </script>
 
 <template>
 	<div class="flex flex-col h-full">
-		<!-- Success Message -->
-		<Message v-if="success && message" severity="success" class="mb-4">{{ message }}</Message>
+		<!-- Page Header -->
+		<div class="flex items-center gap-4 p-6 border-b border-surface-200 dark:border-surface-700">
+			<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="goBack"
+				v-tooltip.bottom="'Back to group'" />
+			<div class="flex items-center gap-3">
+				<div
+					class="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100 dark:bg-green-400/30 border border-green-200 dark:border-green-400/20">
+					<i class="pi pi-user-plus text-lg text-green-600 dark:text-green-300"></i>
+				</div>
+				<div class="flex flex-col">
+					<h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">Invite User</h2>
+					<span class="text-sm text-surface-500 dark:text-surface-400">
+						Send an invitation to join {{ group?.group?.name || 'this group' }}
+					</span>
+				</div>
+			</div>
+		</div>
 
+		<!-- Success Message -->
+		<Message v-if="success && message" severity="success" class="m-6 mb-0">{{ message }}</Message>
+
+		<!-- User Information Form -->
+		<div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800">
+			<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="inviteUser"
+				class="flex items-end gap-6">
+				<FormField v-slot="$field" name="email" class="flex-1">
+					<label for="invite-email" class="block text-color text-base font-medium mb-2">Email Address</label>
+					<IconField icon-position="left" class="w-full">
+						<InputIcon class="pi pi-envelope" />
+						<InputText id="invite-email" name="email" placeholder="Enter user email address" type="email"
+							class="w-full" />
+					</IconField>
+					<Message v-if="$field?.invalid" severity="error" size="small" variant="simple" class="mt-1">{{
+						$field.error?.message
+					}}
+					</Message>
+				</FormField>
+				<div class="flex items-center gap-3">
+					<span class="text-sm text-surface-500 dark:text-surface-400 whitespace-nowrap">
+						{{ selectedRoles.length }} role(s) selected
+					</span>
+					<Button label="Cancel" outlined @click="goBack" />
+					<Button label="Send Invitation" type="submit" />
+				</div>
+			</Form>
+		</div>
+
+		<!-- Role Selection Table -->
 		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
 			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
-			:scrollable="true" scrollHeight="calc(100vh - 16rem)" @page="onPage" @sort="onSort" @filter="onFilter"
-			dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'status', 'created_at']"
-			tableStyle="min-width: 50rem" :rowsPerPageOptions="[10, 25, 50, 100]"
+			:scrollable="true" scrollHeight="calc(100vh - 20rem)" @page="onPage" @sort="onSort" @filter="onFilter"
+			dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
+			:rowsPerPageOptions="[10, 25, 50]"
 			paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 			currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
 
@@ -280,10 +311,10 @@ onMounted(() => {
 								<i class="pi pi-shield text-lg text-purple-600 dark:text-purple-300"></i>
 							</div>
 							<div class="flex flex-col">
-								<h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">User Roles
+								<h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 m-0">Select Roles
 								</h3>
-								<span class="text-sm text-surface-500 dark:text-surface-400">Roles assigned to this
-									user</span>
+								<span class="text-sm text-surface-500 dark:text-surface-400">Choose one or more roles to
+									assign to the user</span>
 							</div>
 						</div>
 						<div class="flex items-center gap-3 ml-6">
@@ -302,7 +333,16 @@ onMounted(() => {
 				</div>
 			</template>
 
-			<Column field="name" header="Role" sortable style="width: 40%">
+			<Column field="select" header="" style="width: 10%">
+				<template #body="{ data }: { data: RolePermission }">
+					<div v-if="data?.role" class="flex justify-center">
+						<Checkbox :modelValue="isRoleSelected(ulid(data.role.iD))"
+							@update:modelValue="toggleRoleSelection(ulid(data.role.iD))" binary />
+					</div>
+				</template>
+			</Column>
+
+			<Column field="name" header="Name" sortable style="width: 40%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.role" class="flex items-center gap-3">
 						<div class="relative">
@@ -310,9 +350,7 @@ onMounted(() => {
 								class="bg-purple-100 dark:bg-purple-400/30 text-purple-600 dark:text-purple-300 border-2 border-purple-200 dark:border-purple-400/20" />
 						</div>
 						<div class="flex flex-col">
-							<span
-								@click="router.push({ name: 'role-details', params: { groupId: ulid(group?.group?.iD), roleId: ulid(data.role.iD) } })"
-								class="font-semibold text-surface-900 dark:text-surface-0 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors duration-200">
+							<span class="font-semibold text-surface-900 dark:text-surface-0">
 								{{ data.role.name }}
 							</span>
 						</div>
@@ -320,7 +358,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="readPermissions" header="Read" style="width: 10%">
+			<Column field="readPermissions" header="Read" style="width: 12%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-eye text-blue-500 dark:text-blue-400"></i>
@@ -331,7 +369,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="editPermissions" header="Edit" style="width: 10%">
+			<Column field="editPermissions" header="Edit" style="width: 12%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-pencil text-orange-500 dark:text-orange-400"></i>
@@ -342,7 +380,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="writePermissions" header="Write" style="width: 10%">
+			<Column field="writePermissions" header="Write" style="width: 12%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-file-edit text-green-500 dark:text-green-400"></i>
@@ -353,25 +391,18 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="status" style="width: 20%">
+			<Column field="created_at" sortable style="width: 14%">
 				<template #header>
-					<span class="flex-1 text-center font-bold">Status</span>
+					<span class="flex-1 text-right font-bold">Created</span>
 				</template>
 				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex items-center justify-center gap-2">
-						<Tag v-if="userRoleIds.has(ulid(data.role.iD))" value="Assigned" severity="success" />
-						<Tag v-else value="Unassigned" severity="secondary" />
-					</div>
-				</template>
-			</Column>
-
-			<Column field="actions" header="" style="width: 10%">
-				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex items-center gap-2 justify-end">
-						<Button v-if="!userRoleIds.has(ulid(data.role.iD))" icon="pi pi-plus" severity="success"
-							outlined size="small" @click="addRole(data)" v-tooltip.top="'Add role'" />
-						<Button v-else icon="pi pi-minus" severity="danger" outlined size="small"
-							@click="removeRole(data)" v-tooltip.top="'Remove role'" />
+					<div v-if="data?.role" class="flex flex-col gap-1 justify-end">
+						<div class="flex items-center gap-2 justify-end">
+							<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
+							<span class="font-medium text-surface-700 dark:text-surface-200">
+								{{ formatDate(data.role.createdAt) }}
+							</span>
+						</div>
 					</div>
 				</template>
 			</Column>

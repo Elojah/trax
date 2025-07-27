@@ -33,6 +33,7 @@ import InputIcon from 'primevue/inputicon';
 
 // Form Validation
 import { useConfirm } from 'primevue/useconfirm';
+import { useRoleStore } from '@/stores/role';
 
 const props = defineProps<{
 	roleId: string;
@@ -47,15 +48,16 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const userStore = useUserStore();
 const { users, total, usersByRole } = toRefs(userStore);
+const roleStore = useRoleStore();
+const { roles } = toRefs(roleStore);
 const confirm = useConfirm();
 
 const loading = ref(false);
 const search = ref('');
 const viewIDs = ref<string[]>([]);
 
-const group = computed(() => {
-	return groups.value.get(props.groupId) || null;
-});
+const group = groups.value.get(props.groupId)
+const role = roles.value.get(props.roleId);
 
 const views = computed(() => {
 	return viewIDs.value.map((userId: string) => users.value?.get(userId));
@@ -65,7 +67,7 @@ const properties = ref<DataTableProps>({});
 
 // Get users who have this role
 const usersWithRole = computed(() => {
-	return usersByRole.value.get(props.roleId) || new Map<string, boolean>();
+	return usersByRole.value.get(ulid(role?.role?.iD)) || new Map<string, boolean>();
 });
 
 const list = async (p: DataTableProps = {
@@ -74,7 +76,7 @@ const list = async (p: DataTableProps = {
 	sortField: 'created_at',
 	sortOrder: -1,
 }) => {
-	if (!group.value) {
+	if (!group) {
 		viewIDs.value = [];
 		return;
 	}
@@ -89,7 +91,7 @@ const list = async (p: DataTableProps = {
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await userStore.list(ListUserReq.create({
-			groupIDs: [group.value.group?.iD],
+			groupIDs: [group.group?.iD],
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
@@ -114,12 +116,12 @@ const list = async (p: DataTableProps = {
 
 // Load users with this role
 const loadUsersWithRole = async () => {
-	if (!group.value || !props.roleId) return;
+	if (!group || !ulid(role?.role?.iD)) return;
 
 	try {
 		await userStore.list(ListUserReq.create({
-			groupIDs: [group.value.group?.iD],
-			roleID: parse(props.roleId),
+			groupIDs: [group.group?.iD],
+			roleID: role?.role?.iD!,
 		}));
 	} catch (e) {
 		errorsStore.showGRPC(e);
@@ -177,7 +179,7 @@ const addRole = async (user: U) => {
 	try {
 		await userStore.addRole(
 			user.iD,
-			parse(props.roleId)
+			role?.role?.iD!,
 		);
 		message.value = `Role assigned to user "${getUserDisplayName(user)}"`;
 		success.value = true;
@@ -210,7 +212,7 @@ const removeRole = (user: U) => {
 			try {
 				await userStore.deleteRole(
 					user.iD,
-					parse(props.roleId)
+					role?.role?.iD!,
 				);
 				message.value = `Role removed from user "${getUserDisplayName(user)}"`;
 				success.value = true;
@@ -258,18 +260,14 @@ const getUserDisplayName = (user: U): string => {
 
 // Initialize data on component mount
 onMounted(() => {
-	if (group.value) {
-		list();
-		loadUsersWithRole();
-	}
+	list();
+	loadUsersWithRole();
 });
 
 // Watch for group changes
 watch(() => props.groupId, () => {
-	if (group.value) {
-		list();
-		loadUsersWithRole();
-	}
+	list();
+	loadUsersWithRole();
 });
 </script>
 

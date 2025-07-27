@@ -22,25 +22,13 @@ import DataTable, {
 } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import ConfirmDialog from 'primevue/confirmdialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
-import Card from 'primevue/card';
-import Skeleton from 'primevue/skeleton';
-import Textarea from 'primevue/textarea';
 
 // PrimeVue Input Components
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
-
-// Form Validation
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import z from 'zod';
-import { Form, FormField } from '@primevue/forms';
-import type { FormSubmitEvent } from '@primevue/forms';
-import { useConfirm } from 'primevue/useconfirm';
 
 const props = defineProps<{
 	groupId: string;
@@ -54,7 +42,6 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const userStore = useUserStore();
 const { users, total } = toRefs(userStore);
-const confirmUser = useConfirm();
 
 const loading = ref(false);
 const search = ref('');
@@ -69,20 +56,6 @@ const views = computed(() => {
 });
 
 const properties = ref<DataTableProps>({});
-
-// Dialog states
-const dialogInviteUser = ref(false);
-
-// Form validation
-const resolver = zodResolver(
-	z.object({
-		email: z.string().email({ message: 'Please enter a valid email address.' }),
-	})
-);
-
-const initialValues = ref({
-	email: '',
-});
 
 const list = async (p: DataTableProps = {
 	first: 0,
@@ -174,33 +147,12 @@ const onSearch = () => {
 };
 
 const openInviteUser = () => {
-	initialValues.value = {
-		email: '',
-	};
-	dialogInviteUser.value = true;
-};
-
-const inviteUser = async (e: FormSubmitEvent) => {
-	if (!e.valid || !group.value) {
-		logger.error('Invite user form is invalid', e);
-		return;
-	}
-
-	try {
-		// TODO: Implement user invitation logic
-		// await userStore.invite(e.states.email.value, group.value.iD);
-		console.log('Inviting user:', e.states.email.value, 'to group:', group.value.group?.name);
-	} catch (e) {
-		errorsStore.showGRPC(e);
-		return;
-	}
-
-	message.value = `User ${e.states.email.value} invited successfully`;
-	success.value = true;
-	dialogInviteUser.value = false;
-	e.reset();
-	await authStore.refreshToken();
-	await list();
+	router.push({
+		name: 'group-invite',
+		params: {
+			groupId: props.groupId
+		}
+	});
 };
 
 const navigateToUserDetails = (user: U) => {
@@ -356,54 +308,6 @@ onMounted(() => {
 				</div>
 			</template>
 		</DataTable>
-
-		<!-- Invite User Dialog -->
-		<Dialog v-model:visible="dialogInviteUser" append-to="body" modal
-			:breakpoints="{ '960px': '75vw', '640px': '80vw' }" :style="{ width: '40rem' }" :draggable="false"
-			:resizable="false" :show-header="false" class="shadow-sm rounded-2xl"
-			:pt="{ content: '!p-6', footer: '!pb-6 !px-6' }">
-			<div class="flex justify-between items-start gap-4">
-				<div class="flex gap-4">
-					<div
-						class="flex items-center justify-center w-9 h-9 bg-green-100 dark:bg-green-400/30 text-green-600 dark:text-green-300 rounded-3xl border border-green-200 dark:border-green-400/20 shrink-0">
-						<i class="pi pi-users !text-xl !leading-none" />
-					</div>
-				</div>
-				<Button icon="pi pi-times" text rounded severity="secondary" class="w-10 h-10 !p-2"
-					@click="dialogInviteUser = false" />
-			</div>
-			<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="inviteUser"
-				class="flex flex-col gap-6">
-				<div class="flex items-start gap-4">
-					<div class="flex-1 flex flex-col gap-2">
-						<h1 class="m-0 text-surface-900 dark:text-surface-0 font-semibold text-xl leading-normal">Invite
-							user
-						</h1>
-						<span class="text-surface-500 dark:text-surface-400 text-base leading-normal">Send an invitation
-							to
-							join this group.</span>
-					</div>
-				</div>
-				<div class="flex flex-col gap-6">
-					<FormField v-slot="$field" name="email" class="flex flex-col gap-2">
-						<label for="invite-email" class="text-color text-base">Email</label>
-						<IconField icon-position="left" class="w-full">
-							<InputIcon class="pi pi-envelope" />
-							<InputText id="invite-email" name="email" placeholder="Enter user email" type="email"
-								class="w-full" />
-						</IconField>
-						<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{
-							$field.error?.message
-						}}
-						</Message>
-					</FormField>
-				</div>
-				<div class="flex justify-end gap-4">
-					<Button label="Cancel" outlined @click="dialogInviteUser = false" />
-					<Button label="Send Invitation" type="submit" />
-				</div>
-			</Form>
-		</Dialog>
 	</div>
 </template>
 
