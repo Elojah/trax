@@ -293,7 +293,10 @@ onMounted(() => {
 			</template>
 		</Column>
 
-		<Column field="created_at" header="Created" sortable style="width: 15%">
+		<Column field="created_at" sortable style="width: 15%">
+			<template #header>
+				<span class="flex-1 text-right font-bold">Created</span>
+			</template>
 			<template #body="{ data }: { data: GroupView }">
 				<div v-if="data" class="flex flex-col gap-1">
 					<div class="flex items-center gap-2">

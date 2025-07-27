@@ -23,7 +23,6 @@ import DataTable, {
 } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import ConfirmDialog from 'primevue/confirmdialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
 import Tag from 'primevue/tag';
@@ -186,9 +185,14 @@ const addRole = async (role: RolePermission) => {
 	if (!role.role) return;
 
 	try {
+		await roleStore.addUser(
+			role.role.iD,
+			parse(props.userId),
+		);
 		await userStore.addRole(
 			parse(props.userId),
-			role.role.iD
+			role.role.iD,
+			true // dry run to update local state only
 		);
 		message.value = `Role "${role.role.name}" added to user`;
 		success.value = true;
@@ -218,9 +222,14 @@ const removeRole = (role: RolePermission) => {
 			if (!role.role) return;
 
 			try {
+				await roleStore.deleteUser(
+					role.role.iD,
+					parse(props.userId),
+				);
 				await userStore.deleteRole(
 					parse(props.userId),
-					role.role.iD
+					role.role.iD,
+					true
 				);
 				message.value = `Role "${role.role.name}" removed from user`;
 				success.value = true;
@@ -310,7 +319,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="readPermissions" header="Read" style="width: 8%">
+			<Column field="readPermissions" header="Read" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-eye text-blue-500 dark:text-blue-400"></i>
@@ -321,7 +330,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="editPermissions" header="Edit" style="width: 8%">
+			<Column field="editPermissions" header="Edit" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-pencil text-orange-500 dark:text-orange-400"></i>
@@ -332,7 +341,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="writePermissions" header="Write" style="width: 9%">
+			<Column field="writePermissions" header="Write" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-file-edit text-green-500 dark:text-green-400"></i>
@@ -343,16 +352,19 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="status" header="Status" style="width: 20%">
+			<Column field="status" style="width: 20%">
+				<template #header>
+					<span class="flex-1 text-center font-bold">Status</span>
+				</template>
 				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex items-center gap-2">
+					<div v-if="data?.role" class="flex items-center justify-center gap-2">
 						<Tag v-if="userRoleIds.has(ulid(data.role.iD))" value="Assigned" severity="success" />
-						<Tag v-else value="Not Assigned" severity="secondary" />
+						<Tag v-else value="Unassigned" severity="secondary" />
 					</div>
 				</template>
 			</Column>
 
-			<Column field="actions" header="" style="width: 15%">
+			<Column field="actions" header="" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.role" class="flex items-center gap-2 justify-end">
 						<Button v-if="!userRoleIds.has(ulid(data.role.iD))" icon="pi pi-plus" severity="success"

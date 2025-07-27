@@ -333,10 +333,13 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="created_at" header="Joined" sortable style="width: 20%">
+			<Column field="created_at" sortable style="width: 20%">
+				<template #header>
+					<span class="flex-1 text-right font-bold">Created</span>
+				</template>
 				<template #body="{ data }: { data: U }">
-					<div v-if="data" class="flex flex-col gap-1">
-						<div class="flex items-center gap-2">
+					<div v-if="data" class="flex flex-col justify-end gap-1">
+						<div class="flex items-center justify-end gap-2">
 							<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
 							<span class="font-medium text-surface-700 dark:text-surface-200">
 								{{ formatDate(data.createdAt) }}

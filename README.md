@@ -32,7 +32,8 @@ make client && ./bin/trax_web_client config/web_client/local.json
 
 TODO:
 
-- Reactivity of tables and details after ALL actions
+- [x] Reactivity of tables and details after ALL actions
+- Multi roles user bug when listing gorup users
 - Invite User
 - Small UI pas on tag/status
 - Write test flows

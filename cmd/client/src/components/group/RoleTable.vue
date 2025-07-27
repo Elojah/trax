@@ -286,7 +286,7 @@ onMounted(() => {
 				</div>
 			</template>
 
-			<Column field="name" header="Name" sortable style="width: 30%">
+			<Column field="name" header="Name" sortable style="width: 40%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.role" class="flex items-center gap-3">
 						<div class="relative">
@@ -304,7 +304,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="readPermissions" header="Read" style="width: 18%">
+			<Column field="readPermissions" header="Read" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-eye text-blue-500 dark:text-blue-400"></i>
@@ -315,7 +315,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="editPermissions" header="Edit" style="width: 18%">
+			<Column field="editPermissions" header="Edit" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-pencil text-orange-500 dark:text-orange-400"></i>
@@ -326,7 +326,7 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="writePermissions" header="Write" style="width: 19%">
+			<Column field="writePermissions" header="Write" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.permissions" class="flex items-center gap-2">
 						<i class="pi pi-file-edit text-green-500 dark:text-green-400"></i>
@@ -337,10 +337,13 @@ onMounted(() => {
 				</template>
 			</Column>
 
-			<Column field="created_at" header="Created" sortable style="width: 15%">
+			<Column field="created_at" sortable style="width: 30%">
+				<template #header>
+					<span class="flex-1 text-right font-bold">Created</span>
+				</template>
 				<template #body="{ data }: { data: RolePermission }">
-					<div v-if="data?.role" class="flex flex-col gap-1">
-						<div class="flex items-center gap-2">
+					<div v-if="data?.role" class="flex flex-col gap-1 justify-end">
+						<div class="flex items-center gap-2 justify-end">
 							<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
 							<span class="font-medium text-surface-700 dark:text-surface-200">
 								{{ formatDate(data.role.createdAt) }}

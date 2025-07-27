@@ -22,7 +22,6 @@ import DataTable, {
 } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import ConfirmDialog from 'primevue/confirmdialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
 import Tag from 'primevue/tag';
@@ -319,7 +318,7 @@ watch(() => props.groupId, () => {
 				</div>
 			</template>
 
-			<Column field="user" header="User" sortable style="width: 35%">
+			<Column field="user" header="User" sortable style="width: 40%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex items-center gap-3">
 						<div class="relative">
@@ -342,7 +341,7 @@ watch(() => props.groupId, () => {
 				</template>
 			</Column>
 
-			<Column field="name" header="Name" sortable style="width: 20%">
+			<Column field="name" header="Name" sortable style="width: 25%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex flex-col gap-1">
 						<span class="text-surface-700 dark:text-surface-200">
@@ -353,29 +352,19 @@ watch(() => props.groupId, () => {
 				</template>
 			</Column>
 
-			<Column field="status" header="Role Status" style="width: 15%">
+			<Column field="status" style="width: 25%">
+				<template #header>
+					<span class="flex-1 text-center font-bold">Status</span>
+				</template>
 				<template #body="{ data }: { data: U }">
-					<div v-if="data" class="flex items-center gap-2">
-						<Tag v-if="usersWithRole.has(ulid(data.iD))" value="Has Role" severity="success" />
-						<Tag v-else value="No Role" severity="secondary" />
+					<div v-if="data" class="flex items-center justify-center gap-2">
+						<Tag v-if="usersWithRole.has(ulid(data.iD))" value="Assigned" severity="success" />
+						<Tag v-else value="Unassigned" severity="secondary" />
 					</div>
 				</template>
 			</Column>
 
-			<Column field="created_at" header="Joined" sortable style="width: 15%">
-				<template #body="{ data }: { data: U }">
-					<div v-if="data" class="flex flex-col gap-1">
-						<div class="flex items-center gap-2">
-							<i class="pi pi-calendar text-surface-500 dark:text-surface-400"></i>
-							<span class="font-medium text-surface-700 dark:text-surface-200">
-								{{ formatDate(data.createdAt) }}
-							</span>
-						</div>
-					</div>
-				</template>
-			</Column>
-
-			<Column field="actions" header="" style="width: 15%">
+			<Column field="actions" header="" style="width: 10%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex items-center gap-2 justify-end">
 						<Button v-if="!usersWithRole.has(ulid(data.iD))" icon="pi pi-plus" severity="success" outlined
@@ -393,9 +382,6 @@ watch(() => props.groupId, () => {
 				</div>
 			</template>
 		</DataTable>
-
-		<!-- Confirm Dialog -->
-		<ConfirmDialog />
 	</div>
 </template>
 

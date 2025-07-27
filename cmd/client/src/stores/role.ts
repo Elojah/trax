@@ -83,13 +83,13 @@ export const useRoleStore = defineStore('role', () => {
   }
 
   // Add user to role
-  const addUser = async function (roleID: Uint8Array, userID: Uint8Array) {
+  const addUser = async function (roleID: Uint8Array, userID: Uint8Array, dry: boolean = false) {
     try {
       // zero case exception, dry update local only
-      if (ulid(userID) === ulid(zero)) {
+      if (dry) {
         const roles = rolesByUser.value.get(ulid(userID)) ?? new Map()
-        roles?.set(ulid(zero), true)
-        rolesByUser.value.set(ulid(roleID), roles)
+        roles?.set(ulid(roleID), true)
+        rolesByUser.value.set(ulid(userID), roles)
 
         return
       }
@@ -111,12 +111,12 @@ export const useRoleStore = defineStore('role', () => {
   }
 
 
-  const deleteUser = async function (roleID: Uint8Array, userID: Uint8Array) {
+  const deleteUser = async function (roleID: Uint8Array, userID: Uint8Array, dry: boolean = false) {
     try {
       // zero case exception, dry update local only
-      if (ulid(userID) === ulid(zero)) {
+      if (dry) {
         const roles = rolesByUser.value.get(ulid(userID)) ?? new Map()
-        roles?.delete(ulid(zero))
+        roles?.delete(ulid(roleID))
         rolesByUser.value.set(ulid(userID), roles)
 
         return

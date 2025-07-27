@@ -290,7 +290,7 @@ func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
+	b.WriteString(`SELECT DISTINCT ON (u.id) u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
 	if f.Paginate != nil {
 		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
 	} else {
@@ -298,7 +298,7 @@ func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error
 	}
 	b.WriteString(`FROM "user"."user" u `)
 
-	if f.GroupIDs != nil {
+	if f.GroupIDs != nil || f.RoleID != nil || len(f.RoleIDs) > 0 {
 		b.WriteString(`
 			JOIN "user"."role_user" ru ON u.id = ru.user_id
 			JOIN "user"."role" r ON ru.role_id = r.id
