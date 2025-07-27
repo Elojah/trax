@@ -246,9 +246,9 @@ onMounted(async () => {
 <template>
 	<div class="flex flex-col h-full">
 		<!-- Page Header -->
-		<div class="flex items-center gap-4 p-6 border-b border-surface-200 dark:border-surface-700">
+		<div class="flex items-center gap-4 px-8 py-4 border-b border-surface-200 dark:border-surface-700">
 			<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="goBack"
-				v-tooltip.bottom="'Back to group'" />
+				v-tooltip.bottom="'Back'" />
 			<div class="flex items-center gap-3">
 				<div
 					class="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100 dark:bg-green-400/30 border border-green-200 dark:border-green-400/20">

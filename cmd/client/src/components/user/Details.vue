@@ -126,7 +126,7 @@ onMounted(() => {
 			class="flex justify-between items-center px-8 py-4 bg-surface-0 dark:bg-surface-950 border-b border-surface-200 dark:border-surface-700">
 			<div class="flex items-center gap-4">
 				<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="goBack"
-					v-tooltip.bottom="'Back to group'" />
+					v-tooltip.bottom="'Back'" />
 				<div class="flex items-center gap-3">
 					<div
 						class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-400/30 border border-blue-200 dark:border-blue-400/20">
@@ -172,7 +172,7 @@ onMounted(() => {
 							<p class="text-surface-500 dark:text-surface-400 mb-4">
 								The user you're looking for doesn't exist or you don't have permission to view it.
 							</p>
-							<Button label="Back to Group" icon="pi pi-arrow-left" @click="goBack" />
+							<Button label="Back" icon="pi pi-arrow-left" @click="goBack" />
 						</div>
 					</template>
 				</Card>
