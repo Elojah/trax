@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
 import Signin from '@/views/Signin.vue'
 import Signup from '@/views/Signup.vue'
-import User from '@/views/User.vue'
 import Map from '@/views/Map.vue'
 import Group from '@/views/Group.vue'
 import GroupDetails from '@/components/group/Details.vue'
@@ -40,12 +39,6 @@ const router = createRouter({
       name: 'signup',
       component: Signup,
       meta: { missingAuth: true }
-    },
-    {
-      path: '/user',
-      name: 'user',
-      component: User,
-      meta: { requiresAuth: true }
     },
     {
       path: '/group',

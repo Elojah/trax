@@ -117,6 +117,15 @@ func (h *handler) UpdateRole(ctx context.Context, req *dto.UpdateRoleReq) (*dto.
 
 				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 			}
+		} else {
+			permissions, err = h.user.ListPermission(ctx, user.FilterPermission{
+				RoleID: r.ID,
+			})
+			if err != nil {
+				logger.Error().Err(err).Msg("failed to list permissions")
+
+				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+			}
 		}
 
 		roles, err := h.user.UpdateRole(ctx, user.FilterRole{

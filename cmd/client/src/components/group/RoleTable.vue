@@ -58,9 +58,7 @@ const search = ref('');
 const viewIDs = ref<string[]>([]);
 const permissions = ref()
 
-const group = computed(() => {
-	return groups.value.get(props.groupId) || null;
-});
+const group = groups.value.get(props.groupId) || null;
 
 const views = computed(() => {
 	return viewIDs.value.map((roleId: string) => roles.value?.get(roleId));
@@ -88,7 +86,7 @@ const list = async (p: DataTableProps = {
 	sortField: 'created_at',
 	sortOrder: -1,
 }) => {
-	if (!group.value) {
+	if (!group) {
 		viewIDs.value = [];
 		return;
 	}
@@ -103,7 +101,7 @@ const list = async (p: DataTableProps = {
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await roleStore.list(ListRoleReq.create({
-			groupIDs: [group.value.group?.iD],
+			groupIDs: [group.group?.iD],
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
@@ -190,14 +188,14 @@ const navigateToRoleDetails = (role: RolePermission) => {
 };
 
 const create = async (e: FormSubmitEvent) => {
-	if (!e.valid || !group.value) {
+	if (!e.valid || !group) {
 		logger.error('Create role form is invalid', e);
 		return;
 	}
 
 	try {
 		await roleStore.create(
-			group.value.group?.iD!,
+			group.group?.iD!,
 			e.states.name.value,
 			permissions.value?.selected() || [],
 		);
@@ -233,7 +231,7 @@ const short = (description: string): string => {
 
 // Initialize data on component mount
 onMounted(() => {
-	if (group.value) {
+	if (group) {
 		list();
 	}
 });

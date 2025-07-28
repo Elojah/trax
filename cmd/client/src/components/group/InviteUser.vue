@@ -48,16 +48,14 @@ const { groups } = toRefs(groupStore);
 const roleStore = useRoleStore();
 const { roles, total } = toRefs(roleStore);
 
-const groupId = computed(() => route.params.groupId as string);
+const groupId = route.params.groupId as string
 
 const loading = ref(false);
 const search = ref('');
 const viewIDs = ref<string[]>([]);
 const selectedRoles = ref<string[]>([]);
 
-const group = computed(() => {
-	return groups.value.get(groupId.value) || null;
-});
+const group = groups.value.get(groupId) || null;
 
 const views = computed(() => {
 	return viewIDs.value.map((roleId: string) => roles.value?.get(roleId));
@@ -82,7 +80,7 @@ const list = async (p: DataTableProps = {
 	sortField: 'created_at',
 	sortOrder: -1,
 }) => {
-	if (!group.value) {
+	if (!group) {
 		viewIDs.value = [];
 		return;
 	}
@@ -97,7 +95,7 @@ const list = async (p: DataTableProps = {
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await roleStore.list(ListRoleReq.create({
-			groupIDs: [group.value.group?.iD],
+			groupIDs: [group.group?.iD],
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
@@ -181,20 +179,20 @@ const isRoleSelected = (roleId: string): boolean => {
 const goBack = () => {
 	router.push({
 		name: 'group-details',
-		params: { id: groupId.value }
+		params: { id: groupId }
 	});
 };
 
 const inviteUser = async (e: FormSubmitEvent) => {
-	if (!e.valid || !group.value) {
+	if (!e.valid || !group) {
 		logger.error('Invite user form is invalid', e);
 		return;
 	}
 
 	try {
 		// TODO: Implement user invitation logic with selected roles
-		// await userStore.invite(e.states.email.value, group.value.iD, selectedRoles.value);
-		console.log('Inviting user:', e.states.email.value, 'to group:', group.value.group?.name);
+		// await userStore.invite(e.states.email.value, group.iD, selectedRoles.value);
+		console.log('Inviting user:', e.states.email.value, 'to group:', group.group?.name);
 		if (selectedRoles.value.length > 0) {
 			console.log('Selected roles:', selectedRoles.value);
 		}
@@ -227,9 +225,9 @@ const formatDate = (timestamp: bigint): string => {
 // Initialize data on component mount
 onMounted(async () => {
 	// Load group data if not already loaded
-	if (!group.value) {
+	if (!group) {
 		try {
-			await groupStore.populate([groupId.value]);
+			await groupStore.populate([groupId]);
 		} catch (e) {
 			errorsStore.showGRPC(e);
 			goBack();
@@ -237,7 +235,7 @@ onMounted(async () => {
 		}
 	}
 
-	if (group.value) {
+	if (group) {
 		list();
 	}
 });

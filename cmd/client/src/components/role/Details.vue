@@ -50,13 +50,13 @@ const groupStore = useGroupStore();
 const errorsStore = useErrorsStore();
 const confirm = useConfirm();
 
-const { roles } = roleStore;
-const { groups } = groupStore;
+const { roles } = toRefs(roleStore);
+const { groups } = toRefs(groupStore);
 const { success, message } = toRefs(errorsStore);
 
 const loading = ref(true);
-const roleId = computed(() => route.params.roleId as string);
-const groupId = computed(() => route.params.groupId as string);
+const roleId = route.params.roleId as string;
+const groupId = route.params.groupId as string;
 const activeTab = ref("0");
 
 // Dialog states
@@ -78,19 +78,16 @@ const initialValues = ref({
 const permissionTableRef = ref();
 
 const role = computed(() => {
-	if (!roleId.value) return null;
-	return roles.get(roleId.value) || null;
+	return roles.value.get(roleId) || null;
 });
 
 const group = computed(() => {
-	if (!groupId.value) return null;
-	return groups.get(groupId.value) || null;
+	return groups.value.get(groupId) || null;
 });
 
-
 const loadRole = async () => {
-	if (!roleId.value || !groupId.value) {
-		router.push({ name: 'group-details', params: { id: groupId.value } });
+	if (!roleId || !groupId) {
+		router.push({ name: 'group-details', params: { id: groupId } });
 		return;
 	}
 
@@ -98,18 +95,18 @@ const loadRole = async () => {
 
 	try {
 		// Load group data
-		await groupStore.populate([groupId.value]);
+		await groupStore.populate([groupId]);
 	} catch (e) {
 		errorsStore.showGRPC(e);
-		router.push({ name: 'group-details', params: { id: groupId.value } });
+		router.push({ name: 'group-details', params: { id: groupId } });
 	}
 
 	try {
 		// Load role data
-		await roleStore.populate([roleId.value], [groupId.value]);
+		await roleStore.populate([roleId], [groupId]);
 	} catch (e) {
 		errorsStore.showGRPC(e);
-		router.push({ name: 'group-details', params: { id: groupId.value } });
+		router.push({ name: 'group-details', params: { id: groupId } });
 		return;
 	}
 
@@ -212,7 +209,7 @@ const deleteRoleAction = () => {
 			success.value = true;
 			await authStore.refreshToken();
 			// Navigate back to group after deletion
-			router.push({ name: 'group-details', params: { id: groupId.value } });
+			router.push({ name: 'group-details', params: { id: groupId } });
 		}
 	});
 };

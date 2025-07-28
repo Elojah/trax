@@ -45,7 +45,7 @@ export const useRoleStore = defineStore('role', () => {
     try {
       const resp = await api.updateRole(req, { meta: { token: token.value } })
 
-      roles.value?.set(ulid(resp.response.iD), resp.response)
+      roles.value?.set(ulid(resp.response.role?.iD), resp.response)
     } catch (err: any) {
       logger.error(err)
       throw err

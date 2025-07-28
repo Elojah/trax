@@ -47,9 +47,7 @@ const loading = ref(false);
 const search = ref('');
 const viewIDs = ref<string[]>([]);
 
-const group = computed(() => {
-	return groups.value.get(props.groupId) || null;
-});
+const group = groups.value.get(props.groupId) || null;
 
 const views = computed(() => {
 	return viewIDs.value.map((userId: string) => users.value?.get(userId));
@@ -63,7 +61,7 @@ const list = async (p: DataTableProps = {
 	sortField: 'created_at',
 	sortOrder: -1,
 }) => {
-	if (!group.value) {
+	if (!group) {
 		viewIDs.value = [];
 		return;
 	}
@@ -78,7 +76,7 @@ const list = async (p: DataTableProps = {
 		}] : [{ key: 'created_at', order: 'desc' }];
 
 		const newIDs = await userStore.list(ListUserReq.create({
-			groupIDs: [group.value.group?.iD],
+			groupIDs: [group.group?.iD],
 			search: search.value,
 			paginate: {
 				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
@@ -190,7 +188,7 @@ const getUserDisplayName = (user: U): string => {
 
 // Initialize data on component mount
 onMounted(() => {
-	if (group.value) {
+	if (group) {
 		list();
 	}
 });

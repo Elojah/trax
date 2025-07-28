@@ -9,7 +9,6 @@ import { useUserStore } from '@/stores/user';
 
 // Internal utilities and types
 import { parse, ulid } from '@/utils/ulid';
-import { logger } from "@/config";
 import { ListRoleReq } from '@internal/user/dto/role';
 import type { RolePermission } from '@internal/user/dto/role';
 import { Command } from '@internal/user/role';

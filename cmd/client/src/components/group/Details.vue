@@ -47,11 +47,11 @@ const store = useGroupStore();
 const errorsStore = useErrorsStore();
 const confirm = useConfirm();
 
-const { groups } = store;
+const { groups } = toRefs(store);
 const { success, message } = toRefs(errorsStore);
 
 const loading = ref(true);
-const groupId = computed(() => route.params.id as string);
+const groupId = route.params.id as string;
 const activeTab = ref("0");
 
 // Dialog states
@@ -73,12 +73,11 @@ const initialValues = ref({
 });
 
 const group = computed(() => {
-	if (!groupId.value) return null;
-	return groups.get(groupId.value) || null;
+	return groups.value.get(groupId) || null;
 });
 
 const loadGroup = async () => {
-	if (!groupId.value) {
+	if (!groupId) {
 		router.push({ name: 'group' });
 		return;
 	}
@@ -86,7 +85,7 @@ const loadGroup = async () => {
 	loading.value = true;
 
 	try {
-		await store.populate([groupId.value]);
+		await store.populate([groupId]);
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		router.push({ name: 'group' });

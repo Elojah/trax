@@ -21,7 +21,6 @@ const groupStore = useGroupStore();
 const {
 	selected: selectedGroups,
 } = toRefs(groupStore);
-const selectedGroupID = computed(() => ulid(selectedGroups.value.at(0)?.group?.iD));
 
 // Define the resource and command labels for display
 const resourceLabels: Record<Resource, string> = {

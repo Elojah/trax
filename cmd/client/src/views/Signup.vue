@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import Signup from '@/components/sign/Signup.vue';
+import suntornado from '@/assets/sun-tornado.svg?url';
 
 </script>
 <template>
-	<div class="px-12 py-20 md:px-12 lg:px-20 bg-no-repeat bg-cover w-full" style="
-            background:
-                linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%),
-                linear-gradient(0deg, var(--p-primary-500) 0%, var(--p-primary-500) 100%),
-                url('https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/signin/signin-feature.jpg') lightgray 50% / cover no-repeat;
-            background-blend-mode: normal, overlay, normal;
-        ">
+	<div class="min-h-screen h-full px-12 py-20 md:px-12 lg:px-20 bg-no-repeat bg-cover w-full" :style='{
+		background: `url("${suntornado}") no-repeat center center/cover`,
+		backgroundBlendMode: "normal, overlay, normal"
+	}'>
 		<div class="flex flex-wrap">
 			<div
 				class="md:flex hidden w-full md:w-6/12 p-16 bg-white/80 dark:bg-surface-950/70 backdrop-blur-sm rounded-l-2xl flex-col gap-10">

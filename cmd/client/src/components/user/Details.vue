@@ -32,34 +32,25 @@ import UserRoleTable from '@/components/user/RoleTable.vue';
 
 const route = useRoute();
 const router = useRouter();
-const authStore = useAuthStore();
 const userStore = useUserStore();
 const groupStore = useGroupStore();
-const roleStore = useRoleStore();
 const errorsStore = useErrorsStore();
 
-const { users } = userStore;
-const { groups } = groupStore;
+const { users } = toRefs(userStore);
 const { success, message } = toRefs(errorsStore);
 
 const loading = ref(true);
-const userId = computed(() => route.params.userId as string);
-const groupId = computed(() => route.params.groupId as string);
+const userId = route.params.userId as string
+const groupId = route.params.groupId as string
 const activeTab = ref("0");
 
 const user = computed(() => {
-	if (!userId.value) return null;
-	return users.get(userId.value) || null;
-});
-
-const group = computed(() => {
-	if (!groupId.value) return null;
-	return groups.get(groupId.value) || null;
+	return users.value.get(userId) || null;
 });
 
 const loadUser = async () => {
-	if (!userId.value || !groupId.value) {
-		router.push({ name: 'group-details', params: { id: groupId.value } });
+	if (!userId || !groupId) {
+		router.push({ name: 'group-details', params: { id: groupId } });
 		return;
 	}
 
@@ -67,17 +58,17 @@ const loadUser = async () => {
 
 	try {
 		// Load group data
-		await groupStore.populate([groupId.value]);
+		await groupStore.populate([groupId]);
 	} catch (e) {
 		errorsStore.showGRPC(e);
-		router.push({ name: 'group-details', params: { id: groupId.value } });
+		router.push({ name: 'group-details', params: { id: groupId } });
 	}
 
 	try {
-		await userStore.populate([userId.value], [groupId.value]);
+		await userStore.populate([userId], [groupId]);
 	} catch (e) {
 		errorsStore.showGRPC(e);
-		router.push({ name: 'group-details', params: { id: groupId.value } });
+		router.push({ name: 'group-details', params: { id: groupId } });
 	}
 
 	loading.value = false;
