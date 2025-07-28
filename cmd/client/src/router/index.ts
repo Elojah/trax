@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
-import Sign from '@/views/Sign.vue'
+import Signin from '@/views/Signin.vue'
+import Signup from '@/views/Signup.vue'
 import User from '@/views/User.vue'
 import Map from '@/views/Map.vue'
 import Group from '@/views/Group.vue'
@@ -29,9 +30,15 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/sign',
-      name: 'sign',
-      component: Sign,
+      path: '/signin',
+      name: 'signin',
+      component: Signin,
+      meta: { missingAuth: true }
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: Signup,
       meta: { missingAuth: true }
     },
     {
@@ -84,7 +91,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth) && !authStore.user) {
     authStore.refreshToken().then(() => {
       if (!authStore.user) {
-        next({ name: 'sign' })
+        next({ name: 'signin' })
       } else {
         next()
       }

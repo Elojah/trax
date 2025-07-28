@@ -131,7 +131,8 @@ const signInGoogleError = async function (error: any) {
       <Button label="Login" class="w-full" type="submit" />
       <div class="text-center">
         <span class="text-surface-600 dark:text-surface-300">Don't have an account? </span>
-        <span class="text-primary font-medium cursor-pointer hover:text-primary-emphasis">Sign up</span>
+        <router-link to="/signup" class="text-primary font-medium cursor-pointer hover:text-primary-emphasis">Sign
+          up</router-link>
       </div>
       <Divider align="center">
         <span class="text-surface-500 dark:text-surface-400">or</span>
