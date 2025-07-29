@@ -27,6 +27,9 @@ type S struct {
 	user.StorePermission
 	user.StoreRoleUser
 
+	user.StoreInvitation
+	user.StoreInvitationRole
+
 	Cookie cookie.Service
 }
 

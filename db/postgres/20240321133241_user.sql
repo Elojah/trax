@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS "user"."user" (
 	UNIQUE ("email"),
 	UNIQUE ("google_id")
 );
+CREATE INDEX idx_user_created_at ON "user"."user" ("created_at");
+CREATE INDEX idx_user_updated_at ON "user"."user" ("updated_at");
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin

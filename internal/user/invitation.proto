@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package user;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_registration) = true;
+
+option go_package = "github.com/elojah/trax/internal/user";
+
+import "pkg/gogoproto/gogo.proto";
+
+message Invitation {
+	bytes ID                   = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+
+	string Email               = 2;
+
+	int64 CreatedAt            = 3;
+	int64 UpdatedAt            = 4;
+}
+
+message InvitationRole {
+	bytes InvitationID         = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes RoleID               = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+
+	int64 CreatedAt            = 3;
+	int64 UpdatedAt            = 4;
+}

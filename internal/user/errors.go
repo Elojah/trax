@@ -94,3 +94,18 @@ type ErrForbiddenAdminRole struct{}
 func (e ErrForbiddenAdminRole) Error() string {
 	return fmt.Sprintf("admin role cannot be updated")
 }
+
+type ErrEmptyEmail struct{}
+
+func (e ErrEmptyEmail) Error() string {
+	return fmt.Sprintf("empty email")
+}
+
+type ErrInvalidEmailLength struct {
+	Email  string
+	Length int
+}
+
+func (e ErrInvalidEmailLength) Error() string {
+	return fmt.Sprintf("invalid email length %d : %s", e.Length, e.Email)
+}

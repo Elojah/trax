@@ -22,6 +22,9 @@ type Service interface {
 	StorePermission
 	StoreRoleUser
 
+	StoreInvitation
+	StoreInvitationRole
+
 	CreateJWT(context.Context, U, string, time.Duration) (string, error)
 	ReadJWT(context.Context, string) (Claims, error)
 

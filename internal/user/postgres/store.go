@@ -12,4 +12,7 @@ var _ user.StoreRole = (*Store)(nil)
 var _ user.StorePermission = (*Store)(nil)
 var _ user.StoreRoleUser = (*Store)(nil)
 
+var _ user.StoreInvitation = (*Store)(nil)
+var _ user.StoreInvitationRole = (*Store)(nil)
+
 type Store struct{}
