@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -31,7 +31,7 @@ func (s *Service) Dial(ctx context.Context, cfg Config) error {
 	if cfg.CSR != "" {
 		pool = x509.NewCertPool()
 
-		pem, err := ioutil.ReadFile(cfg.CSR)
+		pem, err := os.ReadFile(cfg.CSR)
 		if err != nil {
 			return err
 		}

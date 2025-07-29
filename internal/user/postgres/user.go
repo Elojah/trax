@@ -120,7 +120,7 @@ func (f filter) where(n int) (string, []any) {
 	if len(f.Search) > 0 {
 		clause = append(clause, fmt.Sprintf(`( u.email ILIKE $%d OR u.first_name ILIKE $%d OR u.last_name ILIKE $%d )`, n, n+1, n+2))
 		args = append(args, "%"+f.Search+"%", "%"+f.Search+"%", "%"+f.Search+"%")
-		n += 3
+		// n += 3
 	}
 
 	b := strings.Builder{}

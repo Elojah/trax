@@ -78,7 +78,7 @@ func (f filterPermission) where() (string, []any) {
 	if f.Command != nil {
 		clause = append(clause, fmt.Sprintf(`p.command = $%d`, n))
 		args = append(args, f.Command.String())
-		n++
+		// n++
 	}
 
 	b := strings.Builder{}

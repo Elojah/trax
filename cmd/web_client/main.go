@@ -18,7 +18,6 @@ import (
 	tlog "github.com/elojah/trax/pkg/log"
 	"github.com/elojah/trax/pkg/redis"
 	"github.com/elojah/trax/pkg/shutdown"
-	"github.com/hashicorp/go-multierror"
 	"github.com/rs/zerolog/log"
 	_ "google.golang.org/grpc/encoding/gzip"
 )
@@ -29,24 +28,6 @@ const (
 )
 
 var version string
-
-type closer interface {
-	Close(context.Context) error
-}
-
-type closers []closer
-
-func (cs closers) Close(ctx context.Context) error {
-	var result *multierror.Error
-
-	for _, c := range cs {
-		if c != nil {
-			result = multierror.Append(result, c.Close(ctx))
-		}
-	}
-
-	return result.ErrorOrNil()
-}
 
 // run services.
 func run(prog string, filename string) {

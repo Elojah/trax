@@ -75,7 +75,7 @@ func (f filterGroup) where(n int) (string, []any) {
 	if len(f.Search) > 0 {
 		clause = append(clause, fmt.Sprintf(`g.name ILIKE $%d`, n))
 		args = append(args, "%"+f.Search+"%")
-		n++
+		// n++
 	}
 
 	b := strings.Builder{}

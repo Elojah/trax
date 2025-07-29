@@ -16,13 +16,13 @@ func (e ErrInvalidClaims) Error() string {
 type ErrInvalidPassword struct{}
 
 func (e ErrInvalidPassword) Error() string {
-	return fmt.Sprintf("invalid password")
+	return "invalid password"
 }
 
 type ErrEmptyName struct{}
 
 func (e ErrEmptyName) Error() string {
-	return fmt.Sprintf("empty name")
+	return "empty name"
 }
 
 type ErrInvalidNameLength struct {
@@ -70,7 +70,7 @@ func (e ErrUnauthorizedRole) Error() string {
 type ErrEmptyPermissions struct{}
 
 func (e ErrEmptyPermissions) Error() string {
-	return fmt.Sprintf("missing permissions")
+	return "missing permissions"
 }
 
 type ErrUnknownResource struct {
@@ -92,13 +92,13 @@ func (e ErrUnknownCommand) Error() string {
 type ErrForbiddenAdminRole struct{}
 
 func (e ErrForbiddenAdminRole) Error() string {
-	return fmt.Sprintf("admin role cannot be updated")
+	return "admin role cannot be updated"
 }
 
 type ErrEmptyEmail struct{}
 
 func (e ErrEmptyEmail) Error() string {
-	return fmt.Sprintf("empty email")
+	return "empty email"
 }
 
 type ErrInvalidEmailLength struct {

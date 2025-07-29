@@ -64,7 +64,7 @@ func (f filterInvitationRole) where(n int) (string, []any) {
 	if len(f.RoleIDs) > 0 {
 		clause = append(clause, fmt.Sprintf(`ir.role_id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
 		args = append(args, ulid.IDs(f.RoleIDs).Any()...)
-		n += len(f.RoleIDs)
+		// n += len(f.RoleIDs)
 	}
 
 	b := strings.Builder{}

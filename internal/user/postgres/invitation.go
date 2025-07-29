@@ -81,7 +81,7 @@ func (f filterInvitation) where(n int) (string, []any) {
 	if len(f.Search) > 0 {
 		clause = append(clause, fmt.Sprintf(`i.email ILIKE $%d`, n))
 		args = append(args, "%"+f.Search+"%")
-		n++
+		// n++
 	}
 
 	b := strings.Builder{}

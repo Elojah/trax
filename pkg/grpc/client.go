@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Client struct {
@@ -14,10 +15,7 @@ type Client struct {
 }
 
 func (c *Client) Dial(ctx context.Context, cfg ConfigClient) error {
-	var err error
-
-	// default to insecure connection except if cert/key provided in config
-	secureOption := grpc.WithInsecure()
+	var creds credentials.TransportCredentials
 
 	if cfg.Cert != "" && cfg.Key != "" {
 		cert, err := tls.LoadX509KeyPair(cfg.Cert, cfg.Key)
@@ -25,15 +23,20 @@ func (c *Client) Dial(ctx context.Context, cfg ConfigClient) error {
 			return err
 		}
 
-		secureOption = grpc.WithTransportCredentials(credentials.NewServerTLSFromCert(&cert))
+		creds = credentials.NewServerTLSFromCert(&cert)
+	} else {
+		creds = insecure.NewCredentials()
 	}
+
+	secureOption := grpc.WithTransportCredentials(creds)
 
 	host := strings.Join([]string{cfg.Hostname, cfg.Port}, ":")
 
-	if c.ClientConn, err = grpc.DialContext(
-		ctx,
+	var err error
+
+	if c.ClientConn, err = grpc.NewClient(
 		host,
-		grpc.WithMaxMsgSize(int(cfg.MaxSendMsgSize)),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(int(cfg.MaxSendMsgSize))),
 		secureOption,
 	); err != nil {
 		return err

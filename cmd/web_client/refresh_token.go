@@ -59,7 +59,12 @@ func (h handler) refreshToken(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   24 * 60 * 60,
 	})
 
-	w.Write([]byte(jwt.AccessToken))
+	if _, err := w.Write([]byte(jwt.AccessToken)); err != nil {
+		logger.Error().Err(err).Msg("failed to write response")
+
+		http.Error(w, "failed to write response", http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 

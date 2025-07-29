@@ -5,19 +5,19 @@ import "fmt"
 type ErrNullRequest struct{}
 
 func (e ErrNullRequest) Error() string {
-	return fmt.Sprintf("null request")
+	return "null request"
 }
 
 type ErrMissingAuth struct{}
 
 func (e ErrMissingAuth) Error() string {
-	return fmt.Sprintf("missing authentication")
+	return "missing authentication"
 }
 
 type ErrInvalidCredentials struct{}
 
 func (e ErrInvalidCredentials) Error() string {
-	return fmt.Sprintf("invalid credentials")
+	return "invalid credentials"
 }
 
 // ErrInvalidNumericalRange is raised when a numerical value is out of range.
