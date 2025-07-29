@@ -2,7 +2,6 @@
 // Vue and Store imports
 import { computed, ref, toRefs, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
 import { useRoleStore } from '@/stores/role';
@@ -10,16 +9,17 @@ import { useRoleStore } from '@/stores/role';
 // Internal utilities and types
 import { ulid } from '@/utils/ulid';
 import { logger } from "@/config";
+import { formatDate } from '@/utils/date';
+import { createPagination } from '@/utils/requests';
+import { back } from '@/utils/router';
+import { useTable } from '@/composables';
 import { ListRoleReq } from '@internal/user/dto/role';
 import type { RolePermission } from '@internal/user/dto/role';
 import { Command } from '@internal/user/role';
 
 // PrimeVue UI Components
 import DataTable, {
-	type DataTableFilterEvent,
-	type DataTablePageEvent,
 	type DataTableProps,
-	type DataTableSortEvent
 } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -40,7 +40,6 @@ import type { FormSubmitEvent } from '@primevue/forms';
 
 const router = useRouter();
 const route = useRoute();
-const authStore = useAuthStore();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 const groupStore = useGroupStore();
@@ -50,18 +49,52 @@ const { roles, total } = toRefs(roleStore);
 
 const groupId = route.params.groupId as string
 
-const loading = ref(false);
-const search = ref('');
-const viewIDs = ref<string[]>([]);
 const selectedRoles = ref<string[]>([]);
 
-const group = groups.value.get(groupId) || null;
+const group = computed(() => groups.value.get(groupId) || null);
 
-const views = computed(() => {
-	return viewIDs.value.map((roleId: string) => roles.value?.get(roleId));
+// Create table composable with request creation function
+const createRequest = (props: DataTableProps, search: string) => {
+	if (!group.value) {
+		return ListRoleReq.create({});
+	}
+
+	return ListRoleReq.create({
+		groupIDs: [group.value?.group?.iD],
+		search,
+		paginate: createPagination(props)
+	});
+};
+
+const table = useTable({
+	createRequest,
+	listMethod: roleStore.list,
+	itemsMap: roles,
+	total
 });
 
-const properties = ref<DataTableProps>({});
+const { views, handlers, search, loading: tableLoading } = table;
+
+// Keep separate loading state for group loading
+const loading = ref(false);
+
+const loadGroup = async () => {
+	loading.value = true;
+
+	try {
+		await groupStore.populate([groupId]);
+	} catch (e) {
+		errorsStore.showGRPC(e);
+		back();
+		return;
+	}
+
+	loading.value = false;
+};
+
+
+// Role validation error
+const roleValidationError = ref<string | null>(null);
 
 // Form validation
 const resolver = zodResolver(
@@ -74,94 +107,22 @@ const initialValues = ref({
 	email: '',
 });
 
-const list = async (p: DataTableProps = {
-	first: 0,
-	rows: 10,
-	sortField: 'created_at',
-	sortOrder: -1,
-}) => {
-	if (!group) {
-		viewIDs.value = [];
-		return;
+// Validate roles selection
+const validateRoles = (): boolean => {
+	if (selectedRoles.value.length === 0) {
+		roleValidationError.value = 'Please select at least one role for the user.';
+		return false;
 	}
+	roleValidationError.value = null;
+	return true;
+};
 
-	loading.value = true;
-
-	try {
-		const page = Math.floor((p.first ?? 0) / (p.rows ?? 1)) + 1;
-		const sortBy = p.sortField ? [{
-			key: p.sortField,
-			order: p.sortOrder === 1 ? 'asc' : 'desc'
-		}] : [{ key: 'created_at', order: 'desc' }];
-
-		const newIDs = await roleStore.list(ListRoleReq.create({
-			groupIDs: [group.group?.iD],
-			search: search.value,
-			paginate: {
-				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
-				end: BigInt(page * (p.rows ?? 10)),
-				sort: sortBy?.at(0)?.key ?? '',
-				order: sortBy?.at(0)?.order === 'asc' ? true : false,
-			}
-		}));
-
-		viewIDs.value = newIDs;
-
-		if (p) {
-			properties.value = p;
-		}
-
-	} catch (e) {
-		errorsStore.showGRPC(e);
+// Watch for changes in selectedRoles to clear validation error
+watch(selectedRoles, () => {
+	if (selectedRoles.value.length > 0 && roleValidationError.value) {
+		roleValidationError.value = null;
 	}
-
-	loading.value = false;
-};
-
-// Handle DataTable lazy loading events
-const onPage = (event: DataTablePageEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onSort = (event: DataTableSortEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onFilter = (event: DataTableFilterEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-// Handle search input changes
-const onSearch = () => {
-	list({
-		first: 0,
-		rows: properties.value.rows ?? 10,
-		sortField: properties.value.sortField,
-		sortOrder: properties.value.sortOrder ?? -1,
-		filters: properties.value.filters,
-	});
-};
+}, { deep: true });
 
 const toggleRoleSelection = (roleId: string) => {
 	const index = selectedRoles.value.indexOf(roleId);
@@ -176,15 +137,11 @@ const isRoleSelected = (roleId: string): boolean => {
 	return selectedRoles.value.includes(roleId);
 };
 
-const goBack = () => {
-	router.push({
-		name: 'group-details',
-		params: { id: groupId }
-	});
-};
-
 const inviteUser = async (e: FormSubmitEvent) => {
-	if (!e.valid || !group) {
+	// Validate roles first
+	const isRolesValid = validateRoles();
+
+	if (!e.valid || !group.value || !isRolesValid) {
 		logger.error('Invite user form is invalid', e);
 		return;
 	}
@@ -192,7 +149,7 @@ const inviteUser = async (e: FormSubmitEvent) => {
 	try {
 		// TODO: Implement user invitation logic with selected roles
 		// await userStore.invite(e.states.email.value, group.iD, selectedRoles.value);
-		console.log('Inviting user:', e.states.email.value, 'to group:', group.group?.name);
+		console.log('Inviting user:', e.states.email.value, 'to group:', group.value?.group?.name);
 		if (selectedRoles.value.length > 0) {
 			console.log('Selected roles:', selectedRoles.value);
 		}
@@ -207,37 +164,22 @@ const inviteUser = async (e: FormSubmitEvent) => {
 	// Reset form and go back to group details
 	e.reset();
 	selectedRoles.value = [];
+	roleValidationError.value = null;
 
 	// Wait a bit to show the success message, then navigate back
 	setTimeout(() => {
-		goBack();
+		back();
 	}, 2000);
-};
-
-const formatDate = (timestamp: bigint): string => {
-	return new Date(Number(timestamp) * 1000).toLocaleDateString('en-GB', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric'
-	});
 };
 
 // Initialize data on component mount
 onMounted(async () => {
 	// Load group data if not already loaded
-	if (!group) {
-		try {
-			await groupStore.populate([groupId]);
-		} catch (e) {
-			errorsStore.showGRPC(e);
-			goBack();
-			return;
-		}
+	if (!group.value) {
+		await loadGroup()
 	}
 
-	if (group) {
-		list();
-	}
+	table.list();
 });
 </script>
 
@@ -245,7 +187,7 @@ onMounted(async () => {
 	<div class="flex flex-col h-full">
 		<!-- Page Header -->
 		<div class="flex items-center gap-4 px-8 py-4 border-b border-surface-200 dark:border-surface-700">
-			<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="goBack"
+			<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="back"
 				v-tooltip.bottom="'Back'" />
 			<div class="flex items-center gap-3">
 				<div
@@ -284,17 +226,22 @@ onMounted(async () => {
 					<span class="text-sm text-surface-500 dark:text-surface-400 whitespace-nowrap">
 						{{ selectedRoles.length }} role(s) selected
 					</span>
-					<Button label="Cancel" outlined @click="goBack" />
+					<Button label="Cancel" outlined @click="back" />
 					<Button label="Send Invitation" type="submit" />
 				</div>
 			</Form>
+			<!-- Role validation error message -->
+			<Message v-if="roleValidationError" severity="error" size="small" variant="simple" class="mt-2 mx-6">
+				{{ roleValidationError }}
+			</Message>
 		</div>
 
 		<!-- Role Selection Table -->
-		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
-			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
-			:scrollable="true" scrollHeight="calc(100vh - 20rem)" @page="onPage" @sort="onSort" @filter="onFilter"
-			dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
+		<DataTable :value="views" :lazy="true" :loading="tableLoading" :paginator="true"
+			:rows="table.properties.value.rows" :totalRecords="Number(total)" :first="table.properties.value.first"
+			v-model:filters="table.properties.value.filters" :scrollable="true" scrollHeight="calc(100vh - 20rem)"
+			@page="handlers.onPage" @sort="handlers.onSort" @filter="handlers.onFilter" dataKey="id"
+			filterDisplay="menu" :globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
 			:rowsPerPageOptions="[10, 25, 50]"
 			paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 			currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
@@ -320,13 +267,13 @@ onMounted(async () => {
 								<InputIcon class="pi pi-search text-surface-400" />
 								<InputText type="text"
 									class="w-96 pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-900 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800 transition-all duration-200"
-									placeholder="Search roles by name..." v-model="search" @input="onSearch" />
+									placeholder="Search roles by name..." v-model="search" @input="handlers.onSearch" />
 							</IconField>
 						</div>
 					</div>
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
-							@click="list()" v-tooltip.bottom="'Refresh roles'" />
+							@click="table.list()" v-tooltip.bottom="'Refresh roles'" />
 					</div>
 				</div>
 			</template>

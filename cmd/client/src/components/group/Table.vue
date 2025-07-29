@@ -10,6 +10,8 @@ import { useGroupStore } from '@/stores/group';
 import { ulid } from '@/utils/ulid';
 import { grpccodes } from '@/utils/errors';
 import { logger } from "@/config";
+import { createPagination } from '@/utils/requests';
+import { useTable } from '@/composables';
 import { DeleteGroupReq, GroupView, ListGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
 import { Group } from '@internal/user/group';
 
@@ -52,107 +54,26 @@ const {
 const errorsStore = useErrorsStore()
 const { success, message } = toRefs(errorsStore)
 
-const loading = ref(false);
-const search = ref('');
-
-const viewIDs = ref<string[]>([])
-
-const views = computed(() => {
-	return viewIDs.value.map((groupID: string) => groups.value?.get(groupID));
-});
-
-const properties = ref<DataTableProps>({});
-
-const select = () => { };
-
-const list = async (p: DataTableProps = {
-	first: 0,
-	rows: 10,
-	sortField: 'created_at',
-	sortOrder: -1, // -1 for desc, 1 for asc
-}) => {
-	loading.value = true;
-
-	try {
-		// Use event data if provided (from DataTable lazy loading), otherwise use current p
-		const page = Math.floor((p.first ?? 0) / (p.rows ?? 1)) + 1; // Convert first index to page number
-
-		// Map PrimeVue sort order to your API format
-		const sortBy = p.sortField ? [{
-			key: p.sortField,
-			order: p.sortOrder === 1 ? 'asc' : 'desc'
-		}] : [{ key: 'created_at', order: 'desc' }];
-
-		const newIDs = await store.list(ListGroupReq.create({
-			own: true,
-			search: search.value,
-			paginate: {
-				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1), // page starts at 1, start starts at 1
-				end: BigInt(page * (p.rows ?? 10)),
-				sort: sortBy?.at(0)?.key ?? '',
-				order: sortBy?.at(0)?.order === 'asc' ? true : false,
-			}
-		}));
-
-		viewIDs.value = newIDs;
-
-		// Update props if event is provided
-		if (p) {
-			properties.value = p
-		}
-
-	} catch (e) {
-		errorsStore.showGRPC(e)
-	}
-
-	loading.value = false;
-};
-
-// Handle DataTable lazy loading events
-const onPage = (event: DataTablePageEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onSort = (event: DataTableSortEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onFilter = (event: DataTableFilterEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-// Handle search input changes
-const onSearch = () => {
-	// Trigger a new search with current parameters
-	list({
-		first: 0, // Reset to first page when searching
-		rows: properties.value.rows ?? 10,
-		sortField: properties.value.sortField,
-		sortOrder: properties.value.sortOrder ?? -1,
-		filters: properties.value.filters,
+// Create request function for the table
+const createRequest = (props: DataTableProps, search: string) => {
+	return ListGroupReq.create({
+		own: true,
+		search,
+		paginate: createPagination(props)
 	});
 };
+
+// Use the table composable
+const table = useTable({
+	createRequest,
+	listMethod: store.list,
+	itemsMap: groups,
+	total
+});
+
+const { viewIDs, views, properties, loading, search, handlers, list } = table;
+
+const select = () => { };
 
 const resolver = zodResolver(
 	z.object({
@@ -214,9 +135,10 @@ onMounted(() => {
 <template>
 	<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
 		:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters" :scrollable="true"
-		scrollHeight="calc(100vh - 9rem)" v-model:selection="selected" @row-select="select" @page="onPage"
-		@sort="onSort" @filter="onFilter" dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'created_at']"
-		tableStyle="min-width: 50rem" :rowsPerPageOptions="[10, 25, 50, 100]"
+		scrollHeight="calc(100vh - 9rem)" v-model:selection="selected" @row-select="select" @page="handlers.onPage"
+		@sort="handlers.onSort" @filter="handlers.onFilter" dataKey="id" filterDisplay="menu"
+		:globalFilterFields="['name', 'created_at']" tableStyle="min-width: 50rem"
+		:rowsPerPageOptions="[10, 25, 50, 100]"
 		paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 		currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
 
@@ -241,7 +163,7 @@ onMounted(() => {
 							<InputText type="text"
 								class="w-96 pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-900 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800 transition-all duration-200"
 								placeholder="Search groups by name or description..." v-model="search"
-								@input="onSearch" />
+								@input="handlers.onSearch" />
 						</IconField>
 					</div>
 				</div>

@@ -10,6 +10,9 @@ import { useUserStore } from '@/stores/user';
 // Internal utilities and types
 import { ulid } from '@/utils/ulid';
 import { logger } from "@/config";
+import { formatDate } from '@/utils/date';
+import { createPagination } from '@/utils/requests';
+import { useTable } from '@/composables';
 import { ListUserReq } from '@internal/user/dto/user';
 import type { U } from '@internal/user/user';
 
@@ -35,7 +38,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const authStore = useAuthStore();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 const groupStore = useGroupStore();
@@ -43,106 +45,29 @@ const { groups } = toRefs(groupStore);
 const userStore = useUserStore();
 const { users, total } = toRefs(userStore);
 
-const loading = ref(false);
-const search = ref('');
-const viewIDs = ref<string[]>([]);
-
 const group = groups.value.get(props.groupId) || null;
 
-const views = computed(() => {
-	return viewIDs.value.map((userId: string) => users.value?.get(userId));
-});
-
-const properties = ref<DataTableProps>({});
-
-const list = async (p: DataTableProps = {
-	first: 0,
-	rows: 10,
-	sortField: 'created_at',
-	sortOrder: -1,
-}) => {
+// Create table composable with request creation function
+const createRequest = (props: DataTableProps, search: string) => {
 	if (!group) {
-		viewIDs.value = [];
-		return;
+		return ListUserReq.create({});
 	}
 
-	loading.value = true;
-
-	try {
-		const page = Math.floor((p.first ?? 0) / (p.rows ?? 1)) + 1;
-		const sortBy = p.sortField ? [{
-			key: p.sortField,
-			order: p.sortOrder === 1 ? 'asc' : 'desc'
-		}] : [{ key: 'created_at', order: 'desc' }];
-
-		const newIDs = await userStore.list(ListUserReq.create({
-			groupIDs: [group.group?.iD],
-			search: search.value,
-			paginate: {
-				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
-				end: BigInt(page * (p.rows ?? 10)),
-				sort: sortBy?.at(0)?.key ?? '',
-				order: sortBy?.at(0)?.order === 'asc' ? true : false,
-			}
-		}));
-
-		viewIDs.value = newIDs;
-
-		if (p) {
-			properties.value = p;
-		}
-
-	} catch (e) {
-		errorsStore.showGRPC(e);
-	}
-
-	loading.value = false;
-};
-
-// Handle DataTable lazy loading events
-const onPage = (event: DataTablePageEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onSort = (event: DataTableSortEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onFilter = (event: DataTableFilterEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-// Handle search input changes
-const onSearch = () => {
-	list({
-		first: 0,
-		rows: properties.value.rows ?? 10,
-		sortField: properties.value.sortField,
-		sortOrder: properties.value.sortOrder ?? -1,
-		filters: properties.value.filters,
+	return ListUserReq.create({
+		groupIDs: [group.group?.iD],
+		search,
+		paginate: createPagination(props)
 	});
 };
+
+const table = useTable({
+	createRequest,
+	listMethod: userStore.list,
+	itemsMap: users,
+	total
+});
+
+const { views, handlers, search, loading } = table;
 
 const openInviteUser = () => {
 	router.push({
@@ -164,14 +89,6 @@ const navigateToUserDetails = (user: U) => {
 	});
 };
 
-const formatDate = (timestamp: bigint): string => {
-	return new Date(Number(timestamp) * 1000).toLocaleDateString('en-GB', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric'
-	});
-};
-
 const getUserInitials = (user: U): string => {
 	if (user.firstName && user.lastName) {
 		return (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
@@ -188,9 +105,7 @@ const getUserDisplayName = (user: U): string => {
 
 // Initialize data on component mount
 onMounted(() => {
-	if (group) {
-		list();
-	}
+	table.list();
 });
 </script>
 
@@ -199,11 +114,12 @@ onMounted(() => {
 		<!-- Success Message -->
 		<Message v-if="success && message" severity="success" class="mb-4">{{ message }}</Message>
 
-		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
-			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
-			:scrollable="true" scrollHeight="calc(100vh - 16rem)" @page="onPage" @sort="onSort" @filter="onFilter"
-			dataKey="id" filterDisplay="menu" :globalFilterFields="['email', 'name', 'created_at']"
-			tableStyle="min-width: 50rem" :rowsPerPageOptions="[10, 25, 50, 100]"
+		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="table.properties.value.rows"
+			:totalRecords="Number(total)" :first="table.properties.value.first"
+			v-model:filters="table.properties.value.filters" :scrollable="true" scrollHeight="calc(100vh - 16rem)"
+			@page="handlers.onPage" @sort="handlers.onSort" @filter="handlers.onFilter" dataKey="id"
+			filterDisplay="menu" :globalFilterFields="['email', 'name', 'created_at']" tableStyle="min-width: 50rem"
+			:rowsPerPageOptions="[10, 25, 50, 100]"
 			paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 			currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
 
@@ -226,13 +142,14 @@ onMounted(() => {
 								<InputIcon class="pi pi-search text-surface-400" />
 								<InputText type="text"
 									class="w-96 pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-900 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800 transition-all duration-200"
-									placeholder="Search users by name or email..." v-model="search" @input="onSearch" />
+									placeholder="Search users by name or email..." v-model="search"
+									@input="handlers.onSearch" />
 							</IconField>
 						</div>
 					</div>
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
-							@click="list()" v-tooltip.bottom="'Refresh users'" />
+							@click="table.list()" v-tooltip.bottom="'Refresh users'" />
 						<Button label="" icon="pi pi-plus" outlined severity="primary" class="font-medium"
 							@click="openInviteUser" />
 					</div>

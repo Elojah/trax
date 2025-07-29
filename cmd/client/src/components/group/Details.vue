@@ -8,6 +8,8 @@ import { useGroupStore } from '@/stores/group';
 
 // Internal utilities and types
 import { logger } from "@/config";
+import { formatDate } from '@/utils/date';
+import { back } from '@/utils/router';
 import { DeleteGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
 
 // PrimeVue UI Components
@@ -94,10 +96,6 @@ const loadGroup = async () => {
 	loading.value = false;
 };
 
-const goBack = () => {
-	router.go(-1);
-};
-
 // Action handlers
 const openManageGroup = () => {
 	if (group.value) {
@@ -173,21 +171,9 @@ const deleteGroup = () => {
 	});
 };
 
-const formatDate = (timestamp: bigint | undefined): string => {
-	if (!timestamp) return 'Unknown';
-
-	return new Date(Number(timestamp) * 1000).toLocaleDateString('en-GB', {
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit'
-	});
-};
-
 // Initialize data on component mount
-onMounted(() => {
-	loadGroup();
+onMounted(async () => {
+	await loadGroup();
 });
 </script>
 
@@ -197,7 +183,7 @@ onMounted(() => {
 		<div
 			class="flex justify-between items-center px-8 py-4 bg-surface-0 dark:bg-surface-950 border-b border-surface-200 dark:border-surface-700">
 			<div class="flex items-center gap-4">
-				<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="goBack"
+				<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="back"
 					v-tooltip.bottom="'Back'" />
 				<div class="flex items-center gap-3">
 					<div
@@ -244,7 +230,7 @@ onMounted(() => {
 							<p class="text-surface-500 dark:text-surface-400 mb-4">
 								The group you're looking for doesn't exist or you don't have permission to view it.
 							</p>
-							<Button label="Back" icon="pi pi-arrow-left" @click="goBack" />
+							<Button label="Back" icon="pi pi-arrow-left" @click="back" />
 						</div>
 					</template>
 				</Card>

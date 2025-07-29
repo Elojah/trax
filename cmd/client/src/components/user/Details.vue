@@ -2,21 +2,17 @@
 // Vue and Store imports
 import { computed, ref, onMounted, toRefs } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useUserStore } from '@/stores/user';
 import { useGroupStore } from '@/stores/group';
-import { useRoleStore } from '@/stores/role';
 
 // Internal utilities and types
-import { ulid } from '@/utils/ulid';
-import { logger } from "@/config";
+import { formatDate } from '@/utils/date';
+import { back } from '@/utils/router';
 import type { U } from '@internal/user/user';
 
 // PrimeVue UI Components
 import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import ConfirmDialog from 'primevue/confirmdialog';
 import Message from 'primevue/message';
 import Avatar from 'primevue/avatar';
 import Card from 'primevue/card';
@@ -74,22 +70,6 @@ const loadUser = async () => {
 	loading.value = false;
 };
 
-const goBack = () => {
-	router.go(-1);
-};
-
-const formatDate = (timestamp: bigint | undefined): string => {
-	if (!timestamp) return 'Unknown';
-
-	return new Date(Number(timestamp) * 1000).toLocaleDateString('en-GB', {
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit'
-	});
-};
-
 const getUserInitials = (user: U): string => {
 	if (user.firstName && user.lastName) {
 		return (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
@@ -105,8 +85,8 @@ const getUserDisplayName = (user: U): string => {
 };
 
 // Initialize data on component mount
-onMounted(() => {
-	loadUser();
+onMounted(async () => {
+	await loadUser();
 });
 </script>
 
@@ -116,7 +96,7 @@ onMounted(() => {
 		<div
 			class="flex justify-between items-center px-8 py-4 bg-surface-0 dark:bg-surface-950 border-b border-surface-200 dark:border-surface-700">
 			<div class="flex items-center gap-4">
-				<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="goBack"
+				<Button icon="pi pi-arrow-left" severity="secondary" text rounded class="w-10 h-10" @click="back"
 					v-tooltip.bottom="'Back'" />
 				<div class="flex items-center gap-3">
 					<div
@@ -163,7 +143,7 @@ onMounted(() => {
 							<p class="text-surface-500 dark:text-surface-400 mb-4">
 								The user you're looking for doesn't exist or you don't have permission to view it.
 							</p>
-							<Button label="Back" icon="pi pi-arrow-left" @click="goBack" />
+							<Button label="Back" icon="pi pi-arrow-left" @click="back" />
 						</div>
 					</template>
 				</Card>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Vue and Store imports
-import { computed, ref, toRefs, onMounted, watch } from 'vue';
+import { computed, ref, toRefs, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useErrorsStore } from '@/stores/errors';
 import { useGroupStore } from '@/stores/group';
@@ -9,6 +9,9 @@ import { useUserStore } from '@/stores/user';
 
 // Internal utilities and types
 import { parse, ulid } from '@/utils/ulid';
+import { formatDate } from '@/utils/date';
+import { createPagination } from '@/utils/requests';
+import { useTable } from '@/composables';
 import { ListRoleReq } from '@internal/user/dto/role';
 import type { RolePermission } from '@internal/user/dto/role';
 import { Command } from '@internal/user/role';
@@ -51,12 +54,7 @@ const userStore = useUserStore();
 const { users } = toRefs(userStore);
 const confirm = useConfirm();
 
-const loading = ref(false);
-const search = ref('');
-const viewIDs = ref<string[]>([]);
-
 const group = groups.value.get(props.groupId);
-
 const user = users.value.get(props.userId);
 
 const userRoleIds = computed(() => {
@@ -69,55 +67,28 @@ const userRoleIds = computed(() => {
 	return userHasRoles;
 });
 
-const views = computed(() => {
-	return viewIDs.value.map((roleId: string) => roles.value?.get(roleId));
+// Create request function for the table
+const createRequest = (props: DataTableProps, search: string) => {
+	if (!group) {
+		return ListRoleReq.create({});
+	}
+
+	return ListRoleReq.create({
+		groupIDs: [group.group?.iD],
+		search,
+		paginate: createPagination(props)
+	});
+};
+
+// Use the table composable
+const table = useTable({
+	createRequest,
+	listMethod: roleStore.list,
+	itemsMap: roles,
+	total
 });
 
-const properties = ref<DataTableProps>({});
-
-const list = async (p: DataTableProps = {
-	first: 0,
-	rows: 10,
-	sortField: 'created_at',
-	sortOrder: -1,
-}) => {
-	if (!group) {
-		viewIDs.value = [];
-		return;
-	}
-
-	loading.value = true;
-
-	try {
-		const page = Math.floor((p.first ?? 0) / (p.rows ?? 1)) + 1;
-		const sortBy = p.sortField ? [{
-			key: p.sortField,
-			order: p.sortOrder === 1 ? 'asc' : 'desc'
-		}] : [{ key: 'created_at', order: 'desc' }];
-
-		const newIDs = await roleStore.list(ListRoleReq.create({
-			groupIDs: [group.group?.iD],
-			search: search.value,
-			paginate: {
-				start: BigInt(((page - 1) * (p.rows ?? 10)) + 1),
-				end: BigInt(page * (p.rows ?? 10)),
-				sort: sortBy?.at(0)?.key ?? '',
-				order: sortBy?.at(0)?.order === 'asc' ? true : false,
-			}
-		}));
-
-		viewIDs.value = newIDs;
-
-		if (p) {
-			properties.value = p;
-		}
-
-	} catch (e) {
-		errorsStore.showGRPC(e);
-	}
-
-	loading.value = false;
-};
+const { viewIDs, views, properties, loading, search, handlers, list } = table;
 
 const loadRoles = async () => {
 	if (!group) return;
@@ -134,51 +105,6 @@ const loadRoles = async () => {
 	}
 
 	loading.value = false;
-};
-
-// Handle DataTable lazy loading events
-const onPage = (event: DataTablePageEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onSort = (event: DataTableSortEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-const onFilter = (event: DataTableFilterEvent) => {
-	const props: DataTableProps = {
-		first: event.first,
-		rows: event.rows,
-		sortField: event.sortField,
-		sortOrder: event.sortOrder ?? 0,
-		filters: event.filters,
-	};
-	list(props);
-};
-
-// Handle search input changes
-const onSearch = () => {
-	list({
-		first: 0,
-		rows: properties.value.rows ?? 10,
-		sortField: properties.value.sortField,
-		sortOrder: properties.value.sortOrder ?? -1,
-		filters: properties.value.filters,
-	});
 };
 
 const addRole = async (role: RolePermission) => {
@@ -241,18 +167,10 @@ const removeRole = (role: RolePermission) => {
 	});
 };
 
-const formatDate = (timestamp: bigint): string => {
-	return new Date(Number(timestamp) * 1000).toLocaleDateString('en-GB', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric'
-	});
-};
-
 // Initialize data on component mount
-onMounted(() => {
-	loadRoles()
-	list()
+onMounted(async () => {
+	await loadRoles();
+	list();
 });
 </script>
 
@@ -263,9 +181,10 @@ onMounted(() => {
 
 		<DataTable :value="views" :lazy="true" :loading="loading" :paginator="true" :rows="properties.rows"
 			:totalRecords="Number(total)" :first="properties.first" v-model:filters="properties.filters"
-			:scrollable="true" scrollHeight="calc(100vh - 16rem)" @page="onPage" @sort="onSort" @filter="onFilter"
-			dataKey="id" filterDisplay="menu" :globalFilterFields="['name', 'status', 'created_at']"
-			tableStyle="min-width: 50rem" :rowsPerPageOptions="[10, 25, 50, 100]"
+			:scrollable="true" scrollHeight="calc(100vh - 16rem)" @page="handlers.onPage" @sort="handlers.onSort"
+			@filter="handlers.onFilter" dataKey="id" filterDisplay="menu"
+			:globalFilterFields="['name', 'status', 'created_at']" tableStyle="min-width: 50rem"
+			:rowsPerPageOptions="[10, 25, 50, 100]"
 			paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
 			currentPageReportTemplate="{first} - {last} ({totalRecords})" pt:header:class="!p-0">
 
@@ -290,7 +209,7 @@ onMounted(() => {
 								<InputIcon class="pi pi-search text-surface-400" />
 								<InputText type="text"
 									class="w-96 pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-900 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800 transition-all duration-200"
-									placeholder="Search roles by name..." v-model="search" @input="onSearch" />
+									placeholder="Search roles by name..." v-model="search" @input="handlers.onSearch" />
 							</IconField>
 						</div>
 					</div>
