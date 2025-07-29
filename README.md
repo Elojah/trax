@@ -33,9 +33,13 @@ make client && ./bin/trax_web_client config/web_client/local.json
 TODO:
 
 - [x] Reactivity of tables and details after ALL actions
-- [x] Multi roles user bug when listing gorup users
 - [x] Small UI pas on tag/status
-- Invite User
+
+- [x] Multi roles user bug when listing gorup users
+  - group icons still bug
+- [ ] Invite User
+  - Finish invite_user route to associate existing user
+  - Add invitations tab under group vue
 - Write test flows
 
 - Find a way to have expire map for pinia stores

@@ -460,7 +460,7 @@ func (s Store) CountByGroup(ctx context.Context, f user.Filter) (map[string]uint
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT r.group_id, COUNT(1) FROM "user"."user" u `)
+	b.WriteString(`SELECT r.group_id, COUNT(DISTINCT u.id) FROM "user"."user" u `)
 	b.WriteString(`
 		JOIN "user"."role_user" ru ON u.id = ru.user_id
 		JOIN "user"."role" r ON ru.role_id = r.id
