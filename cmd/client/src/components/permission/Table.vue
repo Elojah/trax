@@ -140,8 +140,7 @@ defineExpose({
 							class="text-center p-3 border-b border-surface-100 dark:border-surface-800">
 							<div class="flex justify-center">
 								<Checkbox :model-value="isChecked(resource, command)" :disabled="disabled"
-									:binary="true" @update:model-value="togglePermission(resource, command)"
-									class="permission-checkbox" />
+									:binary="true" @update:model-value="togglePermission(resource, command)" />
 							</div>
 						</td>
 					</tr>
@@ -152,12 +151,7 @@ defineExpose({
 </template>
 
 <style scoped>
-.permissions-table .permission-checkbox {
-	scale: 1.1;
-}
-
-.permissions-table .permission-checkbox:not([disabled]):hover {
-	scale: 1.2;
-	transition: scale 0.2s ease-in-out;
+.permissions-table :deep(.p-checkbox.p-disabled.p-checkbox-checked .p-checkbox-box) {
+	--p-checkbox-checked-disabled-border-color: var(--p-primary-color);
 }
 </style>
