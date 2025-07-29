@@ -123,6 +123,37 @@ func (s Store) InsertInvitationRole(ctx context.Context, invitationRole user.Inv
 	return nil
 }
 
+func (s Store) InsertBatchInvitationRole(ctx context.Context, invitationRoles ...user.InvitationRole) error {
+	if len(invitationRoles) == 0 {
+		return nil
+	}
+
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	irs := make([]sqlInvitationRole, len(invitationRoles))
+	for i, ir := range invitationRoles {
+		irs[i] = newInvitationRole(ir)
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO "user"."invitation_role" (invitation_id, role_id, created_at, updated_at) VALUES `)
+	b.WriteString(postgres.BatchInsert(4, len(invitationRoles)))
+
+	args := make([]any, 0, len(irs)*4)
+	for _, ir := range irs {
+		args = append(args, ir.InvitationID, ir.RoleID, ir.CreatedAt, ir.UpdatedAt)
+	}
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
+		return postgres.Error(err, "invitation_role", fmt.Sprintf("batch insert %d roles", len(invitationRoles)))
+	}
+
+	return nil
+}
+
 func (s Store) FetchInvitationRole(ctx context.Context, f user.FilterInvitationRole) (user.InvitationRole, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {

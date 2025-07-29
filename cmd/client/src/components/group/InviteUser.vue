@@ -7,7 +7,7 @@ import { useGroupStore } from '@/stores/group';
 import { useRoleStore } from '@/stores/role';
 
 // Internal utilities and types
-import { ulid } from '@/utils/ulid';
+import { parse, ulid } from '@/utils/ulid';
 import { logger } from "@/config";
 import { formatDate } from '@/utils/date';
 import { createPagination } from '@/utils/requests';
@@ -37,8 +37,8 @@ import { zodResolver } from '@primevue/forms/resolvers/zod';
 import z from 'zod';
 import { Form, FormField } from '@primevue/forms';
 import type { FormSubmitEvent } from '@primevue/forms';
+import { useUserStore } from '@/stores/user';
 
-const router = useRouter();
 const route = useRoute();
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
@@ -46,10 +46,11 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const roleStore = useRoleStore();
 const { roles, total } = toRefs(roleStore);
+const userStore = useUserStore();
 
 const groupId = route.params.groupId as string
 
-const selectedRoles = ref<string[]>([]);
+const selectedRoles = ref<Map<string, boolean>>(new Map());
 
 const group = computed(() => groups.value.get(groupId) || null);
 
@@ -109,7 +110,7 @@ const initialValues = ref({
 
 // Validate roles selection
 const validateRoles = (): boolean => {
-	if (selectedRoles.value.length === 0) {
+	if (selectedRoles.value.size === 0) {
 		roleValidationError.value = 'Please select at least one role for the user.';
 		return false;
 	}
@@ -119,22 +120,21 @@ const validateRoles = (): boolean => {
 
 // Watch for changes in selectedRoles to clear validation error
 watch(selectedRoles, () => {
-	if (selectedRoles.value.length > 0 && roleValidationError.value) {
+	if (selectedRoles.value.size > 0 && roleValidationError.value) {
 		roleValidationError.value = null;
 	}
 }, { deep: true });
 
 const toggleRoleSelection = (roleId: string) => {
-	const index = selectedRoles.value.indexOf(roleId);
-	if (index > -1) {
-		selectedRoles.value.splice(index, 1);
+	if (selectedRoles.value.has(roleId)) {
+		selectedRoles.value.delete(roleId);
 	} else {
-		selectedRoles.value.push(roleId);
+		selectedRoles.value.set(roleId, true);
 	}
 };
 
 const isRoleSelected = (roleId: string): boolean => {
-	return selectedRoles.value.includes(roleId);
+	return selectedRoles.value.has(roleId);
 };
 
 const inviteUser = async (e: FormSubmitEvent) => {
@@ -147,23 +147,18 @@ const inviteUser = async (e: FormSubmitEvent) => {
 	}
 
 	try {
-		// TODO: Implement user invitation logic with selected roles
-		// await userStore.invite(e.states.email.value, group.iD, selectedRoles.value);
-		console.log('Inviting user:', e.states.email.value, 'to group:', group.value?.group?.name);
-		if (selectedRoles.value.length > 0) {
-			console.log('Selected roles:', selectedRoles.value);
-		}
+		await userStore.invite(e.states.email.value, group.value?.group?.iD!, Array.from(selectedRoles.value.keys()).map(id => parse(id)));
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		return;
 	}
 
-	message.value = `User ${e.states.email.value} invited successfully${selectedRoles.value.length > 0 ? ` with ${selectedRoles.value.length} role(s)` : ''}`;
+	message.value = `User ${e.states.email.value} invited successfully${selectedRoles.value.size > 0 ? ` with ${selectedRoles.value.size} role(s)` : ''}`;
 	success.value = true;
 
 	// Reset form and go back to group details
 	e.reset();
-	selectedRoles.value = [];
+	selectedRoles.value = new Map();
 	roleValidationError.value = null;
 
 	// Wait a bit to show the success message, then navigate back
@@ -224,7 +219,7 @@ onMounted(async () => {
 				</FormField>
 				<div class="flex items-center gap-3">
 					<span class="text-sm text-surface-500 dark:text-surface-400 whitespace-nowrap">
-						{{ selectedRoles.length }} role(s) selected
+						{{ selectedRoles.size }} role(s) selected
 					</span>
 					<Button label="Cancel" outlined @click="back" />
 					<Button label="Send Invitation" type="submit" />

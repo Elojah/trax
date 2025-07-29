@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
@@ -84,68 +85,99 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 		}
 	}
 
-	// TODO: Check if user already exists globally
+	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
+		// Check if user already exists globally
+		u, err := h.user.Fetch(ctx, user.Filter{
+			Email: &req.Email,
+		})
+		if err != nil {
+			if !errors.As(err, &gerrors.ErrNotFound{}) {
+				logger.Error().Err(err).Msg("failed to fetch user")
+				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+			}
 
-	// now := time.Now().Unix()
-	// ru := user.RoleUser{
-	// 	RoleID:    req.RoleID,
-	// 	UserID:    req.UserID,
-	// 	CreatedAt: now,
-	// 	UpdatedAt: now,
-	// }
+			logger.Info().Msg("user not found, creating new user")
 
-	// var u user.U
-	// var roles []user.Role
+			// Check if invitation already exists
+			invitation, err := h.user.FetchInvitation(ctx, user.FilterInvitation{
+				Email: &req.Email,
+			})
+			if err != nil {
+				if !errors.As(err, &gerrors.ErrNotFound{}) {
+					logger.Error().Err(err).Msg("failed to fetch invitation")
+					return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+				}
 
-	// if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
-	// 	rolesByUser, _, err := h.user.ListRoleByUser(ctx, user.FilterRole{
-	// 		UserID:   req.UserID,
-	// 		GroupID: role.GroupID,
-	// 	})
-	// 	if err != nil {
-	// 		logger.Error().Err(err).Msg("failed to list roles")
+				logger.Info().Msg("invitation not found, creating new invitation")
 
-	// 		return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
-	// 	}
+				// Create new invitation
+				invitation = user.Invitation{
+					ID:    ulid.NewID(),
+					Email: req.Email,
+				}
 
-	// 	// user needs AT LEAST ONE ROLE in current group to be assigned a new role
-	// 	// if user has no role in current group, it means he has no access to this group
-	// 	// if you want to assign a role to a user, you need to invite him with a role in the group first
-	// 	var ok bool
+				if err := h.user.InsertInvitation(ctx, invitation); err != nil {
+					logger.Error().Err(err).Msg("failed to insert invitation")
+					return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+				}
+			}
 
-	// 	roles, ok = rolesByUser[req.UserID.String()]
-	// 	if !ok || len(roles) == 0 {
-	// 		err := gerrors.ErrNotFound{Resource: "user", Index: req.UserID.String()}
-	// 		logger.Error().Err(err).Msg("user not found")
+			logger.Info().Msg("inserting invitation role")
 
-	// 		return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
-	// 	}
+			// Insert invitation role
+			invitationRoleBatch := make([]user.InvitationRole, len(req.RoleIDs))
+			for i, roleID := range req.RoleIDs {
+				invitationRoleBatch[i] = user.InvitationRole{
+					InvitationID: invitation.ID,
+					RoleID:       roleID,
+				}
+			}
+			if err := h.user.InsertBatchInvitationRole(ctx, invitationRoleBatch...); err != nil {
+				logger.Error().Err(err).Msg("failed to insert invitation role")
 
-	// 	if err = h.user.InsertRoleUser(ctx, ru); err != nil {
-	// 		logger.Error().Err(err).Msg("failed to insert role user")
+				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+			}
+		}
 
-	// 		return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
-	// 	}
+		_ = u
+		// 	// user needs AT LEAST ONE ROLE in current group to be assigned a new role
+		// 	// if user has no role in current group, it means he has no access to this group
+		// 	// if you want to assign a role to a user, you need to invite him with a role in the group first
+		// 	var ok bool
 
-	// 	// To build response
-	// 	u, err = h.user.Fetch(ctx, user.Filter{
-	// 		ID: req.UserID,
-	// 	})
-	// 	if err != nil {
-	// 		if !errors.As(err, &gerrors.ErrNotFound{}) {
-	// 			logger.Error().Err(err).Msg("user not found")
+		// 	roles, ok = rolesByUser[req.UserID.String()]
+		// 	if !ok || len(roles) == 0 {
+		// 		err := gerrors.ErrNotFound{Resource: "user", Index: req.UserID.String()}
+		// 		logger.Error().Err(err).Msg("user not found")
 
-	// 			return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
-	// 		}
-	// 		logger.Error().Err(err).Msg("failed to fetch role")
+		// 		return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
+		// 	}
 
-	// 		return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
-	// 	}
+		// 	if err = h.user.InsertRoleUser(ctx, ru); err != nil {
+		// 		logger.Error().Err(err).Msg("failed to insert role user")
 
-	// 	return transaction.Commit, nil
-	// }); err != nil {
-	// 	return &user.U{}, err
-	// }
+		// 		return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		// 	}
+
+		// 	// To build response
+		// 	u, err = h.user.Fetch(ctx, user.Filter{
+		// 		ID: req.UserID,
+		// 	})
+		// 	if err != nil {
+		// 		if !errors.As(err, &gerrors.ErrNotFound{}) {
+		// 			logger.Error().Err(err).Msg("user not found")
+
+		// 			return transaction.Rollback, status.New(codes.NotFound, err.Error()).Err()
+		// 		}
+		// 		logger.Error().Err(err).Msg("failed to fetch role")
+
+		// 		return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		// 	}
+
+		return transaction.Commit, nil
+	}); err != nil {
+		return &user.U{}, err
+	}
 
 	logger.Info().Msg("success")
 

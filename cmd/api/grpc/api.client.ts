@@ -21,7 +21,7 @@ import type { FetchGroupReq } from "../../../internal/user/dto/group";
 import type { ListGroupResp } from "../../../internal/user/dto/group";
 import type { ListGroupReq } from "../../../internal/user/dto/group";
 import type { ClaimAuth } from "../../../internal/user/claims";
-import type { InviteUserReq } from "../../../internal/user/dto/user";
+import type { InviteUserReq } from "../../../internal/user/dto/invitation";
 import type { UpdateUserReq } from "../../../internal/user/dto/user";
 import type { U } from "../../../internal/user/user";
 import type { FetchUserReq } from "../../../internal/user/dto/user";

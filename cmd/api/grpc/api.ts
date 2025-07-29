@@ -18,7 +18,7 @@ import { FetchGroupReq } from "../../../internal/user/dto/group";
 import { ListGroupResp } from "../../../internal/user/dto/group";
 import { ListGroupReq } from "../../../internal/user/dto/group";
 import { ClaimAuth } from "../../../internal/user/claims";
-import { InviteUserReq } from "../../../internal/user/dto/user";
+import { InviteUserReq } from "../../../internal/user/dto/invitation";
 import { UpdateUserReq } from "../../../internal/user/dto/user";
 import { U } from "../../../internal/user/user";
 import { FetchUserReq } from "../../../internal/user/dto/user";

@@ -191,7 +191,7 @@ func (id *ID) Unmarshal(data []byte) error {
 		*id = make(ID, length)
 	}
 
-	for i := 0; i < length; i++ {
+	for i := range length {
 		(*id)[i] = data[i]
 	}
 

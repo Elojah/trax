@@ -41,6 +41,7 @@ type FilterInvitationRole struct {
 
 type StoreInvitationRole interface {
 	InsertInvitationRole(context.Context, InvitationRole) error
+	InsertBatchInvitationRole(context.Context, ...InvitationRole) error
 	FetchInvitationRole(context.Context, FilterInvitationRole) (InvitationRole, error)
 	ListInvitationRole(context.Context, FilterInvitationRole) ([]InvitationRole, error)
 	DeleteInvitationRole(context.Context, FilterInvitationRole) error

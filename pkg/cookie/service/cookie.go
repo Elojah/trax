@@ -24,7 +24,7 @@ func (s *S) Setup(ctx context.Context, n int) error {
 		return err
 	}
 
-	for i := 0; i < n; i++ {
+	for range n {
 		keys = append(keys, cookie.NewKeys())
 	}
 

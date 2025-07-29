@@ -113,6 +113,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$(info $(M) generate clients) @
 	$(info $(M) generate dto) @
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/group.proto
+	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/invitation.proto
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/role.proto
 	$Q $(GEN_PB_$(PB_LANG)) internal/user/dto/user.proto
 	$(info $(M) generate services) @

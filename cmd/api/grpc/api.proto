@@ -21,6 +21,7 @@ import "internal/user/group.proto";
 import "internal/user/user.proto";
 import "internal/user/claims.proto";
 import "internal/user/dto/group.proto";
+import "internal/user/dto/invitation.proto";
 import "internal/user/dto/role.proto";
 import "internal/user/dto/user.proto";
 

@@ -64,9 +64,3 @@ message ListUserResp {
 	repeated user.U Users             = 1 [(gogoproto.nullable) = false];
 	uint64 Total                      = 2;
 }
-
-message InviteUserReq {
-    string Email                      = 1;
-    bytes GroupID                    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes RoleIDs            = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-}
