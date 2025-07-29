@@ -174,6 +174,37 @@ func (s Store) InsertInvitation(ctx context.Context, invitation user.Invitation)
 	return nil
 }
 
+func (s Store) InsertBatchInvitation(ctx context.Context, invitations ...user.Invitation) error {
+	if len(invitations) == 0 {
+		return nil
+	}
+
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	is := make([]sqlInvitation, len(invitations))
+	for i, invitation := range invitations {
+		is[i] = newInvitation(invitation)
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO "user"."invitation" (id, email, created_at, updated_at) VALUES `)
+	b.WriteString(postgres.BatchInsert(4, len(invitations)))
+
+	args := make([]any, 0, len(is)*4)
+	for _, i := range is {
+		args = append(args, i.ID, i.Email, i.CreatedAt, i.UpdatedAt)
+	}
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
+		return postgres.Error(err, "invitation", fmt.Sprintf("batch insert %d invitations", len(invitations)))
+	}
+
+	return nil
+}
+
 func (s Store) UpdateInvitation(ctx context.Context, f user.FilterInvitation, p user.PatchInvitation) ([]user.Invitation, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {

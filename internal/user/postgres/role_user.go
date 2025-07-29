@@ -124,6 +124,37 @@ func (s Store) InsertRoleUser(ctx context.Context, roleUser user.RoleUser) error
 	return nil
 }
 
+func (s Store) InsertBatchRoleUser(ctx context.Context, roleUsers ...user.RoleUser) error {
+	if len(roleUsers) == 0 {
+		return nil
+	}
+
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	rus := make([]sqlRoleUser, len(roleUsers))
+	for i, ru := range roleUsers {
+		rus[i] = newRoleUser(ru)
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO "user"."role_user" (role_id, user_id, created_at, updated_at) VALUES `)
+	b.WriteString(postgres.BatchInsert(4, len(roleUsers)))
+
+	args := make([]any, 0, len(rus)*4)
+	for _, ru := range rus {
+		args = append(args, ru.RoleID, ru.UserID, ru.CreatedAt, ru.UpdatedAt)
+	}
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
+		return postgres.Error(err, "role_user", fmt.Sprintf("batch insert %d role_users", len(roleUsers)))
+	}
+
+	return nil
+}
+
 func (s Store) FetchRoleUser(ctx context.Context, f user.FilterRoleUser) (user.RoleUser, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {

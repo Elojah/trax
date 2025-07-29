@@ -135,36 +135,32 @@ func (s Store) InsertPermission(ctx context.Context, permission user.Permission)
 	return nil
 }
 
-func (s Store) InsertPermissions(ctx context.Context, permissions []user.Permission) error {
+func (s Store) InsertBatchPermission(ctx context.Context, permissions ...user.Permission) error {
+	if len(permissions) == 0 {
+		return nil
+	}
+
 	tx, err := postgres.Tx(ctx)
 	if err != nil {
 		return err
 	}
 
-	n := 1
-	values := make([]string, 0, len(permissions))
-	args := make([]any, 0, len(permissions)*5)
-
-	for _, permission := range permissions {
-		b := strings.Builder{}
-		b.WriteString(`(`)
-
-		b.WriteString(postgres.Array(n, 5))
-		n += 5
-
-		p := newPermission(permission)
-		args = append(args, p.RoleID, p.Resource, p.Command, p.CreatedAt, p.UpdatedAt)
-		b.WriteString(`)`)
-
-		values = append(values, b.String())
+	ps := make([]sqlPermission, len(permissions))
+	for i, permission := range permissions {
+		ps[i] = newPermission(permission)
 	}
 
 	b := strings.Builder{}
 	b.WriteString(`INSERT INTO "user"."permission" (role_id, resource, command, created_at, updated_at) VALUES `)
-	b.WriteString(strings.Join(values, ", "))
+	b.WriteString(postgres.BatchInsert(5, len(permissions)))
+
+	args := make([]any, 0, len(ps)*5)
+	for _, p := range ps {
+		args = append(args, p.RoleID, p.Resource, p.Command, p.CreatedAt, p.UpdatedAt)
+	}
 
 	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
-		return err
+		return postgres.Error(err, "permission", fmt.Sprintf("batch insert %d permissions", len(permissions)))
 	}
 
 	return nil

@@ -239,6 +239,37 @@ func (s Store) Insert(ctx context.Context, u user.U) error {
 	return nil
 }
 
+func (s Store) InsertBatch(ctx context.Context, users ...user.U) error {
+	if len(users) == 0 {
+		return nil
+	}
+
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	us := make([]sqlUser, len(users))
+	for i, u := range users {
+		us[i] = newUser(u)
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO "user"."user" (id, email, password_hash, password_salt, first_name, last_name, avatar_url, google_id, created_at, updated_at) VALUES `)
+	b.WriteString(postgres.BatchInsert(10, len(users)))
+
+	args := make([]any, 0, len(us)*10)
+	for _, u := range us {
+		args = append(args, u.ID, u.Email, u.PasswordHash, u.PasswordSalt, u.FirstName, u.LastName, u.AvatarURL, u.GoogleID, u.CreatedAt, u.UpdatedAt)
+	}
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
+		return postgres.Error(err, "user", fmt.Sprintf("batch insert %d users", len(users)))
+	}
+
+	return nil
+}
+
 func (s Store) Fetch(ctx context.Context, f user.Filter) (user.U, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {

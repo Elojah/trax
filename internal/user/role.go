@@ -44,6 +44,7 @@ type PatchRole struct {
 
 type StoreRole interface {
 	InsertRole(context.Context, Role) error
+	InsertBatchRole(context.Context, ...Role) error
 	UpdateRole(context.Context, FilterRole, PatchRole) ([]Role, error)
 	FetchRole(context.Context, FilterRole) (Role, error)
 	ListRole(context.Context, FilterRole) ([]Role, uint64, error)
@@ -62,7 +63,7 @@ type FilterPermission struct {
 
 type StorePermission interface {
 	InsertPermission(context.Context, Permission) error
-	InsertPermissions(context.Context, []Permission) error
+	InsertBatchPermission(context.Context, ...Permission) error
 	FetchPermission(context.Context, FilterPermission) (Permission, error)
 	ListPermission(context.Context, FilterPermission) ([]Permission, error)
 	DeletePermission(context.Context, FilterPermission) error
@@ -78,6 +79,7 @@ type FilterRoleUser struct {
 
 type StoreRoleUser interface {
 	InsertRoleUser(context.Context, RoleUser) error
+	InsertBatchRoleUser(context.Context, ...RoleUser) error
 	FetchRoleUser(context.Context, FilterRoleUser) (RoleUser, error)
 	ListRoleUser(context.Context, FilterRoleUser) ([]RoleUser, error)
 	DeleteRoleUser(context.Context, FilterRoleUser) error

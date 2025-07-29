@@ -96,8 +96,6 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 			}
 
-			logger.Info().Msg("user not found, creating new user")
-
 			// Check if invitation already exists
 			invitation, err := h.user.FetchInvitation(ctx, user.FilterInvitation{
 				Email: &req.Email,
@@ -107,8 +105,6 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 					logger.Error().Err(err).Msg("failed to fetch invitation")
 					return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 				}
-
-				logger.Info().Msg("invitation not found, creating new invitation")
 
 				// Create new invitation
 				invitation = user.Invitation{
@@ -121,8 +117,6 @@ func (h *handler) InviteUser(ctx context.Context, req *dto.InviteUserReq) (*user
 					return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 				}
 			}
-
-			logger.Info().Msg("inserting invitation role")
 
 			// Insert invitation role
 			invitationRoleBatch := make([]user.InvitationRole, len(req.RoleIDs))

@@ -56,6 +56,7 @@ type Patch struct {
 
 type Store interface {
 	Insert(context.Context, U) error
+	InsertBatch(context.Context, ...U) error
 	Fetch(context.Context, Filter) (U, error)
 	List(context.Context, Filter) ([]U, uint64, error)
 	Update(context.Context, Filter, Patch) ([]U, error)

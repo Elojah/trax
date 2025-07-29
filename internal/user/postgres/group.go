@@ -169,6 +169,37 @@ func (s Store) InsertGroup(ctx context.Context, group user.Group) error {
 	return nil
 }
 
+func (s Store) InsertBatchGroup(ctx context.Context, groups ...user.Group) error {
+	if len(groups) == 0 {
+		return nil
+	}
+
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	gs := make([]sqlGroup, len(groups))
+	for i, group := range groups {
+		gs[i] = newGroup(group)
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`INSERT INTO "user"."group" (id, name, description, avatar_url, created_at, updated_at) VALUES `)
+	b.WriteString(postgres.BatchInsert(6, len(groups)))
+
+	args := make([]any, 0, len(gs)*6)
+	for _, g := range gs {
+		args = append(args, g.ID, g.Name, g.Description, g.AvatarURL, g.CreatedAt, g.UpdatedAt)
+	}
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
+		return postgres.Error(err, "group", fmt.Sprintf("batch insert %d groups", len(groups)))
+	}
+
+	return nil
+}
+
 func (s Store) FetchGroup(ctx context.Context, f user.FilterGroup) (user.Group, error) {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {

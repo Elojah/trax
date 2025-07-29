@@ -6,25 +6,50 @@ import (
 )
 
 func Array(start int, len int) string {
-	n := make([]string, len)
-
-	for i := range len {
-		n[i] = fmt.Sprintf("$%d", start+i)
+	if len == 0 {
+		return ""
 	}
 
-	return strings.Join(n, ",")
+	var builder strings.Builder
+	// Pre-allocate approximate capacity: each variable is roughly "$N," format
+	builder.Grow(len * 4)
+
+	for i := range len {
+		if i > 0 {
+			builder.WriteByte(',')
+		}
+		builder.WriteByte('$')
+		builder.WriteString(fmt.Sprintf("%d", start+i))
+	}
+
+	return builder.String()
 }
 
 func BatchInsert(nVariables int, nItems int) string {
-	n := make([]string, nItems)
-
-	for i := range nVariables {
-		vars := make([]string, nItems)
-		for j := range nItems {
-			vars[j] = fmt.Sprintf("$%d", i*nItems+j+1)
-		}
-		n[i] = fmt.Sprintf("(%s)", strings.Join(vars, ","))
+	if nItems == 0 || nVariables == 0 {
+		return ""
 	}
 
-	return strings.Join(n, ",")
+	var builder strings.Builder
+	// Pre-allocate approximate capacity: each item is roughly "($1,$2,...$N)," format
+	builder.Grow(nItems * (nVariables*4 + 3))
+
+	for i := range nItems {
+		if i > 0 {
+			builder.WriteByte(',')
+		}
+		builder.WriteByte('(')
+
+		for j := range nVariables {
+			if j > 0 {
+				builder.WriteByte(',')
+			}
+			builder.WriteByte('$')
+			builder.WriteString(fmt.Sprintf("%d", i*nVariables+j+1))
+		}
+
+		builder.WriteByte(')')
+	}
+
+	return builder.String()
 }

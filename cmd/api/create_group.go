@@ -70,7 +70,7 @@ func (h *handler) CreateGroup(ctx context.Context, req *dto.CreateGroupReq) (*us
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		if err := h.user.InsertPermissions(ctx, user.AllPermissions(role.ID)); err != nil {
+		if err := h.user.InsertBatchPermission(ctx, user.AllPermissions(role.ID)...); err != nil {
 			logger.Error().Err(err).Msg("failed to insert permissions")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()

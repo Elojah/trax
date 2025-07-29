@@ -85,7 +85,7 @@ func (h *handler) CreateRole(ctx context.Context, req *dto.CreateRoleReq) (*dto.
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
 		}
 
-		if err = h.user.InsertPermissions(ctx, permissions); err != nil {
+		if err = h.user.InsertBatchPermission(ctx, permissions...); err != nil {
 			logger.Error().Err(err).Msg("failed to insert role permissions")
 
 			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()

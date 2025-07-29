@@ -24,6 +24,7 @@ type PatchGroup struct {
 
 type StoreGroup interface {
 	InsertGroup(context.Context, Group) error
+	InsertBatchGroup(context.Context, ...Group) error
 	UpdateGroup(context.Context, FilterGroup, PatchGroup) ([]Group, error)
 	FetchGroup(context.Context, FilterGroup) (Group, error)
 	ListGroup(context.Context, FilterGroup) ([]Group, uint64, error)

@@ -25,6 +25,7 @@ type PatchInvitation struct {
 
 type StoreInvitation interface {
 	InsertInvitation(context.Context, Invitation) error
+	InsertBatchInvitation(context.Context, ...Invitation) error
 	UpdateInvitation(context.Context, FilterInvitation, PatchInvitation) ([]Invitation, error)
 	FetchInvitation(context.Context, FilterInvitation) (Invitation, error)
 	ListInvitation(context.Context, FilterInvitation) ([]Invitation, uint64, error)
