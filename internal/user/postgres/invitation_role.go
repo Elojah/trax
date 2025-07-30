@@ -87,8 +87,8 @@ func (f filterInvitationRole) index() string {
 	}
 
 	if f.InvitationIDs != nil {
-		ss := ulid.IDs(f.InvitationIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.InvitationIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.RoleID != nil {
@@ -96,8 +96,8 @@ func (f filterInvitationRole) index() string {
 	}
 
 	if f.RoleIDs != nil {
-		ss := ulid.IDs(f.RoleIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.RoleIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	return strings.Join(cols, " - ")

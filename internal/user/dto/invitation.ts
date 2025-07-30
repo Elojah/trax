@@ -10,10 +10,12 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Invitation } from "../invitation";
+import { Paginate } from "../../../pkg/paginate/paginate";
 /**
- * @generated from protobuf message dto.InviteUserReq
+ * @generated from protobuf message dto.CreateInvitationReq
  */
-export interface InviteUserReq {
+export interface CreateInvitationReq {
     /**
      * @generated from protobuf field: string Email = 1
      */
@@ -27,25 +29,88 @@ export interface InviteUserReq {
      */
     roleIDs: Uint8Array[];
 }
+/**
+ * @generated from protobuf message dto.ListInvitationReq
+ */
+export interface ListInvitationReq {
+    /**
+     * @generated from protobuf field: paginate.Paginate Paginate = 1
+     */
+    paginate?: Paginate;
+    /**
+     * @generated from protobuf field: string Search = 2
+     */
+    search: string;
+    /**
+     * @generated from protobuf field: bool OwnGroup = 3
+     */
+    ownGroup: boolean;
+    /**
+     * @generated from protobuf field: repeated bytes IDs = 4
+     */
+    iDs: Uint8Array[];
+    /**
+     * @generated from protobuf field: repeated bytes GroupIDs = 5
+     */
+    groupIDs: Uint8Array[];
+}
+/**
+ * @generated from protobuf message dto.ListInvitationResp
+ */
+export interface ListInvitationResp {
+    /**
+     * @generated from protobuf field: repeated user.Invitation Invitations = 1
+     */
+    invitations: Invitation[];
+    /**
+     * @generated from protobuf field: uint64 Total = 2
+     */
+    total: bigint;
+}
+/**
+ * @generated from protobuf message dto.ListInvitationRoleReq
+ */
+export interface ListInvitationRoleReq {
+    /**
+     * @generated from protobuf field: paginate.Paginate Paginate = 1
+     */
+    paginate?: Paginate;
+    /**
+     * @generated from protobuf field: string Search = 2
+     */
+    search: string;
+    /**
+     * @generated from protobuf field: bool OwnGroup = 3
+     */
+    ownGroup: boolean;
+    /**
+     * @generated from protobuf field: repeated bytes IDs = 4
+     */
+    iDs: Uint8Array[];
+    /**
+     * @generated from protobuf field: repeated bytes GroupIDs = 5
+     */
+    groupIDs: Uint8Array[];
+}
 // @generated message type with reflection information, may provide speed optimized methods
-class InviteUserReq$Type extends MessageType<InviteUserReq> {
+class CreateInvitationReq$Type extends MessageType<CreateInvitationReq> {
     constructor() {
-        super("dto.InviteUserReq", [
+        super("dto.CreateInvitationReq", [
             { no: 1, name: "Email", kind: "scalar", jsonName: "Email", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "GroupID", kind: "scalar", jsonName: "GroupID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
             { no: 3, name: "RoleIDs", kind: "scalar", jsonName: "RoleIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
         ]);
     }
-    create(value?: PartialMessage<InviteUserReq>): InviteUserReq {
+    create(value?: PartialMessage<CreateInvitationReq>): CreateInvitationReq {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.email = "";
         message.groupID = new Uint8Array(0);
         message.roleIDs = [];
         if (value !== undefined)
-            reflectionMergePartial<InviteUserReq>(this, message, value);
+            reflectionMergePartial<CreateInvitationReq>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: InviteUserReq): InviteUserReq {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateInvitationReq): CreateInvitationReq {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -70,7 +135,7 @@ class InviteUserReq$Type extends MessageType<InviteUserReq> {
         }
         return message;
     }
-    internalBinaryWrite(message: InviteUserReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: CreateInvitationReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string Email = 1; */
         if (message.email !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.email);
@@ -87,6 +152,217 @@ class InviteUserReq$Type extends MessageType<InviteUserReq> {
     }
 }
 /**
- * @generated MessageType for protobuf message dto.InviteUserReq
+ * @generated MessageType for protobuf message dto.CreateInvitationReq
  */
-export const InviteUserReq = new InviteUserReq$Type();
+export const CreateInvitationReq = new CreateInvitationReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ListInvitationReq$Type extends MessageType<ListInvitationReq> {
+    constructor() {
+        super("dto.ListInvitationReq", [
+            { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
+            { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "OwnGroup", kind: "scalar", jsonName: "OwnGroup", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 5, name: "GroupIDs", kind: "scalar", jsonName: "GroupIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<ListInvitationReq>): ListInvitationReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.search = "";
+        message.ownGroup = false;
+        message.iDs = [];
+        message.groupIDs = [];
+        if (value !== undefined)
+            reflectionMergePartial<ListInvitationReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListInvitationReq): ListInvitationReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* paginate.Paginate Paginate */ 1:
+                    message.paginate = Paginate.internalBinaryRead(reader, reader.uint32(), options, message.paginate);
+                    break;
+                case /* string Search */ 2:
+                    message.search = reader.string();
+                    break;
+                case /* bool OwnGroup */ 3:
+                    message.ownGroup = reader.bool();
+                    break;
+                case /* repeated bytes IDs */ 4:
+                    message.iDs.push(reader.bytes());
+                    break;
+                case /* repeated bytes GroupIDs */ 5:
+                    message.groupIDs.push(reader.bytes());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ListInvitationReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* paginate.Paginate Paginate = 1; */
+        if (message.paginate)
+            Paginate.internalBinaryWrite(message.paginate, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string Search = 2; */
+        if (message.search !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.search);
+        /* bool OwnGroup = 3; */
+        if (message.ownGroup !== false)
+            writer.tag(3, WireType.Varint).bool(message.ownGroup);
+        /* repeated bytes IDs = 4; */
+        for (let i = 0; i < message.iDs.length; i++)
+            writer.tag(4, WireType.LengthDelimited).bytes(message.iDs[i]);
+        /* repeated bytes GroupIDs = 5; */
+        for (let i = 0; i < message.groupIDs.length; i++)
+            writer.tag(5, WireType.LengthDelimited).bytes(message.groupIDs[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.ListInvitationReq
+ */
+export const ListInvitationReq = new ListInvitationReq$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ListInvitationResp$Type extends MessageType<ListInvitationResp> {
+    constructor() {
+        super("dto.ListInvitationResp", [
+            { no: 1, name: "Invitations", kind: "message", jsonName: "Invitations", repeat: 2 /*RepeatType.UNPACKED*/, T: () => Invitation, options: { "gogoproto.nullable": false } },
+            { no: 2, name: "Total", kind: "scalar", jsonName: "Total", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ListInvitationResp>): ListInvitationResp {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.invitations = [];
+        message.total = 0n;
+        if (value !== undefined)
+            reflectionMergePartial<ListInvitationResp>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListInvitationResp): ListInvitationResp {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated user.Invitation Invitations */ 1:
+                    message.invitations.push(Invitation.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* uint64 Total */ 2:
+                    message.total = reader.uint64().toBigInt();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ListInvitationResp, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated user.Invitation Invitations = 1; */
+        for (let i = 0; i < message.invitations.length; i++)
+            Invitation.internalBinaryWrite(message.invitations[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* uint64 Total = 2; */
+        if (message.total !== 0n)
+            writer.tag(2, WireType.Varint).uint64(message.total);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.ListInvitationResp
+ */
+export const ListInvitationResp = new ListInvitationResp$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ListInvitationRoleReq$Type extends MessageType<ListInvitationRoleReq> {
+    constructor() {
+        super("dto.ListInvitationRoleReq", [
+            { no: 1, name: "Paginate", kind: "message", jsonName: "Paginate", T: () => Paginate, options: { "gogoproto.nullable": true } },
+            { no: 2, name: "Search", kind: "scalar", jsonName: "Search", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "OwnGroup", kind: "scalar", jsonName: "OwnGroup", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "IDs", kind: "scalar", jsonName: "IDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 5, name: "GroupIDs", kind: "scalar", jsonName: "GroupIDs", repeat: 2 /*RepeatType.UNPACKED*/, T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<ListInvitationRoleReq>): ListInvitationRoleReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.search = "";
+        message.ownGroup = false;
+        message.iDs = [];
+        message.groupIDs = [];
+        if (value !== undefined)
+            reflectionMergePartial<ListInvitationRoleReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ListInvitationRoleReq): ListInvitationRoleReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* paginate.Paginate Paginate */ 1:
+                    message.paginate = Paginate.internalBinaryRead(reader, reader.uint32(), options, message.paginate);
+                    break;
+                case /* string Search */ 2:
+                    message.search = reader.string();
+                    break;
+                case /* bool OwnGroup */ 3:
+                    message.ownGroup = reader.bool();
+                    break;
+                case /* repeated bytes IDs */ 4:
+                    message.iDs.push(reader.bytes());
+                    break;
+                case /* repeated bytes GroupIDs */ 5:
+                    message.groupIDs.push(reader.bytes());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ListInvitationRoleReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* paginate.Paginate Paginate = 1; */
+        if (message.paginate)
+            Paginate.internalBinaryWrite(message.paginate, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string Search = 2; */
+        if (message.search !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.search);
+        /* bool OwnGroup = 3; */
+        if (message.ownGroup !== false)
+            writer.tag(3, WireType.Varint).bool(message.ownGroup);
+        /* repeated bytes IDs = 4; */
+        for (let i = 0; i < message.iDs.length; i++)
+            writer.tag(4, WireType.LengthDelimited).bytes(message.iDs[i]);
+        /* repeated bytes GroupIDs = 5; */
+        for (let i = 0; i < message.groupIDs.length; i++)
+            writer.tag(5, WireType.LengthDelimited).bytes(message.groupIDs[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.ListInvitationRoleReq
+ */
+export const ListInvitationRoleReq = new ListInvitationRoleReq$Type();

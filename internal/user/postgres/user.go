@@ -143,8 +143,8 @@ func (f filter) index() string {
 	}
 
 	if f.IDs != nil {
-		ss := ulid.IDs(f.IDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.IDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.Email != nil {
@@ -160,13 +160,13 @@ func (f filter) index() string {
 	}
 
 	if f.GroupIDs != nil {
-		ss := ulid.IDs(f.GroupIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.GroupIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.RoleIDs != nil {
-		ss := ulid.IDs(f.RoleIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.RoleIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	return strings.Join(cols, " - ")

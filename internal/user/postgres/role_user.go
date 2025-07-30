@@ -88,8 +88,8 @@ func (f filterRoleUser) index() string {
 	}
 
 	if f.RoleIDs != nil {
-		ss := ulid.IDs(f.RoleIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.RoleIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.UserID != nil {
@@ -97,8 +97,8 @@ func (f filterRoleUser) index() string {
 	}
 
 	if f.UserIDs != nil {
-		ss := ulid.IDs(f.UserIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.UserIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	return strings.Join(cols, " - ")

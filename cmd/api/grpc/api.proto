@@ -33,7 +33,10 @@ service API {
     rpc ListUser(dto.ListUserReq) returns (dto.ListUserResp);
     rpc FetchUser(dto.FetchUserReq) returns (user.U);
     rpc UpdateUser(dto.UpdateUserReq) returns (user.U);
-    rpc InviteUser(dto.InviteUserReq) returns (user.U);
+
+    // Invitation
+    rpc CreateInvitation(dto.CreateInvitationReq) returns (user.U);
+    rpc ListInvitation(dto.ListInvitationReq) returns (dto.ListInvitationResp);
 
     // Claims
     rpc FetchClaims(pbtypes.Empty) returns (user.ClaimAuth);

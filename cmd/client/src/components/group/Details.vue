@@ -34,6 +34,7 @@ import InputIcon from 'primevue/inputicon';
 // Table Components
 import RoleTable from '@/components/group/RoleTable.vue';
 import UserTable from '@/components/group/UserTable.vue';
+import InvitationTable from '@/components/group/InvitationTable.vue';
 
 // Form Validation
 import { zodResolver } from '@primevue/forms/resolvers/zod';
@@ -256,6 +257,12 @@ onMounted(async () => {
 								<span>Users</span>
 							</div>
 						</Tab>
+						<Tab value="3">
+							<div class="flex items-center gap-2">
+								<i class="pi pi-envelope"></i>
+								<span>Invitations</span>
+							</div>
+						</Tab>
 					</TabList>
 					<TabPanels>
 						<!-- Details Tab -->
@@ -410,6 +417,11 @@ onMounted(async () => {
 						<!-- Users Tab -->
 						<TabPanel value="2">
 							<UserTable :groupId="groupId" />
+						</TabPanel>
+
+						<!-- Invitations Tab -->
+						<TabPanel value="3">
+							<InvitationTable :groupId="groupId" />
 						</TabPanel>
 					</TabPanels>
 				</Tabs>

@@ -14,9 +14,37 @@ option (gogoproto.goproto_registration) = true;
 option go_package = "github.com/elojah/trax/internal/user/dto";
 
 import "pkg/gogoproto/gogo.proto";
+import "pkg/paginate/paginate.proto";
 
-message InviteUserReq {
+import "internal/user/invitation.proto";
+
+message CreateInvitationReq {
 	string Email                = 1;
 	bytes GroupID 			    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 	repeated bytes RoleIDs      = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
+message ListInvitationReq {
+	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
+	string Search                     = 2;
+
+	bool OwnGroup                     = 3;
+
+    repeated bytes IDs                = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes GroupIDs           = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+}
+
+message ListInvitationResp {
+	repeated user.Invitation Invitations  = 1 [(gogoproto.nullable) = false];
+	uint64 Total                          = 2;
+}
+
+message ListInvitationRoleReq {
+	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
+	string Search                     = 2;
+
+	bool OwnGroup                     = 3;
+
+    repeated bytes IDs                = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes GroupIDs           = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }

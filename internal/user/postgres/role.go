@@ -112,8 +112,8 @@ func (f filterRole) index() string {
 	}
 
 	if f.IDs != nil {
-		ss := ulid.IDs(f.IDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.IDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.GroupID != nil {
@@ -121,8 +121,8 @@ func (f filterRole) index() string {
 	}
 
 	if f.GroupIDs != nil {
-		ss := ulid.IDs(f.GroupIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.GroupIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.Search != "" {

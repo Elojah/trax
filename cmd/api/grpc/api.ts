@@ -18,7 +18,9 @@ import { FetchGroupReq } from "../../../internal/user/dto/group";
 import { ListGroupResp } from "../../../internal/user/dto/group";
 import { ListGroupReq } from "../../../internal/user/dto/group";
 import { ClaimAuth } from "../../../internal/user/claims";
-import { InviteUserReq } from "../../../internal/user/dto/invitation";
+import { ListInvitationResp } from "../../../internal/user/dto/invitation";
+import { ListInvitationReq } from "../../../internal/user/dto/invitation";
+import { CreateInvitationReq } from "../../../internal/user/dto/invitation";
 import { UpdateUserReq } from "../../../internal/user/dto/user";
 import { U } from "../../../internal/user/user";
 import { FetchUserReq } from "../../../internal/user/dto/user";
@@ -34,7 +36,8 @@ export const API = new ServiceType("grpc.API", [
     { name: "ListUser", options: {}, I: ListUserReq, O: ListUserResp },
     { name: "FetchUser", options: {}, I: FetchUserReq, O: U },
     { name: "UpdateUser", options: {}, I: UpdateUserReq, O: U },
-    { name: "InviteUser", options: {}, I: InviteUserReq, O: U },
+    { name: "CreateInvitation", options: {}, I: CreateInvitationReq, O: U },
+    { name: "ListInvitation", options: {}, I: ListInvitationReq, O: ListInvitationResp },
     { name: "FetchClaims", options: {}, I: Empty, O: ClaimAuth },
     { name: "ListGroup", options: {}, I: ListGroupReq, O: ListGroupResp },
     { name: "FetchGroup", options: {}, I: FetchGroupReq, O: Group },

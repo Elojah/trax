@@ -101,8 +101,8 @@ func (f filterPermission) index() string {
 	}
 
 	if f.RoleIDs != nil {
-		ss := ulid.IDs(f.RoleIDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.RoleIDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.Resource != nil {

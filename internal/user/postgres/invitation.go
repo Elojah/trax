@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elojah/trax/internal/user"
+	pagpostgres "github.com/elojah/trax/pkg/paginate/postgres"
 	ppostgres "github.com/elojah/trax/pkg/paginate/postgres"
 	"github.com/elojah/trax/pkg/postgres"
 	"github.com/elojah/trax/pkg/ulid"
@@ -64,6 +65,13 @@ func (f filterInvitation) where(n int) (string, []any) {
 		n += len(f.IDs)
 	}
 
+	// !!! Only available if role r is joined
+	if len(f.GroupIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`r.group_id IN (%s)`, postgres.Array(n, len(f.GroupIDs))))
+		args = append(args, ulid.IDs(f.GroupIDs).Any()...)
+		n += len(f.GroupIDs)
+	}
+
 	if f.Email != nil {
 		clause = append(clause, fmt.Sprintf(`i.email = $%d`, n))
 		args = append(args, *f.Email)
@@ -104,8 +112,13 @@ func (f filterInvitation) index() string {
 	}
 
 	if f.IDs != nil {
-		ss := ulid.IDs(f.IDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.IDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
+	}
+
+	if f.GroupIDs != nil {
+		uids := ulid.IDs(f.IDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	if f.Email != nil {
@@ -306,6 +319,52 @@ func (s Store) ListInvitation(ctx context.Context, f user.FilterInvitation) ([]u
 		}
 
 		invitations = append(invitations, i.invitation())
+	}
+
+	return invitations, count, nil
+}
+
+func (s Store) ListInvitationByGroup(ctx context.Context, f user.FilterInvitation) (map[string][]user.Invitation, uint64, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT DISTINCT ON (i.id, r.group_id) i.id, i.email, i.created_at, i.updated_at, r.group_id, COUNT(1) OVER() `)
+	if f.Paginate != nil {
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).RowPartition(sortUser, "r.group_id"))
+	} else {
+		b.WriteString(`, 0 `)
+	}
+	b.WriteString(`
+	FROM "user"."invitation" i
+	JOIN "user"."invitation_role" ru ON i.id = ru.invitation_id
+	JOIN "user"."role" r ON ru.role_id = r.id
+	`)
+
+	clause, args := filterInvitation(f).where(1)
+	b.WriteString(clause)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, 0, postgres.Error(err, "invitation+role", filterInvitation(f).index())
+	}
+
+	invitations := make(map[string][]user.Invitation)
+
+	var count uint64
+	var row_number int
+
+	for rows.Next() {
+		var i sqlInvitation
+		var groupID ulid.ID
+
+		if err := rows.Scan(&i.ID, &i.Email, &i.CreatedAt, &i.UpdatedAt, &groupID, &count, &row_number); err != nil {
+			return nil, 0, postgres.Error(err, "invitation+role", filterInvitation(f).index())
+		}
+
+		invitations[groupID.String()] = append(invitations[groupID.String()], i.invitation())
 	}
 
 	return invitations, count, nil

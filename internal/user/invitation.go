@@ -16,6 +16,8 @@ type FilterInvitation struct {
 
 	*paginate.Paginate
 	Search string
+
+	GroupIDs []ulid.ID
 }
 
 type PatchInvitation struct {
@@ -29,6 +31,7 @@ type StoreInvitation interface {
 	UpdateInvitation(context.Context, FilterInvitation, PatchInvitation) ([]Invitation, error)
 	FetchInvitation(context.Context, FilterInvitation) (Invitation, error)
 	ListInvitation(context.Context, FilterInvitation) ([]Invitation, uint64, error)
+	ListInvitationByGroup(context.Context, FilterInvitation) (map[string][]Invitation, uint64, error)
 	DeleteInvitation(context.Context, FilterInvitation) error
 }
 

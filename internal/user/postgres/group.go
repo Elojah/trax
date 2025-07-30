@@ -99,8 +99,8 @@ func (f filterGroup) index() string {
 	}
 
 	if f.IDs != nil {
-		ss := ulid.IDs(f.IDs).String()
-		cols = append(cols, strings.Join(ss, "|"))
+		uids := ulid.IDs(f.IDs).String()
+		cols = append(cols, strings.Join(uids, "|"))
 	}
 
 	return strings.Join(cols, " - ")
