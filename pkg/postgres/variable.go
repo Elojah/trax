@@ -53,3 +53,18 @@ func BatchInsert(nVariables int, nItems int) string {
 
 	return builder.String()
 }
+
+func With(s string, name string) string {
+	if s == "" {
+		return ""
+	}
+
+	b := strings.Builder{}
+	b.WriteString("WITH ")
+	b.WriteString(name)
+	b.WriteString(" AS (")
+	b.WriteString(s)
+	b.WriteString(")")
+
+	return b.String()
+}

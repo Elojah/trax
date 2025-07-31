@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
@@ -136,8 +135,6 @@ func (h *handler) ListInvitation(ctx context.Context, req *dto.ListInvitationReq
 	}
 
 	logger.Info().Msg("success")
-
-	fmt.Println("Total invitations:", total)
 
 	return &dto.ListInvitationResp{
 		Invitations: invitationViews,

@@ -331,24 +331,21 @@ func (s Store) ListInvitationByGroup(ctx context.Context, f user.FilterInvitatio
 	}
 
 	b := strings.Builder{}
-	// Use a CTE to first get distinct invitations, then calculate window functions
-	b.WriteString(`
-	WITH distinct_invitations AS (
-		SELECT DISTINCT ON (i.id, r.group_id)
-			i.id, i.email, i.created_at, i.updated_at, r.group_id
-		FROM "user"."invitation" i
+	b.WriteString(`SELECT DISTINCT ON (i.id, r.group_id) i.id, i.email, i.created_at, i.updated_at, r.group_id`)
+	b.WriteString(`	FROM "user"."invitation" i
 		JOIN "user"."invitation_role" ir ON i.id = ir.invitation_id
 		JOIN "user"."role" r ON ir.role_id = r.id
 	`)
-
 	clause, args := filterInvitation(f).where(1)
 	b.WriteString(clause)
 
+	// Use a CTE to handle DISTINCT ON and pagination
+	with := postgres.With(b.String(), "invitation_by_group")
+
 	// Add ordering for DISTINCT ON
-	b.WriteString(` ORDER BY i.id, r.group_id, i.created_at DESC
-	)
-	SELECT i.id, i.email, i.created_at, i.updated_at, i.group_id,
-		   COUNT(1) OVER(PARTITION BY i.group_id) as total_count`)
+	b.Reset()
+	b.WriteString(with)
+	b.WriteString(`SELECT i.id, i.email, i.created_at, i.updated_at, i.group_id, COUNT(1) OVER(PARTITION BY i.group_id)`)
 
 	if f.Paginate != nil {
 		b.WriteString(pagpostgres.Paginate(*f.Paginate).RowPartition(sortInvitation, "i.group_id"))
@@ -356,9 +353,7 @@ func (s Store) ListInvitationByGroup(ctx context.Context, f user.FilterInvitatio
 		b.WriteString(`, 0 `)
 	}
 
-	b.WriteString(`
-	FROM distinct_invitations i
-	`)
+	b.WriteString(`FROM invitation_by_group i`)
 
 	// Apply pagination if needed
 	if f.Paginate != nil {
@@ -367,8 +362,6 @@ func (s Store) ListInvitationByGroup(ctx context.Context, f user.FilterInvitatio
 		b.WriteString(pag)
 	}
 
-	fmt.Println(b.String())
-
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
 		return nil, 0, postgres.Error(err, "invitation+role", filterInvitation(f).index())
@@ -376,21 +369,21 @@ func (s Store) ListInvitationByGroup(ctx context.Context, f user.FilterInvitatio
 
 	invitations := make(map[string][]user.Invitation)
 
-	var totalCount uint64
+	var count uint64
 	var row_number int
 
 	for rows.Next() {
 		var i sqlInvitation
 		var groupID ulid.ID
 
-		if err := rows.Scan(&i.ID, &i.Email, &i.CreatedAt, &i.UpdatedAt, &groupID, &totalCount, &row_number); err != nil {
+		if err := rows.Scan(&i.ID, &i.Email, &i.CreatedAt, &i.UpdatedAt, &groupID, &count, &row_number); err != nil {
 			return nil, 0, postgres.Error(err, "invitation+role", filterInvitation(f).index())
 		}
 
 		invitations[groupID.String()] = append(invitations[groupID.String()], i.invitation())
 	}
 
-	return invitations, totalCount, nil
+	return invitations, count, nil
 }
 
 func (s Store) DeleteInvitation(ctx context.Context, f user.FilterInvitation) error {
