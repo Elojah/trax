@@ -61,6 +61,15 @@ func (f filterInvitationRole) where(n int) (string, []any) {
 		n++
 	}
 
+	// !!! Only available if role r is joined
+	if len(f.GroupIDs) > 0 {
+		// Only happens on groupIDs, change if needed
+		clause = append(clause, `r.id = ir.role_id`)
+		clause = append(clause, fmt.Sprintf(`r.group_id IN (%s)`, postgres.Array(n, len(f.GroupIDs))))
+		args = append(args, ulid.IDs(f.GroupIDs).Any()...)
+		n += len(f.GroupIDs)
+	}
+
 	if len(f.RoleIDs) > 0 {
 		clause = append(clause, fmt.Sprintf(`ir.role_id IN (%s)`, postgres.Array(n, len(f.RoleIDs))))
 		args = append(args, ulid.IDs(f.RoleIDs).Any()...)
@@ -218,9 +227,7 @@ func (s Store) CountInvitationRoleByInvitation(ctx context.Context, f user.Filte
 
 	clause, args := filterInvitationRole(f).where(1)
 	b.WriteString(clause)
-	b.WriteString(`
-	GROUP BY ir.invitation_id
-	`)
+	b.WriteString(` GROUP BY ir.invitation_id`)
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
@@ -250,6 +257,25 @@ func (s Store) DeleteInvitationRole(ctx context.Context, f user.FilterInvitation
 
 	b := strings.Builder{}
 	b.WriteString(`DELETE FROM "user"."invitation_role" ir `)
+
+	clause, args := filterInvitationRole(f).where(1)
+	b.WriteString(clause)
+
+	if _, err := tx.Exec(ctx, b.String(), args...); err != nil {
+		return postgres.Error(err, "invitation_role", filterInvitationRole(f).index())
+	}
+
+	return nil
+}
+
+func (s Store) DeleteInvitationRoleByGroup(ctx context.Context, f user.FilterInvitationRole) error {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`DELETE FROM "user"."invitation_role" ir USING "user"."role" r `)
 
 	clause, args := filterInvitationRole(f).where(1)
 	b.WriteString(clause)

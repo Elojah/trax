@@ -41,6 +41,8 @@ type FilterInvitationRole struct {
 
 	RoleID  ulid.ID
 	RoleIDs []ulid.ID
+
+	GroupIDs []ulid.ID
 }
 
 type StoreInvitationRole interface {
@@ -50,6 +52,7 @@ type StoreInvitationRole interface {
 	ListInvitationRole(context.Context, FilterInvitationRole) ([]InvitationRole, error)
 	CountInvitationRoleByInvitation(context.Context, FilterInvitationRole) (map[string]uint64, error)
 	DeleteInvitationRole(context.Context, FilterInvitationRole) error
+	DeleteInvitationRoleByGroup(context.Context, FilterInvitationRole) error
 }
 
 func (i Invitation) Check() error {

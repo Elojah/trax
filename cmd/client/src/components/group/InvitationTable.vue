@@ -35,7 +35,7 @@ import InputIcon from 'primevue/inputicon';
 
 // Form Validation
 import { useConfirm } from 'primevue/useconfirm';
-import { InvitationView, ListInvitationReq } from '@internal/user/dto/invitation';
+import { DeleteInvitationReq, InvitationView, ListInvitationReq } from '@internal/user/dto/invitation';
 
 const props = defineProps<{
 	groupId: string;
@@ -90,10 +90,12 @@ const deleteInvitation = (invitation: InvitationView) => {
 			if (!invitation.invitation) return;
 
 			const email = invitation.invitation.email;
-			const invitationId = ulid(invitation.invitation.iD);
 
 			try {
-				await invitationStore.deleteInvitation(invitationId);
+				await invitationStore.delete_(DeleteInvitationReq.create({
+					iD: invitation.invitation.iD,
+					groupID: group?.group?.iD
+				}));
 			} catch (e) {
 				errorsStore.showGRPC(e);
 				return;

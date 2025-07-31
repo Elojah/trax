@@ -85,6 +85,19 @@ export interface ListInvitationResp {
      */
     total: bigint;
 }
+/**
+ * @generated from protobuf message dto.DeleteInvitationReq
+ */
+export interface DeleteInvitationReq {
+    /**
+     * @generated from protobuf field: bytes ID = 1
+     */
+    iD: Uint8Array;
+    /**
+     * @generated from protobuf field: bytes GroupID = 2
+     */
+    groupID: Uint8Array;
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class InvitationView$Type extends MessageType<InvitationView> {
     constructor() {
@@ -343,3 +356,58 @@ class ListInvitationResp$Type extends MessageType<ListInvitationResp> {
  * @generated MessageType for protobuf message dto.ListInvitationResp
  */
 export const ListInvitationResp = new ListInvitationResp$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DeleteInvitationReq$Type extends MessageType<DeleteInvitationReq> {
+    constructor() {
+        super("dto.DeleteInvitationReq", [
+            { no: 1, name: "ID", kind: "scalar", jsonName: "ID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } },
+            { no: 2, name: "GroupID", kind: "scalar", jsonName: "GroupID", T: 12 /*ScalarType.BYTES*/, options: { "gogoproto.nullable": false, "gogoproto.customtype": "github.com/elojah/trax/pkg/ulid.ID" } }
+        ]);
+    }
+    create(value?: PartialMessage<DeleteInvitationReq>): DeleteInvitationReq {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.iD = new Uint8Array(0);
+        message.groupID = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<DeleteInvitationReq>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteInvitationReq): DeleteInvitationReq {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes ID */ 1:
+                    message.iD = reader.bytes();
+                    break;
+                case /* bytes GroupID */ 2:
+                    message.groupID = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DeleteInvitationReq, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes ID = 1; */
+        if (message.iD.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.iD);
+        /* bytes GroupID = 2; */
+        if (message.groupID.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.groupID);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dto.DeleteInvitationReq
+ */
+export const DeleteInvitationReq = new DeleteInvitationReq$Type();

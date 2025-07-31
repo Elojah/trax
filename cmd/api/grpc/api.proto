@@ -19,6 +19,7 @@ import "pkg/pbtypes/empty.proto";
 
 import "internal/user/group.proto";
 import "internal/user/user.proto";
+import "internal/user/invitation.proto";
 import "internal/user/claims.proto";
 import "internal/user/dto/group.proto";
 import "internal/user/dto/invitation.proto";
@@ -37,6 +38,7 @@ service API {
     // Invitation
     rpc CreateInvitation(dto.CreateInvitationReq) returns (user.U);
     rpc ListInvitation(dto.ListInvitationReq) returns (dto.ListInvitationResp);
+    rpc DeleteInvitation(dto.DeleteInvitationReq) returns (user.Invitation);
 
     // Claims
     rpc FetchClaims(pbtypes.Empty) returns (user.ClaimAuth);

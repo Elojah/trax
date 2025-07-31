@@ -3,7 +3,7 @@ import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { Invitation, InvitationRole } from '@internal/user/invitation'
-import { InvitationView, ListInvitationReq, ListInvitationResp } from '@internal/user/dto/invitation'
+import { DeleteInvitationReq, InvitationView, ListInvitationReq, ListInvitationResp } from '@internal/user/dto/invitation'
 import { useAuthStore } from '@/stores/auth'
 import { computed, ref } from 'vue'
 import { parse, ulid } from '@/utils/ulid'
@@ -62,14 +62,11 @@ export const useInvitationStore = defineStore('invitation', () => {
     }
   }
 
-  // Mock function for deleting an invitation
-  // This would need to be implemented in the backend
-  const deleteInvitation = async function (invitationId: string) {
+  const delete_ = async function (req: DeleteInvitationReq) {
     try {
-      // TODO: Implement backend endpoint for deleting invitations
-      // For now, just remove from local state
-      invitations.value?.delete(invitationId)
-      logger.info(`Mock: Deleted invitation ${invitationId}`)
+      const resp: { response: Invitation } = await api.deleteInvitation(req, { meta: { token: token.value } })
+
+      invitations.value?.delete(ulid(resp.response.iD))
     } catch (err: any) {
       logger.error(err)
       throw err
@@ -93,7 +90,7 @@ export const useInvitationStore = defineStore('invitation', () => {
     }
   }
 
-  const populate = async function (ids: string[]) {
+  const populate = async function (ids: string[], groupIDs: string[]) {
     const newIDs = ids.reduce((acc: string[], id: string) => {
       if (invitations.value?.has(id)) {
         return acc
@@ -106,8 +103,20 @@ export const useInvitationStore = defineStore('invitation', () => {
       return
     }
 
-    // TODO: Implement actual populate logic when backend endpoint exists
-    logger.info(`Mock: Would populate invitations ${newIDs.join(', ')}`)
+    await list(
+      ListInvitationReq.create({
+        iDs: newIDs,
+        groupIDs: groupIDs.map(id => parse(id)),
+        ownGroup: true,
+        paginate: {
+          start: BigInt(0),
+          end: BigInt(newIDs.length),
+          order: true,
+          sort: 'created_at'
+        }
+      })
+    )
+
   }
 
   return {
@@ -116,7 +125,7 @@ export const useInvitationStore = defineStore('invitation', () => {
     selected,
     create,
     list,
-    deleteInvitation,
+    delete_,
     resendInvitation,
     populate
   }

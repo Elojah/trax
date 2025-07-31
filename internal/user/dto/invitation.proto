@@ -20,15 +20,15 @@ import "internal/user/invitation.proto";
 import "internal/user/role.proto";
 
 message InvitationView {
-	user.Invitation Invitation      = 1 [(gogoproto.nullable) = false];
-	repeated user.Role RoleSample   = 2 [(gogoproto.nullable) = false];
-	uint64 RoleCount                = 3;
+	user.Invitation Invitation        = 1 [(gogoproto.nullable) = false];
+	repeated user.Role RoleSample     = 2 [(gogoproto.nullable) = false];
+	uint64 RoleCount                  = 3;
 }
 
 message CreateInvitationReq {
-	string Email                = 1;
-	bytes GroupID 			    = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes RoleIDs      = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	string Email                      = 1;
+	bytes GroupID                     = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	repeated bytes RoleIDs            = 3 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
 
 message ListInvitationReq {
@@ -42,6 +42,11 @@ message ListInvitationReq {
 }
 
 message ListInvitationResp {
-	repeated InvitationView Invitations   = 1 [(gogoproto.nullable) = false];
-	uint64 Total                          = 2;
+	repeated InvitationView Invitations    = 1 [(gogoproto.nullable) = false];
+	uint64 Total                           = 2;
+}
+
+message DeleteInvitationReq {
+	bytes ID                               = 1 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
+	bytes GroupID                          = 2 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }
