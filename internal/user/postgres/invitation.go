@@ -339,10 +339,8 @@ func (s Store) ListInvitationByGroup(ctx context.Context, f user.FilterInvitatio
 	clause, args := filterInvitation(f).where(1)
 	b.WriteString(clause)
 
-	// Use a CTE to handle DISTINCT ON and pagination
 	with := postgres.With(b.String(), "invitation_by_group")
 
-	// Add ordering for DISTINCT ON
 	b.Reset()
 	b.WriteString(with)
 	b.WriteString(`SELECT i.id, i.email, i.created_at, i.updated_at, i.group_id, COUNT(1) OVER(PARTITION BY i.group_id)`)

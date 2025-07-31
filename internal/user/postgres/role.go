@@ -342,12 +342,7 @@ func (s Store) ListRoleByInvitation(ctx context.Context, f user.FilterRole) (map
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT DISTINCT ON (r.id, ir.invitation_id) r.id, r.group_id, r.name, r.created_at, r.updated_at, ir.invitation_id, COUNT(1) OVER() `)
-	if f.Paginate != nil {
-		b.WriteString(ppostgres.Paginate(*f.Paginate).RowPartition(sortRole, "ir.invitation_id"))
-	} else {
-		b.WriteString(`, 0 `)
-	}
+	b.WriteString(`SELECT DISTINCT ON (r.id, ir.invitation_id) r.id, r.group_id, r.name, r.created_at, r.updated_at, ir.invitation_id`)
 	b.WriteString(`
 	FROM "user"."role" r
 	JOIN "user"."invitation_role" ir ON r.id = ir.role_id
@@ -355,6 +350,21 @@ func (s Store) ListRoleByInvitation(ctx context.Context, f user.FilterRole) (map
 
 	clause, args := filterRole(f).where(1)
 	b.WriteString(clause)
+
+	with := postgres.With(b.String(), "role_by_invitation")
+	// Add ordering for DISTINCT ON
+
+	b.Reset()
+	b.WriteString(with)
+	b.WriteString(`SELECT r.id, r.group_id, r.name, r.created_at, r.updated_at, r.invitation_id, COUNT(1) OVER(PARTITION BY r.invitation_id) `)
+
+	if f.Paginate != nil {
+		b.WriteString(ppostgres.Paginate(*f.Paginate).RowPartition(sortRole, "r.invitation_id"))
+	} else {
+		b.WriteString(`, 0 `)
+	}
+
+	b.WriteString(` FROM role_by_invitation r `)
 
 	if f.Paginate != nil {
 		pag := ppostgres.Paginate(*f.Paginate).CTE(b.String())

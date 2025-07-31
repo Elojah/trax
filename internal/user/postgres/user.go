@@ -379,7 +379,6 @@ func (s Store) ListByGroup(ctx context.Context, f user.Filter) (map[string][]use
 	b.WriteString(clause)
 
 	with := postgres.With(b.String(), "user_by_group")
-	// Add ordering for DISTINCT ON
 
 	b.Reset()
 	b.WriteString(with)
@@ -398,8 +397,6 @@ func (s Store) ListByGroup(ctx context.Context, f user.Filter) (map[string][]use
 		b.Reset()
 		b.WriteString(pag)
 	}
-
-	fmt.Println(b.String())
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
@@ -432,12 +429,7 @@ func (s Store) ListByRole(ctx context.Context, f user.Filter) (map[string][]user
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT DISTINCT ON (r.id) u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, r.id, COUNT(1) OVER() `)
-	if f.Paginate != nil {
-		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
-	} else {
-		b.WriteString(`, 0 `)
-	}
+	b.WriteString(`SELECT DISTINCT ON (u.id, r.id) u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, r.id`)
 	b.WriteString(`
 	FROM "user"."user" u
 	JOIN "user"."role_user" ru ON u.id = ru.user_id
@@ -446,6 +438,26 @@ func (s Store) ListByRole(ctx context.Context, f user.Filter) (map[string][]user
 
 	clause, args := filter(f).where(1)
 	b.WriteString(clause)
+
+	with := postgres.With(b.String(), "user_by_role")
+
+	b.Reset()
+	b.WriteString(with)
+	b.WriteString(`SELECT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, u.role_id, COUNT(1) OVER(PARTITION BY u.role_id) `)
+
+	if f.Paginate != nil {
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).RowPartition(sortUser, "u.role_id"))
+	} else {
+		b.WriteString(`, 0 `)
+	}
+
+	b.WriteString(` FROM user_by_role u `)
+
+	if f.Paginate != nil {
+		pag := pagpostgres.Paginate(*f.Paginate).CTE(b.String())
+		b.Reset()
+		b.WriteString(pag)
+	}
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
