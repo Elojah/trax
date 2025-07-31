@@ -86,6 +86,7 @@ func (h *handler) CreateInvitation(ctx context.Context, req *dto.CreateInvitatio
 		}
 	}
 
+	now := time.Now().Unix()
 	if err := h.user.Tx(ctx, transaction.Write, func(ctx context.Context) (transaction.Operation, error) {
 		// Check if user already exists globally
 		u, err := h.user.Fetch(ctx, user.Filter{
@@ -109,8 +110,10 @@ func (h *handler) CreateInvitation(ctx context.Context, req *dto.CreateInvitatio
 
 				// Create new invitation
 				invitation = user.Invitation{
-					ID:    ulid.NewID(),
-					Email: req.Email,
+					ID:        ulid.NewID(),
+					Email:     req.Email,
+					CreatedAt: now,
+					UpdatedAt: now,
 				}
 
 				if err := h.user.InsertInvitation(ctx, invitation); err != nil {
@@ -125,6 +128,8 @@ func (h *handler) CreateInvitation(ctx context.Context, req *dto.CreateInvitatio
 				invitationRoleBatch[i] = user.InvitationRole{
 					InvitationID: invitation.ID,
 					RoleID:       roleID,
+					CreatedAt:    now,
+					UpdatedAt:    now,
 				}
 			}
 			if err := h.user.InsertBatchInvitationRole(ctx, invitationRoleBatch...); err != nil {
@@ -136,7 +141,6 @@ func (h *handler) CreateInvitation(ctx context.Context, req *dto.CreateInvitatio
 			return transaction.Commit, nil
 		}
 
-		now := time.Now().Unix()
 		roleUsers := make([]user.RoleUser, len(req.RoleIDs))
 		for i, role := range roles {
 			roleUsers[i] = user.RoleUser{

@@ -207,6 +207,41 @@ func (s Store) ListInvitationRole(ctx context.Context, f user.FilterInvitationRo
 	return invitationRoles, nil
 }
 
+func (s Store) CountInvitationRoleByInvitation(ctx context.Context, f user.FilterInvitationRole) (map[string]uint64, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT ir.invitation_id, COUNT(1) FROM "user"."invitation_role" ir `)
+
+	clause, args := filterInvitationRole(f).where(1)
+	b.WriteString(clause)
+	b.WriteString(`
+	GROUP BY ir.invitation_id
+	`)
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, postgres.Error(err, "invitation_role", filterInvitationRole(f).index())
+	}
+
+	counts := make(map[string]uint64)
+
+	for rows.Next() {
+		var id string
+		var count uint64
+		if err := rows.Scan(&id, &count); err != nil {
+			return nil, postgres.Error(err, "invitation_role", filterInvitationRole(f).index())
+		}
+
+		counts[id] = count
+	}
+
+	return counts, nil
+}
+
 func (s Store) DeleteInvitationRole(ctx context.Context, f user.FilterInvitationRole) error {
 	tx, err := postgres.Tx(ctx)
 	if err != nil {

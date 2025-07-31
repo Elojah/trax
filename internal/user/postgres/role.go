@@ -79,6 +79,12 @@ func (f filterRole) where(n int) (string, []any) {
 		n += len(f.GroupIDs)
 	}
 
+	if len(f.InvitationIDs) > 0 {
+		clause = append(clause, fmt.Sprintf(`ir.invitation_id IN (%s)`, postgres.Array(n, len(f.InvitationIDs))))
+		args = append(args, ulid.IDs(f.InvitationIDs).Any()...)
+		n += len(f.InvitationIDs)
+	}
+
 	// ListRoleByUser only
 	if f.UserID != nil {
 		clause = append(clause, fmt.Sprintf(`ru.user_id = $%d`, n))
@@ -327,6 +333,56 @@ func (s Store) ListRole(ctx context.Context, f user.FilterRole) ([]user.Role, ui
 	}
 
 	return roles, count, nil
+}
+
+func (s Store) ListRoleByInvitation(ctx context.Context, f user.FilterRole) (map[string][]user.Role, uint64, error) {
+	tx, err := postgres.Tx(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	b := strings.Builder{}
+	b.WriteString(`SELECT DISTINCT ON (r.id, ir.invitation_id) r.id, r.group_id, r.name, r.created_at, r.updated_at, ir.invitation_id, COUNT(1) OVER() `)
+	if f.Paginate != nil {
+		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortRole))
+	} else {
+		b.WriteString(`, 0 `)
+	}
+	b.WriteString(`
+	FROM "user"."role" r
+	JOIN "user"."invitation_role" ir ON r.id = ir.role_id
+	`)
+
+	clause, args := filterRole(f).where(1)
+	b.WriteString(clause)
+
+	if f.Paginate != nil {
+		pag := ppostgres.Paginate(*f.Paginate).CTE(b.String())
+		b.Reset()
+		b.WriteString(pag)
+	}
+
+	rows, err := tx.Query(ctx, b.String(), args...)
+	if err != nil {
+		return nil, 0, postgres.Error(err, "role+invitation_role", filterRole(f).index())
+	}
+
+	roleMap := make(map[string][]user.Role)
+	var count uint64
+	var row_number int
+
+	for rows.Next() {
+		var r sqlRole
+		var invitationID ulid.ID
+		if err := rows.Scan(&r.ID, &r.GroupID, &r.Name, &r.CreatedAt, &r.UpdatedAt, &invitationID, &count, &row_number); err != nil {
+			return nil, 0, postgres.Error(err, "role", filterRole(f).index())
+		}
+
+		role := r.role()
+		roleMap[invitationID.String()] = append(roleMap[invitationID.String()], role)
+	}
+
+	return roleMap, count, nil
 }
 
 func (s Store) CountRoleByGroup(ctx context.Context, f user.FilterRole) (map[string]uint64, error) {

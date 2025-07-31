@@ -30,6 +30,44 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type InvitationView struct {
+	Invitation user.Invitation `protobuf:"bytes,1,opt,name=Invitation,proto3" json:"Invitation"`
+	RoleSample []user.Role     `protobuf:"bytes,2,rep,name=RoleSample,proto3" json:"RoleSample"`
+	RoleCount  uint64          `protobuf:"varint,3,opt,name=RoleCount,proto3" json:"RoleCount,omitempty"`
+}
+
+func (m *InvitationView) Reset()      { *m = InvitationView{} }
+func (*InvitationView) ProtoMessage() {}
+func (*InvitationView) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6a299ab25b4df04f, []int{0}
+}
+func (m *InvitationView) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *InvitationView) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_InvitationView.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *InvitationView) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InvitationView.Merge(m, src)
+}
+func (m *InvitationView) XXX_Size() int {
+	return m.Size()
+}
+func (m *InvitationView) XXX_DiscardUnknown() {
+	xxx_messageInfo_InvitationView.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InvitationView proto.InternalMessageInfo
+
 type CreateInvitationReq struct {
 	Email   string                               `protobuf:"bytes,1,opt,name=Email,proto3" json:"Email,omitempty"`
 	GroupID github_com_elojah_trax_pkg_ulid.ID   `protobuf:"bytes,2,opt,name=GroupID,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"GroupID"`
@@ -39,7 +77,7 @@ type CreateInvitationReq struct {
 func (m *CreateInvitationReq) Reset()      { *m = CreateInvitationReq{} }
 func (*CreateInvitationReq) ProtoMessage() {}
 func (*CreateInvitationReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6a299ab25b4df04f, []int{0}
+	return fileDescriptor_6a299ab25b4df04f, []int{1}
 }
 func (m *CreateInvitationReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -79,7 +117,7 @@ type ListInvitationReq struct {
 func (m *ListInvitationReq) Reset()      { *m = ListInvitationReq{} }
 func (*ListInvitationReq) ProtoMessage() {}
 func (*ListInvitationReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6a299ab25b4df04f, []int{1}
+	return fileDescriptor_6a299ab25b4df04f, []int{2}
 }
 func (m *ListInvitationReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -109,14 +147,14 @@ func (m *ListInvitationReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListInvitationReq proto.InternalMessageInfo
 
 type ListInvitationResp struct {
-	Invitations []user.Invitation `protobuf:"bytes,1,rep,name=Invitations,proto3" json:"Invitations"`
-	Total       uint64            `protobuf:"varint,2,opt,name=Total,proto3" json:"Total,omitempty"`
+	Invitations []InvitationView `protobuf:"bytes,1,rep,name=Invitations,proto3" json:"Invitations"`
+	Total       uint64           `protobuf:"varint,2,opt,name=Total,proto3" json:"Total,omitempty"`
 }
 
 func (m *ListInvitationResp) Reset()      { *m = ListInvitationResp{} }
 func (*ListInvitationResp) ProtoMessage() {}
 func (*ListInvitationResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6a299ab25b4df04f, []int{2}
+	return fileDescriptor_6a299ab25b4df04f, []int{3}
 }
 func (m *ListInvitationResp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -145,55 +183,15 @@ func (m *ListInvitationResp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListInvitationResp proto.InternalMessageInfo
 
-type ListInvitationRoleReq struct {
-	Paginate *paginate.Paginate                   `protobuf:"bytes,1,opt,name=Paginate,proto3" json:"Paginate,omitempty"`
-	Search   string                               `protobuf:"bytes,2,opt,name=Search,proto3" json:"Search,omitempty"`
-	OwnGroup bool                                 `protobuf:"varint,3,opt,name=OwnGroup,proto3" json:"OwnGroup,omitempty"`
-	IDs      []github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,4,rep,name=IDs,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"IDs"`
-	GroupIDs []github_com_elojah_trax_pkg_ulid.ID `protobuf:"bytes,5,rep,name=GroupIDs,proto3,customtype=github.com/elojah/trax/pkg/ulid.ID" json:"GroupIDs"`
-}
-
-func (m *ListInvitationRoleReq) Reset()      { *m = ListInvitationRoleReq{} }
-func (*ListInvitationRoleReq) ProtoMessage() {}
-func (*ListInvitationRoleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6a299ab25b4df04f, []int{3}
-}
-func (m *ListInvitationRoleReq) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ListInvitationRoleReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListInvitationRoleReq.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ListInvitationRoleReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListInvitationRoleReq.Merge(m, src)
-}
-func (m *ListInvitationRoleReq) XXX_Size() int {
-	return m.Size()
-}
-func (m *ListInvitationRoleReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListInvitationRoleReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListInvitationRoleReq proto.InternalMessageInfo
-
 func init() {
+	proto.RegisterType((*InvitationView)(nil), "dto.InvitationView")
+	golang_proto.RegisterType((*InvitationView)(nil), "dto.InvitationView")
 	proto.RegisterType((*CreateInvitationReq)(nil), "dto.CreateInvitationReq")
 	golang_proto.RegisterType((*CreateInvitationReq)(nil), "dto.CreateInvitationReq")
 	proto.RegisterType((*ListInvitationReq)(nil), "dto.ListInvitationReq")
 	golang_proto.RegisterType((*ListInvitationReq)(nil), "dto.ListInvitationReq")
 	proto.RegisterType((*ListInvitationResp)(nil), "dto.ListInvitationResp")
 	golang_proto.RegisterType((*ListInvitationResp)(nil), "dto.ListInvitationResp")
-	proto.RegisterType((*ListInvitationRoleReq)(nil), "dto.ListInvitationRoleReq")
-	golang_proto.RegisterType((*ListInvitationRoleReq)(nil), "dto.ListInvitationRoleReq")
 }
 
 func init() {
@@ -204,38 +202,77 @@ func init() {
 }
 
 var fileDescriptor_6a299ab25b4df04f = []byte{
-	// 455 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x54, 0xbf, 0x8f, 0xd3, 0x30,
-	0x18, 0xf5, 0xd7, 0xf4, 0x8e, 0x9e, 0xcb, 0x00, 0xe6, 0x87, 0xa2, 0x22, 0x7d, 0xad, 0x32, 0x45,
-	0x0c, 0x89, 0x74, 0x30, 0x30, 0x30, 0x95, 0x02, 0xaa, 0x84, 0x04, 0x32, 0x4c, 0x6c, 0xbe, 0xab,
-	0x95, 0x1a, 0x72, 0x71, 0x48, 0x5c, 0x60, 0x44, 0x62, 0x60, 0xe5, 0xcf, 0xe0, 0x3f, 0x80, 0xf1,
-	0xc6, 0x8e, 0x1d, 0x4f, 0x0c, 0x15, 0x71, 0x17, 0xc6, 0x1b, 0x19, 0x51, 0xd2, 0x5c, 0x8e, 0x2b,
-	0x62, 0xe8, 0xcc, 0xe6, 0xe7, 0xe7, 0xf7, 0xfc, 0xbe, 0x97, 0x1f, 0xd4, 0x53, 0x89, 0x91, 0x59,
-	0x22, 0xe2, 0x70, 0x96, 0xcb, 0x2c, 0x9c, 0x18, 0x1d, 0xaa, 0xe4, 0xad, 0x32, 0xc2, 0x28, 0x9d,
-	0x04, 0x69, 0xa6, 0x8d, 0x66, 0xce, 0xc4, 0xe8, 0x9e, 0x9b, 0xbe, 0x8e, 0xc2, 0x48, 0x47, 0xba,
-	0xda, 0xab, 0x56, 0x6b, 0xba, 0x77, 0xab, 0x64, 0x52, 0x11, 0xa9, 0x44, 0x18, 0xd9, 0x2c, 0x6a,
-	0x12, 0x2f, 0xfa, 0x6f, 0x7a, 0x7b, 0x5f, 0x81, 0x5e, 0x7b, 0x90, 0x49, 0x61, 0xe4, 0xb8, 0xa1,
-	0xb8, 0x7c, 0xc3, 0xae, 0xd3, 0x9d, 0x87, 0x47, 0x42, 0xc5, 0x2e, 0x0c, 0xc0, 0xdf, 0xe3, 0x6b,
-	0xc0, 0x46, 0xf4, 0xd2, 0xe3, 0x4c, 0xcf, 0xd2, 0xf1, 0xc8, 0x6d, 0x0d, 0xc0, 0xbf, 0x3c, 0xbc,
-	0x3d, 0x5f, 0xf6, 0xc9, 0xf7, 0x65, 0xdf, 0x8b, 0x94, 0x99, 0xce, 0x0e, 0x82, 0x43, 0x7d, 0x14,
-	0xca, 0x58, 0xbf, 0x12, 0xd3, 0xd0, 0x64, 0xe2, 0x7d, 0x58, 0x46, 0x9b, 0xc5, 0x6a, 0x12, 0x8c,
-	0x47, 0xfc, 0x4c, 0x5a, 0xba, 0x70, 0x1d, 0xcb, 0xf1, 0x28, 0x77, 0x9d, 0x81, 0xb3, 0xad, 0x4b,
-	0x2d, 0xf5, 0x3e, 0xb6, 0xe8, 0xd5, 0x27, 0x2a, 0x37, 0x17, 0x73, 0xdf, 0xa5, 0x9d, 0x67, 0x75,
-	0x03, 0x55, 0xf4, 0xee, 0x3e, 0x0b, 0x9a, 0x4a, 0xce, 0x98, 0x61, 0x7b, 0xbe, 0xec, 0x03, 0x6f,
-	0x4e, 0xb2, 0x9b, 0x74, 0xf7, 0xb9, 0x14, 0xd9, 0xe1, 0xb4, 0x1a, 0x6b, 0x8f, 0xd7, 0x88, 0xf5,
-	0x68, 0xe7, 0xe9, 0xbb, 0xa4, 0xca, 0xed, 0x3a, 0x03, 0xf0, 0x3b, 0xbc, 0xc1, 0xec, 0x3e, 0x75,
-	0xca, 0x09, 0xda, 0x5b, 0x4f, 0x50, 0xca, 0xd8, 0x23, 0xda, 0xa9, 0xeb, 0xc8, 0xdd, 0x9d, 0xad,
-	0x2d, 0x1a, 0xad, 0x37, 0xa1, 0x6c, 0xb3, 0x84, 0x3c, 0x65, 0xf7, 0x68, 0xf7, 0x7c, 0x27, 0x77,
-	0x61, 0xe0, 0xf8, 0xdd, 0xfd, 0x2b, 0x41, 0xf9, 0x0a, 0x04, 0xe7, 0x44, 0x55, 0x03, 0xe1, 0x7f,
-	0x1e, 0x2d, 0x9f, 0xfb, 0x0b, 0x6d, 0x44, 0x5c, 0x15, 0xd1, 0xe6, 0x6b, 0xe0, 0x7d, 0x6a, 0xd1,
-	0x1b, 0x1b, 0xd7, 0xe8, 0x58, 0xfe, 0x87, 0x7d, 0x0f, 0xb3, 0x79, 0x81, 0x64, 0x51, 0x20, 0x39,
-	0x29, 0x90, 0x9c, 0x16, 0x08, 0xbf, 0x0a, 0x84, 0x0f, 0x16, 0xe1, 0x8b, 0x45, 0xf8, 0x66, 0x11,
-	0x8e, 0x2d, 0xc2, 0xdc, 0x22, 0x2c, 0x2c, 0xc2, 0x0f, 0x8b, 0xf0, 0xd3, 0x22, 0x39, 0xb5, 0x08,
-	0x9f, 0x57, 0x48, 0x8e, 0x57, 0x08, 0x8b, 0x15, 0x92, 0x93, 0x15, 0x92, 0x97, 0xfe, 0x3f, 0xee,
-	0xfd, 0xeb, 0x87, 0x70, 0xb0, 0x5b, 0x7d, 0xaa, 0x77, 0x7e, 0x07, 0x00, 0x00, 0xff, 0xff, 0x31,
-	0x49, 0x8d, 0xd8, 0x2c, 0x04, 0x00, 0x00,
+	// 513 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x31, 0x6f, 0xd3, 0x40,
+	0x14, 0xf6, 0xc5, 0x69, 0x49, 0x2e, 0x08, 0xc1, 0x15, 0x21, 0x2b, 0xa0, 0xd7, 0xc8, 0x53, 0xc4,
+	0x60, 0xa3, 0x82, 0x58, 0x60, 0x4a, 0x03, 0x28, 0x12, 0x12, 0xe8, 0x8a, 0x18, 0xd8, 0xae, 0xcd,
+	0xc9, 0x39, 0x70, 0x7c, 0xc6, 0x3e, 0x53, 0x46, 0x24, 0xfe, 0x00, 0x23, 0x3f, 0x81, 0x7f, 0x00,
+	0x63, 0xc7, 0x8c, 0x19, 0x2b, 0x86, 0x0a, 0x3b, 0x0b, 0x63, 0x47, 0x46, 0x74, 0x17, 0xc7, 0x6e,
+	0x8a, 0x18, 0xb2, 0xdd, 0xfb, 0xde, 0xfb, 0xbe, 0x7b, 0xef, 0xbb, 0x77, 0xd8, 0x15, 0x91, 0xe2,
+	0x49, 0xc4, 0x42, 0x3f, 0x4b, 0x79, 0xe2, 0x8f, 0x95, 0xf4, 0x45, 0xf4, 0x41, 0x28, 0xa6, 0x84,
+	0x8c, 0xbc, 0x38, 0x91, 0x4a, 0x12, 0x7b, 0xac, 0x64, 0xd7, 0x89, 0xdf, 0x05, 0x7e, 0x20, 0x03,
+	0x69, 0x30, 0x73, 0x5a, 0xa6, 0xbb, 0xb7, 0x75, 0x26, 0x66, 0x81, 0x88, 0x98, 0xe2, 0xd5, 0xa1,
+	0x4c, 0xc2, 0xba, 0xfe, 0x65, 0xed, 0xae, 0xb3, 0x9e, 0x4f, 0x64, 0x58, 0x32, 0xdd, 0xaf, 0x08,
+	0x5f, 0x1b, 0x55, 0xe5, 0xaf, 0x05, 0x3f, 0x26, 0x0f, 0x31, 0xae, 0x11, 0x07, 0xf5, 0x50, 0xbf,
+	0xb3, 0x77, 0xdd, 0xd3, 0x44, 0xaf, 0xc6, 0x07, 0xcd, 0xd9, 0xd9, 0xae, 0x45, 0x2f, 0x54, 0x92,
+	0x7b, 0x18, 0x53, 0x19, 0xf2, 0x03, 0x36, 0x8d, 0x43, 0xee, 0x34, 0x7a, 0x76, 0xbf, 0xb3, 0x87,
+	0x97, 0x3c, 0x8d, 0xaf, 0x18, 0x75, 0x0d, 0xb9, 0x83, 0xdb, 0x3a, 0xda, 0x97, 0x59, 0xa4, 0x1c,
+	0xbb, 0x87, 0xfa, 0x4d, 0x5a, 0x03, 0xee, 0x77, 0x84, 0x77, 0xf6, 0x13, 0xce, 0x14, 0xaf, 0x2f,
+	0xa1, 0xfc, 0x3d, 0xb9, 0x89, 0xb7, 0x9e, 0x4c, 0x99, 0x08, 0x4d, 0x6b, 0x6d, 0xba, 0x0c, 0xc8,
+	0x10, 0x5f, 0x79, 0x96, 0xc8, 0x2c, 0x1e, 0x0d, 0x9d, 0x46, 0x0f, 0xf5, 0xaf, 0x0e, 0xee, 0xea,
+	0xeb, 0x7e, 0x9e, 0xed, 0xba, 0x81, 0x50, 0x93, 0xec, 0xd0, 0x3b, 0x92, 0x53, 0x9f, 0x87, 0xf2,
+	0x2d, 0x9b, 0xf8, 0x2a, 0x61, 0x1f, 0x7d, 0xed, 0x67, 0x16, 0x8a, 0xb1, 0x37, 0x1a, 0xd2, 0x15,
+	0x55, 0xab, 0xe8, 0x06, 0x46, 0xc3, 0xd4, 0xb1, 0x7b, 0xf6, 0xa6, 0x2a, 0x25, 0xd5, 0xfd, 0xdc,
+	0xc0, 0x37, 0x9e, 0x8b, 0x54, 0xad, 0xf7, 0xfd, 0x00, 0xb7, 0x5e, 0x96, 0xcf, 0x56, 0xba, 0x4a,
+	0xbc, 0xea, 0x1d, 0x57, 0x19, 0xe3, 0x12, 0xa2, 0x55, 0x25, 0xb9, 0x85, 0xb7, 0x0f, 0x38, 0x4b,
+	0x8e, 0x26, 0x66, 0xac, 0x36, 0x2d, 0x23, 0xd2, 0xc5, 0xad, 0x17, 0xc7, 0x91, 0xe9, 0xdb, 0x58,
+	0xd7, 0xa2, 0x55, 0x4c, 0x1e, 0x63, 0x5b, 0x4f, 0xd0, 0xdc, 0x78, 0x02, 0x4d, 0x23, 0x4f, 0x71,
+	0xab, 0xb4, 0x23, 0x75, 0xb6, 0x36, 0x96, 0xa8, 0xb8, 0x6e, 0x80, 0xc9, 0x65, 0x13, 0xd2, 0x98,
+	0x3c, 0xc2, 0x9d, 0x1a, 0x49, 0x1d, 0x64, 0xd6, 0x64, 0xc7, 0x1b, 0x2b, 0xe9, 0xad, 0xef, 0x61,
+	0xb9, 0x2f, 0x17, 0xab, 0xf5, 0xd3, 0xbf, 0x92, 0x8a, 0x85, 0xc6, 0x8b, 0x26, 0x5d, 0x06, 0x83,
+	0x64, 0x96, 0x83, 0x35, 0xcf, 0xc1, 0x3a, 0xcd, 0xc1, 0x3a, 0xcf, 0x01, 0xfd, 0xc9, 0x01, 0x7d,
+	0x2a, 0x00, 0x7d, 0x2b, 0x00, 0xfd, 0x28, 0x00, 0x9d, 0x14, 0x80, 0x66, 0x05, 0xa0, 0x79, 0x01,
+	0xe8, 0x57, 0x01, 0xe8, 0x77, 0x01, 0xd6, 0x79, 0x01, 0xe8, 0xcb, 0x02, 0xac, 0x93, 0x05, 0xa0,
+	0xf9, 0x02, 0xac, 0xd3, 0x05, 0x58, 0x6f, 0xfa, 0xff, 0x19, 0xf0, 0x9f, 0xef, 0x7b, 0xb8, 0x6d,
+	0xbe, 0xcf, 0xfd, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x87, 0xec, 0x0a, 0xb1, 0xda, 0x03, 0x00,
+	0x00,
 }
 
+func (this *InvitationView) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*InvitationView)
+	if !ok {
+		that2, ok := that.(InvitationView)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Invitation.Equal(&that1.Invitation) {
+		return false
+	}
+	if len(this.RoleSample) != len(that1.RoleSample) {
+		return false
+	}
+	for i := range this.RoleSample {
+		if !this.RoleSample[i].Equal(&that1.RoleSample[i]) {
+			return false
+		}
+	}
+	if this.RoleCount != that1.RoleCount {
+		return false
+	}
+	return true
+}
 func (this *CreateInvitationReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -349,51 +386,23 @@ func (this *ListInvitationResp) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ListInvitationRoleReq) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
+func (this *InvitationView) GoString() string {
+	if this == nil {
+		return "nil"
 	}
-
-	that1, ok := that.(*ListInvitationRoleReq)
-	if !ok {
-		that2, ok := that.(ListInvitationRoleReq)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
+	s := make([]string, 0, 7)
+	s = append(s, "&dto.InvitationView{")
+	s = append(s, "Invitation: "+strings.Replace(this.Invitation.GoString(), `&`, ``, 1)+",\n")
+	if this.RoleSample != nil {
+		vs := make([]user.Role, len(this.RoleSample))
+		for i := range vs {
+			vs[i] = this.RoleSample[i]
 		}
+		s = append(s, "RoleSample: "+fmt.Sprintf("%#v", vs)+",\n")
 	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.Paginate.Equal(that1.Paginate) {
-		return false
-	}
-	if this.Search != that1.Search {
-		return false
-	}
-	if this.OwnGroup != that1.OwnGroup {
-		return false
-	}
-	if len(this.IDs) != len(that1.IDs) {
-		return false
-	}
-	for i := range this.IDs {
-		if !this.IDs[i].Equal(that1.IDs[i]) {
-			return false
-		}
-	}
-	if len(this.GroupIDs) != len(that1.GroupIDs) {
-		return false
-	}
-	for i := range this.GroupIDs {
-		if !this.GroupIDs[i].Equal(that1.GroupIDs[i]) {
-			return false
-		}
-	}
-	return true
+	s = append(s, "RoleCount: "+fmt.Sprintf("%#v", this.RoleCount)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
 }
 func (this *CreateInvitationReq) GoString() string {
 	if this == nil {
@@ -430,29 +439,13 @@ func (this *ListInvitationResp) GoString() string {
 	s := make([]string, 0, 6)
 	s = append(s, "&dto.ListInvitationResp{")
 	if this.Invitations != nil {
-		vs := make([]user.Invitation, len(this.Invitations))
+		vs := make([]InvitationView, len(this.Invitations))
 		for i := range vs {
 			vs[i] = this.Invitations[i]
 		}
 		s = append(s, "Invitations: "+fmt.Sprintf("%#v", vs)+",\n")
 	}
 	s = append(s, "Total: "+fmt.Sprintf("%#v", this.Total)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *ListInvitationRoleReq) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 9)
-	s = append(s, "&dto.ListInvitationRoleReq{")
-	if this.Paginate != nil {
-		s = append(s, "Paginate: "+fmt.Sprintf("%#v", this.Paginate)+",\n")
-	}
-	s = append(s, "Search: "+fmt.Sprintf("%#v", this.Search)+",\n")
-	s = append(s, "OwnGroup: "+fmt.Sprintf("%#v", this.OwnGroup)+",\n")
-	s = append(s, "IDs: "+fmt.Sprintf("%#v", this.IDs)+",\n")
-	s = append(s, "GroupIDs: "+fmt.Sprintf("%#v", this.GroupIDs)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -464,6 +457,58 @@ func valueToGoStringInvitation(v interface{}, typ string) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
 }
+func (m *InvitationView) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *InvitationView) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *InvitationView) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.RoleCount != 0 {
+		i = encodeVarintInvitation(dAtA, i, uint64(m.RoleCount))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.RoleSample) > 0 {
+		for iNdEx := len(m.RoleSample) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RoleSample[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintInvitation(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	{
+		size, err := m.Invitation.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintInvitation(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func (m *CreateInvitationReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -640,86 +685,6 @@ func (m *ListInvitationResp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ListInvitationRoleReq) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListInvitationRoleReq) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListInvitationRoleReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.GroupIDs) > 0 {
-		for iNdEx := len(m.GroupIDs) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size := m.GroupIDs[iNdEx].Size()
-				i -= size
-				if _, err := m.GroupIDs[iNdEx].MarshalTo(dAtA[i:]); err != nil {
-					return 0, err
-				}
-				i = encodeVarintInvitation(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x2a
-		}
-	}
-	if len(m.IDs) > 0 {
-		for iNdEx := len(m.IDs) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size := m.IDs[iNdEx].Size()
-				i -= size
-				if _, err := m.IDs[iNdEx].MarshalTo(dAtA[i:]); err != nil {
-					return 0, err
-				}
-				i = encodeVarintInvitation(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x22
-		}
-	}
-	if m.OwnGroup {
-		i--
-		if m.OwnGroup {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.Search) > 0 {
-		i -= len(m.Search)
-		copy(dAtA[i:], m.Search)
-		i = encodeVarintInvitation(dAtA, i, uint64(len(m.Search)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Paginate != nil {
-		{
-			size, err := m.Paginate.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintInvitation(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintInvitation(dAtA []byte, offset int, v uint64) int {
 	offset -= sovInvitation(v)
 	base := offset
@@ -731,16 +696,34 @@ func encodeVarintInvitation(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func NewPopulatedInvitationView(r randyInvitation, easy bool) *InvitationView {
+	this := &InvitationView{}
+	v1 := user.NewPopulatedInvitation(r, easy)
+	this.Invitation = *v1
+	if r.Intn(5) != 0 {
+		v2 := r.Intn(5)
+		this.RoleSample = make([]user.Role, v2)
+		for i := 0; i < v2; i++ {
+			v3 := user.NewPopulatedRole(r, easy)
+			this.RoleSample[i] = *v3
+		}
+	}
+	this.RoleCount = uint64(uint64(r.Uint32()))
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedCreateInvitationReq(r randyInvitation, easy bool) *CreateInvitationReq {
 	this := &CreateInvitationReq{}
 	this.Email = string(randStringInvitation(r))
-	v1 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-	this.GroupID = *v1
-	v2 := r.Intn(10)
-	this.RoleIDs = make([]github_com_elojah_trax_pkg_ulid.ID, v2)
-	for i := 0; i < v2; i++ {
-		v3 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-		this.RoleIDs[i] = *v3
+	v4 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+	this.GroupID = *v4
+	v5 := r.Intn(10)
+	this.RoleIDs = make([]github_com_elojah_trax_pkg_ulid.ID, v5)
+	for i := 0; i < v5; i++ {
+		v6 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+		this.RoleIDs[i] = *v6
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -754,17 +737,17 @@ func NewPopulatedListInvitationReq(r randyInvitation, easy bool) *ListInvitation
 	}
 	this.Search = string(randStringInvitation(r))
 	this.OwnGroup = bool(bool(r.Intn(2) == 0))
-	v4 := r.Intn(10)
-	this.IDs = make([]github_com_elojah_trax_pkg_ulid.ID, v4)
-	for i := 0; i < v4; i++ {
-		v5 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-		this.IDs[i] = *v5
+	v7 := r.Intn(10)
+	this.IDs = make([]github_com_elojah_trax_pkg_ulid.ID, v7)
+	for i := 0; i < v7; i++ {
+		v8 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+		this.IDs[i] = *v8
 	}
-	v6 := r.Intn(10)
-	this.GroupIDs = make([]github_com_elojah_trax_pkg_ulid.ID, v6)
-	for i := 0; i < v6; i++ {
-		v7 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-		this.GroupIDs[i] = *v7
+	v9 := r.Intn(10)
+	this.GroupIDs = make([]github_com_elojah_trax_pkg_ulid.ID, v9)
+	for i := 0; i < v9; i++ {
+		v10 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
+		this.GroupIDs[i] = *v10
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -774,38 +757,14 @@ func NewPopulatedListInvitationReq(r randyInvitation, easy bool) *ListInvitation
 func NewPopulatedListInvitationResp(r randyInvitation, easy bool) *ListInvitationResp {
 	this := &ListInvitationResp{}
 	if r.Intn(5) != 0 {
-		v8 := r.Intn(5)
-		this.Invitations = make([]user.Invitation, v8)
-		for i := 0; i < v8; i++ {
-			v9 := user.NewPopulatedInvitation(r, easy)
-			this.Invitations[i] = *v9
+		v11 := r.Intn(5)
+		this.Invitations = make([]InvitationView, v11)
+		for i := 0; i < v11; i++ {
+			v12 := NewPopulatedInvitationView(r, easy)
+			this.Invitations[i] = *v12
 		}
 	}
 	this.Total = uint64(uint64(r.Uint32()))
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedListInvitationRoleReq(r randyInvitation, easy bool) *ListInvitationRoleReq {
-	this := &ListInvitationRoleReq{}
-	if r.Intn(5) != 0 {
-		this.Paginate = paginate.NewPopulatedPaginate(r, easy)
-	}
-	this.Search = string(randStringInvitation(r))
-	this.OwnGroup = bool(bool(r.Intn(2) == 0))
-	v10 := r.Intn(10)
-	this.IDs = make([]github_com_elojah_trax_pkg_ulid.ID, v10)
-	for i := 0; i < v10; i++ {
-		v11 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-		this.IDs[i] = *v11
-	}
-	v12 := r.Intn(10)
-	this.GroupIDs = make([]github_com_elojah_trax_pkg_ulid.ID, v12)
-	for i := 0; i < v12; i++ {
-		v13 := github_com_elojah_trax_pkg_ulid.NewPopulatedID(r)
-		this.GroupIDs[i] = *v13
-	}
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -830,9 +789,9 @@ func randUTF8RuneInvitation(r randyInvitation) rune {
 	return rune(ru + 61)
 }
 func randStringInvitation(r randyInvitation) string {
-	v14 := r.Intn(100)
-	tmps := make([]rune, v14)
-	for i := 0; i < v14; i++ {
+	v13 := r.Intn(100)
+	tmps := make([]rune, v13)
+	for i := 0; i < v13; i++ {
 		tmps[i] = randUTF8RuneInvitation(r)
 	}
 	return string(tmps)
@@ -854,11 +813,11 @@ func randFieldInvitation(dAtA []byte, r randyInvitation, fieldNumber int, wire i
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateInvitation(dAtA, uint64(key))
-		v15 := r.Int63()
+		v14 := r.Int63()
 		if r.Intn(2) == 0 {
-			v15 *= -1
+			v14 *= -1
 		}
-		dAtA = encodeVarintPopulateInvitation(dAtA, uint64(v15))
+		dAtA = encodeVarintPopulateInvitation(dAtA, uint64(v14))
 	case 1:
 		dAtA = encodeVarintPopulateInvitation(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -883,6 +842,26 @@ func encodeVarintPopulateInvitation(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
+func (m *InvitationView) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Invitation.Size()
+	n += 1 + l + sovInvitation(uint64(l))
+	if len(m.RoleSample) > 0 {
+		for _, e := range m.RoleSample {
+			l = e.Size()
+			n += 1 + l + sovInvitation(uint64(l))
+		}
+	}
+	if m.RoleCount != 0 {
+		n += 1 + sovInvitation(uint64(m.RoleCount))
+	}
+	return n
+}
+
 func (m *CreateInvitationReq) Size() (n int) {
 	if m == nil {
 		return 0
@@ -954,43 +933,28 @@ func (m *ListInvitationResp) Size() (n int) {
 	return n
 }
 
-func (m *ListInvitationRoleReq) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Paginate != nil {
-		l = m.Paginate.Size()
-		n += 1 + l + sovInvitation(uint64(l))
-	}
-	l = len(m.Search)
-	if l > 0 {
-		n += 1 + l + sovInvitation(uint64(l))
-	}
-	if m.OwnGroup {
-		n += 2
-	}
-	if len(m.IDs) > 0 {
-		for _, e := range m.IDs {
-			l = e.Size()
-			n += 1 + l + sovInvitation(uint64(l))
-		}
-	}
-	if len(m.GroupIDs) > 0 {
-		for _, e := range m.GroupIDs {
-			l = e.Size()
-			n += 1 + l + sovInvitation(uint64(l))
-		}
-	}
-	return n
-}
-
 func sovInvitation(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozInvitation(x uint64) (n int) {
 	return sovInvitation(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (this *InvitationView) String() string {
+	if this == nil {
+		return "nil"
+	}
+	repeatedStringForRoleSample := "[]Role{"
+	for _, f := range this.RoleSample {
+		repeatedStringForRoleSample += fmt.Sprintf("%v", f) + ","
+	}
+	repeatedStringForRoleSample += "}"
+	s := strings.Join([]string{`&InvitationView{`,
+		`Invitation:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Invitation), "Invitation", "user.Invitation", 1), `&`, ``, 1) + `,`,
+		`RoleSample:` + repeatedStringForRoleSample + `,`,
+		`RoleCount:` + fmt.Sprintf("%v", this.RoleCount) + `,`,
+		`}`,
+	}, "")
+	return s
 }
 func (this *CreateInvitationReq) String() string {
 	if this == nil {
@@ -1022,28 +986,14 @@ func (this *ListInvitationResp) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForInvitations := "[]Invitation{"
+	repeatedStringForInvitations := "[]InvitationView{"
 	for _, f := range this.Invitations {
-		repeatedStringForInvitations += fmt.Sprintf("%v", f) + ","
+		repeatedStringForInvitations += strings.Replace(strings.Replace(f.String(), "InvitationView", "InvitationView", 1), `&`, ``, 1) + ","
 	}
 	repeatedStringForInvitations += "}"
 	s := strings.Join([]string{`&ListInvitationResp{`,
 		`Invitations:` + repeatedStringForInvitations + `,`,
 		`Total:` + fmt.Sprintf("%v", this.Total) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ListInvitationRoleReq) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ListInvitationRoleReq{`,
-		`Paginate:` + strings.Replace(fmt.Sprintf("%v", this.Paginate), "Paginate", "paginate.Paginate", 1) + `,`,
-		`Search:` + fmt.Sprintf("%v", this.Search) + `,`,
-		`OwnGroup:` + fmt.Sprintf("%v", this.OwnGroup) + `,`,
-		`IDs:` + fmt.Sprintf("%v", this.IDs) + `,`,
-		`GroupIDs:` + fmt.Sprintf("%v", this.GroupIDs) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1055,6 +1005,142 @@ func valueToStringInvitation(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
+}
+func (m *InvitationView) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowInvitation
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: InvitationView: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: InvitationView: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Invitation", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInvitation
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthInvitation
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthInvitation
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Invitation.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoleSample", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInvitation
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthInvitation
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthInvitation
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoleSample = append(m.RoleSample, user.Role{})
+			if err := m.RoleSample[len(m.RoleSample)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoleCount", wireType)
+			}
+			m.RoleCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInvitation
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RoleCount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipInvitation(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthInvitation
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *CreateInvitationReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1472,7 +1558,7 @@ func (m *ListInvitationResp) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Invitations = append(m.Invitations, user.Invitation{})
+			m.Invitations = append(m.Invitations, InvitationView{})
 			if err := m.Invitations[len(m.Invitations)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1496,214 +1582,6 @@ func (m *ListInvitationResp) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipInvitation(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListInvitationRoleReq) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowInvitation
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListInvitationRoleReq: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListInvitationRoleReq: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Paginate", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowInvitation
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Paginate == nil {
-				m.Paginate = &paginate.Paginate{}
-			}
-			if err := m.Paginate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Search", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowInvitation
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Search = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OwnGroup", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowInvitation
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.OwnGroup = bool(v != 0)
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IDs", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowInvitation
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v github_com_elojah_trax_pkg_ulid.ID
-			m.IDs = append(m.IDs, v)
-			if err := m.IDs[len(m.IDs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GroupIDs", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowInvitation
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthInvitation
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v github_com_elojah_trax_pkg_ulid.ID
-			m.GroupIDs = append(m.GroupIDs, v)
-			if err := m.GroupIDs[len(m.GroupIDs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipInvitation(dAtA[iNdEx:])

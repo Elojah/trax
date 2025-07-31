@@ -17,6 +17,13 @@ import "pkg/gogoproto/gogo.proto";
 import "pkg/paginate/paginate.proto";
 
 import "internal/user/invitation.proto";
+import "internal/user/role.proto";
+
+message InvitationView {
+	user.Invitation Invitation      = 1 [(gogoproto.nullable) = false];
+	repeated user.Role RoleSample   = 2 [(gogoproto.nullable) = false];
+	uint64 RoleCount                = 3;
+}
 
 message CreateInvitationReq {
 	string Email                = 1;
@@ -35,16 +42,6 @@ message ListInvitationReq {
 }
 
 message ListInvitationResp {
-	repeated user.Invitation Invitations  = 1 [(gogoproto.nullable) = false];
+	repeated InvitationView Invitations   = 1 [(gogoproto.nullable) = false];
 	uint64 Total                          = 2;
-}
-
-message ListInvitationRoleReq {
-	paginate.Paginate Paginate        = 1 [(gogoproto.nullable) = true];
-	string Search                     = 2;
-
-	bool OwnGroup                     = 3;
-
-    repeated bytes IDs                = 4 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
-	repeated bytes GroupIDs           = 5 [(gogoproto.customtype) = "github.com/elojah/trax/pkg/ulid.ID", (gogoproto.nullable) = false];
 }

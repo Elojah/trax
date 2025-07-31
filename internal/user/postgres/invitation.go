@@ -333,7 +333,7 @@ func (s Store) ListInvitationByGroup(ctx context.Context, f user.FilterInvitatio
 	b := strings.Builder{}
 	b.WriteString(`SELECT DISTINCT ON (i.id, r.group_id) i.id, i.email, i.created_at, i.updated_at, r.group_id, COUNT(1) OVER() `)
 	if f.Paginate != nil {
-		b.WriteString(pagpostgres.Paginate(*f.Paginate).RowPartition(sortUser, "r.group_id"))
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).RowPartition(sortInvitation, "r.group_id"))
 	} else {
 		b.WriteString(`, 0 `)
 	}

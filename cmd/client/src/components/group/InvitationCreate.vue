@@ -38,6 +38,7 @@ import z from 'zod';
 import { Form, FormField } from '@primevue/forms';
 import type { FormSubmitEvent } from '@primevue/forms';
 import { useUserStore } from '@/stores/user';
+import { useInvitationStore } from '@/stores/invitation';
 
 const route = useRoute();
 const errorsStore = useErrorsStore();
@@ -46,7 +47,7 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const roleStore = useRoleStore();
 const { roles, total } = toRefs(roleStore);
-const userStore = useUserStore();
+const invitationStore = useInvitationStore();
 
 const groupId = route.params.groupId as string
 
@@ -137,7 +138,7 @@ const isRoleSelected = (roleId: string): boolean => {
 	return selectedRoles.value.has(roleId);
 };
 
-const inviteUser = async (e: FormSubmitEvent) => {
+const createInvitation = async (e: FormSubmitEvent) => {
 	// Validate roles first
 	const isRolesValid = validateRoles();
 
@@ -147,7 +148,7 @@ const inviteUser = async (e: FormSubmitEvent) => {
 	}
 
 	try {
-		await userStore.invite(e.states.email.value, group.value?.group?.iD!, Array.from(selectedRoles.value.keys()).map(id => parse(id)));
+		await invitationStore.create(e.states.email.value, group.value?.group?.iD!, Array.from(selectedRoles.value.keys()).map(id => parse(id)));
 	} catch (e) {
 		errorsStore.showGRPC(e);
 		return;
@@ -203,7 +204,7 @@ onMounted(async () => {
 
 		<!-- User Information Form -->
 		<div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800">
-			<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="inviteUser"
+			<Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="createInvitation"
 				class="flex items-end gap-6">
 				<FormField v-slot="$field" name="email" class="flex-1">
 					<label for="invite-email" class="block text-color text-base font-medium mb-2">Email Address</label>

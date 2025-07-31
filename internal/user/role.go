@@ -33,6 +33,8 @@ type FilterRole struct {
 
 	UserID ulid.ID
 
+	InvitationIDs []ulid.ID
+
 	*paginate.Paginate
 	Search string
 }
@@ -48,6 +50,7 @@ type StoreRole interface {
 	UpdateRole(context.Context, FilterRole, PatchRole) ([]Role, error)
 	FetchRole(context.Context, FilterRole) (Role, error)
 	ListRole(context.Context, FilterRole) ([]Role, uint64, error)
+	ListRoleByInvitation(context.Context, FilterRole) (map[string][]Role, uint64, error)
 	DeleteRole(context.Context, FilterRole) error
 
 	CountRoleByGroup(context.Context, FilterRole) (map[string]uint64, error)

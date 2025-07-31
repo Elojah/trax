@@ -48,6 +48,7 @@ type StoreInvitationRole interface {
 	InsertBatchInvitationRole(context.Context, ...InvitationRole) error
 	FetchInvitationRole(context.Context, FilterInvitationRole) (InvitationRole, error)
 	ListInvitationRole(context.Context, FilterInvitationRole) ([]InvitationRole, error)
+	CountInvitationRoleByInvitation(context.Context, FilterInvitationRole) (map[string]uint64, error)
 	DeleteInvitationRole(context.Context, FilterInvitationRole) error
 }
 

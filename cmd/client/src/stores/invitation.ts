@@ -3,15 +3,11 @@ import { config, logger } from '@/config'
 import { APIClient } from '@api/api.client'
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport'
 import { Invitation, InvitationRole } from '@internal/user/invitation'
+import { InvitationView, ListInvitationReq, ListInvitationResp } from '@internal/user/dto/invitation'
 import { useAuthStore } from '@/stores/auth'
 import { computed, ref } from 'vue'
 import { parse, ulid } from '@/utils/ulid'
-
-export interface InvitationView {
-  invitation?: Invitation
-  roles?: string[] // Role names
-  roleCount?: number
-}
+import type { U } from '@internal/user/user'
 
 export const useInvitationStore = defineStore('invitation', () => {
   const invitations = ref<Map<string, InvitationView>>(new Map())
@@ -27,43 +23,39 @@ export const useInvitationStore = defineStore('invitation', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  // Mock function for listing invitations by group ID
-  // This would need to be implemented in the backend
-  const listByGroup = async function (groupId: string): Promise<string[]> {
+  const create = async function (email: string, groupID: Uint8Array, roleIDs: Uint8Array[]) {
     try {
-      // TODO: Implement backend endpoint for listing invitations by group
-      // For now, return mock data
-      const mockInvitations: InvitationView[] = [
-        {
-          invitation: {
-            iD: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
-            email: 'john.doe@example.com',
-            createdAt: BigInt(Date.now() - 86400000), // 1 day ago
-            updatedAt: BigInt(Date.now() - 86400000)
-          },
-          roles: ['Admin', 'Editor'],
-          roleCount: 2
-        },
-        {
-          invitation: {
-            iD: new Uint8Array([2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
-            email: 'jane.smith@example.com',
-            createdAt: BigInt(Date.now() - 172800000), // 2 days ago
-            updatedAt: BigInt(Date.now() - 172800000)
-          },
-          roles: ['Viewer'],
-          roleCount: 1
-        }
-      ]
+      const req = {
+        email: email,
+        groupID: groupID,
+        roleIDs: roleIDs,
+      }
 
-      mockInvitations.forEach((invitation: InvitationView) => {
-        const id = ulid(invitation.invitation?.iD)
-        invitations.value?.set(id, invitation)
+      const resp: { response: U } = await api.createInvitation(req, { meta: { token: token.value } })
+
+      return resp
+    } catch (err: any) {
+      logger.error(err)
+      throw err
+    }
+
+  }
+
+  // General list function for invitations
+  const list = async function (req: ListInvitationReq): Promise<string[]> {
+    try {
+      const resp: { response: ListInvitationResp } = await api.listInvitation(req, { meta: { token: token.value } })
+
+      resp.response.invitations?.forEach((invitationView: InvitationView) => {
+        const id = ulid(invitationView.invitation?.iD)
+        invitations.value?.set(id, invitationView)
       })
 
-      total.value = BigInt(mockInvitations.length)
+      if (req?.iDs.length === 0) {
+        total.value = resp.response.total
+      }
 
-      return mockInvitations.map((invitation: InvitationView) => ulid(invitation.invitation?.iD))
+      return resp.response.invitations.map((invitationView: InvitationView) => ulid(invitationView.invitation?.iD))
     } catch (err: any) {
       logger.error(err)
       throw err
@@ -122,7 +114,8 @@ export const useInvitationStore = defineStore('invitation', () => {
     invitations,
     total,
     selected,
-    listByGroup,
+    create,
+    list,
     deleteInvitation,
     resendInvitation,
     populate

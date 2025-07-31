@@ -24,24 +24,6 @@ export const useUserStore = defineStore('user', () => {
   const authStore = useAuthStore()
   const token = computed(() => authStore.token)
 
-  const invite = async function (email: string, groupID: Uint8Array, roleIDs: Uint8Array[]) {
-    try {
-      const req = {
-        email: email,
-        groupID: groupID,
-        roleIDs: roleIDs,
-      }
-
-      const resp: { response: U } = await api.inviteUser(req, { meta: { token: token.value } })
-
-      return resp
-    } catch (err: any) {
-      logger.error(err)
-      throw err
-    }
-
-  }
-
   // Return users ids and group ids
   const list = async function (req: ListUserReq): Promise<string[]> {
     try {
@@ -161,7 +143,6 @@ export const useUserStore = defineStore('user', () => {
     users,
     total,
     usersByRole,
-    invite,
     list,
     addRole,
     deleteRole,

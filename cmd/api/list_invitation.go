@@ -6,6 +6,7 @@ import (
 	"github.com/elojah/trax/internal/user"
 	"github.com/elojah/trax/internal/user/dto"
 	gerrors "github.com/elojah/trax/pkg/errors"
+	"github.com/elojah/trax/pkg/paginate"
 	"github.com/elojah/trax/pkg/transaction"
 	"github.com/elojah/trax/pkg/ulid"
 	"github.com/rs/zerolog/log"
@@ -54,7 +55,7 @@ func (h *handler) ListInvitation(ctx context.Context, req *dto.ListInvitationReq
 		ids = req.IDs
 	}
 
-	var invitations []user.Invitation
+	var invitationViews []dto.InvitationView
 	var total uint64
 
 	// Fetch invitations
@@ -75,9 +76,57 @@ func (h *handler) ListInvitation(ctx context.Context, req *dto.ListInvitationReq
 
 		total = totalByGroup
 
-		invitations = make([]user.Invitation, 0)
-		for _, i := range invitationsByGroup {
-			invitations = append(invitations, i...)
+		ids := make([]ulid.ID, 0, len(invitationsByGroup))
+		for _, invitations := range invitationsByGroup {
+			for _, i := range invitations {
+				ids = append(ids, i.ID)
+			}
+		}
+
+		rolesByInvitation, _, err := h.user.ListRoleByInvitation(ctx, user.FilterRole{
+			InvitationIDs: ids,
+			Paginate: &paginate.Paginate{
+				Start: 0,
+				End:   9,
+				Sort:  "created_at",
+				Order: false,
+			},
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to list roles")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		countRoles, err := h.user.CountInvitationRoleByInvitation(ctx, user.FilterInvitationRole{
+			InvitationIDs: ids,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to count roles")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		invitationViews = make([]dto.InvitationView, 0, len(invitationsByGroup))
+		for _, invitations := range invitationsByGroup {
+			for _, i := range invitations {
+				iv := dto.InvitationView{
+					Invitation: i,
+					RoleSample: func() []user.Role {
+						if sample, ok := rolesByInvitation[i.ID.String()]; ok {
+							return sample
+						}
+						return []user.Role{}
+					}(),
+					RoleCount: func() uint64 {
+						if count, ok := countRoles[i.ID.String()]; ok {
+							return count
+						}
+						return 0
+					}(),
+				}
+				invitationViews = append(invitationViews, iv)
+			}
 		}
 
 		return transaction.Commit, nil
@@ -88,7 +137,7 @@ func (h *handler) ListInvitation(ctx context.Context, req *dto.ListInvitationReq
 	logger.Info().Msg("success")
 
 	return &dto.ListInvitationResp{
-		Invitations: invitations,
+		Invitations: invitationViews,
 		Total:       total,
 	}, nil
 }

@@ -69,7 +69,7 @@ const table = useTable({
 
 const { views, handlers, search, loading } = table;
 
-const openInviteUser = () => {
+const openInvitationCreate = () => {
 	router.push({
 		name: 'group-invite',
 		params: {
@@ -151,7 +151,7 @@ onMounted(() => {
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
 							@click="table.list()" v-tooltip.bottom="'Refresh users'" />
 						<Button label="" icon="pi pi-plus" outlined severity="primary" class="font-medium"
-							@click="openInviteUser" />
+							@click="openInvitationCreate" />
 					</div>
 				</div>
 			</template>
