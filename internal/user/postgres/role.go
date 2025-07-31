@@ -344,7 +344,7 @@ func (s Store) ListRoleByInvitation(ctx context.Context, f user.FilterRole) (map
 	b := strings.Builder{}
 	b.WriteString(`SELECT DISTINCT ON (r.id, ir.invitation_id) r.id, r.group_id, r.name, r.created_at, r.updated_at, ir.invitation_id, COUNT(1) OVER() `)
 	if f.Paginate != nil {
-		b.WriteString(ppostgres.Paginate(*f.Paginate).Row(sortRole))
+		b.WriteString(ppostgres.Paginate(*f.Paginate).RowPartition(sortRole, "ir.invitation_id"))
 	} else {
 		b.WriteString(`, 0 `)
 	}

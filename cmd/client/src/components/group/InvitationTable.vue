@@ -212,8 +212,10 @@ onMounted(async () => {
 			<Column field="roles" header="Roles" class="min-w-48">
 				<template #body="{ data }: { data: InvitationView }">
 					<div class="flex flex-wrap gap-1">
-						<Tag v-for="role in data.roleSample" :key="ulid(role.iD)" :value="role" severity="secondary"
-							class="text-xs" />
+						<Tag v-for="role in data.roleSample?.slice(0, 9)" :key="ulid(role.iD)" :value="role.name"
+							severity="secondary" class="text-xs" />
+						<Tag v-if="Number(data.roleCount) > 9" :value="`+${Number(data.roleCount) - 9}`"
+							severity="primary" class="text-xs" />
 						<span v-if="!data.roleSample || data.roleSample.length === 0"
 							class="text-surface-400 dark:text-surface-500 text-sm">No roles</span>
 					</div>
@@ -247,9 +249,9 @@ onMounted(async () => {
 			</Column>
 
 			<!-- Actions Column -->
-			<Column header="Actions" class="min-w-48">
+			<Column header="" class="min-w-48">
 				<template #body="{ data }: { data: InvitationView }">
-					<div class="flex items-center gap-2">
+					<div class="flex items-center justify-end gap-2">
 						<Button icon="pi pi-send" severity="info" size="small" outlined @click="resendInvitation(data)"
 							v-tooltip.bottom="'Resend invitation'" />
 						<Button icon="pi pi-trash" severity="danger" size="small" outlined

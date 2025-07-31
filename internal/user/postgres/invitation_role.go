@@ -230,13 +230,13 @@ func (s Store) CountInvitationRoleByInvitation(ctx context.Context, f user.Filte
 	counts := make(map[string]uint64)
 
 	for rows.Next() {
-		var id string
+		var id ulid.ID
 		var count uint64
 		if err := rows.Scan(&id, &count); err != nil {
 			return nil, postgres.Error(err, "invitation_role", filterInvitationRole(f).index())
 		}
 
-		counts[id] = count
+		counts[id.String()] = count
 	}
 
 	return counts, nil

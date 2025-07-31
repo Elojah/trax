@@ -283,7 +283,7 @@ onMounted(async () => {
 				</template>
 			</Column>
 
-			<Column field="actions" header="" style="width: 10%">
+			<Column header="" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.role" class="flex items-center gap-2 justify-end">
 						<Button v-if="!userRoleIds.has(ulid(data.role.iD))" icon="pi pi-plus" severity="success"
