@@ -161,11 +161,6 @@ const createInvitation = async (e: FormSubmitEvent) => {
 	e.reset();
 	selectedRoles.value = new Map();
 	roleValidationError.value = null;
-
-	// Wait a bit to show the success message, then navigate back
-	setTimeout(() => {
-		back();
-	}, 2000);
 };
 
 // Initialize data on component mount

@@ -11,6 +11,7 @@ import { logger } from "@/config";
 import { formatDate } from '@/utils/date';
 import { back } from '@/utils/router';
 import { DeleteGroupReq, UpdateGroupReq } from '@internal/user/dto/group';
+import { Command, Resource } from '@internal/user/role';
 
 // PrimeVue UI Components
 import Button from 'primevue/button';
@@ -42,6 +43,8 @@ import z from 'zod';
 import { Form, FormField } from '@primevue/forms';
 import type { FormSubmitEvent } from '@primevue/forms';
 import { useConfirm } from 'primevue/useconfirm';
+import { ulid } from '@/utils/ulid';
+import { hasClaim } from '@/utils/claims';
 
 const route = useRoute();
 const router = useRouter();
@@ -51,6 +54,7 @@ const errorsStore = useErrorsStore();
 const confirm = useConfirm();
 
 const { groups } = toRefs(store);
+const { claims } = toRefs(authStore);
 const { success, message } = toRefs(errorsStore);
 
 const loading = ref(true);
@@ -96,6 +100,15 @@ const loadGroup = async () => {
 
 	loading.value = false;
 };
+
+const readRolePermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_role, Command.C_read);
+});
+
+const readUserPermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_user, Command.C_read);
+});
+
 
 // Action handlers
 const openManageGroup = () => {
@@ -245,19 +258,19 @@ onMounted(async () => {
 								<span>Details</span>
 							</div>
 						</Tab>
-						<Tab value="1">
+						<Tab value="1" :disabled="!readRolePermission">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-shield"></i>
 								<span>Roles</span>
 							</div>
 						</Tab>
-						<Tab value="2">
+						<Tab value="2" :disabled="!readUserPermission">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-users"></i>
 								<span>Users</span>
 							</div>
 						</Tab>
-						<Tab value="3">
+						<Tab value="3" :disabled="!readUserPermission">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-envelope"></i>
 								<span>Invitations</span>
@@ -411,17 +424,17 @@ onMounted(async () => {
 
 						<!-- Roles Tab -->
 						<TabPanel value="1">
-							<RoleTable :groupId="groupId" />
+							<RoleTable v-if="readRolePermission" :groupId="groupId" />
 						</TabPanel>
 
 						<!-- Users Tab -->
 						<TabPanel value="2">
-							<UserTable :groupId="groupId" />
+							<UserTable v-if="readUserPermission" :groupId="groupId" />
 						</TabPanel>
 
 						<!-- Invitations Tab -->
 						<TabPanel value="3">
-							<InvitationTable :groupId="groupId" />
+							<InvitationTable v-if="readUserPermission" :groupId="groupId" />
 						</TabPanel>
 					</TabPanels>
 				</Tabs>

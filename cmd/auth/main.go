@@ -94,13 +94,15 @@ func run(prog string, filename string) {
 
 	userStore := &userpostgres.Store{}
 	userService := useragg.S{
-		Transactioner:   postgress,
-		Store:           userStore,
-		StoreGroup:      userStore,
-		StoreRole:       userStore,
-		StorePermission: userStore,
-		StoreRoleUser:   userStore,
-		Cookie:          cookieService,
+		Transactioner:       postgress,
+		Store:               userStore,
+		StoreInvitation:     userStore,
+		StoreInvitationRole: userStore,
+		StoreGroup:          userStore,
+		StoreRole:           userStore,
+		StorePermission:     userStore,
+		StoreRoleUser:       userStore,
+		Cookie:              cookieService,
 	}
 	if err := userService.Dial(ctx); err != nil {
 		log.Error().Err(err).Msg("failed to dial user application")

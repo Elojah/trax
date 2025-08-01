@@ -56,6 +56,52 @@ func (h *handler) Signup(ctx context.Context, req *dto.SignupReq) (*pbtypes.Empt
 
 		logger.Info().Msg("created")
 
+		// Assign user roles if invitation exists for this email
+		invitation, err := h.user.FetchInvitation(ctx, user.FilterInvitation{
+			Email: &u.Email,
+		})
+		if err != nil {
+			if errors.As(err, &gerrors.ErrNotFound{}) {
+				logger.Info().Msg("no invitation found for user")
+
+				return transaction.Commit, nil
+			} else {
+				logger.Error().Err(err).Msg("failed to fetch invitation")
+
+				return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+			}
+		}
+
+		iroles, err := h.user.ListInvitationRole(ctx, user.FilterInvitationRole{
+			InvitationID: invitation.ID,
+		})
+		if err != nil {
+			logger.Error().Err(err).Msg("failed to list invitation roles")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
+		if len(iroles) == 0 {
+			logger.Info().Msg("no roles to assign from invitation")
+
+			return transaction.Commit, nil
+		}
+
+		roleUsers := make([]user.RoleUser, 0, len(iroles))
+		for _, irole := range iroles {
+			roleUsers = append(roleUsers, user.RoleUser{
+				UserID:    u.ID,
+				RoleID:    irole.RoleID,
+				CreatedAt: now,
+				UpdatedAt: now,
+			})
+		}
+		if err := h.user.InsertBatchRoleUser(ctx, roleUsers...); err != nil {
+			logger.Error().Err(err).Msg("failed to insert role users")
+
+			return transaction.Rollback, status.New(codes.Internal, err.Error()).Err()
+		}
+
 		return transaction.Commit, nil
 	}); err != nil {
 		return &pbtypes.Empty{}, err
