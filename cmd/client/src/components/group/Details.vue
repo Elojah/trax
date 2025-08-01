@@ -101,6 +101,18 @@ const loadGroup = async () => {
 	loading.value = false;
 };
 
+const readGroupPermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_group, Command.C_read);
+});
+
+const editGroupPermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_group, Command.C_edit);
+});
+
+const writeGroupPermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_group, Command.C_write);
+});
+
 const readRolePermission = computed(() => {
 	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_role, Command.C_read);
 });
@@ -252,7 +264,7 @@ onMounted(async () => {
 				<!-- Group Content with Tabs -->
 				<Tabs v-else v-model:value="activeTab" class="w-full">
 					<TabList>
-						<Tab value="0">
+						<Tab value="0" :disabled="!readGroupPermission">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-info-circle"></i>
 								<span>Details</span>
@@ -280,7 +292,7 @@ onMounted(async () => {
 					<TabPanels>
 						<!-- Details Tab -->
 						<TabPanel value="0">
-							<Card class="shadow-lg border-0">
+							<Card v-if="readGroupPermission" class="shadow-lg border-0">
 								<template #content>
 									<div class="p-8">
 										<!-- Hero Section with Edit Button -->
@@ -313,7 +325,8 @@ onMounted(async () => {
 														</div>
 													</div>
 													<div class="flex items-center gap-3">
-														<Button label="" icon="pi pi-cog" outlined severity="primary"
+														<Button :disabled="!editGroupPermission" label=""
+															icon="pi pi-cog" outlined severity="primary"
 															class="font-medium" @click="openManageGroup"
 															v-tooltip.bottom="'Edit group settings'" />
 													</div>
@@ -503,8 +516,8 @@ onMounted(async () => {
 					</FormField>
 				</div>
 				<div class="flex justify-between items-center">
-					<Button label="Delete Group" icon="pi pi-trash" severity="danger" outlined class="font-medium"
-						@click="deleteGroup" />
+					<Button :disabled="!writeGroupPermission" label="Delete Group" icon="pi pi-trash" severity="danger"
+						outlined class="font-medium" @click="deleteGroup" />
 					<div class="flex gap-4">
 						<Button label="Cancel" outlined @click="dialogManageGroup = false" />
 						<Button label="Update" type="submit" />

@@ -14,7 +14,7 @@ import { formatDate } from '@/utils/date';
 import { createPagination } from '@/utils/requests';
 import { useTable } from '@/composables';
 import { ListRoleReq, RolePermission, CreateRoleReq } from '@internal/user/dto/role';
-import { Command } from '@internal/user/role';
+import { Command, Resource } from '@internal/user/role';
 
 // PrimeVue UI Components
 import DataTable, {
@@ -42,6 +42,7 @@ import { zodResolver } from '@primevue/forms/resolvers/zod';
 import z from 'zod';
 import { Form, FormField } from '@primevue/forms';
 import type { FormSubmitEvent } from '@primevue/forms';
+import { hasClaim } from '@/utils/claims';
 
 const props = defineProps<{
 	groupId: string;
@@ -49,6 +50,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const authStore = useAuthStore();
+const { claims } = toRefs(authStore);
 const errorsStore = useErrorsStore();
 const { success, message } = toRefs(errorsStore);
 const groupStore = useGroupStore();
@@ -59,6 +61,10 @@ const { roles, total } = toRefs(roleStore);
 const permissions = ref()
 
 const group = groups.value.get(props.groupId) || null;
+
+const writeRolePermission = computed(() => {
+	return hasClaim(claims.value, group?.group?.iD!, Resource.R_role, Command.C_write);
+});
 
 // Create table composable with request creation function
 const createRequest = (props: DataTableProps, search: string) => {
@@ -191,8 +197,8 @@ onMounted(() => {
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
 							@click="table.list()" v-tooltip.bottom="'Refresh roles'" />
-						<Button label="" icon="pi pi-plus" outlined severity="primary" class="font-medium"
-							@click="openCreateRole" />
+						<Button :disabled="!writeRolePermission" label="" icon="pi pi-plus" outlined severity="primary"
+							class="font-medium" @click="openCreateRole" />
 					</div>
 				</div>
 			</template>

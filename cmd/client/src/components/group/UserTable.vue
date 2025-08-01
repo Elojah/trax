@@ -32,6 +32,8 @@ import Avatar from 'primevue/avatar';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import { hasClaim } from '@/utils/claims';
+import { Command, Resource } from '@internal/user/role';
 
 const props = defineProps<{
 	groupId: string;
@@ -44,8 +46,14 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const userStore = useUserStore();
 const { users, total } = toRefs(userStore);
+const authStore = useAuthStore();
+const { claims } = toRefs(authStore);
 
 const group = groups.value.get(props.groupId) || null;
+
+const writeUserPermission = computed(() => {
+	return hasClaim(claims.value, group?.group?.iD!, Resource.R_user, Command.C_write);
+});
 
 // Create table composable with request creation function
 const createRequest = (props: DataTableProps, search: string) => {
@@ -150,8 +158,8 @@ onMounted(() => {
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
 							@click="table.list()" v-tooltip.bottom="'Refresh users'" />
-						<Button label="" icon="pi pi-plus" outlined severity="primary" class="font-medium"
-							@click="openInvitationCreate" />
+						<Button :disabled="!writeUserPermission" label="" icon="pi pi-plus" outlined severity="primary"
+							class="font-medium" @click="openInvitationCreate" />
 					</div>
 				</div>
 			</template>

@@ -25,14 +25,20 @@ import TabPanel from 'primevue/tabpanel';
 
 // Table Components
 import UserRoleTable from '@/components/user/RoleTable.vue';
+import { useAuthStore } from '@/stores/auth';
+import { hasClaim } from '@/utils/claims';
+import { Command, Resource } from '@internal/user/role';
+import { parse } from '@/utils/ulid';
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 const groupStore = useGroupStore();
 const errorsStore = useErrorsStore();
+const authStore = useAuthStore();
 
 const { users } = toRefs(userStore);
+const { claims } = toRefs(authStore);
 const { success, message } = toRefs(errorsStore);
 
 const loading = ref(true);
@@ -42,6 +48,14 @@ const activeTab = ref("0");
 
 const user = computed(() => {
 	return users.value.get(userId) || null;
+});
+
+const readUserPermission = computed(() => {
+	return hasClaim(claims.value, parse(groupId), Resource.R_user, Command.C_read);
+});
+
+const readRolePermission = computed(() => {
+	return hasClaim(claims.value, parse(groupId), Resource.R_role, Command.C_read);
 });
 
 const loadUser = async () => {
@@ -151,13 +165,13 @@ onMounted(async () => {
 				<!-- User Content with Tabs -->
 				<Tabs v-else v-model:value="activeTab" class="w-full">
 					<TabList>
-						<Tab value="0">
+						<Tab :disabled="!readUserPermission" value="0">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-info-circle"></i>
 								<span>Details</span>
 							</div>
 						</Tab>
-						<Tab value="1">
+						<Tab :disabled="!readRolePermission" value="1">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-shield"></i>
 								<span>Roles</span>
@@ -167,7 +181,7 @@ onMounted(async () => {
 					<TabPanels>
 						<!-- Details Tab -->
 						<TabPanel value="0">
-							<Card class="shadow-lg border-0">
+							<Card v-if="readUserPermission" class="shadow-lg border-0">
 								<template #content>
 									<div class="p-8">
 										<!-- Hero Section with Edit Button -->
@@ -270,7 +284,7 @@ onMounted(async () => {
 
 						<!-- Roles Tab -->
 						<TabPanel value="1">
-							<UserRoleTable :user-id="userId" :group-id="groupId" />
+							<UserRoleTable v-if="readRolePermission" :user-id="userId" :group-id="groupId" />
 						</TabPanel>
 					</TabPanels>
 				</Tabs>

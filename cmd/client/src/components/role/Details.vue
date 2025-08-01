@@ -42,6 +42,8 @@ import z from 'zod';
 import { Form, FormField } from '@primevue/forms';
 import type { FormSubmitEvent } from '@primevue/forms';
 import { useConfirm } from 'primevue/useconfirm';
+import { hasClaim } from '@/utils/claims';
+import { Command, Resource } from '@internal/user/role';
 
 const route = useRoute();
 const router = useRouter();
@@ -53,6 +55,7 @@ const confirm = useConfirm();
 
 const { roles } = toRefs(roleStore);
 const { groups } = toRefs(groupStore);
+const { claims } = toRefs(authStore);
 const { success, message } = toRefs(errorsStore);
 
 const loading = ref(true);
@@ -84,6 +87,22 @@ const role = computed(() => {
 
 const group = computed(() => {
 	return groups.value.get(groupId) || null;
+});
+
+const readRolePermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_role, Command.C_read);
+});
+
+const readUserPermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_user, Command.C_read);
+});
+
+const editRolePermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_role, Command.C_edit);
+});
+
+const writeRolePermission = computed(() => {
+	return hasClaim(claims.value, group.value?.group?.iD!, Resource.R_role, Command.C_write);
 });
 
 const loadRole = async () => {
@@ -278,13 +297,13 @@ onMounted(async () => {
 				<!-- Role Content with Tabs -->
 				<Tabs v-else v-model:value="activeTab" class="w-full">
 					<TabList>
-						<Tab value="0">
+						<Tab :disabled="!readRolePermission" value="0">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-info-circle"></i>
 								<span>Details</span>
 							</div>
 						</Tab>
-						<Tab value="1">
+						<Tab :disabled="!readUserPermission" value="1">
 							<div class="flex items-center gap-2">
 								<i class="pi pi-users"></i>
 								<span>Users</span>
@@ -294,7 +313,7 @@ onMounted(async () => {
 					<TabPanels>
 						<!-- Details Tab -->
 						<TabPanel value="0">
-							<Card class="shadow-lg border-0">
+							<Card v-if="readRolePermission" class="shadow-lg border-0">
 								<template #content>
 									<div class="p-8">
 										<!-- Hero Section with Edit Button -->
@@ -324,7 +343,8 @@ onMounted(async () => {
 														</div>
 													</div>
 													<div class="flex items-center gap-3">
-														<Button label="" icon="pi pi-cog" outlined severity="primary"
+														<Button :disabled="!editRolePermission" label=""
+															icon="pi pi-cog" outlined severity="primary"
 															class="font-medium" @click="openManageRole"
 															v-tooltip.bottom="'Edit role settings'" />
 													</div>
@@ -381,9 +401,9 @@ onMounted(async () => {
 																<i class="pi pi-key text-primary-500"></i>
 																Permissions
 															</h3>
-															<Button label="" icon="pi pi-pencil" outlined
-																severity="primary" class="font-medium"
-																@click="openEditPermissions"
+															<Button :disabled="!editRolePermission" label=""
+																icon="pi pi-pencil" outlined severity="primary"
+																class="font-medium" @click="openEditPermissions"
 																v-tooltip.bottom="'Edit permissions'" />
 														</div>
 														<PermissionTable :disabled="true"
@@ -439,7 +459,7 @@ onMounted(async () => {
 
 						<!-- Users Tab -->
 						<TabPanel value="1">
-							<RoleUserTable :role-id="roleId" :group-id="groupId" />
+							<RoleUserTable v-if="readUserPermission" :role-id="roleId" :group-id="groupId" />
 						</TabPanel>
 					</TabPanels>
 				</Tabs>
@@ -487,8 +507,8 @@ onMounted(async () => {
 					</FormField>
 				</div>
 				<div class="flex justify-between items-center">
-					<Button label="Delete Role" icon="pi pi-trash" severity="danger" outlined class="font-medium"
-						@click="deleteRoleAction" />
+					<Button :disabled="!writeRolePermission" label="Delete Role" icon="pi pi-trash" severity="danger"
+						outlined class="font-medium" @click="deleteRoleAction" />
 					<div class="flex gap-4">
 						<Button label="Cancel" outlined @click="dialogManageRole = false" />
 						<Button label="Update" type="submit" />

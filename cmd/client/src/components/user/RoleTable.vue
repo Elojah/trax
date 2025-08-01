@@ -14,7 +14,7 @@ import { createPagination } from '@/utils/requests';
 import { useTable } from '@/composables';
 import { ListRoleReq } from '@internal/user/dto/role';
 import type { RolePermission } from '@internal/user/dto/role';
-import { Command } from '@internal/user/role';
+import { Command, Resource } from '@internal/user/role';
 
 // PrimeVue UI Components
 import DataTable, {
@@ -37,6 +37,7 @@ import InputIcon from 'primevue/inputicon';
 // Form Validation
 import { useConfirm } from 'primevue/useconfirm';
 import router from '@/router';
+import { hasClaim } from '@/utils/claims';
 
 const props = defineProps<{
 	userId: string;
@@ -52,6 +53,7 @@ const roleStore = useRoleStore();
 const { roles, rolesByUser, total } = toRefs(roleStore);
 const userStore = useUserStore();
 const { users } = toRefs(userStore);
+const { claims } = toRefs(authStore);
 const confirm = useConfirm();
 
 const group = groups.value.get(props.groupId);
@@ -65,6 +67,14 @@ const userRoleIds = computed(() => {
 		}
 	});
 	return userHasRoles;
+});
+
+const readRolePermission = computed(() => {
+	return hasClaim(claims.value, group?.group?.iD!, Resource.R_role, Command.C_read);
+});
+
+const editRolePermission = computed(() => {
+	return hasClaim(claims.value, group?.group?.iD!, Resource.R_role, Command.C_edit);
 });
 
 // Create request function for the table
@@ -286,10 +296,11 @@ onMounted(async () => {
 			<Column header="" style="width: 10%">
 				<template #body="{ data }: { data: RolePermission }">
 					<div v-if="data?.role" class="flex items-center gap-2 justify-end">
-						<Button v-if="!userRoleIds.has(ulid(data.role.iD))" icon="pi pi-plus" severity="success"
-							outlined size="small" @click="addRole(data)" v-tooltip.top="'Add role'" />
-						<Button v-else icon="pi pi-minus" severity="danger" outlined size="small"
-							@click="removeRole(data)" v-tooltip.top="'Remove role'" />
+						<Button :disabled="!editRolePermission" v-if="!userRoleIds.has(ulid(data.role.iD))"
+							icon="pi pi-plus" severity="success" outlined size="small" @click="addRole(data)"
+							v-tooltip.top="'Add role'" />
+						<Button :disabled="!editRolePermission" v-else icon="pi pi-minus" severity="danger" outlined
+							size="small" @click="removeRole(data)" v-tooltip.top="'Remove role'" />
 					</div>
 				</template>
 			</Column>

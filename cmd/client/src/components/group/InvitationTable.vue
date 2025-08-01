@@ -36,6 +36,8 @@ import InputIcon from 'primevue/inputicon';
 // Form Validation
 import { useConfirm } from 'primevue/useconfirm';
 import { DeleteInvitationReq, InvitationView, ListInvitationReq } from '@internal/user/dto/invitation';
+import { hasClaim } from '@/utils/claims';
+import { Command, Resource } from '@internal/user/role';
 
 const props = defineProps<{
 	groupId: string;
@@ -48,9 +50,20 @@ const groupStore = useGroupStore();
 const { groups } = toRefs(groupStore);
 const invitationStore = useInvitationStore();
 const { invitations, total } = toRefs(invitationStore);
+const authStore = useAuthStore();
+const { claims } = toRefs(authStore);
 const confirm = useConfirm();
 
 const group = groups.value.get(props.groupId) || null;
+
+const editUserPermission = computed(() => {
+	return hasClaim(claims.value, group?.group?.iD!, Resource.R_user, Command.C_edit);
+});
+
+const writeUserPermission = computed(() => {
+	return hasClaim(claims.value, group?.group?.iD!, Resource.R_user, Command.C_write);
+});
+
 // Create request function for the table
 const createRequest = (props: DataTableProps, search: string) => {
 	return ListInvitationReq.create({
@@ -185,8 +198,8 @@ onMounted(async () => {
 					<div class="flex items-center gap-3">
 						<Button icon="pi pi-refresh" severity="secondary" outlined rounded class="w-10 h-10"
 							@click="table.list()" v-tooltip.bottom="'Refresh invitations'" />
-						<Button label="" icon="pi pi-plus" outlined severity="primary" class="font-medium"
-							@click="openInvitationCreate" />
+						<Button :disabled="!writeUserPermission" label="" icon="pi pi-plus" outlined severity="primary"
+							class="font-medium" @click="openInvitationCreate" />
 
 					</div>
 				</div>
@@ -254,10 +267,10 @@ onMounted(async () => {
 			<Column header="" class="min-w-48">
 				<template #body="{ data }: { data: InvitationView }">
 					<div class="flex items-center justify-end gap-2">
-						<Button icon="pi pi-send" severity="info" size="small" outlined @click="resendInvitation(data)"
-							v-tooltip.bottom="'Resend invitation'" />
-						<Button icon="pi pi-trash" severity="danger" size="small" outlined
-							@click="deleteInvitation(data)" v-tooltip.bottom="'Delete invitation'" />
+						<Button :disabled="!editUserPermission" icon="pi pi-send" severity="info" size="small" outlined
+							@click="resendInvitation(data)" v-tooltip.bottom="'Resend invitation'" />
+						<Button :disabled="!writeUserPermission" icon="pi pi-trash" severity="danger" size="small"
+							outlined @click="deleteInvitation(data)" v-tooltip.bottom="'Delete invitation'" />
 					</div>
 				</template>
 			</Column>

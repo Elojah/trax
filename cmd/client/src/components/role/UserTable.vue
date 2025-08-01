@@ -37,6 +37,8 @@ import InputIcon from 'primevue/inputicon';
 // Form Validation
 import { useConfirm } from 'primevue/useconfirm';
 import { useRoleStore } from '@/stores/role';
+import { hasClaim } from '@/utils/claims';
+import { Command, Resource } from '@internal/user/role';
 
 const props = defineProps<{
 	roleId: string;
@@ -53,6 +55,7 @@ const userStore = useUserStore();
 const { users, total, usersByRole } = toRefs(userStore);
 const roleStore = useRoleStore();
 const { roles } = toRefs(roleStore);
+const { claims } = toRefs(authStore);
 const confirm = useConfirm();
 
 const group = groups.value.get(props.groupId)
@@ -61,6 +64,10 @@ const role = roles.value.get(props.roleId);
 // Get users who have this role
 const usersWithRole = computed(() => {
 	return usersByRole.value.get(ulid(role?.role?.iD)) || new Map<string, boolean>();
+});
+
+const editUserPermission = computed(() => {
+	return hasClaim(claims.value, group?.group?.iD!, Resource.R_user, Command.C_edit);
 });
 
 // Create request function for the table
@@ -278,10 +285,11 @@ onMounted(async () => {
 			<Column header="" style="width: 10%">
 				<template #body="{ data }: { data: U }">
 					<div v-if="data" class="flex items-center gap-2 justify-end">
-						<Button v-if="!usersWithRole.has(ulid(data.iD))" icon="pi pi-plus" severity="success" outlined
-							size="small" @click="addRole(data)" v-tooltip.top="'Assign role'" />
-						<Button v-else icon="pi pi-minus" severity="danger" outlined size="small"
-							@click="removeRole(data)" v-tooltip.top="'Remove role'" />
+						<Button :disabled="!editUserPermission" v-if="!usersWithRole.has(ulid(data.iD))"
+							icon="pi pi-plus" severity="success" outlined size="small" @click="addRole(data)"
+							v-tooltip.top="'Assign role'" />
+						<Button :disabled="!editUserPermission" v-else icon="pi pi-minus" severity="danger" outlined
+							size="small" @click="removeRole(data)" v-tooltip.top="'Remove role'" />
 					</div>
 				</template>
 			</Column>
