@@ -3,7 +3,8 @@ import Map from '@/components/Map.vue';
 </script>
 
 <template>
-	<Map />
+	<div class="h-screen flex flex-col relative">
+		<Map class="flex-1" />
+	</div>
 </template>
-
 <style scoped></style>
