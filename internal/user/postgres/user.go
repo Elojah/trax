@@ -321,13 +321,8 @@ func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error
 	}
 
 	b := strings.Builder{}
-	b.WriteString(`SELECT DISTINCT ON (u.id) u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
-	if f.Paginate != nil {
-		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
-	} else {
-		b.WriteString(`, 0 `)
-	}
-	b.WriteString(`FROM "user"."user" u `)
+
+	b.WriteString(`SELECT DISTINCT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at FROM "user"."user" u `)
 
 	if f.GroupIDs != nil || f.RoleID != nil || len(f.RoleIDs) > 0 {
 		b.WriteString(`
@@ -338,6 +333,25 @@ func (s Store) List(ctx context.Context, f user.Filter) ([]user.U, uint64, error
 
 	clause, args := filter(f).where(1)
 	b.WriteString(clause)
+
+	// Wrap the base query in a CTE to count distinct users properly
+	with := postgres.With(b.String(), "distinct_user")
+
+	b.Reset()
+	b.WriteString(with)
+	b.WriteString(`SELECT u.id, u.email, u.first_name, u.last_name, u.avatar_url, u.created_at, u.updated_at, COUNT(1) OVER() `)
+	if f.Paginate != nil {
+		b.WriteString(pagpostgres.Paginate(*f.Paginate).Row(sortUser))
+	} else {
+		b.WriteString(`, 0 `)
+	}
+	b.WriteString(`FROM distinct_user u `)
+
+	if f.Paginate != nil {
+		pag := pagpostgres.Paginate(*f.Paginate).CTE(b.String())
+		b.Reset()
+		b.WriteString(pag)
+	}
 
 	rows, err := tx.Query(ctx, b.String(), args...)
 	if err != nil {
