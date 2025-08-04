@@ -9,7 +9,6 @@ import { useUserStore } from '@/stores/user';
 
 // Internal utilities and types
 import { parse, ulid } from '@/utils/ulid';
-import { formatDate } from '@/utils/date';
 import { createPagination } from '@/utils/requests';
 import { useTable } from '@/composables';
 import { ListRoleReq } from '@internal/user/dto/role';
@@ -18,10 +17,7 @@ import { Command, Resource } from '@internal/user/role';
 
 // PrimeVue UI Components
 import DataTable, {
-	type DataTableFilterEvent,
-	type DataTablePageEvent,
 	type DataTableProps,
-	type DataTableSortEvent
 } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';

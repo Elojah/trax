@@ -100,6 +100,7 @@ proto-go proto-ts: ## Regenerate protobuf files
 	$(info $(M) running protobuf $(PB_LANG)) @
 	$(info $(M) generate pkg) @
 	$Q $(GEN_PB_$(PB_LANG)) pkg/gogoproto/gogo.proto
+	$Q $(GEN_PB_$(PB_LANG)) pkg/geometry/position.proto
 	$Q $(GEN_PB_$(PB_LANG)) pkg/paginate/paginate.proto
 	$Q $(GEN_PB_$(PB_LANG)) pkg/pbtypes/empty.proto
 	$Q $(GEN_PB_$(PB_LANG)) pkg/pbtypes/string.proto

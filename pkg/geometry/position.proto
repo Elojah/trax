@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package geometry;
+
+option (gogoproto.testgen_all)  = true;
+option (gogoproto.benchgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_registration) = true;
+
+import "pkg/gogoproto/gogo.proto";
+
+message Position {
+	int64 Lat                         = 1;
+	int64 Lng                         = 2;
+}
