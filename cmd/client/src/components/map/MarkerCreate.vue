@@ -222,7 +222,7 @@ const toggleMenu = (event: any, index: number) => {
 							</ul>
 						</div>
 					</div>
-					<div class="flex flex-col gap-4">
+					<div class="flex gap-4 px-6 py-3 bg-surface-50 dark:bg-surface-800">
 						<Button @click="closePanel" outlined class="flex-1 py-2 px-3" label="Cancel" />
 						<Button @click="closePanel" class="flex-1 py-2 px-3" label="Save" />
 					</div>
