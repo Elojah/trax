@@ -120,9 +120,10 @@ const toggleMenu = (event: any, index: number) => {
 
 <template>
 	<div :class="panelClass"
-		class="bg-surface-0 dark:bg-surface-900 absolute w-full sm:w-[36rem] h-full shadow-xl right-0 top-0 transition-all duration-300 z-50">
+		class="bg-surface-0 dark:bg-surface-900 absolute w-full sm:w-[36rem] h-full shadow-xl right-0 top-0 transition-all duration-300 z-50 overflow-hidden">
 		<div class="flex flex-col h-full">
-			<div class="px-6 py-4 border-b border-surface flex items-center justify-between">
+			<!-- Fixed Header -->
+			<div class="px-6 py-4 border-b border-surface flex items-center justify-between flex-shrink-0">
 				<div class="flex items-center gap-4">
 					<div class="flex items-center gap-2">
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" width="33" height="32"
@@ -145,113 +146,90 @@ const toggleMenu = (event: any, index: number) => {
 				<Button @click="closePanel" icon="pi pi-times" rounded text severity="secondary" />
 			</div>
 
-			<div class="flex flex-col">
-				<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
-					<span class="text-surface-900 dark:text-surface-0 font-medium">General</span>
-				</div>
-				<div class="p-6 flex flex-col gap-6">
-					<InputText placeholder="Name" />
-					<InputText placeholder="Price" />
-					<Textarea placeholder="Description" rows="5" class="w-full" />
-				</div>
-			</div>
+			<!-- Scrollable Content -->
+			<div class="flex-1 overflow-y-auto">
+				<div class="flex flex-col">
 
-			<div class="flex flex-col">
-				<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
-					<span class="text-surface-900 dark:text-surface-0 font-medium">Meta</span>
-				</div>
-				<div class="p-6 flex flex-col gap-6">
-					<MultiSelect v-model="selectedTags" :options="tags" option-label="name" display="chip"
-						class="w-full" placeholder="Select Tags" />
-
-					<InputGroup class="w-full">
-						<InputGroupAddon>
-							<span class="text-surface-500 dark:text-surface-400">robert/</span>
-						</InputGroupAddon>
-						<InputText class="w-full" />
-					</InputGroup>
-				</div>
-			</div>
-
-			<div class="flex flex-col">
-				<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
-					<span class="text-surface-900 dark:text-surface-0 font-medium">Media</span>
-				</div>
-				<div class="p-6 flex flex-col gap-4">
-					<div
-						class="w-full border border-dashed border-surface-200 dark:border-surface-700 rounded-lg flex flex-col gap-4 py-6 px-6 items-center justify-center">
-						<div class="text-surface-900 dark:text-surface-0 text-center font-medium">Drop your images
-							here or click to browse.</div>
-						<div class="text-surface-500 dark:text-surface-400 text-center">1600 × 1200 (4:3)
-							recommended, up to 20MB each.</div>
+					<div class="flex flex-col">
+						<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
+							<span class="text-surface-900 dark:text-surface-0 font-medium">General</span>
+						</div>
+						<div class="p-6 flex flex-col gap-6">
+							<InputText placeholder="Name" />
+							<InputText placeholder="Price" />
+							<Textarea placeholder="Description" rows="5" class="w-full" />
+						</div>
 					</div>
-					<span class="text-surface-500 dark:text-surface-400 text-sm">Add up to 5 images to your product.
-						Used to represent your product during checkout, in email, social sharing and more.</span>
-				</div>
-			</div>
 
-			<div class="flex flex-col flex-1">
-				<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
-					<span class="text-surface-900 dark:text-surface-0 font-medium">Uploads</span>
-				</div>
-				<div class="p-6 flex flex-col gap-6">
-					<ul class="flex flex-col gap-6">
-						<li v-for="(file, index) in uploadedFiles" :key="file.id"
-							class="flex justify-between items-center gap-4">
-							<div class="flex flex-row gap-4">
-								<div class="flex flex-col gap-2">
-									<span class="text-surface-900 dark:text-surface-0 font-medium">{{
-										file.name
-									}}</span>
-									<span class="text-surface-500 dark:text-surface-400">{{ file.size }}</span>
-								</div>
+					<div class="flex flex-col">
+						<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
+							<span class="text-surface-900 dark:text-surface-0 font-medium">Meta</span>
+						</div>
+						<div class="p-6 flex flex-col gap-6">
+							<MultiSelect v-model="selectedTags" :options="tags" option-label="name" display="chip"
+								class="w-full" placeholder="Select Tags" />
+
+							<InputGroup class="w-full">
+								<InputGroupAddon>
+									<span class="text-surface-500 dark:text-surface-400">robert/</span>
+								</InputGroupAddon>
+								<InputText class="w-full" />
+							</InputGroup>
+						</div>
+					</div>
+
+					<div class="flex flex-col">
+						<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
+							<span class="text-surface-900 dark:text-surface-0 font-medium">Media</span>
+						</div>
+						<div class="p-6 flex flex-col gap-4">
+							<div
+								class="w-full border border-dashed border-surface-200 dark:border-surface-700 rounded-lg flex flex-col gap-4 py-6 px-6 items-center justify-center">
+								<div class="text-surface-900 dark:text-surface-0 text-center font-medium">Drop your
+									images
+									here or click to browse.</div>
+								<div class="text-surface-500 dark:text-surface-400 text-center">1600 × 1200 (4:3)
+									recommended, up to 20MB each.</div>
 							</div>
+							<span class="text-surface-500 dark:text-surface-400 text-sm">Add up to 5 images to your
+								product.
+								Used to represent your product during checkout, in email, social sharing and
+								more.</span>
+						</div>
+					</div>
 
-							<Button icon="pi pi-ellipsis-h !text-xl !leading-none" text rounded severity="secondary"
-								@click="toggleMenu($event, index)" />
-							<Menu :ref="(el) => (menus[index] = el)" :model="menuItems" :popup="true" />
-						</li>
-					</ul>
+					<div class="flex flex-col flex-1">
+						<div class="px-6 py-3 bg-surface-50 dark:bg-surface-800">
+							<span class="text-surface-900 dark:text-surface-0 font-medium">Uploads</span>
+						</div>
+						<div class="p-6 flex flex-col gap-6">
+							<ul class="flex flex-col gap-6">
+								<li v-for="(file, index) in uploadedFiles" :key="file.id"
+									class="flex justify-between items-center gap-4">
+									<div class="flex flex-row gap-4">
+										<div class="flex flex-col gap-2">
+											<span class="text-surface-900 dark:text-surface-0 font-medium">{{
+												file.name
+											}}</span>
+											<span class="text-surface-500 dark:text-surface-400">{{ file.size }}</span>
+										</div>
+									</div>
+
+									<Button icon="pi pi-ellipsis-h !text-xl !leading-none" text rounded
+										severity="secondary" @click="toggleMenu($event, index)" />
+									<Menu :ref="(el) => (menus[index] = el)" :model="menuItems" :popup="true" />
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="flex flex-col gap-4">
+						<Button @click="closePanel" outlined class="flex-1 py-2 px-3" label="Cancel" />
+						<Button @click="closePanel" class="flex-1 py-2 px-3" label="Save" />
+					</div>
 				</div>
-			</div>
-			<div class="flex gap-4">
-				<Button @click="closePanel" outlined class="flex-1 py-2 px-3" label="Cancel" />
-				<Button @click="closePanel" class="flex-1 py-2 px-3" label="Save" />
 			</div>
 		</div>
 	</div>
 </template>
 
-<style scoped>
-/* @keyframes fadeinright {
-	from {
-		opacity: 0;
-		transform: translateX(100%);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateX(0);
-	}
-}
-
-@keyframes fadeoutright {
-	from {
-		opacity: 1;
-		transform: translateX(0);
-	}
-
-	to {
-		opacity: 0;
-		transform: translateX(100%);
-	}
-}
-
-.animate-fadeinright {
-	animation: fadeinright 0.3s ease-out forwards;
-}
-
-.animate-fadeoutright {
-	animation: fadeoutright 0.3s ease-in forwards;
-} */
-</style>
+<style scoped></style>

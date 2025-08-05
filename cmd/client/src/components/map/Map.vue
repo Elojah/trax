@@ -53,4 +53,17 @@ const openMarkerPanel = (event: any) => {
 .leaflet-control-attribution {
 	filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
+
+.leaflet-control {
+	z-index: 0 !important
+}
+
+.leaflet-pane {
+	z-index: 0 !important
+}
+
+.leaflet-top,
+.leaflet-bottom {
+	z-index: 0 !important
+}
 </style>
