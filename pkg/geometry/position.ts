@@ -15,26 +15,26 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface Position {
     /**
-     * @generated from protobuf field: int64 Lat = 1
+     * @generated from protobuf field: double Lat = 1
      */
-    lat: bigint;
+    lat: number;
     /**
-     * @generated from protobuf field: int64 Lng = 2
+     * @generated from protobuf field: double Lng = 2
      */
-    lng: bigint;
+    lng: number;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class Position$Type extends MessageType<Position> {
     constructor() {
         super("geometry.Position", [
-            { no: 1, name: "Lat", kind: "scalar", jsonName: "Lat", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 2, name: "Lng", kind: "scalar", jsonName: "Lng", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 1, name: "Lat", kind: "scalar", jsonName: "Lat", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "Lng", kind: "scalar", jsonName: "Lng", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<Position>): Position {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.lat = 0n;
-        message.lng = 0n;
+        message.lat = 0;
+        message.lng = 0;
         if (value !== undefined)
             reflectionMergePartial<Position>(this, message, value);
         return message;
@@ -44,11 +44,11 @@ class Position$Type extends MessageType<Position> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* int64 Lat */ 1:
-                    message.lat = reader.int64().toBigInt();
+                case /* double Lat */ 1:
+                    message.lat = reader.double();
                     break;
-                case /* int64 Lng */ 2:
-                    message.lng = reader.int64().toBigInt();
+                case /* double Lng */ 2:
+                    message.lng = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -62,12 +62,12 @@ class Position$Type extends MessageType<Position> {
         return message;
     }
     internalBinaryWrite(message: Position, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* int64 Lat = 1; */
-        if (message.lat !== 0n)
-            writer.tag(1, WireType.Varint).int64(message.lat);
-        /* int64 Lng = 2; */
-        if (message.lng !== 0n)
-            writer.tag(2, WireType.Varint).int64(message.lng);
+        /* double Lat = 1; */
+        if (message.lat !== 0)
+            writer.tag(1, WireType.Bit64).double(message.lat);
+        /* double Lng = 2; */
+        if (message.lng !== 0)
+            writer.tag(2, WireType.Bit64).double(message.lng);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

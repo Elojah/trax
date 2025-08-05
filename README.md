@@ -42,7 +42,8 @@ TODO:
   - Add invitations tab under group vue
 
 - [Map]
-  - Add clean bounding and centering/zooming on click/move
+  - [x] Add clean bounding and centering/zooming on click/move
+    - Zooming on click (bug when same time than center)
   - Add reverse Geocoding to show location info in panel
   - Allow panel to upload video/images/live video on webrtc
   - Allow panel to share Marker with some groups only

@@ -4,6 +4,7 @@
 package geometry
 
 import (
+	encoding_binary "encoding/binary"
 	fmt "fmt"
 	_ "github.com/elojah/trax/pkg/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
@@ -28,8 +29,8 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Position struct {
-	Lat int64 `protobuf:"varint,1,opt,name=Lat,proto3" json:"Lat,omitempty"`
-	Lng int64 `protobuf:"varint,2,opt,name=Lng,proto3" json:"Lng,omitempty"`
+	Lat float64 `protobuf:"fixed64,1,opt,name=Lat,proto3" json:"Lat,omitempty"`
+	Lng float64 `protobuf:"fixed64,2,opt,name=Lng,proto3" json:"Lng,omitempty"`
 }
 
 func (m *Position) Reset()      { *m = Position{} }
@@ -80,14 +81,14 @@ var fileDescriptor_1172a508ab0d01a0 = []byte{
 	0x4f, 0x4f, 0xcd, 0xcf, 0x4d, 0x2d, 0x29, 0xaa, 0xd4, 0x2f, 0xc8, 0x2f, 0xce, 0x2c, 0xc9, 0xcc,
 	0xcf, 0xd3, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x80, 0x49, 0x48, 0x49, 0x80, 0x95, 0xe5,
 	0xa7, 0xe7, 0x83, 0x25, 0xc0, 0x2c, 0x88, 0x1a, 0x25, 0x3d, 0x2e, 0x8e, 0x00, 0xa8, 0x2e, 0x21,
-	0x01, 0x2e, 0x66, 0x9f, 0xc4, 0x12, 0x09, 0x46, 0x05, 0x46, 0x0d, 0xe6, 0x20, 0x10, 0x13, 0x2c,
+	0x01, 0x2e, 0x66, 0x9f, 0xc4, 0x12, 0x09, 0x46, 0x05, 0x46, 0x0d, 0xc6, 0x20, 0x10, 0x13, 0x2c,
 	0x92, 0x97, 0x2e, 0xc1, 0x04, 0x15, 0xc9, 0x4b, 0x77, 0xf2, 0x38, 0xf1, 0x50, 0x8e, 0xe1, 0xc2,
 	0x43, 0x39, 0x86, 0x1b, 0x0f, 0xe5, 0x18, 0x3e, 0x3c, 0x94, 0x63, 0xfc, 0xf1, 0x50, 0x8e, 0xb1,
 	0xe1, 0x91, 0x1c, 0xe3, 0x8a, 0x47, 0x72, 0x8c, 0x3b, 0x1e, 0xc9, 0x31, 0x1e, 0x78, 0x24, 0xc7,
 	0x78, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0xbe, 0x78, 0x24,
 	0xc7, 0xf0, 0xe1, 0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x07, 0x1e, 0xcb, 0x31, 0x5e, 0x78,
 	0x2c, 0xc7, 0x70, 0xe3, 0xb1, 0x1c, 0x43, 0x12, 0x1b, 0xd8, 0x01, 0xc6, 0x80, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0x72, 0x65, 0x53, 0x65, 0xc3, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x1e, 0x72, 0xb1, 0x2b, 0xc3, 0x00, 0x00, 0x00,
 }
 
 func (this *Position) Equal(that interface{}) bool {
@@ -157,14 +158,16 @@ func (m *Position) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.Lng != 0 {
-		i = encodeVarintPosition(dAtA, i, uint64(m.Lng))
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Lng))))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x11
 	}
 	if m.Lat != 0 {
-		i = encodeVarintPosition(dAtA, i, uint64(m.Lat))
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Lat))))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0x9
 	}
 	return len(dAtA) - i, nil
 }
@@ -182,11 +185,11 @@ func encodeVarintPosition(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedPosition(r randyPosition, easy bool) *Position {
 	this := &Position{}
-	this.Lat = int64(r.Int63())
+	this.Lat = float64(r.Float64())
 	if r.Intn(2) == 0 {
 		this.Lat *= -1
 	}
-	this.Lng = int64(r.Int63())
+	this.Lng = float64(r.Float64())
 	if r.Intn(2) == 0 {
 		this.Lng *= -1
 	}
@@ -274,10 +277,10 @@ func (m *Position) Size() (n int) {
 	var l int
 	_ = l
 	if m.Lat != 0 {
-		n += 1 + sovPosition(uint64(m.Lat))
+		n += 9
 	}
 	if m.Lng != 0 {
-		n += 1 + sovPosition(uint64(m.Lng))
+		n += 9
 	}
 	return n
 }
@@ -337,43 +340,27 @@ func (m *Position) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
+			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Lat", wireType)
 			}
-			m.Lat = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPosition
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Lat |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
 			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Lat = float64(math.Float64frombits(v))
 		case 2:
-			if wireType != 0 {
+			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Lng", wireType)
 			}
-			m.Lng = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPosition
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Lng |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
 			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Lng = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skipPosition(dAtA[iNdEx:])
