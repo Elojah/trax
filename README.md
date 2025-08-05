@@ -37,20 +37,22 @@ TODO:
 
 - [x] Multi roles user bug when listing gorup users
   - group icons still bug
-- [ ] Invite User
+- [x] Invite User
   - Finish invite_user route to associate existing user
   - Add invitations tab under group vue
+
+- [Map]
+  - Add clean bounding and centering/zooming on click/move
+  - Add reverse Geocoding to show location info in panel
+  - Allow panel to upload video/images/live video on webrtc
+  - Allow panel to share Marker with some groups only
+
 - Write test flows
 
 - Find a way to have expire map for pinia stores
 
 ```
-- Stocks
-- Transactions
---> map view ? prediction view ?
-
 - Settings
   + User
-  + Groups
 
 ```

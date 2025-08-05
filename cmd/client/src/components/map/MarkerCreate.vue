@@ -120,7 +120,7 @@ const toggleMenu = (event: any, index: number) => {
 
 <template>
 	<div :class="panelClass"
-		class="bg-surface-0 dark:bg-surface-900 absolute w-full sm:w-[36rem] h-full shadow-xl right-0 top-0 transition-all duration-300 z-50 overflow-hidden">
+		class="bg-surface-0/80 dark:bg-surface-900/80 absolute w-full sm:w-[36rem] h-full shadow-xl right-0 top-0 transition-all duration-300 z-50 overflow-hidden">
 		<div class="flex flex-col h-full">
 			<!-- Fixed Header -->
 			<div class="px-6 py-4 border-b border-surface flex items-center justify-between flex-shrink-0">

@@ -1,20 +1,30 @@
 <script setup lang="ts">
 import "leaflet/dist/leaflet.css";
-import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LMarker, Functions } from "@vue-leaflet/vue-leaflet";
 import { ref } from "vue";
 import type { Position } from "@pkg/geometry/position";
 import MarkerCreate from "@/components/map/MarkerCreate.vue";
 
 
 
-let zoom = 3;
+let zoom = 3; // Default zoom level
 const cursor = ref<Position>();
 const visible = ref(false);
+const center = ref([47.41322, -1.219482]);
+
+// Define max bounds to prevent showing dark areas at extreme latitudes
+const maxBounds = ref([
+	[-85, -180], // Southwest coordinates
+	[85, 180]    // Northeast coordinates
+]);
 
 const openMarkerPanel = (event: any) => {
 	// Display temporary marker at clicked position
 	const { lat, lng } = event.latlng;
 	cursor.value = { lat, lng };
+
+	// Center map on clicked position (bounds will be enforced by maxBounds)
+	center.value = [lat, lng];
 
 	// Open MarkerPanel with the clicked position
 	visible.value = true;
@@ -24,7 +34,7 @@ const openMarkerPanel = (event: any) => {
 
 <template>
 	<div class="h-full w-full relative">
-		<l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]" class="h-full w-full"
+		<l-map ref="map" :zoom="zoom" :min-zoom="3" :center="center" :max-bounds="maxBounds" class="h-full w-full"
 			@click="openMarkerPanel">
 			<l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
 				name="map"></l-tile-layer>
