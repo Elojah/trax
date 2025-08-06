@@ -14,7 +14,7 @@ const { error, message } = toRefs(errorsStore);
 const zoom = ref(3); // Default zoom level
 const cursor = ref<Position>();
 const visible = ref(false);
-let center = ref([47.41322, -1.219482]);
+const center = ref([47.41322, -1.219482]);
 const address = ref<string>('');
 
 // Reverse geocoding composable
@@ -25,27 +25,6 @@ const maxBounds = ref([
 	[-85, -180], // Southwest coordinates
 	[85, 180]    // Northeast coordinates
 ]);
-
-// Compute icon size based on zoom level
-const iconSize = computed(() => {
-	// Base size of 42px at zoom level 10, scale between 20px and 60px
-	const baseZoom = 10;
-	const baseSize = 42;
-	const minSize = 20;
-	const maxSize = 60;
-
-	// Calculate scale factor based on zoom difference
-	const scaleFactor = Math.pow(1.2, zoom.value - baseZoom);
-	const size = Math.round(baseSize * scaleFactor);
-
-	// Clamp between min and max size
-	return Math.max(minSize, Math.min(maxSize, size));
-});
-
-// Handle zoom changes
-const onZoomUpdate = (newZoom: number) => {
-	zoom.value = newZoom;
-};
 
 const openMarkerPanel = async (event: any) => {
 	// Display temporary marker at clicked position
@@ -62,24 +41,24 @@ const openMarkerPanel = async (event: any) => {
 	// Open MarkerPanel with the clicked position
 	visible.value = true;
 
-	if (zoom.value < 10) {
-		zoom.value++;
-	}
-
 	// Perform reverse geocoding using the regular lat/lng numbers
 	try {
 		const geocodingResult = await reverseGeocode(lat, lng);
 		if (geocodingResult) {
 			address.value = formatAddress(geocodingResult);
 		} else {
-			address.value = `${(lat * 1e6).toFixed(6)}, ${(lng * 1e6).toFixed(6)}`;
+			address.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 		}
 	} catch (err) {
-		message.value = 'Failed to reverse geocode location: ' + err;
-		error.value = true;
+		// message.value = 'Failed to reverse geocode location: ' + err;
+		// error.value = true;
 
-		address.value = `${(lat * 1e6).toFixed(6)}, ${(lng * 1e6).toFixed(6)}`;
+		address.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 	}
+};
+
+const zoomUpdate = (z: number) => {
+	zoom.value = z;
 };
 
 </script>
@@ -87,14 +66,13 @@ const openMarkerPanel = async (event: any) => {
 <template>
 	<div class="h-full w-full relative">
 		<l-map ref="map" :zoom="zoom" :min-zoom="3" :center="center" :max-bounds="maxBounds" class="h-full w-full"
-			@click="openMarkerPanel" @update:zoom="onZoomUpdate">
+			@click="openMarkerPanel" v-on:update:zoom="zoomUpdate">
 			<l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
 				name="map"></l-tile-layer>
 
 			<!-- Render cursor marker -->
 			<l-marker v-if="cursor" :lat-lng="[cursor.lat, cursor.lng]">
-				<l-icon :icon-url="decodeURI(catpaw)" :icon-size="[iconSize, iconSize]"
-					:icon-anchor="[iconSize / 2, iconSize]" />
+				<l-icon :icon-url="decodeURI(catpaw)" :icon-size="[42, 42]" :icon-anchor="[42 / 2, 42]" />
 			</l-marker>
 		</l-map>
 
