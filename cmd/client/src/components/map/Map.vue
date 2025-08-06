@@ -4,8 +4,10 @@ import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
 import { ref, toRefs, computed } from "vue";
 import type { Position } from "@pkg/geometry/position";
 import MarkerCreate from "@/components/map/MarkerCreate.vue";
+import Search from "@/components/map/Search.vue";
 import { useReverseGeocoding } from "@/composables/useReverseGeocoding";
 import { useErrorsStore } from "@/stores/errors";
+import type { GeocodingResult } from "@/composables/useGeocoding";
 import catpaw from '@/assets/cat-paw.svg?url';
 
 const errorsStore = useErrorsStore();
@@ -61,10 +63,32 @@ const zoomUpdate = (z: number) => {
 	zoom.value = z;
 };
 
+const handleLocationSelected = async (result: GeocodingResult) => {
+	const lat = parseFloat(result.lat);
+	const lng = parseFloat(result.lon);
+
+	// Display marker at selected position
+	cursor.value = {
+		lat: lat,
+		lng: lng,
+	};
+
+	// Center map on selected position with appropriate zoom
+	center.value = [lat, lng];
+	zoom.value = Math.max(zoom.value, 12); // Zoom in if current zoom is too low
+
+	// Open MarkerPanel with the selected position
+	visible.value = true;
+
+	// Use the search result data for address
+	address.value = result.display_name;
+};
+
 </script>
 
 <template>
 	<div class="h-full w-full relative">
+		<Search @location-selected="handleLocationSelected" />
 		<l-map ref="map" :zoom="zoom" :min-zoom="3" :center="center" :max-bounds="maxBounds" class="h-full w-full"
 			@click="openMarkerPanel" v-on:update:zoom="zoomUpdate">
 			<l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
@@ -78,7 +102,7 @@ const zoomUpdate = (z: number) => {
 
 		<!-- MarkerPanel - Now outside the map, positioned absolutely -->
 		<MarkerCreate :visible="visible" :address="address" :coordinates="cursor" :geocoding-loading="geocodingLoading"
-			:geocoding-error="geocodingError" @close="visible = false" />
+			:geocoding-error="geocodingError" @close="visible = false; cursor = undefined" />
 	</div>
 </template>
 <style>
