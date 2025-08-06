@@ -68,7 +68,7 @@ const openMarkerPanel = async (event: any) => {
 
 			<!-- Render cursor marker -->
 			<l-marker v-if="cursor" :lat-lng="[cursor.lat, cursor.lng]">
-				<l-icon :icon-url="catpaw" icon-size="[42, 42]" icon-anchor="[21, 42]" />
+				<l-icon :icon-url="decodeURI(catpaw)" :icon-size="[42, 42]" :icon-anchor="[21, 42]" />
 			</l-marker>
 		</l-map>
 
