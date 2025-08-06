@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet";
-import { ref, toRefs } from "vue";
+import { ref, toRefs, computed } from "vue";
 import type { Position } from "@pkg/geometry/position";
 import MarkerCreate from "@/components/map/MarkerCreate.vue";
 import { useReverseGeocoding } from "@/composables/useReverseGeocoding";
@@ -11,7 +11,7 @@ import catpaw from '@/assets/cat-paw.svg?url';
 const errorsStore = useErrorsStore();
 const { error, message } = toRefs(errorsStore);
 
-let zoom = 3; // Default zoom level
+const zoom = ref(3); // Default zoom level
 const cursor = ref<Position>();
 const visible = ref(false);
 let center = ref([47.41322, -1.219482]);
@@ -25,6 +25,27 @@ const maxBounds = ref([
 	[-85, -180], // Southwest coordinates
 	[85, 180]    // Northeast coordinates
 ]);
+
+// Compute icon size based on zoom level
+const iconSize = computed(() => {
+	// Base size of 42px at zoom level 10, scale between 20px and 60px
+	const baseZoom = 10;
+	const baseSize = 42;
+	const minSize = 20;
+	const maxSize = 60;
+
+	// Calculate scale factor based on zoom difference
+	const scaleFactor = Math.pow(1.2, zoom.value - baseZoom);
+	const size = Math.round(baseSize * scaleFactor);
+
+	// Clamp between min and max size
+	return Math.max(minSize, Math.min(maxSize, size));
+});
+
+// Handle zoom changes
+const onZoomUpdate = (newZoom: number) => {
+	zoom.value = newZoom;
+};
 
 const openMarkerPanel = async (event: any) => {
 	// Display temporary marker at clicked position
@@ -40,6 +61,10 @@ const openMarkerPanel = async (event: any) => {
 
 	// Open MarkerPanel with the clicked position
 	visible.value = true;
+
+	if (zoom.value < 10) {
+		zoom.value++;
+	}
 
 	// Perform reverse geocoding using the regular lat/lng numbers
 	try {
@@ -62,13 +87,14 @@ const openMarkerPanel = async (event: any) => {
 <template>
 	<div class="h-full w-full relative">
 		<l-map ref="map" :zoom="zoom" :min-zoom="3" :center="center" :max-bounds="maxBounds" class="h-full w-full"
-			@click="openMarkerPanel">
+			@click="openMarkerPanel" @update:zoom="onZoomUpdate">
 			<l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
 				name="map"></l-tile-layer>
 
 			<!-- Render cursor marker -->
 			<l-marker v-if="cursor" :lat-lng="[cursor.lat, cursor.lng]">
-				<l-icon :icon-url="decodeURI(catpaw)" :icon-size="[42, 42]" :icon-anchor="[21, 42]" />
+				<l-icon :icon-url="decodeURI(catpaw)" :icon-size="[iconSize, iconSize]"
+					:icon-anchor="[iconSize / 2, iconSize]" />
 			</l-marker>
 		</l-map>
 
