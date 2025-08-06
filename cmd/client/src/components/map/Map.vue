@@ -14,7 +14,7 @@ const { error, message } = toRefs(errorsStore);
 let zoom = 3; // Default zoom level
 const cursor = ref<Position>();
 const visible = ref(false);
-const center = ref([47.41322, -1.219482]);
+let center = ref([47.41322, -1.219482]);
 const address = ref<string>('');
 
 // Reverse geocoding composable
@@ -38,6 +38,9 @@ const openMarkerPanel = async (event: any) => {
 	// Center map on clicked position (bounds will be enforced by maxBounds)
 	center.value = [lat, lng];
 
+	// Open MarkerPanel with the clicked position
+	visible.value = true;
+
 	// Perform reverse geocoding using the regular lat/lng numbers
 	try {
 		const geocodingResult = await reverseGeocode(lat, lng);
@@ -52,9 +55,6 @@ const openMarkerPanel = async (event: any) => {
 
 		address.value = `${(lat * 1e6).toFixed(6)}, ${(lng * 1e6).toFixed(6)}`;
 	}
-
-	// Open MarkerPanel with the clicked position
-	visible.value = true;
 };
 
 </script>
