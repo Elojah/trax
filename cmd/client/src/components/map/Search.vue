@@ -25,11 +25,23 @@ const searchContainer = ref<HTMLDivElement>();
 // Geocoding composable
 const { loading, error, results, geocode, getShortDisplayName, clear } = useGeocoding();
 
-// Debounced search
+// Debounced search with improved request handling
 let searchTimeout: NodeJS.Timeout;
+let currentSearchId = 0;
+let isInternalUpdate = false;
 
 const handleSearch = () => {
+	// Skip search if this is an internal update (from selectLocation)
+	if (isInternalUpdate) {
+		isInternalUpdate = false;
+		return;
+	}
+
+	// Cancel previous timeout
 	clearTimeout(searchTimeout);
+
+	// Increment search ID to invalidate previous requests
+	currentSearchId++;
 
 	if (!searchQuery.value.trim()) {
 		showDropdown.value = false;
@@ -37,15 +49,31 @@ const handleSearch = () => {
 		return;
 	}
 
+	// Wait 300ms before making the request
 	searchTimeout = setTimeout(async () => {
-		await geocode(searchQuery.value);
-		if (results.value.length > 0 && props.showResults) {
-			showDropdown.value = true;
+		const searchId = currentSearchId;
+
+		try {
+			await geocode(searchQuery.value);
+
+			// Only update UI if this is still the latest search
+			if (searchId === currentSearchId) {
+				if (results.value.length > 0 && props.showResults) {
+					showDropdown.value = true;
+				}
+			}
+		} catch (error: any) {
+			// Only show error if this is still the latest search
+			if (searchId === currentSearchId) {
+				console.error('Geocoding error:', error);
+			}
 		}
 	}, 300); // 300ms debounce
 };
 
 const selectLocation = (result: GeocodingResult) => {
+	// Set flag to prevent triggering search on the next assignment
+	isInternalUpdate = true;
 	searchQuery.value = getShortDisplayName(result);
 	showDropdown.value = false;
 	emit('locationSelected', result);
@@ -72,10 +100,13 @@ onMounted(() => {
 onUnmounted(() => {
 	document.removeEventListener('click', handleClickOutside);
 	clearTimeout(searchTimeout);
+	// Invalidate any pending searches
+	currentSearchId++;
 });
 
 // Watch for input changes
 watch(searchQuery, handleSearch);
+
 </script>
 <template>
 	<div ref="searchContainer" class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-96 max-w-[60%]">
