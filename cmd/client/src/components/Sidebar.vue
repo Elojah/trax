@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useRouter, useRoute } from 'vue-router'
 import { toRefs, ref, computed } from 'vue';
 import Avatar from 'primevue/avatar';
+import Menu from 'primevue/menu';
 
 const router = useRouter()
 const route = useRoute()
@@ -16,6 +17,30 @@ const redirect = function (name: string) {
 }
 
 const selectedItem = computed(() => route.name?.toString() || 'home');
+
+// Menu functionality
+const avatarMenu = ref();
+const userMenuItems = ref([
+	{
+		label: 'Profile',
+		icon: 'pi pi-user',
+		command: () => {
+			router.push({ name: 'user' });
+		}
+	},
+	{
+		label: 'Signout',
+		icon: 'pi pi-sign-out',
+		command: async () => {
+			await authStore.signout();
+			router.push({ name: 'home' });
+		}
+	}
+]);
+
+const toggleAvatarMenu = (event: Event) => {
+	avatarMenu.value.toggle(event);
+};
 
 interface MenuItem {
 	label: string;
@@ -93,7 +118,8 @@ const menuItems = ref([
 			</div>
 			<div class="py-4 border-t border-surface flex justify-center items-center">
 				<Avatar :image="user?.avatarURL" class="!w-10 !h-10 cursor-pointer" shape="circle"
-					@click="selectItem({ label: 'user', icon: 'pi pi-fw pi-user', command: () => redirect('user') })" />
+					@click="toggleAvatarMenu" />
+				<Menu ref="avatarMenu" :model="userMenuItems" :popup="true" />
 			</div>
 		</div>
 	</div>

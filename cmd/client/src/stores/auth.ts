@@ -103,11 +103,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const updateUser = async (firstName: string | undefined, lastName: string | undefined) => {
+  const updateUser = async (firstName: string | undefined, lastName: string | undefined, avatarURL: string | undefined = undefined) => {
     try {
       const req = UpdateUserReq.create({
         ...(firstName && { firstname: { value: firstName } }),
-        ...(lastName && { lastname: { value: lastName } })
+        ...(lastName && { lastname: { value: lastName } }),
+        ...(avatarURL !== undefined && { avatarURL: { value: avatarURL } })
       })
 
       const resp = await api.updateUser(req, { meta: { token: token.value } })
@@ -134,11 +135,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const signout = async () => {
-    token.value = ''
-    user.value = null
-
-    removeCookie('g_state')
-
     const resp = await fetch(signoutURL, {
       method: 'GET'
     })
@@ -147,6 +143,11 @@ export const useAuthStore = defineStore('auth', () => {
       logger.error('failed to sign out')
     }
 
+    token.value = ''
+    user.value = null
+
+    removeCookie('g_state')
+    removeCookie('g_csrf_token')
   }
 
   return {

@@ -4,6 +4,7 @@ import Signin from '@/views/Signin.vue'
 import Signup from '@/views/Signup.vue'
 import Map from '@/views/Map.vue'
 import Group from '@/views/Group.vue'
+import User from '@/views/User.vue'
 import GroupDetails from '@/components/group/Details.vue'
 import InvitationCreate from '@/components/group/InvitationCreate.vue'
 import RoleDetails from '@/components/role/Details.vue'
@@ -44,6 +45,12 @@ const router = createRouter({
       path: '/group',
       name: 'group',
       component: Group,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/user',
+      name: 'user',
+      component: User,
       meta: { requiresAuth: true }
     },
     {
